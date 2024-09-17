@@ -1,0 +1,45 @@
+{
+  "name": "hedgehog-mode",
+  "version": "1.0.0",
+  "description": "hedgehog mode",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "vitest",
+    "build": "vite build",
+    "dev": "vite build --watch",
+    "deploy": "npm publish",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "keywords": [
+    "typescript",
+    "github packages",
+    "npm packages",
+    "boilerplate"
+  ],
+  "author": "Ben White",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/posthog/hedgehog-mode.git"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.7.0",
+    "@types/node": "^20.14.11",
+    "eslint": "9.x",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "globals": "^15.8.0",
+    "prettier": "^3.3.3",
+    "typescript": "~5.5.3",
+    "typescript-eslint": "^7.16.1",
+    "vite": "^5.3.4",
+    "vite-plugin-dts": "^3.9.1",
+    "vitest": "^2.0.3"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

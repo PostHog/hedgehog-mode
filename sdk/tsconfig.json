@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "lib": ["ESNext", "dom"],
+    "module": "ESNext",
+    "noImplicitReturns": true,
+    "esModuleInterop": true,
+    "outDir": "dist",
+    "sourceMap": true,
+    "target": "ESNext",
+    "declaration": true,
+    "isolatedDeclarations": true,
+    "types": ["node", "vitest/globals"]
+  },
+  "compileOnSave": true,
+  "include": ["src"]
+}

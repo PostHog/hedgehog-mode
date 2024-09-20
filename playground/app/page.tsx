@@ -1,13 +1,15 @@
-"use client"
+"use client";
 import { HedgeHogMode } from "hedgehog-mode";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function Home() {
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
-  
+
   useEffect(() => {
     if (ref) {
-      const hedgeHogMode = new HedgeHogMode();
+      const hedgeHogMode = new HedgeHogMode({
+        assetsUrl: "/assets",
+      });
       hedgeHogMode.render(ref);
     }
   }, [ref]);
@@ -19,7 +21,17 @@ export default function Home() {
         <div className="border rounded p-4">Box 2</div>
       </main>
 
-      <div id="game" ref={(r) => setRef(r)}></div>
+      <div
+        id="game"
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+        }}
+        ref={(r) => setRef(r)}
+      ></div>
     </div>
   );
 }

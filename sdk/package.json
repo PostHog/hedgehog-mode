@@ -41,5 +41,8 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "dependencies": {
+    "pixi.js": "^8.4.0"
   }
 }

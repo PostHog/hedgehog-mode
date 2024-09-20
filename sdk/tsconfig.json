@@ -2,6 +2,7 @@
   "compilerOptions": {
     "lib": ["ESNext", "dom"],
     "module": "ESNext",
+    "moduleResolution": "node", // Resolve modules using Node.js style
     "noImplicitReturns": true,
     "esModuleInterop": true,
     "outDir": "dist",
@@ -9,7 +10,8 @@
     "target": "ESNext",
     "declaration": true,
     "isolatedDeclarations": true,
-    "types": ["node", "vitest/globals"]
+    "types": ["node", "vitest/globals"],
+    "resolveJsonModule": true
   },
   "compileOnSave": true,
   "include": ["src"]

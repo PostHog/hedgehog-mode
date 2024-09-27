@@ -34,7 +34,7 @@
         <key>dataFormat</key>
         <string>pixijs4</string>
         <key>textureFileName</key>
-        <filename>../../hedgehog-mode/sdk/assets/sprites.png</filename>
+        <filename>../sdk/assets/sprites.png</filename>
         <key>flipPVR</key>
         <false/>
         <key>pvrQualityLevel</key>
@@ -124,7 +124,7 @@
             <key>data</key>
             <struct type="DataFile">
                 <key>name</key>
-                <filename>../../hedgehog-mode/sdk/assets/sprites.json</filename>
+                <filename>../sdk/assets/sprites.json</filename>
             </struct>
         </map>
         <key>multiPackMode</key>

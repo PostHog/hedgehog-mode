@@ -1,4 +1,4 @@
-import { AnimatedSprite, Assets, Spritesheet } from "pixi.js";
+import { AnimatedSpriteFrames, Assets, Spritesheet } from "pixi.js";
 import sprites from "../../assets/sprites.json";
 import { HedgehogModeConfig } from "../types";
 
@@ -19,9 +19,7 @@ export class SpritesManager {
     await this.spritesheet.parse();
   }
 
-  createAnimatedSprite = (animation: AvailableAnimations): AnimatedSprite => {
-    const sprite = new AnimatedSprite(this.spritesheet.animations[animation]);
-    sprite.animationSpeed = 0.25;
-    return sprite;
-  };
+  getSpriteFrames(animation: AvailableAnimations): AnimatedSpriteFrames {
+    return this.spritesheet.animations[animation];
+  }
 }

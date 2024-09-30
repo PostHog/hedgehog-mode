@@ -1,5 +1,5 @@
 import { Application, Ticker } from "pixi.js";
-import { AvailableAnimations, SpritesManager } from "../sprites/sprites";
+import { SpritesManager } from "../sprites/sprites";
 import { Actor } from "./Actor";
 
 export type HedgehogActorOptions = {
@@ -22,6 +22,10 @@ export class HedgehogActor extends Actor {
     this.loadSprite("skins/default/action/tile");
     this.setDraggable();
 
+    setTimeout(() => {
+      this.updateSprite("skins/default/jump/tile");
+    }, 1000);
+
     this.x = Math.min(
       Math.max(0, Math.floor(Math.random() * window.innerWidth)),
       window.innerWidth
@@ -32,11 +36,7 @@ export class HedgehogActor extends Actor {
     );
 
     this.yVelocity = 2; // Start it with a bounce effect
-  }
-
-  protected loadSprite(animation: AvailableAnimations): void {
-    // any handlers should be added here
-    super.loadSprite(animation);
+    this.xVelocity = Math.random() * 2 - 1;
   }
 
   update(ticker: Ticker): void {

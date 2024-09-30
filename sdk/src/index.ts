@@ -99,15 +99,12 @@ export class HedgeHogMode {
     // this.app.stage.addChild(anim);
 
     // Add a ticker callback to move the sprite back and forth
-    this.elapsed = 0.0;
     this.app.ticker.add((ticker) => {
       this.update(ticker);
     });
   }
 
   private update(ticker: Ticker) {
-    this.elapsed += ticker.deltaTime;
-
     let shouldHavePointerEvents = false;
 
     this.actors.forEach((actor) => {
@@ -120,6 +117,5 @@ export class HedgeHogMode {
     if (shouldHavePointerEvents !== this.pointerEventsEnabled) {
       this.setPointerEvents(shouldHavePointerEvents);
     }
-    // anim.x = 100.0 + Math.cos(elapsed / 50.0) * 100.0;
   }
 }

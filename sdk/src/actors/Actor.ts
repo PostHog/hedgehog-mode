@@ -1,9 +1,10 @@
-import { AnimatedSprite, Application, Ticker } from "pixi.js";
-import { AvailableAnimations, SpritesManager } from "../sprites/sprites";
+import { AnimatedSprite, Ticker } from "pixi.js";
+import { AvailableAnimations } from "../sprites/sprites";
+import { BoundingRect, Game, GameObject } from "../types";
 
 const GRAVITY_PIXELS_PER_SECOND = 10;
 
-export class Actor {
+export class Actor implements GameObject {
   protected sprite: AnimatedSprite;
   public isPointerOver = false;
   public isDragging = false;
@@ -11,19 +12,31 @@ export class Actor {
   protected y = 0;
   protected xVelocity = 0; // Sort of "pixels per second"
   protected yVelocity = 0;
+  protected bounce = 0.4;
+  protected applyGravity = true;
   protected currentAnimation: AvailableAnimations;
 
-  constructor(
-    private app: Application,
-    private spritesManager: SpritesManager
-  ) {}
+  constructor(private game: Game) {}
+
+  get bounds(): BoundingRect {
+    return {
+      x: this.x,
+      y: this.y,
+      width: 100, // TODO
+      height: 100, // TODO
+    };
+  }
+
+  get hitArea(): BoundingRect {
+    return this.bounds;
+  }
 
   protected loadSprite(animation: AvailableAnimations): void {
     this.currentAnimation = animation;
     this.sprite = new AnimatedSprite(
-      this.spritesManager.getSpriteFrames(animation)
+      this.game.spritesManager.getSpriteFrames(animation)
     );
-    this.sprite.animationSpeed = 0.25;
+    this.sprite.animationSpeed = 0.5;
 
     // Setup a bunch of listeners for the sprite
     this.sprite.on("pointerover", () => {
@@ -40,13 +53,13 @@ export class Actor {
     this.sprite.anchor.set(0.5);
     this.sprite.x = this.x;
     this.sprite.y = this.y;
-    this.app.stage.addChild(this.sprite);
+    this.game.app.stage.addChild(this.sprite);
   }
 
   protected updateSprite(animation: AvailableAnimations): void {
     this.currentAnimation = animation;
     this.sprite.stop();
-    this.sprite.textures = this.spritesManager.getSpriteFrames(animation);
+    this.sprite.textures = this.game.spritesManager.getSpriteFrames(animation);
     this.sprite.currentFrame = 0;
     this.sprite.play();
   }
@@ -54,30 +67,57 @@ export class Actor {
   setDraggable(): void {
     this.sprite.on("pointerdown", () => {
       this.isDragging = true;
-      this.app.stage.on("pointermove", onDragMove);
-    });
 
-    const onDragMove = (event) => {
-      if (this.isDragging) {
+      const onDragMove = (event) => {
+        if (!this.isDragging) {
+          return;
+        }
         this.x = event.data.global.x;
         this.y = event.data.global.y;
-      }
-    };
+      };
 
-    const onDragEnd = () => {
-      this.isDragging = false;
-      this.app.stage.off("pointermove", onDragMove);
-    };
+      const onDragEnd = () => {
+        this.isDragging = false;
+        this.game.app.stage.off("pointermove", onDragMove);
+      };
 
-    this.app.stage.on("pointerup", onDragEnd);
-    this.app.stage.on("pointerupoutside", onDragEnd);
+      this.game.app.stage.on("pointermove", onDragMove);
+      this.game.app.stage.on("pointerup", onDragEnd);
+      this.game.app.stage.on("pointerupoutside", onDragEnd);
+    });
   }
 
   update(ticker: Ticker): void {
     const relativeDelta = ticker.deltaMS / 1000;
-    this.yVelocity -= GRAVITY_PIXELS_PER_SECOND * relativeDelta;
-    this.y -= this.yVelocity;
-    this.x += this.xVelocity;
+    let newY = this.y;
+    let newX = this.x;
+
+    if (this.isDragging) {
+      // Apply the change to the sprite and estimate the velocity based on the values
+      this.xVelocity += (this.x - this.sprite.x) * relativeDelta;
+      this.yVelocity -= (this.y - this.sprite.y) * relativeDelta;
+    } else {
+      if (this.applyGravity) {
+        this.yVelocity -= GRAVITY_PIXELS_PER_SECOND * relativeDelta;
+      }
+
+      newY -= this.yVelocity;
+      newX += this.xVelocity;
+    }
+
+    // Hit detection
+    this.game.boxes.forEach((box) => {
+      // Detect if the box is intersecting and react
+
+      // TODO: Fix to account for height of item
+      if (this.y > box.hitArea.y) {
+        newY = box.hitArea.y;
+        this.yVelocity = -this.yVelocity * this.bounce;
+      }
+    });
+
+    this.y = newY;
+    this.x = newX;
 
     this.sprite.x = this.x;
     this.sprite.y = this.y;

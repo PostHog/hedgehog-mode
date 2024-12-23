@@ -1,16 +1,19 @@
 import { Application, Ticker } from "pixi.js";
-import { HedgehogModeConfig } from "./types";
+import { Game, HedgehogModeConfig } from "./types";
 import { SpritesManager } from "./sprites/sprites";
 import { HedgehogActor, HedgehogActorOptions } from "./actors/Hedgehog";
 import { Actor } from "./actors/Actor";
+import { Box } from "./scene/Box";
+import { Floor } from "./scene/Floor";
 
-export class HedgeHogMode {
+export class HedgeHogMode implements Game {
   ref?: HTMLDivElement;
   app: Application;
   pointerEventsEnabled = false;
   spritesManager: SpritesManager;
   elapsed?: number;
   actors: Actor[] = [];
+  boxes: Box[] = [];
 
   constructor(private options: HedgehogModeConfig) {
     this.spritesManager = new SpritesManager(options);
@@ -23,7 +26,7 @@ export class HedgeHogMode {
   }
 
   private spawnHedgehog(options: HedgehogActorOptions) {
-    const actor = new HedgehogActor(this.app, this.spritesManager, options);
+    const actor = new HedgehogActor(this, options);
     this.actors.push(actor);
   }
 
@@ -44,6 +47,8 @@ export class HedgeHogMode {
     ref.appendChild(this.app.canvas);
     this.app.stage.eventMode = "static";
     this.app.stage.hitArea = this.app.screen;
+
+    this.boxes.push(new Floor(this));
 
     this.spawnHedgehog({});
     this.spawnHedgehog({});
@@ -106,6 +111,8 @@ export class HedgeHogMode {
 
   private update(ticker: Ticker) {
     let shouldHavePointerEvents = false;
+
+    this.boxes.forEach((box) => box.update(ticker));
 
     this.actors.forEach((actor) => {
       actor.update(ticker);

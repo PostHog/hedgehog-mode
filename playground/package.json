@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 8002",
-    "build": "pnpm --filter hedgehog-mode build && next build",
+    "build": "pnpm --dir ../hedgehog-mode build && next build",
     "build:next": "next build",
     "start": "next start",
     "lint": "next lint"

@@ -41,7 +41,7 @@ export default function Home() {
 
   useEffect(() => {
     setRandomBoxes(makeRandomBoxes());
-  }, [randomBoxes]);
+  }, []);
 
   return (
     <div className="">

@@ -55,7 +55,15 @@ export class HedgehogActor extends Actor {
 
   private setOnFire(times: number = 3): void {
     clearTimeout(this.fireTimer);
-    this.fireTimer = undefined;
+    this.fireTimer = setTimeout(() => {
+      if (times <= 1) {
+        this.sprite.removeChild(this.overlayAnimation);
+        this.overlayAnimation = undefined;
+        this.fireTimer = undefined;
+        return;
+      }
+      this.setOnFire(times - 1);
+    }, 1000);
 
     if (!this.overlayAnimation) {
       this.overlayAnimation = new AnimatedSprite(
@@ -71,16 +79,6 @@ export class HedgehogActor extends Actor {
       x: (Math.random() - 0.5) * 20,
       y: this.getGround() ? -10 : this.rigidBody.velocity.y,
     });
-
-    this.fireTimer = setTimeout(() => {
-      if (times <= 1) {
-        this.sprite.removeChild(this.overlayAnimation);
-        this.overlayAnimation = undefined;
-        this.fireTimer = undefined;
-        return;
-      }
-      this.setOnFire(times - 1);
-    }, 1000);
   }
 
   private jump(): void {

@@ -202,8 +202,8 @@ export class HedgeHogMode implements Game {
     });
   }
 
-  log(message: string): void {
+  log(...args: unknown[]): void {
     // LATER: Add debugging option
-    console.log(message);
+    console.log("[HedgeHogMode]", ...args);
   }
 }

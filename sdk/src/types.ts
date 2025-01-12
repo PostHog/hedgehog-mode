@@ -23,5 +23,5 @@ export type Game = {
   spritesManager: SpritesManager;
   elapsed?: number;
   elements: GameElement[];
-  log: (message: string) => void;
+  log: (...args: unknown[]) => void;
 };

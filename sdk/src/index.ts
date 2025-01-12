@@ -123,9 +123,15 @@ export class HedgeHogMode implements Game {
     this.elements.push(new Wall(this, "left"));
     this.elements.push(new Wall(this, "right"));
 
-    this.spawnHedgehog({});
-    // this.spawnHedgehog({});
-    // this.spawnHedgehog({});
+    this.spawnHedgehog({
+      controls_enabled: true,
+    });
+
+    for (let i = 0; i < 10; i++) {
+      this.spawnHedgehog({
+        controls_enabled: false,
+      });
+    }
   }
 
   private update(ticker: Ticker) {

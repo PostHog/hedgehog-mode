@@ -12,15 +12,14 @@ export type HedgehogActorOptions = {
 };
 
 export class HedgehogActor extends Actor {
-  isInteractive = true;
   direction: "left" | "right" = "right";
   jumps = 0;
 
   hitBoxModifier = {
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
+    left: 0.25,
+    right: 0.24,
+    top: 0.2,
+    bottom: 0.05,
   };
 
   constructor(
@@ -29,9 +28,13 @@ export class HedgehogActor extends Actor {
   ) {
     super(game);
     this.loadSprite("skins/default/jump/tile");
-    this.setDraggable();
-
     this.setupKeyboardListeners();
+    this.isInteractive = options.interactions_enabled ?? true;
+
+    Matter.Body.setPosition(this.rigidBody, {
+      x: window.innerWidth * Math.random(),
+      y: 0,
+    });
   }
 
   private setOnFire(): void {
@@ -99,9 +102,9 @@ export class HedgehogActor extends Actor {
     ];
 
     const keyDownListener = (e: KeyboardEvent): void => {
-      // if (shouldIgnoreInput(e) || !this.hedgehogConfig.controls_enabled) {
-      //   return;
-      // }
+      if (!this.options.controls_enabled) {
+        return;
+      }
 
       const key = e.key.toLowerCase();
 

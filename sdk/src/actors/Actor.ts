@@ -12,6 +12,13 @@ export class Actor implements GameElement {
   rigidBody: Matter.Body;
   isInteractive = false;
 
+  hitBoxModifier = {
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+  };
+
   constructor(
     protected game: Game,
     private rigidBodyOptions: Matter.IBodyDefinition = {}
@@ -44,6 +51,8 @@ export class Actor implements GameElement {
     this.sprite.x = this.rigidBody.position.x;
     this.sprite.y = this.rigidBody.position.y;
     this.game.app.stage.addChild(this.sprite);
+
+    this.setupPointerEvents();
   }
 
   private maybeLoadRigidBody(): void {
@@ -63,11 +72,18 @@ export class Actor implements GameElement {
       ...this.rigidBodyOptions,
     };
 
+    const width = this.sprite.width;
+    const height = this.sprite.height;
+
     this.rigidBody = Matter.Bodies.rectangle(
       window.innerWidth / 2,
       window.innerHeight / 2,
-      this.sprite.width,
-      this.sprite.height,
+      width -
+        width * this.hitBoxModifier.left -
+        width * this.hitBoxModifier.right,
+      height -
+        height * this.hitBoxModifier.top -
+        height * this.hitBoxModifier.bottom,
       playerOptions
     );
 
@@ -82,8 +98,12 @@ export class Actor implements GameElement {
     this.sprite.play();
   }
 
-  setDraggable(): void {
+  setupPointerEvents(): void {
     this.sprite.on("pointerdown", () => {
+      if (!this.isInteractive) {
+        return;
+      }
+
       this.isDragging = true;
 
       const onDragMove = (event) => {
@@ -117,19 +137,33 @@ export class Actor implements GameElement {
 
     // this.rotation = this.rigidBody.angle; // todo make sure rigidbody angle cannot change
 
-    // if (this.rigidBody.position.y > 500) this.resetPosition();
+    const yDiff = this.game.app.screen.height - this.rigidBody.position.y;
 
-    if (this.rigidBody.position.y > this.game.app.screen.height) {
-      this.resetPosition();
+    if (yDiff < 0) {
+      Matter.Body.setPosition(this.rigidBody, {
+        x: this.rigidBody.position.x,
+        y: Math.max(this.rigidBody.position.y - yDiff, 0),
+      });
     }
 
-    this.sprite.x = this.rigidBody.position.x;
-    this.sprite.y = this.rigidBody.position.y;
-  }
+    // TRICKY: This offsets the rendered sprite to match the hitbox
+    const { height, width } = this.sprite;
+    const hitBoxHeight =
+      height -
+      height * this.hitBoxModifier.top -
+      height * this.hitBoxModifier.bottom;
 
-  resetPosition(): void {
-    Matter.Body.setPosition(this.rigidBody, { x: 0, y: 0 });
-    Matter.Body.setVelocity(this.rigidBody, { x: 0, y: 0 });
-    Matter.Body.setAngularVelocity(this.rigidBody, 0);
+    const hitBoxWidth =
+      width -
+      width * this.hitBoxModifier.left -
+      width * this.hitBoxModifier.right;
+
+    const yOffsetDiff = height * this.hitBoxModifier.top;
+    const yCenterDiff = (height - hitBoxHeight) / 2;
+    const xOffsetDiff = width * this.hitBoxModifier.left;
+    const xCenterDiff = (width - hitBoxWidth) / 2;
+
+    this.sprite.x = this.rigidBody.position.x - xOffsetDiff + xCenterDiff;
+    this.sprite.y = this.rigidBody.position.y - yOffsetDiff + yCenterDiff;
   }
 }

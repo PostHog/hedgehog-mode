@@ -2,7 +2,7 @@ import { Actor } from "./Actor";
 import { Game, GameElement } from "../types";
 import Matter, { Constraint } from "matter-js";
 import { SyncedBox } from "../items/SyncedBox";
-import { Sprite } from "pixi.js";
+import { AnimatedSprite, Sprite } from "pixi.js";
 import { HedgehogAccessory } from "./Accessories";
 
 export type HedgehogActorOptions = {
@@ -20,6 +20,7 @@ export class HedgehogActor extends Actor {
   walkSpeed = 0;
   ropeConstraint?: Constraint;
   accessorySprites: { [key: string]: Sprite } = {};
+  overlayAnimation?: AnimatedSprite;
 
   hitBoxModifier = {
     left: 0.25,
@@ -46,37 +47,35 @@ export class HedgehogActor extends Actor {
     // this.setupRopeConstraint();
   }
 
-  private setupRopeConstraint(): void {
-    if (!this.options.controls_enabled) {
-      return;
+  private fireTimer?: NodeJS.Timeout;
+
+  private setOnFire(times: number = 3): void {
+    clearTimeout(this.fireTimer);
+
+    if (!this.overlayAnimation) {
+      this.overlayAnimation = new AnimatedSprite(
+        this.game.spritesManager.getAnimatedSpriteFrames("overlays/fire/tile")
+      );
+      this.overlayAnimation.play();
+      this.overlayAnimation.anchor.set(0.5);
+      this.overlayAnimation.alpha = 0.75;
+      this.sprite.addChild(this.overlayAnimation);
     }
 
-    window.addEventListener("mousedown", (e) => {
-      this.ropeConstraint = Constraint.create({
-        pointA: { x: e.clientX, y: e.clientY },
-        bodyB: this.rigidBody,
-        stiffness: 0.2,
-        length: 200,
-      });
-      Matter.World.addConstraint(this.game.engine.world, this.ropeConstraint);
+    this.jump();
+    Matter.Body.setVelocity(this.rigidBody, {
+      x: (Math.random() - 0.5) * 20,
+      y: -10,
     });
 
-    window.addEventListener("mousemove", (e) => {
-      if (!this.ropeConstraint) {
+    this.fireTimer = setTimeout(() => {
+      if (times <= 1) {
+        this.sprite.removeChild(this.overlayAnimation);
+        this.overlayAnimation = undefined;
         return;
       }
-      this.ropeConstraint.pointA.x = e.clientX;
-      this.ropeConstraint.pointA.y = e.clientY;
-    });
-
-    window.addEventListener("mouseup", () => {
-      Matter.World.remove(this.game.engine.world, this.ropeConstraint);
-      this.ropeConstraint = undefined;
-    });
-  }
-
-  private setOnFire(): void {
-    this.jump();
+      this.setOnFire(times - 1);
+    }, 1000);
   }
 
   private jump(): void {
@@ -140,19 +139,11 @@ export class HedgehogActor extends Actor {
     ];
 
     const keyDownListener = (e: KeyboardEvent): void => {
-      if (!this.options.controls_enabled) {
-        return;
-      }
-
       const key = e.key.toLowerCase();
 
       lastKeys.push(key);
       if (lastKeys.length > 20) {
         lastKeys.shift();
-      }
-
-      if ([" ", "w", "arrowup"].includes(key)) {
-        this.jump();
       }
 
       secretMap.forEach((secret) => {
@@ -163,6 +154,10 @@ export class HedgehogActor extends Actor {
           lastKeys.splice(-secret.keys.length);
         }
       });
+
+      if (!this.options.controls_enabled) {
+        return;
+      }
 
       // if (["arrowdown", "s"].includes(key)) {
       //   if (this.ground === document.body) {
@@ -176,6 +171,10 @@ export class HedgehogActor extends Actor {
       //     this.setAnimation("fall");
       //   }
       // }
+
+      if ([" ", "w", "arrowup"].includes(key)) {
+        this.jump();
+      }
 
       if (["arrowleft", "a", "arrowright", "d"].includes(key)) {
         this.walkSpeed = 0.05;
@@ -293,9 +292,6 @@ export class HedgehogActor extends Actor {
   }
 
   private syncAccessories(): void {
-    this.accessorySprites = {};
-    this.sprite.removeChildren(0, this.sprite.children.length);
-
     this.options.accessories?.forEach((accessory) => {
       const frame = this.game.spritesManager.getSpriteFrames(
         `accessories/${accessory}.png`

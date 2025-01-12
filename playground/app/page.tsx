@@ -33,6 +33,9 @@ export default function Home() {
   }, [ref]);
 
   useEffect(() => {
+    if (localStorage.getItem("hedgehog-mode-boxes") === "disabled") {
+      return;
+    }
     const t = setTimeout(() => {
       setRandomBoxes(makeRandomBoxes());
     }, 5000);

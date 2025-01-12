@@ -25,7 +25,6 @@ export class HedgeHogMode implements Game {
 
   constructor(private options: HedgehogModeConfig) {
     this.spritesManager = new SpritesManager(options);
-
     this.setupDebugListeners();
   }
 
@@ -159,7 +158,6 @@ export class HedgeHogMode implements Game {
     }
   }
 
-  // check who hits what - todo: use collisionFilter if you dont want coins to hit each other
   private onCollision(event: Matter.IEventCollision<Matter.Engine>) {
     event.pairs.forEach((pair) => {
       const [bodyA, bodyB] = [pair.bodyA, pair.bodyB];

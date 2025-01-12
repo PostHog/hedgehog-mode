@@ -172,4 +172,9 @@ export class Actor implements GameElement {
     // this.sprite.scale.set(xScale, yScale);
     // // TRICKY: The scale of the hitbox is different to the sprite
   }
+
+  onCollision(element: GameElement, pair: Matter.Pair): void {
+    // We use this to detect if we are on the ground
+    console.log("Collision", element, pair);
+  }
 }

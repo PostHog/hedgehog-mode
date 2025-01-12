@@ -336,6 +336,7 @@ export class HedgehogActor extends Actor {
   }
 
   onCollision(element: GameElement, pair: Matter.Pair): void {
+    super.onCollision(element, pair);
     if (element.rigidBody.bounds.min.y > this.rigidBody.bounds.min.y) {
       this.game.log("Hit something below");
       this.jumps = 0;

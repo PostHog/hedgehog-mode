@@ -127,8 +127,6 @@ export class HedgeHogMode implements Game {
 
   private setupLevel() {
     this.elements.push(new Ground(this));
-    this.elements.push(new Wall(this, "left"));
-    this.elements.push(new Wall(this, "right"));
 
     this.spawnHedgehog({
       controls_enabled: true,

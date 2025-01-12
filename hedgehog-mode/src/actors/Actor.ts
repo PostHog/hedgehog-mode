@@ -95,6 +95,13 @@ export class Actor implements GameElement {
     Matter.Composite.add(this.game.engine.world, this.rigidBody);
   }
 
+  protected getRigidBodyDimensions(): { width: number; height: number } {
+    return {
+      width: this.rigidBody.bounds.max.x - this.rigidBody.bounds.min.x,
+      height: this.rigidBody.bounds.max.y - this.rigidBody.bounds.min.y,
+    };
+  }
+
   protected updateSprite(animation: AvailableAnimations, reset = false): void {
     if (this.currentAnimation === animation && !reset) {
       return;
@@ -172,6 +179,21 @@ export class Actor implements GameElement {
     this.sprite.x = this.rigidBody.position.x - xOffsetDiff + xCenterDiff;
     this.sprite.y = this.rigidBody.position.y - yOffsetDiff + yCenterDiff;
     this.sprite.rotation = this.rigidBody.angle;
+
+    const { width: rigidBodyWidth } = this.getRigidBodyDimensions();
+    if (this.rigidBody.position.x > window.innerWidth + rigidBodyWidth) {
+      Matter.Body.setPosition(this.rigidBody, {
+        x: 0,
+        y: this.rigidBody.position.y,
+      });
+    }
+
+    if (this.rigidBody.position.x < 0 - rigidBodyWidth) {
+      Matter.Body.setPosition(this.rigidBody, {
+        x: window.innerWidth,
+        y: this.rigidBody.position.y,
+      });
+    }
 
     // We scale the sprite relatvie to the hitbox
 

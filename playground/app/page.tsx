@@ -1,6 +1,7 @@
 "use client";
 import { HedgeHogMode } from "@posthog/hedgehog-mode";
 import { useEffect, useState } from "react";
+import { Logo } from "./logo";
 
 export default function Home() {
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
@@ -47,37 +48,22 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="">
-      <main className="fixed inset-0 overflow-hidden flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        {randomBoxes.map((box, index) => (
-          <div
-            key={index}
-            className="border rounded p-4 hover:bg-red-600"
-            style={{
-              position: "absolute",
-              left: `${box.x}px`,
-              top: `${box.y}px`,
-              width: `${box.w}px`,
-              height: `${box.h}px`,
-              transition: "all 1000ms ease-in-out",
-            }}
-          >
-            Box {index + 1}
-          </div>
-        ))}
-      </main>
+    <div>
+      <main className="fixed inset-0 overflow-hidden flex flex-row">
+        <Logo />
 
-      <div
-        id="game"
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
-        }}
-        ref={(r) => setRef(r)}
-      ></div>
+        <div
+          id="game"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+          }}
+          ref={(r) => setRef(r)}
+        ></div>
+      </main>
     </div>
   );
 }

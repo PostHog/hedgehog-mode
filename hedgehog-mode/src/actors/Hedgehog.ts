@@ -344,7 +344,6 @@ export class HedgehogActor extends Actor {
         -10,
         Math.min(0, -this.rigidBody.velocity.y)
       );
-      console.log("Falling", this.rigidBody.velocity.y, yOffsetDiff);
       Object.values(this.accessorySprites).forEach((sprite) => {
         sprite.y = yOffsetDiff;
       });

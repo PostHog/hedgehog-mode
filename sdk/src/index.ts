@@ -13,6 +13,7 @@ export class HedgeHogMode implements Game {
   engine: Matter.Engine;
   debugRender?: Matter.Render;
   elements: GameElement[] = []; // TODO: Type better
+  isDebugging = true;
 
   pointerEventsEnabled = false;
   spritesManager: SpritesManager;
@@ -20,6 +21,26 @@ export class HedgeHogMode implements Game {
 
   constructor(private options: HedgehogModeConfig) {
     this.spritesManager = new SpritesManager(options);
+
+    this.setupDebugListeners();
+  }
+
+  setupDebugListeners(): void {
+    let dCount = 0;
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "d") {
+        dCount++;
+        if (dCount === 5) {
+          dCount = 0;
+          this.isDebugging = !this.isDebugging;
+          this.debugRender.canvas.style.opacity = this.isDebugging
+            ? "0.5"
+            : "0";
+        }
+      } else {
+        dCount = 0;
+      }
+    });
   }
 
   setPointerEvents(enabled: boolean): void {
@@ -40,39 +61,12 @@ export class HedgeHogMode implements Game {
 
     this.engine = Matter.Engine.create();
 
-    // Add debug renderer
-    this.debugRender = Render.create({
-      element: ref,
-      engine: this.engine,
-      options: {
-        width: window.innerWidth,
-        height: window.innerHeight,
-        wireframes: true,
-        showVelocity: true,
-        showCollisions: true,
-        showBounds: true,
-        background: "transparent",
-        pixelRatio: window.devicePixelRatio || 1,
-      },
-    });
-
-    // Position the debug canvas absolutely over the PIXI canvas
-    const debugCanvas = this.debugRender.canvas;
-    debugCanvas.style.position = "absolute";
-    debugCanvas.style.top = "0";
-    debugCanvas.style.left = "0";
-    debugCanvas.style.pointerEvents = "none";
-    debugCanvas.style.opacity = "0.5";
-
-    // Start the debug renderer
-    Render.run(this.debugRender);
-
     Matter.Events.on(this.engine, "collisionStart", (event) =>
       this.onCollision(event)
     );
 
     await this.app.init({
-      backgroundAlpha: 0.2,
+      backgroundAlpha: 0,
       resizeTo: window,
       resolution: window.devicePixelRatio || 1, // Use the device pixel ratio
       autoDensity: true, // Adjust canvas to account for device pixel ratio
@@ -93,6 +87,33 @@ export class HedgeHogMode implements Game {
       this.syncBoxes();
     }, 1000);
     this.syncBoxes();
+
+    // Add debug renderer
+    this.debugRender = Render.create({
+      element: this.ref,
+      engine: this.engine,
+      options: {
+        width: window.innerWidth,
+        height: window.innerHeight,
+        wireframes: true,
+        showVelocity: true,
+        showCollisions: true,
+        showBounds: true,
+        background: "transparent",
+        pixelRatio: window.devicePixelRatio || 1,
+      },
+    });
+
+    // Position the debug canvas absolutely over the PIXI canvas
+    const debugCanvas = this.debugRender.canvas;
+    debugCanvas.style.position = "absolute";
+    debugCanvas.style.top = "0";
+    debugCanvas.style.left = "0";
+    debugCanvas.style.pointerEvents = "none";
+    debugCanvas.style.opacity = this.isDebugging ? "0.5" : "0";
+
+    // Start the debug renderer
+    Render.run(this.debugRender);
 
     this.setupLevel();
   }
@@ -163,15 +184,11 @@ export class HedgeHogMode implements Game {
     console.log(`Removed element. Elements left: ${this.elements.length}`);
   }
 
-  cleanup(): void {
-    if (this.debugRender) {
-      Render.stop(this.debugRender);
-      this.debugRender.canvas.remove();
-    }
-    // ... any other cleanup
-  }
-
   private resize() {
+    if (!this.debugRender) {
+      return;
+    }
+
     // Function to handle resizing
     this.debugRender.bounds.max.x = this.ref.clientWidth;
     this.debugRender.bounds.max.y = this.ref.clientHeight;
@@ -189,7 +206,6 @@ export class HedgeHogMode implements Game {
     const boxes = Array.from(document.querySelectorAll(".border"));
     const existingBoxes = this.elements.filter((el) => el instanceof SyncedBox);
 
-    console.log(boxes);
     boxes.forEach((box) => {
       // TODO: Make this much faster...
 
@@ -204,6 +220,8 @@ export class HedgeHogMode implements Game {
 
   log(...args: unknown[]): void {
     // LATER: Add debugging option
-    console.log("[HedgeHogMode]", ...args);
+    if (this.isDebugging) {
+      console.log("[HedgeHogMode]", ...args);
+    }
   }
 }

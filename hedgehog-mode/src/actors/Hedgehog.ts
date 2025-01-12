@@ -321,22 +321,42 @@ export class HedgehogActor extends Actor {
       });
     }
 
-    if (
-      this.rigidBody.velocity.y > 0.5 &&
-      this.currentAnimation !== "skins/default/fall/tile"
-    ) {
-      this.updateSprite("skins/default/fall/tile");
-    }
-
     if (this.direction === "left") {
       this.sprite.scale.x = -1;
     } else {
       this.sprite.scale.x = 1;
     }
+
+    if (!this.getGround()) {
+      this.updateSprite("skins/default/fall/tile");
+    } else {
+      if (this.rigidBody.velocity.x !== 0) {
+        this.updateSprite("skins/default/walk/tile");
+      } else {
+        this.updateSprite("skins/default/wave/tile");
+        this.sprite.stop();
+      }
+    }
+
+    // We want to make it look like the hedgehog's accesories are disconnected. If we are falling then we position them slightly above
+    if (this.rigidBody.velocity.y > 0.1) {
+      const yOffsetDiff = Math.max(
+        -10,
+        Math.min(0, -this.rigidBody.velocity.y)
+      );
+      console.log("Falling", this.rigidBody.velocity.y, yOffsetDiff);
+      Object.values(this.accessorySprites).forEach((sprite) => {
+        sprite.y = yOffsetDiff;
+      });
+    } else {
+      Object.values(this.accessorySprites).forEach((sprite) => {
+        sprite.y = 0;
+      });
+    }
   }
 
-  onCollision(element: GameElement, pair: Matter.Pair): void {
-    super.onCollision(element, pair);
+  onCollisionStart(element: GameElement, pair: Matter.Pair): void {
+    super.onCollisionStart(element, pair);
     if (element.rigidBody.bounds.min.y > this.rigidBody.bounds.min.y) {
       this.game.log("Hit something below");
       this.jumps = 0;
@@ -351,6 +371,7 @@ export class HedgehogActor extends Actor {
   }
 
   private syncAccessories(): void {
+    this.accessorySprites = {};
     this.sprite.removeChildren(0, this.sprite.children.length);
 
     this.options.accessories?.forEach((accessory) => {
@@ -365,7 +386,7 @@ export class HedgehogActor extends Actor {
       }
 
       const sprite = new Sprite(frame);
-      this.accessorySprites["xmas-hat"] = sprite;
+      this.accessorySprites[accessory] = sprite;
       sprite.eventMode = "static";
       sprite.anchor.set(0.5);
       this.sprite.addChild(sprite);

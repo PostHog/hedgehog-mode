@@ -5,7 +5,8 @@ import type { SpritesManager } from "./sprites/sprites";
 export type GameElement = {
   readonly sprite?: AnimatedSprite;
   readonly rigidBody?: Matter.Body;
-  onCollision?: (element: GameElement, pair: Matter.Pair) => void;
+  onCollisionStart?: (element: GameElement, pair: Matter.Pair) => void;
+  onCollisionEnd?: (element: GameElement, pair: Matter.Pair) => void;
   beforeUnload?: () => void;
   update: () => void;
   isPointerOver: boolean;

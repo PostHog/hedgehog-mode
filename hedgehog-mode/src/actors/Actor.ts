@@ -8,6 +8,7 @@ export class Actor implements GameElement {
   public isPointerOver = false;
   public isDragging = false;
   protected currentAnimation: AvailableAnimations;
+  protected connectedElements: GameElement[] = [];
 
   rigidBody: Matter.Body;
   isInteractive = false;
@@ -94,7 +95,11 @@ export class Actor implements GameElement {
     Matter.Composite.add(this.game.engine.world, this.rigidBody);
   }
 
-  protected updateSprite(animation: AvailableAnimations): void {
+  protected updateSprite(animation: AvailableAnimations, reset = false): void {
+    if (this.currentAnimation === animation && !reset) {
+      return;
+    }
+
     this.currentAnimation = animation;
     this.sprite.stop();
     this.sprite.textures =
@@ -173,8 +178,30 @@ export class Actor implements GameElement {
     // // TRICKY: The scale of the hitbox is different to the sprite
   }
 
-  onCollision(element: GameElement, pair: Matter.Pair): void {
+  onCollisionStart(element: GameElement, pair: Matter.Pair): void {
     // We use this to detect if we are on the ground
     console.log("Collision", element, pair);
+    this.connectedElements.push(element);
+  }
+
+  onCollisionEnd(element: GameElement): void {
+    this.connectedElements = this.connectedElements.filter(
+      (el) => el !== element
+    );
+  }
+
+  getGround(): GameElement | undefined {
+    const ground = this.connectedElements.find((el) => {
+      // Considered ground if it is below us
+      return el.rigidBody?.position.y >= this.rigidBody.position.y;
+    });
+
+    // Slight optimization: If we find ground then lets move it to the front of the array
+    if (ground) {
+      this.connectedElements.splice(this.connectedElements.indexOf(ground), 1);
+      this.connectedElements.unshift(ground);
+    }
+
+    return ground;
   }
 }

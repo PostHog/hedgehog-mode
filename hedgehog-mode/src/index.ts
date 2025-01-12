@@ -68,7 +68,11 @@ export class HedgeHogMode implements Game {
     this.engine = Matter.Engine.create();
 
     Matter.Events.on(this.engine, "collisionStart", (event) =>
-      this.onCollision(event)
+      this.onCollisionStart(event)
+    );
+
+    Matter.Events.on(this.engine, "collisionEnd", (event) =>
+      this.onCollisionEnd(event)
     );
 
     await this.app.init({
@@ -158,30 +162,36 @@ export class HedgeHogMode implements Game {
     }
   }
 
-  private onCollision(event: Matter.IEventCollision<Matter.Engine>) {
+  private onCollisionStart(event: Matter.IEventCollision<Matter.Engine>) {
     event.pairs.forEach((pair) => {
       const [bodyA, bodyB] = [pair.bodyA, pair.bodyB];
       this.log(`${bodyA.label} ${bodyA.id} hits ${bodyB.label} ${bodyA.id}`);
-
-      // Trigger both elements onCollisonHandlers
 
       const elementA = this.findElementWithRigidBody(bodyA);
       const elementB = this.findElementWithRigidBody(bodyB);
 
       if (elementA && elementB) {
-        elementA.onCollision?.(elementB, pair);
-        elementB.onCollision?.(elementA, pair);
+        elementA.onCollisionStart?.(elementB, pair);
+        elementB.onCollisionStart?.(elementA, pair);
       }
     });
+  }
 
-    // if (bodyA.label === "Coin" && bodyB.label === "Player") {
-    //   const element = this.findElementWithRigidBody(bodyA);
-    //   if (element) this.removeElement(element);
-    // }
-    // if (bodyA.label === "Player" && bodyB.label === "Coin") {
-    //   const element = this.findElementWithRigidBody(bodyB);
-    //   if (element) this.removeElement(element);
-    // }
+  private onCollisionEnd(event: Matter.IEventCollision<Matter.Engine>) {
+    event.pairs.forEach((pair) => {
+      const [bodyA, bodyB] = [pair.bodyA, pair.bodyB];
+      this.log(
+        `${bodyA.label} ${bodyA.id} stops hitting ${bodyB.label} ${bodyA.id}`
+      );
+
+      const elementA = this.findElementWithRigidBody(bodyA);
+      const elementB = this.findElementWithRigidBody(bodyB);
+
+      if (elementA && elementB) {
+        elementA.onCollisionEnd?.(elementB, pair);
+        elementB.onCollisionEnd?.(elementA, pair);
+      }
+    });
   }
 
   private findElementWithRigidBody(rb: Matter.Body) {

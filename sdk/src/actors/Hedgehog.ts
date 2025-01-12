@@ -1,6 +1,6 @@
 import { Actor } from "./Actor";
 import { Game, GameElement } from "../types";
-import Matter from "matter-js";
+import Matter, { Constraint } from "matter-js";
 import { SyncedBox } from "../items/SyncedBox";
 
 export type HedgehogActorOptions = {
@@ -15,8 +15,9 @@ export type HedgehogActorOptions = {
 export class HedgehogActor extends Actor {
   direction: "left" | "right" = "right";
   jumps = 0;
-
   walkSpeed = 0;
+
+  ropeConstraint?: Constraint;
 
   hitBoxModifier = {
     left: 0.25,
@@ -37,6 +38,39 @@ export class HedgehogActor extends Actor {
     Matter.Body.setPosition(this.rigidBody, {
       x: window.innerWidth * Math.random(),
       y: 0,
+    });
+
+    this.setupRopeConstraint();
+  }
+
+  private setupRopeConstraint(): void {
+    if (!this.options.controls_enabled) {
+      return;
+    }
+
+    window.addEventListener("mousedown", (e) => {
+      console.log("mousedown");
+      this.ropeConstraint = Constraint.create({
+        pointA: { x: e.clientX, y: e.clientY },
+        bodyB: this.rigidBody,
+        stiffness: 0.01,
+      });
+      Matter.World.addConstraint(this.game.engine.world, this.ropeConstraint);
+    });
+
+    window.addEventListener("mousemove", (e) => {
+      console.log("mousemove");
+      if (!this.ropeConstraint) {
+        return;
+      }
+      this.ropeConstraint.pointA.x = e.clientX;
+      this.ropeConstraint.pointA.y = e.clientY;
+    });
+
+    window.addEventListener("mouseup", (e) => {
+      console.log("mouseup");
+      Matter.World.remove(this.game.engine.world, this.ropeConstraint);
+      this.ropeConstraint = undefined;
     });
   }
 

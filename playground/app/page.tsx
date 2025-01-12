@@ -21,7 +21,7 @@ export default function Home() {
       w: number;
       h: number;
     }[]
-  >(makeRandomBoxes());
+  >([]);
 
   useEffect(() => {
     if (ref) {
@@ -32,12 +32,16 @@ export default function Home() {
     }
   }, [ref]);
 
-  // useEffect(() => {
-  //   const t = setTimeout(() => {
-  //     setRandomBoxes(makeRandomBoxes());
-  //   }, 5000);
-  //   return () => clearTimeout(t);
-  // }, [randomBoxes]);
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setRandomBoxes(makeRandomBoxes());
+    }, 5000);
+    return () => clearTimeout(t);
+  }, [randomBoxes]);
+
+  useEffect(() => {
+    setRandomBoxes(makeRandomBoxes());
+  }, [randomBoxes]);
 
   return (
     <div className="">

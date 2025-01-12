@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "pnpm -r run dev"
+    "dev": "pnpm -r run dev",
+    "build": "pnpm --filter hedgehog-mode build && pnpm --filter playground build"
   },
   "keywords": [],
   "author": "",

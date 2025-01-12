@@ -22,6 +22,7 @@ export class HedgeHogMode implements Game {
   constructor(private options: HedgehogModeConfig) {
     this.spritesManager = new SpritesManager(options);
     this.setupDebugListeners();
+    this.setPointerEvents(false);
   }
 
   setupDebugListeners(): void {

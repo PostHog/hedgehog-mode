@@ -1,37 +1,41 @@
 import { Game, GameElement } from "../types";
 import Matter from "matter-js";
 
-const GROUND_HEIGHT = 20;
-
-export class Ground implements GameElement {
+const WALL_WIDTH = 10;
+export class Wall implements GameElement {
   rigidBody: Matter.Body;
   isPointerOver = false;
   isInteractive = false;
 
-  constructor(game: Game) {
+  constructor(
+    game: Game,
+    private side: "left" | "right"
+  ) {
     // Ground should be set to the bottom of the screen
 
     this.rigidBody = Matter.Bodies.rectangle(
-      window.innerWidth / 2,
-      window.innerHeight + GROUND_HEIGHT * 0.5,
-      window.innerWidth,
-      GROUND_HEIGHT,
+      0,
+      0,
+      WALL_WIDTH,
+      window.innerHeight,
       {
         isStatic: true,
-        label: "Ground",
+        label: "Wall",
       }
     );
 
     Matter.Composite.add(game.engine.world, this.rigidBody);
 
-    // update just once to set the sprite initial position
     this.update();
   }
 
   update(): void {
     Matter.Body.setPosition(this.rigidBody, {
-      x: window.innerWidth / 2,
-      y: window.innerHeight + GROUND_HEIGHT * 0.5,
+      x:
+        this.side === "left"
+          ? -WALL_WIDTH / 2
+          : window.innerWidth + WALL_WIDTH / 2,
+      y: window.innerHeight / 2,
     });
 
     // TODO: Fix the width scaling

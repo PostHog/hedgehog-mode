@@ -1,8 +1,6 @@
 import { Game, GameElement } from "../types";
 import Matter from "matter-js";
 
-const GROUND_HEIGHT = 20;
-
 export class SyncedBox implements GameElement {
   rigidBody: Matter.Body;
   isPointerOver = false;
@@ -19,6 +17,7 @@ export class SyncedBox implements GameElement {
   }
 
   update(): void {
+    // TODO: Remove if out of screen bounds or if removed from DOM
     // Check the element is still in the DOM
     // Get its bounds - if they have changed then update the rigid body position
 

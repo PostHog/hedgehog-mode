@@ -1,10 +1,11 @@
 import Matter, { Render } from "matter-js";
-import { Application } from "pixi.js";
+import { Application, Ticker } from "pixi.js";
 import { Game, GameElement, HedgehogModeConfig } from "./types";
 import { SpritesManager } from "./sprites/sprites";
 import { HedgehogActor, HedgehogActorOptions } from "./actors/Hedgehog";
 import { Ground } from "./items/Ground";
 import { SyncedBox } from "./items/SyncedBox";
+import { Wall } from "./items/Wall";
 
 export class HedgeHogMode implements Game {
   ref?: HTMLDivElement;
@@ -84,7 +85,7 @@ export class HedgeHogMode implements Game {
     this.app.stage.hitArea = this.app.screen;
 
     // Add a ticker callback to move the sprite back and forth
-    this.app.ticker.add(() => this.update());
+    this.app.ticker.add((ticker) => this.update(ticker));
 
     window.addEventListener("resize", () => this.resize());
 
@@ -98,14 +99,17 @@ export class HedgeHogMode implements Game {
 
   private setupLevel() {
     this.elements.push(new Ground(this));
+    this.elements.push(new Wall(this, "left"));
+    this.elements.push(new Wall(this, "right"));
 
     this.spawnHedgehog({});
     // this.spawnHedgehog({});
     // this.spawnHedgehog({});
   }
 
-  private update() {
-    Matter.Engine.update(this.engine, 1000 / 60);
+  private update(ticker: Ticker) {
+    console.log(ticker.deltaMS);
+    Matter.Engine.update(this.engine, ticker.deltaMS);
 
     let shouldHavePointerEvents = false;
 

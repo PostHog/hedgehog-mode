@@ -11,6 +11,7 @@ export class Actor implements GameElement {
 
   rigidBody: Matter.Body;
   isInteractive = false;
+  scale = 1;
 
   hitBoxModifier = {
     left: 0,
@@ -87,6 +88,11 @@ export class Actor implements GameElement {
       playerOptions
     );
 
+    // Matter.Body.scale(this.rigidBody, this.scale, this.scale, {
+    //   x: this.rigidBody.position.x,
+    //   y: this.rigidBody.position.y,
+    // });
+
     Matter.Composite.add(this.game.engine.world, this.rigidBody);
   }
 
@@ -129,14 +135,6 @@ export class Actor implements GameElement {
   }
 
   update(): void {
-    // velocity
-    // Matter.Body.setVelocity(this.rigidBody, {
-    //   x: this.xVelocity,
-    //   y: this.yVelocity,
-    // });
-
-    // this.rotation = this.rigidBody.angle; // todo make sure rigidbody angle cannot change
-
     const yDiff = this.game.app.screen.height - this.rigidBody.position.y;
 
     if (yDiff < 0) {
@@ -165,5 +163,14 @@ export class Actor implements GameElement {
 
     this.sprite.x = this.rigidBody.position.x - xOffsetDiff + xCenterDiff;
     this.sprite.y = this.rigidBody.position.y - yOffsetDiff + yCenterDiff;
+    this.sprite.rotation = this.rigidBody.angle;
+
+    // We scale the sprite relatvie to the hitbox
+
+    // const xScale = (hitBoxWidth / width) * this.scale;
+    // const yScale = (hitBoxHeight / height) * this.scale;
+
+    // this.sprite.scale.set(xScale, yScale);
+    // // TRICKY: The scale of the hitbox is different to the sprite
   }
 }

@@ -1,6 +1,7 @@
 import { Actor } from "./Actor";
 import { Game, GameElement } from "../types";
 import Matter from "matter-js";
+import { SyncedBox } from "../items/SyncedBox";
 
 export type HedgehogActorOptions = {
   skin?: string;
@@ -15,6 +16,8 @@ export class HedgehogActor extends Actor {
   direction: "left" | "right" = "right";
   jumps = 0;
 
+  walkSpeed = 0;
+
   hitBoxModifier = {
     left: 0.25,
     right: 0.24,
@@ -26,7 +29,7 @@ export class HedgehogActor extends Actor {
     game: Game,
     private options: HedgehogActorOptions
   ) {
-    super(game);
+    super(game, {});
     this.loadSprite("skins/default/jump/tile");
     this.setupKeyboardListeners();
     this.isInteractive = options.interactions_enabled ?? true;
@@ -47,9 +50,10 @@ export class HedgehogActor extends Actor {
       return;
     }
 
-    Matter.Body.setVelocity(this.rigidBody, {
-      x: this.rigidBody.velocity.x,
-      y: -10,
+    const force = this.rigidBody.mass * -0.025;
+    Matter.Body.applyForce(this.rigidBody, this.rigidBody.position, {
+      x: 0,
+      y: force,
     });
 
     this.jumps++;
@@ -140,7 +144,7 @@ export class HedgehogActor extends Actor {
       // }
 
       if (["arrowleft", "a", "arrowright", "d"].includes(key)) {
-        let walkingSpeed = 5;
+        this.walkSpeed = 0.05;
 
         // this.isControlledByUser = true;
         // if (this.mainAnimation?.name !== "walk") {
@@ -153,36 +157,31 @@ export class HedgehogActor extends Actor {
         const running = e.shiftKey;
 
         if (running) {
-          walkingSpeed *= 2;
+          this.walkSpeed *= 2;
         }
+
+        this.walkSpeed =
+          this.direction === "left" ? -this.walkSpeed : this.walkSpeed;
 
         if (moonwalk) {
           this.direction = this.direction === "left" ? "right" : "left";
           // IMPORTANT: Moonwalking is hard so he moves slightly slower of course
-
-          walkingSpeed *= 0.8;
+          this.walkSpeed *= 0.8;
         }
-
-        console.log("Setting velocity", this.direction, walkingSpeed);
-
-        Matter.Body.setVelocity(this.rigidBody, {
-          x: this.direction === "left" ? -walkingSpeed : walkingSpeed,
-          y: this.rigidBody.velocity.y,
-        });
       }
     };
 
     const keyUpListener = (e: KeyboardEvent): void => {
+      // Reset friction
       // if (shouldIgnoreInput(e) || !this.hedgehogConfig.controls_enabled) {
       //   return;
       // }
-      // const key = e.key.toLowerCase();
-      // if (["arrowleft", "a", "arrowright", "d"].includes(key)) {
-      //   this.setAnimation("stop", {
-      //     iterations: FPS * 2,
-      //   });
-      //   this.isControlledByUser = false;
-      // }
+      const key = e.key.toLowerCase();
+
+      if (["arrowleft", "a", "arrowright", "d"].includes(key)) {
+        this.walkSpeed = 0;
+        console.log("Resetting walk speed");
+      }
     };
 
     // const onMouseDown = (e: MouseEvent): void => {
@@ -236,6 +235,22 @@ export class HedgehogActor extends Actor {
   update(): void {
     super.update();
 
+    const xForce = 25 * this.walkSpeed * this.rigidBody.mass;
+
+    if (xForce !== 0) {
+      console.log("Applying force", xForce);
+      // TODO: Only apply if on ground - also account for ground friction
+      // Matter.Body.applyForce(this.rigidBody, this.rigidBody.position, {
+      //   x: xForce,
+      //   y: 0,
+      // });
+
+      Matter.Body.setVelocity(this.rigidBody, {
+        x: xForce,
+        y: this.rigidBody.velocity.y,
+      });
+    }
+
     if (
       this.rigidBody.velocity.y > 0.5 &&
       this.currentAnimation !== "skins/default/fall/tile"
@@ -250,10 +265,17 @@ export class HedgehogActor extends Actor {
     }
   }
 
-  onCollision(element: GameElement): void {
-    if (element.rigidBody.position.y > this.rigidBody.position.y) {
+  onCollision(element: GameElement, pair: Matter.Pair): void {
+    if (element.rigidBody.bounds.min.y > this.rigidBody.bounds.min.y) {
       this.game.log("Hit something below");
       this.jumps = 0;
+    } else {
+      this.game.log("Hit something above");
+      // We check if it is a platform and if so we ignore it
+
+      if (element instanceof SyncedBox) {
+        pair.isActive = false;
+      }
     }
   }
 }

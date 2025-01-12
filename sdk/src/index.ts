@@ -154,19 +154,20 @@ export class HedgeHogMode implements Game {
 
   // check who hits what - todo: use collisionFilter if you dont want coins to hit each other
   private onCollision(event: Matter.IEventCollision<Matter.Engine>) {
-    const collision = event.pairs[0];
-    const [bodyA, bodyB] = [collision.bodyA, collision.bodyB];
-    console.log(`${bodyA.label} ${bodyA.id} hits ${bodyB.label} ${bodyA.id}`);
+    event.pairs.forEach((pair) => {
+      const [bodyA, bodyB] = [pair.bodyA, pair.bodyB];
+      console.log(`${bodyA.label} ${bodyA.id} hits ${bodyB.label} ${bodyA.id}`);
 
-    // Trigger both elements onCollisonHandlers
+      // Trigger both elements onCollisonHandlers
 
-    const elementA = this.findElementWithRigidBody(bodyA);
-    const elementB = this.findElementWithRigidBody(bodyB);
+      const elementA = this.findElementWithRigidBody(bodyA);
+      const elementB = this.findElementWithRigidBody(bodyB);
 
-    if (elementA && elementB) {
-      elementA.onCollision?.(elementB);
-      elementB.onCollision?.(elementA);
-    }
+      if (elementA && elementB) {
+        elementA.onCollision?.(elementB, pair);
+        elementB.onCollision?.(elementA, pair);
+      }
+    });
 
     // if (bodyA.label === "Coin" && bodyB.label === "Player") {
     //   const element = this.findElementWithRigidBody(bodyA);

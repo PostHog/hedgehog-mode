@@ -1,4 +1,4 @@
-import Matter from "matter-js";
+import Matter, { Constraint } from "matter-js";
 import { AnimatedSprite } from "pixi.js";
 import { AvailableAnimations } from "../sprites/sprites";
 import { Game, GameElement } from "../types";
@@ -117,29 +117,29 @@ export class Actor implements GameElement {
 
   setupPointerEvents(): void {
     this.sprite.on("pointerdown", (e) => {
-      const originalEvent = e;
-      const offsetX = this.sprite.x - originalEvent.global.x;
-      const offsetY = this.sprite.y - originalEvent.global.y;
-
       if (!this.isInteractive) {
         return;
       }
+      const ropeConstraint = Constraint.create({
+        pointA: { x: e.clientX, y: e.clientY },
+        bodyB: this.rigidBody,
+        stiffness: 0.2,
+        damping: 1,
+        length: 2,
+      });
+      Matter.World.addConstraint(this.game.engine.world, ropeConstraint);
 
       this.isDragging = true;
 
-      const onDragMove = (event) => {
-        if (!this.isDragging) {
-          return;
-        }
-
-        Matter.Body.setPosition(this.rigidBody, {
-          x: event.data.global.x + offsetX,
-          y: event.data.global.y + offsetY,
-        });
+      const onDragMove = () => {
+        ropeConstraint.pointA.x = e.clientX;
+        ropeConstraint.pointA.y = e.clientY;
       };
 
       const onDragEnd = () => {
         this.isDragging = false;
+        Matter.World.remove(this.game.engine.world, ropeConstraint);
+
         this.game.app.stage.off("pointermove", onDragMove);
       };
 

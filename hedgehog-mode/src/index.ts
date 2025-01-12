@@ -1,11 +1,10 @@
-import Matter, { Composite, MouseConstraint, Render } from "matter-js";
+import Matter, { Render } from "matter-js";
 import { Application, Ticker } from "pixi.js";
 import { Game, GameElement, HedgehogModeConfig } from "./types";
 import { SpritesManager } from "./sprites/sprites";
 import { HedgehogActor, HedgehogActorOptions } from "./actors/Hedgehog";
 import { Ground } from "./items/Ground";
 import { SyncedBox } from "./items/SyncedBox";
-import { Wall } from "./items/Wall";
 import { getRandomAccesoryCombo } from "./actors/Accessories";
 
 export class HedgeHogMode implements Game {
@@ -132,7 +131,7 @@ export class HedgeHogMode implements Game {
       controls_enabled: true,
     });
 
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 20; i++) {
       this.spawnHedgehog({
         controls_enabled: false,
       });

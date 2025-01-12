@@ -49,8 +49,13 @@ export class HedgehogActor extends Actor {
 
   private fireTimer?: NodeJS.Timeout;
 
+  public get isOnFire(): boolean {
+    return !!this.fireTimer;
+  }
+
   private setOnFire(times: number = 3): void {
     clearTimeout(this.fireTimer);
+    this.fireTimer = undefined;
 
     if (!this.overlayAnimation) {
       this.overlayAnimation = new AnimatedSprite(
@@ -62,16 +67,16 @@ export class HedgehogActor extends Actor {
       this.sprite.addChild(this.overlayAnimation);
     }
 
-    this.jump();
     Matter.Body.setVelocity(this.rigidBody, {
       x: (Math.random() - 0.5) * 20,
-      y: -10,
+      y: this.getGround() ? -10 : this.rigidBody.velocity.y,
     });
 
     this.fireTimer = setTimeout(() => {
       if (times <= 1) {
         this.sprite.removeChild(this.overlayAnimation);
         this.overlayAnimation = undefined;
+        this.fireTimer = undefined;
         return;
       }
       this.setOnFire(times - 1);
@@ -139,6 +144,10 @@ export class HedgehogActor extends Actor {
     ];
 
     const keyDownListener = (e: KeyboardEvent): void => {
+      if (!this.options.controls_enabled) {
+        return;
+      }
+
       const key = e.key.toLowerCase();
 
       lastKeys.push(key);
@@ -154,10 +163,6 @@ export class HedgehogActor extends Actor {
           lastKeys.splice(-secret.keys.length);
         }
       });
-
-      if (!this.options.controls_enabled) {
-        return;
-      }
 
       // if (["arrowdown", "s"].includes(key)) {
       //   if (this.ground === document.body) {
@@ -278,6 +283,15 @@ export class HedgehogActor extends Actor {
 
   onCollisionStart(element: GameElement, pair: Matter.Pair): void {
     super.onCollisionStart(element, pair);
+
+    if (
+      element instanceof HedgehogActor &&
+      this.isOnFire &&
+      !element.isOnFire
+    ) {
+      element.setOnFire(1);
+    }
+
     if (element.rigidBody.bounds.min.y > this.rigidBody.bounds.min.y) {
       this.game.log("Hit something below");
       this.jumps = 0;

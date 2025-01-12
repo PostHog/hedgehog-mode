@@ -1,4 +1,4 @@
-import Matter from "matter- s";
+import Matter from "matter-js";
 import { AnimatedSprite } from "pixi.js";
 import { AvailableAnimations } from "../sprites/sprites";
 import { Game, GameElement } from "../types";

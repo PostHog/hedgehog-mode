@@ -12,7 +12,10 @@ const nextConfig = {
       new CopyPlugin({
         patterns: [
           {
-            from: path.resolve(__dirname, "node_modules/hedgehog-mode/assets"),
+            from: path.resolve(
+              __dirname,
+              "node_modules/@posthog/hedgehog-mode/assets"
+            ),
             to: path.resolve(__dirname, "public/assets"),
           },
         ],

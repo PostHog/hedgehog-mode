@@ -1,5 +1,5 @@
 "use client";
-import { HedgeHogMode } from "hedgehog-mode";
+import { HedgeHogMode } from "@posthog/hedgehog-mode";
 import { useEffect, useState } from "react";
 
 export default function Home() {

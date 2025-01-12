@@ -59,12 +59,12 @@ importers:
 
   playground:
     dependencies:
+      '@posthog/hedgehog-mode':
+        specifier: workspace:@posthog/hedgehog-mode@*
+        version: link:../hedgehog-mode
       copy-webpack-plugin:
         specifier: ^12.0.2
         version: 12.0.2(webpack@5.94.0)
-      hedgehog-mode:
-        specifier: workspace:hedgehog-mode@*
-        version: link:../hedgehog-mode
       next:
         specifier: 14.2.11
         version: 14.2.11(react-dom@18.3.1)(react@18.3.1)

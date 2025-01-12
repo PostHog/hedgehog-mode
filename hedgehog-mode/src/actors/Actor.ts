@@ -1,4 +1,4 @@
-import Matter from "matter-js";
+import Matter from "matter- s";
 import { AnimatedSprite } from "pixi.js";
 import { AvailableAnimations } from "../sprites/sprites";
 import { Game, GameElement } from "../types";
@@ -109,7 +109,11 @@ export class Actor implements GameElement {
   }
 
   setupPointerEvents(): void {
-    this.sprite.on("pointerdown", () => {
+    this.sprite.on("pointerdown", (e) => {
+      const originalEvent = e;
+      const offsetX = this.sprite.x - originalEvent.global.x;
+      const offsetY = this.sprite.y - originalEvent.global.y;
+
       if (!this.isInteractive) {
         return;
       }
@@ -122,8 +126,8 @@ export class Actor implements GameElement {
         }
 
         Matter.Body.setPosition(this.rigidBody, {
-          x: event.data.global.x,
-          y: event.data.global.y,
+          x: event.data.global.x + offsetX,
+          y: event.data.global.y + offsetY,
         });
       };
 

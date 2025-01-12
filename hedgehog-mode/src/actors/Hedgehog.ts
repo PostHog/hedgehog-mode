@@ -77,7 +77,6 @@ export class HedgehogActor extends Actor {
 
   private setOnFire(): void {
     this.jump();
-    // this.loadSprite("skins/default/fire/tile");
   }
 
   private jump(): void {
@@ -86,10 +85,9 @@ export class HedgehogActor extends Actor {
       return;
     }
 
-    const force = this.rigidBody.mass * -0.075;
-    Matter.Body.applyForce(this.rigidBody, this.rigidBody.position, {
+    Matter.Body.setVelocity(this.rigidBody, {
       x: 0,
-      y: force,
+      y: -10,
     });
 
     this.jumps++;
@@ -289,7 +287,6 @@ export class HedgehogActor extends Actor {
       // We check if it is a platform and if so we ignore it
 
       if (element instanceof SyncedBox) {
-        console.log("Ignoring due to being box", pair);
         pair.isActive = false;
       }
     }

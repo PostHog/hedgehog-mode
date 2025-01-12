@@ -1,4 +1,4 @@
-import Matter, { Render } from "matter-js";
+import Matter, { Composite, MouseConstraint, Render } from "matter-js";
 import { Application, Ticker } from "pixi.js";
 import { Game, GameElement, HedgehogModeConfig } from "./types";
 import { SpritesManager } from "./sprites/sprites";
@@ -238,6 +238,7 @@ export class HedgeHogMode implements Game {
   log(...args: unknown[]): void {
     // LATER: Add debugging option
     if (this.isDebugging) {
+      // eslint-disable-next-line no-console
       console.log("[HedgeHogMode]", ...args);
     }
   }

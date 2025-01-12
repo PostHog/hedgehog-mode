@@ -5,6 +5,24 @@ import { useEffect, useState } from "react";
 export default function Home() {
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
 
+  const makeRandomBoxes = () => {
+    return Array.from({ length: 10 }, () => ({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      w: 100 + Math.random() * 100,
+      h: 50 + Math.random() * 50,
+    }));
+  };
+
+  const [randomBoxes, setRandomBoxes] = useState<
+    {
+      x: number;
+      y: number;
+      w: number;
+      h: number;
+    }[]
+  >(makeRandomBoxes());
+
   useEffect(() => {
     if (ref) {
       const hedgeHogMode = new HedgeHogMode({
@@ -14,11 +32,32 @@ export default function Home() {
     }
   }, [ref]);
 
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setRandomBoxes(makeRandomBoxes());
+    }, 5000);
+    return () => clearTimeout(t);
+  }, [randomBoxes]);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <div className="border rounded p-4 hover:bg-red-600">Box 1</div>
-        <div className="border rounded p-4 hover:bg-red-600">Box 2</div>
+    <div className="">
+      <main className="fixed inset-0 overflow-hidden flex flex-col gap-8 row-start-2 items-center sm:items-start">
+        {randomBoxes.map((box, index) => (
+          <div
+            key={index}
+            className="border rounded p-4 hover:bg-red-600"
+            style={{
+              position: "absolute",
+              left: `${box.x}px`,
+              top: `${box.y}px`,
+              width: `${box.w}px`,
+              height: `${box.h}px`,
+              transition: "all 1000ms ease-in-out",
+            }}
+          >
+            Box {index + 1}
+          </div>
+        ))}
       </main>
 
       <div

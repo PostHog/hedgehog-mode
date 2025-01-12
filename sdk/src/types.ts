@@ -1,29 +1,27 @@
-import { Application } from "pixi.js";
+import type Matter from "matter-js";
+import { AnimatedSprite, Application } from "pixi.js";
 import type { SpritesManager } from "./sprites/sprites";
-import type { Actor } from "./actors/Actor";
-import type { Box } from "./scene/Box";
+
+export type GameElement = {
+  readonly sprite?: AnimatedSprite;
+  readonly rigidBody?: Matter.Body;
+  onCollision?: (element: GameElement) => void;
+  beforeUnload?: () => void;
+  update: () => void;
+  isPointerOver: boolean;
+  isInteractive: boolean;
+};
 
 export type HedgehogModeConfig = {
   assetsUrl: string;
 };
 
-export type BoundingRect = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-};
-
-export type GameObject = {
-  bounds: BoundingRect;
-  hitArea: BoundingRect;
-};
-
 export type Game = {
   app: Application;
+  engine: Matter.Engine;
   pointerEventsEnabled: boolean;
   spritesManager: SpritesManager;
   elapsed?: number;
-  actors: Actor[];
-  boxes: Box[];
+  elements: GameElement[];
+  log: (message: string) => void;
 };

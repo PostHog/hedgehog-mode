@@ -53,6 +53,9 @@ importers:
 
   sdk:
     dependencies:
+      matter-js:
+        specifier: ^0.20.0
+        version: 0.20.0
       pixi.js:
         specifier: ^8.4.0
         version: 8.4.0
@@ -60,6 +63,9 @@ importers:
       '@eslint/js':
         specifier: ^9.7.0
         version: 9.10.0
+      '@types/matter-js':
+        specifier: ^0.19.8
+        version: 0.19.8
       '@types/node':
         specifier: ^20.14.11
         version: 20.16.5
@@ -906,6 +912,10 @@ packages:
 
   /@types/json5@0.0.29:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
+    dev: true
+
+  /@types/matter-js@0.19.8:
+    resolution: {integrity: sha512-W2ZWG58Lijv/4v768NgpeyFqqiOyslmAU7qqM1Lhz4XBoUgGtZtPz4CjcOKYtqHIak14dvPldslQhltqLTWwsw==}
     dev: true
 
   /@types/node@20.16.5:
@@ -3403,6 +3413,10 @@ packages:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.5.0
     dev: true
+
+  /matter-js@0.20.0:
+    resolution: {integrity: sha512-iC9fYR7zVT3HppNnsFsp9XOoQdQN2tUyfaKg4CHLH8bN+j6GT4Gw7IH2rP0tflAebrHFw730RR3DkVSZRX8hwA==}
+    dev: false
 
   /merge-stream@2.0.0:
     resolution: {integrity: sha512-abv/qOcuPfk3URPfDzmZU1LKmuw8kT+0nIHvKrKgFrwifol/doWcdA4ZqsWQ8ENrFKkd67Mfpo/LovbIUsbt3w==}

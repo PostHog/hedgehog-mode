@@ -1,19 +1,21 @@
-import { Application, Ticker } from "pixi.js";
-import { Game, HedgehogModeConfig } from "./types";
+import Matter, { Render } from "matter-js";
+import { Application } from "pixi.js";
+import { Game, GameElement, HedgehogModeConfig } from "./types";
 import { SpritesManager } from "./sprites/sprites";
 import { HedgehogActor, HedgehogActorOptions } from "./actors/Hedgehog";
-import { Actor } from "./actors/Actor";
-import { Box } from "./scene/Box";
-import { Floor } from "./scene/Floor";
+import { Ground } from "./items/Ground";
+import { SyncedBox } from "./items/SyncedBox";
 
 export class HedgeHogMode implements Game {
   ref?: HTMLDivElement;
   app: Application;
+  engine: Matter.Engine;
+  debugRender?: Matter.Render;
+  elements: GameElement[] = []; // TODO: Type better
+
   pointerEventsEnabled = false;
   spritesManager: SpritesManager;
   elapsed?: number;
-  actors: Actor[] = [];
-  boxes: Box[] = [];
 
   constructor(private options: HedgehogModeConfig) {
     this.spritesManager = new SpritesManager(options);
@@ -27,13 +29,46 @@ export class HedgeHogMode implements Game {
 
   private spawnHedgehog(options: HedgehogActorOptions) {
     const actor = new HedgehogActor(this, options);
-    this.actors.push(actor);
+    this.elements.push(actor);
   }
 
   async render(ref: HTMLDivElement): Promise<void> {
     this.ref = ref;
     // Create the application helper and add its render target to the page
     this.app = new Application();
+
+    this.engine = Matter.Engine.create();
+
+    // Add debug renderer
+    this.debugRender = Render.create({
+      element: ref,
+      engine: this.engine,
+      options: {
+        width: window.innerWidth,
+        height: window.innerHeight,
+        wireframes: true,
+        showVelocity: true,
+        showCollisions: true,
+        showBounds: true,
+        background: "transparent",
+        pixelRatio: window.devicePixelRatio || 1,
+      },
+    });
+
+    // Position the debug canvas absolutely over the PIXI canvas
+    const debugCanvas = this.debugRender.canvas;
+    debugCanvas.style.position = "absolute";
+    debugCanvas.style.top = "0";
+    debugCanvas.style.left = "0";
+    debugCanvas.style.pointerEvents = "none";
+    debugCanvas.style.opacity = "0.5";
+
+    // Start the debug renderer
+    Render.run(this.debugRender);
+
+    Matter.Events.on(this.engine, "collisionStart", (event) =>
+      this.onCollision(event)
+    );
 
     await this.app.init({
       backgroundAlpha: 0.2,
@@ -48,81 +83,124 @@ export class HedgeHogMode implements Game {
     this.app.stage.eventMode = "static";
     this.app.stage.hitArea = this.app.screen;
 
-    this.boxes.push(new Floor(this));
-
-    this.spawnHedgehog({});
-    this.spawnHedgehog({});
-    this.spawnHedgehog({});
-
-    // const anim = this.spritesManager.createAnimatedSprite(
-    //   "skins/default/action/tile"
-    // );
-
-    // let isDragging = false;
-
-    // const onDragMove = (event) => {
-    //   console.log("onDragMove", event);
-    //   if (isDragging) {
-    //     anim.x = event.data.global.x;
-    //     anim.y = event.data.global.y;
-    //   }
-    // };
-
-    // const onDragEnd = () => {
-    //   console.log("onDragEnd");
-    //   isDragging = false;
-    //   this.app.stage.off("pointermove", onDragMove);
-    //   this.setPointerEvents(false);
-    // };
-
-    // this.app.stage.on("pointerup", onDragEnd);
-    // this.app.stage.on("pointerupoutside", onDragEnd);
-
-    // anim.on("pointerdown", () => {
-    //   console.log("pointerdown");
-    //   isDragging = true;
-    //   this.app.stage.on("pointermove", onDragMove);
-    // });
-
-    // anim.on("pointerover", (event) => {
-    //   console.log("pointerover", event);
-    //   this.setPointerEvents(true);
-    // });
-    // anim.on("pointerout", (event) => {
-    //   console.log("pointerout", event);
-    //   if (!isDragging) {
-    //     this.setPointerEvents(false);
-    //   }
-    // });
-
-    // anim.eventMode = "static";
-    // anim.play();
-    // anim.anchor.set(0.5);
-    // anim.x = this.app.screen.width / 2;
-    // anim.y = this.app.screen.height / 2;
-
-    // this.app.stage.addChild(anim);
-
     // Add a ticker callback to move the sprite back and forth
-    this.app.ticker.add((ticker) => {
-      this.update(ticker);
-    });
+    this.app.ticker.add(() => this.update());
+
+    window.addEventListener("resize", () => this.resize());
+
+    setTimeout(() => {
+      this.syncBoxes();
+    }, 1000);
+    this.syncBoxes();
+
+    this.setupLevel();
   }
 
-  private update(ticker: Ticker) {
+  private setupLevel() {
+    this.elements.push(new Ground(this));
+
+    this.spawnHedgehog({});
+    // this.spawnHedgehog({});
+    // this.spawnHedgehog({});
+  }
+
+  private update() {
+    Matter.Engine.update(this.engine, 1000 / 60);
+
     let shouldHavePointerEvents = false;
 
-    this.boxes.forEach((box) => box.update(ticker));
+    for (const el of this.elements) {
+      el.update();
 
-    this.actors.forEach((actor) => {
-      actor.update(ticker);
-      if (actor.isPointerOver) {
+      if (el.isPointerOver && el.isInteractive) {
         shouldHavePointerEvents = true;
       }
-    });
+    }
 
     if (shouldHavePointerEvents !== this.pointerEventsEnabled) {
       this.setPointerEvents(shouldHavePointerEvents);
     }
+  }
+
+  // check who hits what - todo: use collisionFilter if you dont want coins to hit each other
+  private onCollision(event: Matter.IEventCollision<Matter.Engine>) {
+    const collision = event.pairs[0];
+    const [bodyA, bodyB] = [collision.bodyA, collision.bodyB];
+    console.log(`${bodyA.label} ${bodyA.id} hits ${bodyB.label} ${bodyA.id}`);
+
+    // Trigger both elements onCollisonHandlers
+
+    const elementA = this.findElementWithRigidBody(bodyA);
+    const elementB = this.findElementWithRigidBody(bodyB);
+
+    if (elementA && elementB) {
+      elementA.onCollision?.(elementB);
+      elementB.onCollision?.(elementA);
+    }
+
+    // if (bodyA.label === "Coin" && bodyB.label === "Player") {
+    //   const element = this.findElementWithRigidBody(bodyA);
+    //   if (element) this.removeElement(element);
+    // }
+    // if (bodyA.label === "Player" && bodyB.label === "Coin") {
+    //   const element = this.findElementWithRigidBody(bodyB);
+    //   if (element) this.removeElement(element);
+    // }
+  }
+
+  private findElementWithRigidBody(rb: Matter.Body) {
+    return this.elements.find((element) => element.rigidBody === rb);
+  }
+
+  private removeElement(element: GameElement) {
+    element.beforeUnload();
+    Matter.Composite.remove(this.engine.world, element.rigidBody); // stop physics simulation
+    this.app.stage.removeChild(element.sprite); // stop drawing on the canvas
+    this.elements = this.elements.filter((el) => el != element); // stop updating
+    console.log(`Removed element. Elements left: ${this.elements.length}`);
+  }
+
+  cleanup(): void {
+    if (this.debugRender) {
+      Render.stop(this.debugRender);
+      this.debugRender.canvas.remove();
+    }
+    // ... any other cleanup
+  }
+
+  private resize() {
+    // Function to handle resizing
+    this.debugRender.bounds.max.x = this.ref.clientWidth;
+    this.debugRender.bounds.max.y = this.ref.clientHeight;
+    this.debugRender.options.width = this.ref.clientWidth;
+    this.debugRender.options.height = this.ref.clientHeight;
+    this.debugRender.canvas.width = this.ref.clientWidth;
+    this.debugRender.canvas.height = this.ref.clientHeight;
+    Matter.Render.setPixelRatio(this.debugRender, window.devicePixelRatio); // added this
+  }
+
+  private syncBoxes() {
+    console.log("Syncing boxes");
+
+    // TODO: Move this to a config option
+    const boxes = Array.from(document.querySelectorAll(".border"));
+    const existingBoxes = this.elements.filter((el) => el instanceof SyncedBox);
+
+    console.log(boxes);
+    boxes.forEach((box) => {
+      // TODO: Make this much faster...
+
+      if (existingBoxes.find((el) => el.ref === box)) {
+        return;
+      }
+
+      const syncedBox = new SyncedBox(this, box as HTMLElement);
+      this.elements.push(syncedBox);
+    });
+  }
+
+  log(message: string): void {
+    // LATER: Add debugging option
+    console.log(message);
   }
 }

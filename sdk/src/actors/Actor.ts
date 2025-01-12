@@ -1,35 +1,23 @@
-import { AnimatedSprite, Ticker } from "pixi.js";
+import Matter from "matter-js";
+import { AnimatedSprite } from "pixi.js";
 import { AvailableAnimations } from "../sprites/sprites";
-import { BoundingRect, Game, GameObject } from "../types";
+import { Game, GameElement } from "../types";
 
-const GRAVITY_PIXELS_PER_SECOND = 10;
-
-export class Actor implements GameObject {
-  protected sprite: AnimatedSprite;
+export class Actor implements GameElement {
+  public sprite: AnimatedSprite;
   public isPointerOver = false;
   public isDragging = false;
-  protected x = 0;
-  protected y = 0;
-  protected xVelocity = 0; // Sort of "pixels per second"
-  protected yVelocity = 0;
-  protected bounce = 0.4;
-  protected applyGravity = true;
   protected currentAnimation: AvailableAnimations;
 
-  constructor(private game: Game) {}
+  rigidBody: Matter.Body;
+  isInteractive = false;
 
-  get bounds(): BoundingRect {
-    return {
-      x: this.x,
-      y: this.y,
-      width: 100, // TODO
-      height: 100, // TODO
-    };
-  }
+  constructor(
+    protected game: Game,
+    private rigidBodyOptions: Matter.IBodyDefinition = {}
+  ) {}
 
-  get hitArea(): BoundingRect {
-    return this.bounds;
-  }
+  beforeUnload: () => void;
 
   protected loadSprite(animation: AvailableAnimations): void {
     this.currentAnimation = animation;
@@ -37,6 +25,8 @@ export class Actor implements GameObject {
       this.game.spritesManager.getSpriteFrames(animation)
     );
     this.sprite.animationSpeed = 0.5;
+
+    this.maybeLoadRigidBody();
 
     // Setup a bunch of listeners for the sprite
     this.sprite.on("pointerover", () => {
@@ -51,9 +41,37 @@ export class Actor implements GameObject {
     this.sprite.eventMode = "static";
     this.sprite.play();
     this.sprite.anchor.set(0.5);
-    this.sprite.x = this.x;
-    this.sprite.y = this.y;
+    this.sprite.x = this.rigidBody.position.x;
+    this.sprite.y = this.rigidBody.position.y;
     this.game.app.stage.addChild(this.sprite);
+  }
+
+  private maybeLoadRigidBody(): void {
+    if (this.rigidBody) {
+      return;
+    }
+
+    const playerOptions: Matter.IBodyDefinition = {
+      density: 0.001,
+      friction: 0.7,
+      frictionStatic: 0,
+      frictionAir: 0.01,
+      restitution: 0.5,
+      inertia: Infinity,
+      inverseInertia: Infinity,
+      label: "Player",
+      ...this.rigidBodyOptions,
+    };
+
+    this.rigidBody = Matter.Bodies.rectangle(
+      window.innerWidth / 2,
+      window.innerHeight / 2,
+      this.sprite.width,
+      this.sprite.height,
+      playerOptions
+    );
+
+    Matter.Composite.add(this.game.engine.world, this.rigidBody);
   }
 
   protected updateSprite(animation: AvailableAnimations): void {
@@ -72,8 +90,11 @@ export class Actor implements GameObject {
         if (!this.isDragging) {
           return;
         }
-        this.x = event.data.global.x;
-        this.y = event.data.global.y;
+
+        Matter.Body.setPosition(this.rigidBody, {
+          x: event.data.global.x,
+          y: event.data.global.y,
+        });
       };
 
       const onDragEnd = () => {
@@ -87,39 +108,28 @@ export class Actor implements GameObject {
     });
   }
 
-  update(ticker: Ticker): void {
-    const relativeDelta = ticker.deltaMS / 1000;
-    let newY = this.y;
-    let newX = this.x;
+  update(): void {
+    // velocity
+    // Matter.Body.setVelocity(this.rigidBody, {
+    //   x: this.xVelocity,
+    //   y: this.yVelocity,
+    // });
 
-    if (this.isDragging) {
-      // Apply the change to the sprite and estimate the velocity based on the values
-      this.xVelocity += (this.x - this.sprite.x) * relativeDelta;
-      this.yVelocity -= (this.y - this.sprite.y) * relativeDelta;
-    } else {
-      if (this.applyGravity) {
-        this.yVelocity -= GRAVITY_PIXELS_PER_SECOND * relativeDelta;
-      }
+    // this.rotation = this.rigidBody.angle; // todo make sure rigidbody angle cannot change
 
-      newY -= this.yVelocity;
-      newX += this.xVelocity;
+    // if (this.rigidBody.position.y > 500) this.resetPosition();
+
+    if (this.rigidBody.position.y > this.game.app.screen.height) {
+      this.resetPosition();
     }
 
-    // Hit detection
-    this.game.boxes.forEach((box) => {
-      // Detect if the box is intersecting and react
+    this.sprite.x = this.rigidBody.position.x;
+    this.sprite.y = this.rigidBody.position.y;
+  }
 
-      // TODO: Fix to account for height of item
-      if (this.y > box.hitArea.y) {
-        newY = box.hitArea.y;
-        this.yVelocity = -this.yVelocity * this.bounce;
-      }
-    });
-
-    this.y = newY;
-    this.x = newX;
-
-    this.sprite.x = this.x;
-    this.sprite.y = this.y;
+  resetPosition(): void {
+    Matter.Body.setPosition(this.rigidBody, { x: 0, y: 0 });
+    Matter.Body.setVelocity(this.rigidBody, { x: 0, y: 0 });
+    Matter.Body.setAngularVelocity(this.rigidBody, 0);
   }
 }

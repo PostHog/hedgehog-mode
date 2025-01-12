@@ -12,6 +12,7 @@ export default defineConfig(({ mode }) => {
         formats: ["es"],
         fileName: "index",
       },
+      sourcemap: true,
     },
     resolve: { alias: { src: resolve("src/") } },
     test: {

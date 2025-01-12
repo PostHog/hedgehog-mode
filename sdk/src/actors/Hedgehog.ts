@@ -2,11 +2,89 @@ import { Actor } from "./Actor";
 import { Game, GameElement } from "../types";
 import Matter, { Constraint } from "matter-js";
 import { SyncedBox } from "../items/SyncedBox";
+import { Sprite } from "pixi.js";
+
+export type AccessoryInfo = {
+  group: "headwear" | "eyewear" | "other";
+};
+
+export const standardAccessories = {
+  beret: {
+    group: "headwear",
+  },
+  cap: {
+    group: "headwear",
+  },
+  chef: {
+    group: "headwear",
+  },
+  cowboy: {
+    group: "headwear",
+  },
+  eyepatch: {
+    group: "eyewear",
+  },
+  flag: {
+    group: "headwear",
+  },
+  glasses: {
+    group: "eyewear",
+  },
+  graduation: {
+    group: "headwear",
+  },
+
+  parrot: {
+    group: "other",
+  },
+  party: {
+    group: "headwear",
+  },
+  pineapple: {
+    group: "headwear",
+  },
+  sunglasses: {
+    group: "eyewear",
+  },
+  tophat: {
+    group: "headwear",
+  },
+  "xmas-hat": {
+    group: "headwear",
+  },
+  "xmas-antlers": {
+    group: "headwear",
+  },
+  "xmas-scarf": {
+    group: "other",
+  },
+};
+
+export type HedgehogAccessory = keyof typeof standardAccessories;
+
+const pickRandom = <T>(arr: T[]): T => {
+  return arr[Math.floor(Math.random() * arr.length)];
+};
+
+export const getRandomAccesoryCombo = (): HedgehogAccessory[] => {
+  return [
+    pickRandom(
+      Object.keys(standardAccessories).filter(
+        (accessory) => standardAccessories[accessory].group === "headwear"
+      ) as HedgehogAccessory[]
+    ),
+    pickRandom(
+      Object.keys(standardAccessories).filter(
+        (accessory) => standardAccessories[accessory].group === "eyewear"
+      ) as HedgehogAccessory[]
+    ),
+  ];
+};
 
 export type HedgehogActorOptions = {
   skin?: string;
   color?: string | null;
-  accessories?: string[];
+  accessories?: HedgehogAccessory[];
   walking_enabled?: boolean;
   interactions_enabled?: boolean;
   controls_enabled?: boolean;
@@ -16,8 +94,8 @@ export class HedgehogActor extends Actor {
   direction: "left" | "right" = "right";
   jumps = 0;
   walkSpeed = 0;
-
   ropeConstraint?: Constraint;
+  accessorySprites: { [key: string]: Sprite } = {};
 
   hitBoxModifier = {
     left: 0.25,
@@ -40,7 +118,8 @@ export class HedgehogActor extends Actor {
       y: 0,
     });
 
-    this.setupRopeConstraint();
+    this.syncAccessories();
+    // this.setupRopeConstraint();
   }
 
   private setupRopeConstraint(): void {
@@ -53,7 +132,8 @@ export class HedgehogActor extends Actor {
       this.ropeConstraint = Constraint.create({
         pointA: { x: e.clientX, y: e.clientY },
         bodyB: this.rigidBody,
-        stiffness: 0.01,
+        stiffness: 0.2,
+        length: 200,
       });
       Matter.World.addConstraint(this.game.engine.world, this.ropeConstraint);
     });
@@ -67,7 +147,7 @@ export class HedgehogActor extends Actor {
       this.ropeConstraint.pointA.y = e.clientY;
     });
 
-    window.addEventListener("mouseup", (e) => {
+    window.addEventListener("mouseup", () => {
       console.log("mouseup");
       Matter.World.remove(this.game.engine.world, this.ropeConstraint);
       this.ropeConstraint = undefined;
@@ -84,7 +164,7 @@ export class HedgehogActor extends Actor {
       return;
     }
 
-    const force = this.rigidBody.mass * -0.025;
+    const force = this.rigidBody.mass * -0.075;
     Matter.Body.applyForce(this.rigidBody, this.rigidBody.position, {
       x: 0,
       y: force,
@@ -187,7 +267,7 @@ export class HedgehogActor extends Actor {
 
         this.direction = ["arrowleft", "a"].includes(key) ? "left" : "right";
 
-        const moonwalk = e.ctrlKey;
+        const moonwalk = e.altKey;
         const running = e.shiftKey;
 
         if (running) {
@@ -218,47 +298,8 @@ export class HedgehogActor extends Actor {
       }
     };
 
-    // const onMouseDown = (e: MouseEvent): void => {
-    //   // if (
-    //   //   !this.hedgehogConfig.controls_enabled ||
-    //   //   this.hedgehogConfig.skin !== "spiderhog"
-    //   // ) {
-    //   //   return;
-    //   // }
-
-    //   // Whilst the mouse is down we will move the hedgehog towards it
-    //   // First check that we haven't clicked the hedgehog
-    //   const elementBounds = this.element?.getBoundingClientRect();
-    //   if (
-    //     elementBounds &&
-    //     e.clientX >= elementBounds.left &&
-    //     e.clientX <= elementBounds.right &&
-    //     e.clientY >= elementBounds.top &&
-    //     e.clientY <= elementBounds.bottom
-    //   ) {
-    //     return;
-    //   }
-
-    //   this.setAnimation("fall");
-    //   this.followMouse = true;
-    //   this.lastKnownMousePosition = [e.clientX, e.clientY];
-
-    //   const onMouseMove = (e: MouseEvent): void => {
-    //     this.lastKnownMousePosition = [e.clientX, e.clientY];
-    //   };
-
-    //   const onMouseUp = (): void => {
-    //     this.followMouse = false;
-    //     window.removeEventListener("mousemove", onMouseMove);
-    //   };
-
-    //   window.addEventListener("mousemove", onMouseMove);
-    //   window.addEventListener("mouseup", onMouseUp);
-    // };
-
     window.addEventListener("keydown", keyDownListener);
     window.addEventListener("keyup", keyUpListener);
-    // window.addEventListener("mousedown", onMouseDown);
 
     return () => {
       window.removeEventListener("keydown", keyDownListener);
@@ -269,16 +310,15 @@ export class HedgehogActor extends Actor {
   update(): void {
     super.update();
 
+    // Match the position of the accessory to the hedgehog
+    // Object.values(this.accessorySprites).forEach((sprite) => {
+    //   sprite.x = this.sprite.x;
+    //   sprite.y = this.sprite.y;
+    // });
+
     const xForce = 25 * this.walkSpeed * this.rigidBody.mass;
 
     if (xForce !== 0) {
-      console.log("Applying force", xForce);
-      // TODO: Only apply if on ground - also account for ground friction
-      // Matter.Body.applyForce(this.rigidBody, this.rigidBody.position, {
-      //   x: xForce,
-      //   y: 0,
-      // });
-
       Matter.Body.setVelocity(this.rigidBody, {
         x: xForce,
         y: this.rigidBody.velocity.y,
@@ -311,5 +351,33 @@ export class HedgehogActor extends Actor {
         pair.isActive = false;
       }
     }
+  }
+
+  private syncAccessories(): void {
+    this.sprite.removeChildren(0, this.sprite.children.length);
+
+    this.options.accessories?.forEach((accessory) => {
+      const frame = this.game.spritesManager.getSpriteFrames(
+        `accessories/${accessory}.png`
+      );
+
+      // Add debug logs to check the frame
+      if (!frame) {
+        this.game.log("Frame not found!", `accessories/${accessory}.png`);
+        return;
+      }
+
+      const sprite = new Sprite(frame);
+      this.accessorySprites["xmas-hat"] = sprite;
+      sprite.eventMode = "static";
+      sprite.anchor.set(0.5);
+      this.sprite.addChild(sprite);
+    });
+  }
+
+  beforeUnload(): void {
+    Object.values(this.accessorySprites).forEach((sprite) => {
+      this.game.app.stage.removeChild(sprite);
+    });
   }
 }

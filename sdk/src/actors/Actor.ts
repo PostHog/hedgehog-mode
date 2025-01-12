@@ -25,12 +25,10 @@ export class Actor implements GameElement {
     private rigidBodyOptions: Matter.IBodyDefinition = {}
   ) {}
 
-  beforeUnload: () => void;
-
   protected loadSprite(animation: AvailableAnimations): void {
     this.currentAnimation = animation;
     this.sprite = new AnimatedSprite(
-      this.game.spritesManager.getSpriteFrames(animation)
+      this.game.spritesManager.getAnimatedSpriteFrames(animation)
     );
     this.sprite.animationSpeed = 0.5;
 
@@ -99,7 +97,8 @@ export class Actor implements GameElement {
   protected updateSprite(animation: AvailableAnimations): void {
     this.currentAnimation = animation;
     this.sprite.stop();
-    this.sprite.textures = this.game.spritesManager.getSpriteFrames(animation);
+    this.sprite.textures =
+      this.game.spritesManager.getAnimatedSpriteFrames(animation);
     this.sprite.currentFrame = 0;
     this.sprite.play();
   }

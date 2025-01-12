@@ -1,8 +1,9 @@
-import { AnimatedSpriteFrames, Assets, Spritesheet } from "pixi.js";
+import { AnimatedSpriteFrames, Assets, Spritesheet, Texture } from "pixi.js";
 import sprites from "../../assets/sprites.json";
 import { HedgehogModeConfig } from "../types";
 
 export type AvailableAnimations = keyof typeof sprites.animations;
+export type AvailableSpriteFrames = keyof typeof sprites.frames;
 
 export class SpritesManager {
   spritesheet: Spritesheet;
@@ -19,7 +20,18 @@ export class SpritesManager {
     await this.spritesheet.parse();
   }
 
-  getSpriteFrames(animation: AvailableAnimations): AnimatedSpriteFrames {
+  getAnimatedSpriteFrames(
+    animation: AvailableAnimations
+  ): AnimatedSpriteFrames {
     return this.spritesheet.animations[animation];
+  }
+
+  getSpriteFrames(name: AvailableSpriteFrames): Texture {
+    console.log(
+      "Getting sprite frames",
+      name,
+      Object.keys(this.spritesheet.textures)
+    );
+    return this.spritesheet.textures[name];
   }
 }

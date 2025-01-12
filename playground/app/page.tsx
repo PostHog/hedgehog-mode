@@ -32,12 +32,12 @@ export default function Home() {
     }
   }, [ref]);
 
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setRandomBoxes(makeRandomBoxes());
-    }, 5000);
-    return () => clearTimeout(t);
-  }, [randomBoxes]);
+  // useEffect(() => {
+  //   const t = setTimeout(() => {
+  //     setRandomBoxes(makeRandomBoxes());
+  //   }, 5000);
+  //   return () => clearTimeout(t);
+  // }, [randomBoxes]);
 
   return (
     <div className="">

@@ -2,7 +2,11 @@ import Matter, { Render } from "matter-js";
 import { Application, Ticker } from "pixi.js";
 import { Game, GameElement, HedgehogModeConfig } from "./types";
 import { SpritesManager } from "./sprites/sprites";
-import { HedgehogActor, HedgehogActorOptions } from "./actors/Hedgehog";
+import {
+  getRandomAccesoryCombo,
+  HedgehogActor,
+  HedgehogActorOptions,
+} from "./actors/Hedgehog";
 import { Ground } from "./items/Ground";
 import { SyncedBox } from "./items/SyncedBox";
 import { Wall } from "./items/Wall";
@@ -50,6 +54,9 @@ export class HedgeHogMode implements Game {
   }
 
   private spawnHedgehog(options: HedgehogActorOptions) {
+    if (!options.accessories) {
+      options.accessories = getRandomAccesoryCombo();
+    }
     const actor = new HedgehogActor(this, options);
     this.elements.push(actor);
   }

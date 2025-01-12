@@ -108,7 +108,6 @@ export class HedgeHogMode implements Game {
   }
 
   private update(ticker: Ticker) {
-    console.log(ticker.deltaMS);
     Matter.Engine.update(this.engine, ticker.deltaMS);
 
     let shouldHavePointerEvents = false;

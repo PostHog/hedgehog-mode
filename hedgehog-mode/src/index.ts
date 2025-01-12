@@ -31,7 +31,7 @@ export class HedgeHogMode implements Game {
   setupDebugListeners(): void {
     let dCount = 0;
     window.addEventListener("keydown", (e) => {
-      if (e.key === "d") {
+      if (e.key === "d" && e.ctrlKey) {
         dCount++;
         if (dCount === 5) {
           dCount = 0;

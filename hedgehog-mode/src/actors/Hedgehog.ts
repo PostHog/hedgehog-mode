@@ -152,6 +152,7 @@ export class HedgehogActor extends Actor {
   }
 
   private setOnFire(): void {
+    this.jump();
     // this.loadSprite("skins/default/fire/tile");
   }
 

@@ -65,6 +65,10 @@ export class HedgehogActor extends Actor {
       this.setOnFire(times - 1);
     }, 1000);
 
+    this.connectedElements.forEach((element) => {
+      this.maybeSetElementOnFire(element);
+    });
+
     if (!this.overlayAnimation) {
       this.overlayAnimation = new AnimatedSprite(
         this.game.spritesManager.getAnimatedSpriteFrames("overlays/fire/tile")
@@ -279,16 +283,21 @@ export class HedgehogActor extends Actor {
     }
   }
 
-  onCollisionStart(element: GameElement, pair: Matter.Pair): void {
-    super.onCollisionStart(element, pair);
-
+  private maybeSetElementOnFire(element: GameElement): void {
     if (
       element instanceof HedgehogActor &&
       this.isOnFire &&
       !element.isOnFire
     ) {
+      // TODO: This could be made better by checking for adjacent boxes when we start the fire too
       element.setOnFire(1);
     }
+  }
+
+  onCollisionStart(element: GameElement, pair: Matter.Pair): void {
+    super.onCollisionStart(element, pair);
+
+    this.maybeSetElementOnFire(element);
 
     if (element.rigidBody.bounds.min.y > this.rigidBody.bounds.min.y) {
       this.game.log("Hit something below");

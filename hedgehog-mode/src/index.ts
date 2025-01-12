@@ -2,14 +2,11 @@ import Matter, { Render } from "matter-js";
 import { Application, Ticker } from "pixi.js";
 import { Game, GameElement, HedgehogModeConfig } from "./types";
 import { SpritesManager } from "./sprites/sprites";
-import {
-  getRandomAccesoryCombo,
-  HedgehogActor,
-  HedgehogActorOptions,
-} from "./actors/Hedgehog";
+import { HedgehogActor, HedgehogActorOptions } from "./actors/Hedgehog";
 import { Ground } from "./items/Ground";
 import { SyncedBox } from "./items/SyncedBox";
 import { Wall } from "./items/Wall";
+import { getRandomAccesoryCombo } from "./actors/Accessories";
 
 export class HedgeHogMode implements Game {
   ref?: HTMLDivElement;

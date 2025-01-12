@@ -178,9 +178,9 @@ export class Actor implements GameElement {
     // // TRICKY: The scale of the hitbox is different to the sprite
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   onCollisionStart(element: GameElement, pair: Matter.Pair): void {
     // We use this to detect if we are on the ground
-    console.log("Collision", element, pair);
     this.connectedElements.push(element);
   }
 

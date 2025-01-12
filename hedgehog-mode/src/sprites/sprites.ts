@@ -27,11 +27,6 @@ export class SpritesManager {
   }
 
   getSpriteFrames(name: AvailableSpriteFrames): Texture {
-    console.log(
-      "Getting sprite frames",
-      name,
-      Object.keys(this.spritesheet.textures)
-    );
     return this.spritesheet.textures[name];
   }
 }

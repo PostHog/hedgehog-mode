@@ -128,7 +128,6 @@ export class HedgehogActor extends Actor {
     }
 
     window.addEventListener("mousedown", (e) => {
-      console.log("mousedown");
       this.ropeConstraint = Constraint.create({
         pointA: { x: e.clientX, y: e.clientY },
         bodyB: this.rigidBody,
@@ -139,7 +138,6 @@ export class HedgehogActor extends Actor {
     });
 
     window.addEventListener("mousemove", (e) => {
-      console.log("mousemove");
       if (!this.ropeConstraint) {
         return;
       }
@@ -148,7 +146,6 @@ export class HedgehogActor extends Actor {
     });
 
     window.addEventListener("mouseup", () => {
-      console.log("mouseup");
       Matter.World.remove(this.game.engine.world, this.ropeConstraint);
       this.ropeConstraint = undefined;
     });
@@ -294,7 +291,6 @@ export class HedgehogActor extends Actor {
 
       if (["arrowleft", "a", "arrowright", "d"].includes(key)) {
         this.walkSpeed = 0;
-        console.log("Resetting walk speed");
       }
     };
 

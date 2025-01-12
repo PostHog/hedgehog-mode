@@ -48,7 +48,7 @@ export class HedgeHogMode implements Game {
   }
 
   setPointerEvents(enabled: boolean): void {
-    console.log("Setting pointer events", enabled);
+    this.log("Setting pointer events", enabled);
     this.ref?.style.setProperty("pointer-events", enabled ? "auto" : "none");
     this.pointerEventsEnabled = enabled;
   }
@@ -163,7 +163,7 @@ export class HedgeHogMode implements Game {
   private onCollision(event: Matter.IEventCollision<Matter.Engine>) {
     event.pairs.forEach((pair) => {
       const [bodyA, bodyB] = [pair.bodyA, pair.bodyB];
-      console.log(`${bodyA.label} ${bodyA.id} hits ${bodyB.label} ${bodyA.id}`);
+      this.log(`${bodyA.label} ${bodyA.id} hits ${bodyB.label} ${bodyA.id}`);
 
       // Trigger both elements onCollisonHandlers
 
@@ -195,7 +195,7 @@ export class HedgeHogMode implements Game {
     Matter.Composite.remove(this.engine.world, element.rigidBody); // stop physics simulation
     this.app.stage.removeChild(element.sprite); // stop drawing on the canvas
     this.elements = this.elements.filter((el) => el != element); // stop updating
-    console.log(`Removed element. Elements left: ${this.elements.length}`);
+    this.log(`Removed element. Elements left: ${this.elements.length}`);
   }
 
   private resize() {
@@ -214,8 +214,6 @@ export class HedgeHogMode implements Game {
   }
 
   private syncBoxes() {
-    console.log("Syncing boxes");
-
     // TODO: Move this to a config option
     const boxes = Array.from(document.querySelectorAll(".border"));
     const existingBoxes = this.elements.filter((el) => el instanceof SyncedBox);

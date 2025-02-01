@@ -22,7 +22,7 @@ export class HedgeHogMode implements Game {
   engine: Matter.Engine;
   debugRender?: Matter.Render;
   elements: GameElement[] = []; // TODO: Type better
-  isDebugging = false;
+  isDebugging = true;
   totalElapsedTime = 0;
 
   pointerEventsEnabled = false;
@@ -32,7 +32,6 @@ export class HedgeHogMode implements Game {
   constructor(private options: HedgehogModeConfig) {
     this.spritesManager = new SpritesManager(options);
     this.setupDebugListeners();
-    this.setPointerEvents(false);
   }
 
   setupDebugListeners(): void {
@@ -77,9 +76,9 @@ export class HedgeHogMode implements Game {
 
   async render(ref: HTMLDivElement): Promise<void> {
     this.ref = ref;
+    this.setPointerEvents(false);
     // Create the application helper and add its render target to the page
     this.app = new Application();
-
     this.engine = Matter.Engine.create();
 
     Matter.Events.on(this.engine, "collisionStart", (event) =>

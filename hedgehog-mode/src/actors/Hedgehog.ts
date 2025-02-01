@@ -111,7 +111,7 @@ export class HedgehogActor extends Actor {
     this.syncAccessories();
   }
 
-  protected updateSprite(sprite: string): void {
+  updateSprite(sprite: string): void {
     const possibleAnimation = `skins/${this.options.skin ?? "default"}/${sprite}/tile`;
 
     // Set the sprite but selecting the skin as well

@@ -23,6 +23,7 @@ export class HedgeHogMode implements Game {
   debugRender?: Matter.Render;
   elements: GameElement[] = []; // TODO: Type better
   isDebugging = false;
+  totalElapsedTime = 0;
 
   pointerEventsEnabled = false;
   spritesManager: SpritesManager;
@@ -140,6 +141,7 @@ export class HedgeHogMode implements Game {
     Render.run(this.debugRender);
 
     new GlobalKeyboardListeners(this);
+    gsap.ticker.remove(gsap.updateRoot);
     this.setupLevel();
   }
 
@@ -160,7 +162,8 @@ export class HedgeHogMode implements Game {
   }
 
   private update(ticker: Ticker) {
-    gsap.updateRoot(ticker.deltaMS / 1000); // Sync GSAP with delta time
+    this.totalElapsedTime += ticker.deltaMS / 1000;
+    gsap.updateRoot(this.totalElapsedTime);
 
     Matter.Engine.update(this.engine, ticker.deltaMS);
 

@@ -1,9 +1,8 @@
-import Matter from "matter-js";
 import { Actor } from "../actors/Actor";
 import { Game } from "../types";
 import { Ticker } from "pixi.js";
 import { COLLISIONS } from "../misc/collisions";
-
+import gsap from "gsap";
 // TODO: How to make this collide to trigger fires but not part of the physics collisions
 export class FlameActor extends Actor {
   public isFlammable = false;
@@ -13,6 +12,10 @@ export class FlameActor extends Actor {
     top: 0.2,
     bottom: 0.05,
   };
+
+  fadeValue = 0;
+
+  private tween: gsap.core.Tween | null = null;
 
   constructor(game: Game) {
     super(game, {
@@ -32,25 +35,25 @@ export class FlameActor extends Actor {
     this.loadSprite("overlays/fire/tile");
     this.isInteractive = false;
 
-    this.sprite.anchor.set(0.5);
-    this.sprite.alpha = 0.5;
-
-    const scale = 0.3;
-    this.sprite.scale.x = scale;
-    this.sprite.scale.y = scale;
-
-    Matter.Body.scale(this.rigidBody, scale, scale, {
-      x: this.rigidBody.position.x,
-      y: this.rigidBody.position.y,
-    });
+    this.sprite.anchor.set(0.5, 0);
+    this.setScale(0.4);
 
     setTimeout(() => {
-      this.game.removeElement(this);
-    }, 2000);
+      this.tween = gsap.to(this, {
+        fadeValue: 1,
+        duration: 3,
+        ease: "power2.in",
+        onComplete: () => {
+          this.game.removeElement(this);
+          this.tween = null;
+        },
+      });
+    }, 100);
   }
 
   update(ticker: Ticker): void {
+    this.sprite.alpha = (1 - this.fadeValue) * 0.75;
+
     super.update(ticker);
-    this.rigidBody.angle = 0;
   }
 }

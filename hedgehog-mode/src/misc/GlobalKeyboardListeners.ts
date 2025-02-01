@@ -51,6 +51,23 @@ export class GlobalKeyboardListeners {
         keys: ["f", "i", "r", "e"],
         action: () => this.getPlayableHedgehog().setOnFire(),
       },
+
+      {
+        keys: ["h", "e", "l", "l", "o"],
+        action: () =>
+          this.getAllHedgehogs().forEach((hedgehog) => {
+            hedgehog.updateSprite("wave");
+          }),
+      },
+
+      {
+        keys: ["h", "e", "a", "t", "m", "a", "p", "s"],
+        action: () =>
+          this.getAllHedgehogs().forEach((hedgehog) => {
+            hedgehog.setOnFire();
+          }),
+      },
+
       {
         keys: ["s", "p", "i", "d", "e", "r", "h", "o", "g"],
         action: () => {

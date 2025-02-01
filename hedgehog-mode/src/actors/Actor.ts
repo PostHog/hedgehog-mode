@@ -14,7 +14,6 @@ export class Actor implements GameElement {
 
   rigidBody: Matter.Body;
   isInteractive = false;
-  scale = 1;
 
   hitBoxModifier = {
     left: 0,
@@ -93,11 +92,6 @@ export class Actor implements GameElement {
       playerOptions
     );
 
-    // Matter.Body.scale(this.rigidBody, this.scale, this.scale, {
-    //   x: this.rigidBody.position.x,
-    //   y: this.rigidBody.position.y,
-    // });
-
     Matter.Composite.add(this.game.engine.world, this.rigidBody);
   }
 
@@ -127,6 +121,11 @@ export class Actor implements GameElement {
 
   public setPosition(position: Matter.Vector): void {
     Matter.Body.setPosition(this.rigidBody, position);
+  }
+
+  public setScale(scale: number): void {
+    this.sprite.scale.set(scale, scale);
+    Matter.Body.scale(this.rigidBody, scale, scale);
   }
 
   setupPointerEvents(): void {
@@ -167,7 +166,7 @@ export class Actor implements GameElement {
     const yDiff = this.game.app.screen.height - this.rigidBody.position.y;
 
     if (yDiff < 0) {
-      Matter.Body.setPosition(this.rigidBody, {
+      this.setPosition({
         x: this.rigidBody.position.x,
         y: Math.max(this.rigidBody.position.y - yDiff, 0),
       });
@@ -196,25 +195,21 @@ export class Actor implements GameElement {
 
     const { width: rigidBodyWidth } = this.getRigidBodyDimensions();
     if (this.rigidBody.position.x > window.innerWidth + rigidBodyWidth) {
-      Matter.Body.setPosition(this.rigidBody, {
+      this.setPosition({
         x: 0,
         y: this.rigidBody.position.y,
       });
     }
 
     if (this.rigidBody.position.x < 0 - rigidBodyWidth) {
-      Matter.Body.setPosition(this.rigidBody, {
+      this.setPosition({
         x: window.innerWidth,
         y: this.rigidBody.position.y,
       });
     }
 
-    // We scale the sprite relatvie to the hitbox
-
-    // const xScale = (hitBoxWidth / width) * this.scale;
-    // const yScale = (hitBoxHeight / height) * this.scale;
-
-    // this.sprite.scale.set(xScale, yScale);
+    // Keep it upright
+    this.rigidBody.angle = 0;
     // // TRICKY: The scale of the hitbox is different to the sprite
   }
 

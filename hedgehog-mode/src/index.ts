@@ -142,10 +142,10 @@ export class HedgeHogMode implements Game {
 
     new GlobalKeyboardListeners(this);
     gsap.ticker.remove(gsap.updateRoot);
-    this.setupLevel();
+    await this.setupLevel();
   }
 
-  private setupLevel() {
+  private async setupLevel() {
     this.elements.push(new Ground(this));
 
     this.spawnHedgehog({
@@ -159,6 +159,8 @@ export class HedgeHogMode implements Game {
         controls_enabled: false,
         color: sample(HEDGEHOG_COLOR_OPTIONS),
       });
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
     }
   }
 

@@ -3,9 +3,25 @@ import { HedgeHogMode } from "@posthog/hedgehog-mode";
 import { useEffect, useState } from "react";
 import { Logo } from "./logo";
 
+const Button = ({
+  children,
+  ...props
+}: {
+  children: React.ReactNode;
+} & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
+  return (
+    <button
+      className="p-2 text-white transition-colors bg-orange-500 border rounded-md hover:bg-orange-600"
+      {...props}
+    >
+      {children}
+    </button>
+  );
+};
+
 export default function Home() {
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
-
+  const [game, setGame] = useState<HedgeHogMode | null>(null);
   const makeRandomBoxes = () => {
     return Array.from({ length: 10 }, () => ({
       x: Math.random() * window.innerWidth,
@@ -30,6 +46,7 @@ export default function Home() {
         assetsUrl: "/assets",
       });
       hedgeHogMode.render(ref);
+      setGame(hedgeHogMode);
     }
   }, [ref]);
 
@@ -49,8 +66,15 @@ export default function Home() {
 
   return (
     <div>
-      <main className="fixed inset-0 overflow-hidden flex flex-row">
+      <main
+        className="fixed inset-0 flex flex-col overflow-hidden"
+        style={{ backgroundColor: "#eeefe9" }}
+      >
         <Logo />
+
+        <div className="flex flex-row gap-2 p-12">
+          <Button onClick={() => game?.spawnHedgehog()}>Spawn hedgehog</Button>
+        </div>
 
         <div
           id="game"

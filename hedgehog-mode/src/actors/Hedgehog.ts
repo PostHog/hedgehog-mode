@@ -44,7 +44,20 @@ export class HedgehogActor extends Actor {
     });
 
     this.syncAccessories();
-    // this.setupRopeConstraint();
+  }
+
+  protected updateSprite(sprite: string): void {
+    const possibleAnimation = `skins/${this.options.skin ?? "default"}/${sprite}/tile`;
+
+    // Set the sprite but selecting the skin as well
+    const spriteName =
+      this.game.spritesManager.toAvailableAnimation(possibleAnimation);
+
+    if (!spriteName) {
+      this.game.log(`Tried to load ${possibleAnimation} but it doesn't exist`);
+      return;
+    }
+    super.updateSprite(spriteName);
   }
 
   private fireTimer?: NodeJS.Timeout;
@@ -257,12 +270,12 @@ export class HedgehogActor extends Actor {
     }
 
     if (!this.getGround()) {
-      this.updateSprite("skins/default/fall/tile");
+      this.updateSprite("fall");
     } else {
       if (this.rigidBody.velocity.x !== 0) {
-        this.updateSprite("skins/default/walk/tile");
+        this.updateSprite("walk");
       } else {
-        this.updateSprite("skins/default/wave/tile");
+        this.updateSprite("wave");
         this.sprite.stop();
       }
     }

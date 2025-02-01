@@ -6,6 +6,7 @@ import { AnimatedSprite, ColorMatrixFilter, Sprite, Ticker } from "pixi.js";
 import { HedgehogAccessory } from "./Accessories";
 import { FlameActor } from "../items/Flame";
 import { range } from "lodash";
+import gsap from "gsap";
 
 export const HEDGEHOG_COLOR_OPTIONS = [
   "green",
@@ -95,7 +96,7 @@ export class HedgehogActor extends Actor {
     private options: HedgehogActorOptions
   ) {
     super(game, {});
-    this.loadSprite("skins/default/jump/tile");
+    this.updateSprite("jump");
     this.setupKeyboardListeners();
     this.isInteractive = options.interactions_enabled ?? true;
 
@@ -105,10 +106,22 @@ export class HedgehogActor extends Actor {
     });
     this.setVelocity({
       x: (Math.random() - 0.5) * 5,
-      y: -2,
+      y: -5,
     });
 
     this.syncAccessories();
+
+    this.sprite.scale = {
+      x: 0,
+      y: 0,
+    };
+
+    gsap.to(this.sprite.scale, {
+      x: 1,
+      y: 1,
+      duration: 0.5,
+      ease: "elastic.out",
+    });
   }
 
   updateSprite(sprite: string): void {
@@ -222,7 +235,7 @@ export class HedgehogActor extends Actor {
         //   this.setAnimation("walk");
         // }
 
-        this.direction = ["arrowleft", "a"].includes(key) ? "left" : "right";
+        const direction = ["arrowleft", "a"].includes(key) ? "left" : "right";
 
         const moonwalk = e.altKey;
         const running = e.shiftKey;
@@ -232,13 +245,15 @@ export class HedgehogActor extends Actor {
         }
 
         this.walkSpeed =
-          this.direction === "left" ? -this.walkSpeed : this.walkSpeed;
+          direction === "left" ? -this.walkSpeed : this.walkSpeed;
 
         if (moonwalk) {
-          this.direction = this.direction === "left" ? "right" : "left";
+          direction === "left" ? "right" : "left";
           // IMPORTANT: Moonwalking is hard so he moves slightly slower of course
           this.walkSpeed *= 0.8;
         }
+
+        this.setDirection(direction);
       }
     };
 
@@ -263,6 +278,14 @@ export class HedgehogActor extends Actor {
     };
   }
 
+  setDirection(direction: "left" | "right"): void {
+    if (direction === "left") {
+      this.sprite.scale.x = -1;
+    } else {
+      this.sprite.scale.x = 1;
+    }
+  }
+
   update(ticker: Ticker): void {
     super.update(ticker);
 
@@ -273,12 +296,6 @@ export class HedgehogActor extends Actor {
         x: xForce,
         y: this.rigidBody.velocity.y,
       });
-    }
-
-    if (this.direction === "left") {
-      this.sprite.scale.x = -1;
-    } else {
-      this.sprite.scale.x = 1;
     }
 
     if (!this.getGround()) {

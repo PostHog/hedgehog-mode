@@ -9,7 +9,7 @@ export class Actor implements GameElement {
   public isPointerOver = false;
   public isDragging = false;
   public isFlammable = false;
-  protected currentAnimation: AvailableAnimations;
+  protected currentAnimation?: AvailableAnimations;
   protected connectedElements: GameElement[] = [];
 
   rigidBody: Matter.Body;
@@ -103,6 +103,10 @@ export class Actor implements GameElement {
   }
 
   protected updateSprite(animation: AvailableAnimations, reset = false): void {
+    if (!this.currentAnimation) {
+      return this.loadSprite(animation);
+    }
+
     if (this.currentAnimation === animation && !reset) {
       return;
     }

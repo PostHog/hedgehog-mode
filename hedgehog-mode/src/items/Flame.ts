@@ -41,18 +41,20 @@ export class FlameActor extends Actor {
     setTimeout(() => {
       this.tween = gsap.to(this, {
         fadeValue: 1,
-        duration: 3,
+        duration: 1,
         ease: "power2.in",
         onComplete: () => {
           this.game.removeElement(this);
           this.tween = null;
         },
       });
-    }, 100);
+    }, 1000);
   }
 
   update(ticker: Ticker): void {
     this.sprite.alpha = (1 - this.fadeValue) * 0.75;
+    const scale = (1 - this.fadeValue) * 0.4;
+    this.sprite.scale.set(scale, scale);
 
     super.update(ticker);
   }

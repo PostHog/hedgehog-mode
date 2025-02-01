@@ -2,6 +2,7 @@ import Matter, { Constraint } from "matter-js";
 import { AnimatedSprite, Ticker } from "pixi.js";
 import { AvailableAnimations } from "../sprites/sprites";
 import { Game, GameElement } from "../types";
+import { COLLISIONS } from "../misc/collisions";
 
 export class Actor implements GameElement {
   public sprite: AnimatedSprite;
@@ -70,6 +71,10 @@ export class Actor implements GameElement {
       inertia: Infinity,
       inverseInertia: Infinity,
       label: "Player",
+      collisionFilter: {
+        category: COLLISIONS.ACTOR,
+        mask: COLLISIONS.PLATFORM | COLLISIONS.ACTOR,
+      },
       ...this.rigidBodyOptions,
     };
 

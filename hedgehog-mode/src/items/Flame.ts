@@ -1,7 +1,8 @@
 import Matter from "matter-js";
 import { Actor } from "../actors/Actor";
-import { Game, GameElement } from "../types";
+import { Game } from "../types";
 import { Ticker } from "pixi.js";
+import { COLLISIONS } from "../misc/collisions";
 
 // TODO: How to make this collide to trigger fires but not part of the physics collisions
 export class FlameActor extends Actor {
@@ -22,6 +23,10 @@ export class FlameActor extends Actor {
       inertia: Infinity,
       inverseInertia: Infinity,
       label: "Flame",
+      collisionFilter: {
+        category: COLLISIONS.PROJECTILE,
+        mask: COLLISIONS.PLATFORM,
+      },
     });
 
     this.loadSprite("overlays/fire/tile");
@@ -47,9 +52,5 @@ export class FlameActor extends Actor {
   update(ticker: Ticker): void {
     super.update(ticker);
     this.rigidBody.angle = 0;
-  }
-
-  beforeUnload(): void {
-    console.log("UNLOAD");
   }
 }

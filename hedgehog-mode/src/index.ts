@@ -1,3 +1,5 @@
+import gsap from "gsap";
+
 import Matter, { Render } from "matter-js";
 import { Application, Ticker } from "pixi.js";
 import { Game, GameElement, HedgehogModeConfig } from "./types";
@@ -158,6 +160,8 @@ export class HedgeHogMode implements Game {
   }
 
   private update(ticker: Ticker) {
+    gsap.updateRoot(ticker.deltaMS / 1000); // Sync GSAP with delta time
+
     Matter.Engine.update(this.engine, ticker.deltaMS);
 
     let shouldHavePointerEvents = false;
@@ -212,7 +216,7 @@ export class HedgeHogMode implements Game {
   }
 
   removeElement(element: GameElement): void {
-    element.beforeUnload();
+    element.beforeUnload?.();
     Matter.Composite.remove(this.engine.world, element.rigidBody); // stop physics simulation
     this.app.stage.removeChild(element.sprite); // stop drawing on the canvas
     this.elements = this.elements.filter((el) => el != element); // stop updating

@@ -5,6 +5,7 @@ import { SyncedBox } from "../items/SyncedBox";
 import { AnimatedSprite, ColorMatrixFilter, Sprite, Ticker } from "pixi.js";
 import { HedgehogAccessory } from "./Accessories";
 import { FlameActor } from "../items/Flame";
+import { range } from "lodash";
 
 export const HEDGEHOG_COLOR_OPTIONS = [
   "green",
@@ -333,16 +334,18 @@ export class HedgehogActor extends Actor {
 
     // Create little flames
     const contact = pair?.contacts?.[0];
-    const flame = new FlameActor(this.game);
-    flame.setPosition({
-      x: contact ? contact.vertex.x : this.rigidBody.position.x,
-      y: contact ? contact.vertex.y : this.rigidBody.position.y,
+    range(3).forEach(() => {
+      const flame = new FlameActor(this.game);
+      flame.setPosition({
+        x: contact ? contact.vertex.x : this.rigidBody.position.x,
+        y: contact ? contact.vertex.y : this.rigidBody.position.y,
+      });
+      flame.setVelocity({
+        x: (Math.random() - 0.5) * 10,
+        y: -4,
+      });
+      this.game.elements.push(flame);
     });
-    flame.setVelocity({
-      x: 0,
-      y: -2,
-    });
-    this.game.elements.push(flame);
   }
 
   onCollisionStart(element: GameElement, pair: Matter.Pair): void {

@@ -45,6 +45,7 @@
     "node": ">=18"
   },
   "dependencies": {
+    "gsap": "^3.12.7",
     "lodash": "^4.17.21",
     "matter-js": "^0.20.0",
     "pixi.js": "^8.4.0"

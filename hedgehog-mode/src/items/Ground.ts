@@ -1,6 +1,6 @@
-import { Ticker } from "pixi.js";
 import { Game, GameElement } from "../types";
 import Matter from "matter-js";
+import { COLLISIONS } from "../misc/collisions";
 
 const GROUND_HEIGHT = 20;
 
@@ -21,6 +21,10 @@ export class Ground implements GameElement {
       {
         isStatic: true,
         label: "Ground",
+        collisionFilter: {
+          category: COLLISIONS.PLATFORM,
+          mask: COLLISIONS.PLATFORM | COLLISIONS.ACTOR | COLLISIONS.PROJECTILE,
+        },
       }
     );
 

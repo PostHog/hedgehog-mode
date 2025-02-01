@@ -1,3 +1,4 @@
+import { COLLISIONS } from "../misc/collisions";
 import { Game, GameElement } from "../types";
 import Matter from "matter-js";
 
@@ -45,6 +46,10 @@ export class SyncedBox implements GameElement {
       {
         isStatic: true,
         label: "SyncedBox",
+        collisionFilter: {
+          category: COLLISIONS.PLATFORM,
+          mask: COLLISIONS.PLATFORM | COLLISIONS.ACTOR | COLLISIONS.PROJECTILE,
+        },
       }
     );
 

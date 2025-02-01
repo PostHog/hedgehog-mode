@@ -100,7 +100,11 @@ export class HedgehogActor extends Actor {
 
     this.setPosition({
       x: window.innerWidth * Math.random(),
-      y: 0,
+      y: Math.random() * 200,
+    });
+    this.setVelocity({
+      x: (Math.random() - 0.5) * 5,
+      y: -2,
     });
 
     this.syncAccessories();
@@ -127,7 +131,11 @@ export class HedgehogActor extends Actor {
     return !!this.fireTimer;
   }
 
-  private setOnFire(times: number = 3): void {
+  updateOptions(options: Partial<HedgehogActorOptions>): void {
+    this.options = { ...this.options, ...options };
+  }
+
+  setOnFire(times: number = 3): void {
     clearTimeout(this.fireTimer);
     this.fireTimer = setTimeout(() => {
       if (times <= 1) {
@@ -159,7 +167,7 @@ export class HedgehogActor extends Actor {
     });
   }
 
-  private jump(): void {
+  jump(): void {
     const MAX_JUMPS = 2;
     if (this.jumps + 1 > MAX_JUMPS) {
       return;
@@ -176,49 +184,6 @@ export class HedgehogActor extends Actor {
   setupKeyboardListeners(): () => void {
     const lastKeys: string[] = [];
 
-    const secretMap: {
-      keys: string[];
-      action: () => void;
-    }[] = [
-      {
-        keys: ["f", "f", "f"],
-        action: () => this.setOnFire(),
-      },
-      {
-        keys: ["f", "i", "r", "e"],
-        action: () => this.setOnFire(),
-      },
-      {
-        keys: ["s", "p", "i", "d", "e", "r", "h", "o", "g"],
-        action: () => {
-          this.options.skin = "spiderhog";
-        },
-      },
-      {
-        keys: [
-          "arrowup",
-          "arrowup",
-          "arrowdown",
-          "arrowdown",
-          "arrowleft",
-          "arrowright",
-          "arrowleft",
-          "arrowright",
-          "b",
-          "a",
-        ],
-        action: () => {
-          this.setOnFire();
-          // this.gravity = -2;
-
-          // lemonToast.info("I must leave. My people need me!");
-          // setTimeout(() => {
-          //   this.gravity = GRAVITY_PIXELS;
-          // }, 2000);
-        },
-      },
-    ];
-
     const keyDownListener = (e: KeyboardEvent): void => {
       if (!this.options.controls_enabled) {
         return;
@@ -230,15 +195,6 @@ export class HedgehogActor extends Actor {
       if (lastKeys.length > 20) {
         lastKeys.shift();
       }
-
-      secretMap.forEach((secret) => {
-        if (
-          lastKeys.slice(-secret.keys.length).join("") === secret.keys.join("")
-        ) {
-          secret.action();
-          lastKeys.splice(-secret.keys.length);
-        }
-      });
 
       // if (["arrowdown", "s"].includes(key)) {
       //   if (this.ground === document.body) {
@@ -359,8 +315,7 @@ export class HedgehogActor extends Actor {
       this.hue = this.hue > 360 ? 0 : this.hue;
       this.filter.hue(this.hue, false);
     } else if (this.options.color) {
-      const options =
-        window.colorOptions ?? COLOR_TO_FILTER_MAP[this.options.color];
+      const options = COLOR_TO_FILTER_MAP[this.options.color];
       this.filter.reset();
       options?.(this.filter);
     }

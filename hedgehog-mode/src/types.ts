@@ -1,6 +1,7 @@
 import type Matter from "matter-js";
 import { AnimatedSprite, Application, Ticker } from "pixi.js";
 import type { SpritesManager } from "./sprites/sprites";
+import type { HedgehogActor, HedgehogActorOptions } from "./actors/Hedgehog";
 
 export type GameElement = {
   readonly sprite?: AnimatedSprite;
@@ -25,6 +26,7 @@ export type Game = {
   spritesManager: SpritesManager;
   elapsed?: number;
   elements: GameElement[];
+  spawnHedgehog: (options?: HedgehogActorOptions) => HedgehogActor;
   removeElement: (element: GameElement) => void;
   log: (...args: unknown[]) => void;
 };

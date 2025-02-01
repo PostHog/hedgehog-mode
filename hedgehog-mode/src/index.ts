@@ -12,6 +12,7 @@ import { SyncedBox } from "./items/SyncedBox";
 import { getRandomAccesoryCombo } from "./actors/Accessories";
 import { Actor } from "./actors/Actor";
 import { sample } from "lodash";
+import { GlobalKeyboardListeners } from "./misc/GlobalKeyboardListeners";
 
 export class HedgeHogMode implements Game {
   ref?: HTMLDivElement;
@@ -55,12 +56,16 @@ export class HedgeHogMode implements Game {
     this.pointerEventsEnabled = enabled;
   }
 
-  private spawnHedgehog(options: HedgehogActorOptions) {
+  spawnHedgehog(options: HedgehogActorOptions = {}): HedgehogActor {
     if (!options.accessories) {
       options.accessories = getRandomAccesoryCombo();
     }
+    if (!options.color) {
+      options.color = sample([...HEDGEHOG_COLOR_OPTIONS, undefined]);
+    }
     const actor = new HedgehogActor(this, options);
     this.spawnActor(actor);
+    return actor;
   }
 
   public spawnActor(actor: Actor): void {
@@ -132,6 +137,7 @@ export class HedgeHogMode implements Game {
     // Start the debug renderer
     Render.run(this.debugRender);
 
+    new GlobalKeyboardListeners(this);
     this.setupLevel();
   }
 

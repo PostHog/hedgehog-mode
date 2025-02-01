@@ -7,6 +7,7 @@ export class Actor implements GameElement {
   public sprite: AnimatedSprite;
   public isPointerOver = false;
   public isDragging = false;
+  public isFlammable = false;
   protected currentAnimation: AvailableAnimations;
   protected connectedElements: GameElement[] = [];
 
@@ -113,6 +114,14 @@ export class Actor implements GameElement {
       this.game.spritesManager.getAnimatedSpriteFrames(animation);
     this.sprite.currentFrame = 0;
     this.sprite.play();
+  }
+
+  public setVelocity(vector: Matter.Vector): void {
+    Matter.Body.setVelocity(this.rigidBody, vector);
+  }
+
+  public setPosition(position: Matter.Vector): void {
+    Matter.Body.setPosition(this.rigidBody, position);
   }
 
   setupPointerEvents(): void {

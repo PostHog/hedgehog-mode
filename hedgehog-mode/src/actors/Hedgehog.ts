@@ -1,9 +1,10 @@
 import { Actor } from "./Actor";
 import { Game, GameElement } from "../types";
-import Matter, { Constraint } from "matter-js";
+import Matter, { Constraint, Pair } from "matter-js";
 import { SyncedBox } from "../items/SyncedBox";
 import { AnimatedSprite, Sprite } from "pixi.js";
 import { HedgehogAccessory } from "./Accessories";
+import { FlameActor } from "../items/Flame";
 
 export type HedgehogActorOptions = {
   skin?: string;
@@ -21,6 +22,7 @@ export class HedgehogActor extends Actor {
   ropeConstraint?: Constraint;
   accessorySprites: { [key: string]: Sprite } = {};
   overlayAnimation?: AnimatedSprite;
+  isFlammable = true;
 
   hitBoxModifier = {
     left: 0.25,
@@ -38,7 +40,7 @@ export class HedgehogActor extends Actor {
     this.setupKeyboardListeners();
     this.isInteractive = options.interactions_enabled ?? true;
 
-    Matter.Body.setPosition(this.rigidBody, {
+    this.setPosition({
       x: window.innerWidth * Math.random(),
       y: 0,
     });
@@ -248,12 +250,6 @@ export class HedgehogActor extends Actor {
   update(): void {
     super.update();
 
-    // Match the position of the accessory to the hedgehog
-    // Object.values(this.accessorySprites).forEach((sprite) => {
-    //   sprite.x = this.sprite.x;
-    //   sprite.y = this.sprite.y;
-    // });
-
     const xForce = 25 * this.walkSpeed * this.rigidBody.mass;
 
     if (xForce !== 0) {
@@ -280,7 +276,7 @@ export class HedgehogActor extends Actor {
       }
     }
 
-    // We want to make it look like the hedgehog's accesories are disconnected. If we are falling then we position them slightly above
+    // We want to make it look like the hedgehog's accessories are disconnected. If we are falling then we position them slightly above
     if (this.rigidBody.velocity.y > 0.1) {
       const yOffsetDiff = Math.max(
         -10,
@@ -296,21 +292,34 @@ export class HedgehogActor extends Actor {
     }
   }
 
-  private maybeSetElementOnFire(element: GameElement): void {
-    if (
-      element instanceof HedgehogActor &&
-      this.isOnFire &&
-      !element.isOnFire
-    ) {
-      // TODO: This could be made better by checking for adjacent boxes when we start the fire too
+  private maybeSetElementOnFire(element: GameElement, pair?: Pair): void {
+    if (!this.isOnFire || !element.isFlammable) {
+      return;
+    }
+
+    if (element instanceof HedgehogActor && !element.isOnFire) {
+      // Set all other actors on fire
       element.setOnFire(1);
     }
+
+    console.log(pair);
+    // Create little flames
+    const contact = pair?.contacts?.[0];
+    const flame = new FlameActor(this.game);
+    flame.setPosition({
+      x: contact ? contact.vertex.x : this.rigidBody.position.x,
+      y: contact ? contact.vertex.y : this.rigidBody.position.y,
+    });
+    flame.setVelocity({
+      x: 0,
+      y: -2,
+    });
+    this.game.elements.push(flame);
   }
 
   onCollisionStart(element: GameElement, pair: Matter.Pair): void {
     super.onCollisionStart(element, pair);
-
-    this.maybeSetElementOnFire(element);
+    this.maybeSetElementOnFire(element, pair);
 
     if (element.rigidBody.bounds.min.y > this.rigidBody.bounds.min.y) {
       this.game.log("Hit something below");

@@ -6,6 +6,7 @@ import { HedgehogActor, HedgehogActorOptions } from "./actors/Hedgehog";
 import { Ground } from "./items/Ground";
 import { SyncedBox } from "./items/SyncedBox";
 import { getRandomAccesoryCombo } from "./actors/Accessories";
+import { Actor } from "./actors/Actor";
 
 export class HedgeHogMode implements Game {
   ref?: HTMLDivElement;
@@ -13,7 +14,7 @@ export class HedgeHogMode implements Game {
   engine: Matter.Engine;
   debugRender?: Matter.Render;
   elements: GameElement[] = []; // TODO: Type better
-  isDebugging = false;
+  isDebugging = true;
 
   pointerEventsEnabled = false;
   spritesManager: SpritesManager;
@@ -54,6 +55,10 @@ export class HedgeHogMode implements Game {
       options.accessories = getRandomAccesoryCombo();
     }
     const actor = new HedgehogActor(this, options);
+    this.spawnActor(actor);
+  }
+
+  public spawnActor(actor: Actor): void {
     this.elements.push(actor);
   }
 
@@ -193,7 +198,7 @@ export class HedgeHogMode implements Game {
     return this.elements.find((element) => element.rigidBody === rb);
   }
 
-  private removeElement(element: GameElement) {
+  removeElement(element: GameElement): void {
     element.beforeUnload();
     Matter.Composite.remove(this.engine.world, element.rigidBody); // stop physics simulation
     this.app.stage.removeChild(element.sprite); // stop drawing on the canvas

@@ -7,6 +7,7 @@ export class Ground implements GameElement {
   rigidBody: Matter.Body;
   isPointerOver = false;
   isInteractive = false;
+  isFlammable = true;
 
   constructor(game: Game) {
     // Ground should be set to the bottom of the screen

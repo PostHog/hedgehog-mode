@@ -11,6 +11,7 @@ export type GameElement = {
   update: () => void;
   isPointerOver: boolean;
   isInteractive: boolean;
+  isFlammable?: boolean;
 };
 
 export type HedgehogModeConfig = {
@@ -24,5 +25,6 @@ export type Game = {
   spritesManager: SpritesManager;
   elapsed?: number;
   elements: GameElement[];
+  removeElement: (element: GameElement) => void;
   log: (...args: unknown[]) => void;
 };

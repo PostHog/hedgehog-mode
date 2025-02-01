@@ -3,7 +3,7 @@ import { Game } from "../types";
 import { Ticker } from "pixi.js";
 import { COLLISIONS } from "../misc/collisions";
 import gsap from "gsap";
-// TODO: How to make this collide to trigger fires but not part of the physics collisions
+
 export class FlameActor extends Actor {
   public isFlammable = false;
   hitBoxModifier = {
@@ -14,8 +14,6 @@ export class FlameActor extends Actor {
   };
 
   fadeValue = 0;
-
-  private tween: gsap.core.Tween | null = null;
 
   constructor(game: Game) {
     super(game, {
@@ -39,13 +37,12 @@ export class FlameActor extends Actor {
     this.setScale(0.4);
 
     setTimeout(() => {
-      this.tween = gsap.to(this, {
+      gsap.to(this, {
         fadeValue: 1,
         duration: 1,
         ease: "power2.in",
         onComplete: () => {
           this.game.removeElement(this);
-          this.tween = null;
         },
       });
     }, 1000);

@@ -150,6 +150,7 @@ export class HedgeHogMode implements Game {
 
     this.spawnHedgehog({
       controls_enabled: true,
+      player: true,
       color: "rainbow",
     });
 

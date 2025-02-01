@@ -7,6 +7,7 @@ import { HedgehogAccessory } from "./Accessories";
 import { FlameActor } from "../items/Flame";
 import { range } from "lodash";
 import gsap from "gsap";
+import { COLLISIONS } from "../misc/collisions";
 
 export const HEDGEHOG_COLOR_OPTIONS = [
   "green",
@@ -64,6 +65,7 @@ const COLOR_TO_FILTER_MAP: Record<
 };
 
 export type HedgehogActorOptions = {
+  player?: boolean;
   skin?: string;
   color?: HedgehogActorColorOptions | null;
   accessories?: HedgehogAccessory[];
@@ -81,6 +83,7 @@ export class HedgehogActor extends Actor {
   overlayAnimation?: AnimatedSprite;
   isFlammable = true;
   hue = 0;
+  health = 100;
 
   private filter = new ColorMatrixFilter();
 
@@ -193,6 +196,14 @@ export class HedgehogActor extends Actor {
     });
 
     this.jumps++;
+  }
+
+  receiveDamage(amount: number): void {
+    this.health -= amount;
+
+    if (this.health <= 0) {
+      this.destroy();
+    }
   }
 
   setupKeyboardListeners(): () => void {
@@ -347,6 +358,10 @@ export class HedgehogActor extends Actor {
     if (element instanceof HedgehogActor && !element.isOnFire) {
       // Set all other actors on fire
       element.setOnFire(1);
+      // If it isn't the player then damage it
+      if (!element.options.player) {
+        element.receiveDamage(50);
+      }
     }
 
     // Create little flames
@@ -399,6 +414,28 @@ export class HedgehogActor extends Actor {
       sprite.eventMode = "static";
       sprite.anchor.set(0.5);
       this.sprite.addChild(sprite);
+    });
+  }
+
+  destroy(): void {
+    this.setVelocity({
+      x: 0,
+      y: -5,
+    });
+
+    this.rigidBody.collisionFilter = {
+      category: COLLISIONS.NONE,
+      mask: COLLISIONS.NONE,
+    };
+
+    gsap.to(this.sprite.scale, {
+      x: 0,
+      y: 0,
+      duration: 3,
+      ease: "elastic.out",
+      onComplete: () => {
+        this.game.removeElement(this);
+      },
     });
   }
 

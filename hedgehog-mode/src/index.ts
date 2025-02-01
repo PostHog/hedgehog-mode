@@ -2,11 +2,16 @@ import Matter, { Render } from "matter-js";
 import { Application, Ticker } from "pixi.js";
 import { Game, GameElement, HedgehogModeConfig } from "./types";
 import { SpritesManager } from "./sprites/sprites";
-import { HedgehogActor, HedgehogActorOptions } from "./actors/Hedgehog";
+import {
+  HEDGEHOG_COLOR_OPTIONS,
+  HedgehogActor,
+  HedgehogActorOptions,
+} from "./actors/Hedgehog";
 import { Ground } from "./items/Ground";
 import { SyncedBox } from "./items/SyncedBox";
 import { getRandomAccesoryCombo } from "./actors/Accessories";
 import { Actor } from "./actors/Actor";
+import { sample } from "lodash";
 
 export class HedgeHogMode implements Game {
   ref?: HTMLDivElement;
@@ -14,7 +19,7 @@ export class HedgeHogMode implements Game {
   engine: Matter.Engine;
   debugRender?: Matter.Render;
   elements: GameElement[] = []; // TODO: Type better
-  isDebugging = true;
+  isDebugging = false;
 
   pointerEventsEnabled = false;
   spritesManager: SpritesManager;
@@ -135,11 +140,13 @@ export class HedgeHogMode implements Game {
 
     this.spawnHedgehog({
       controls_enabled: true,
+      color: "rainbow",
     });
 
     for (let i = 0; i < 20; i++) {
       this.spawnHedgehog({
         controls_enabled: false,
+        color: sample(HEDGEHOG_COLOR_OPTIONS),
       });
     }
   }
@@ -150,7 +157,7 @@ export class HedgeHogMode implements Game {
     let shouldHavePointerEvents = false;
 
     for (const el of this.elements) {
-      el.update();
+      el.update(ticker);
 
       if (el.isPointerOver && el.isInteractive) {
         shouldHavePointerEvents = true;

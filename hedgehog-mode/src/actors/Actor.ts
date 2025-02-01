@@ -1,5 +1,5 @@
 import Matter, { Constraint } from "matter-js";
-import { AnimatedSprite } from "pixi.js";
+import { AnimatedSprite, Ticker } from "pixi.js";
 import { AvailableAnimations } from "../sprites/sprites";
 import { Game, GameElement } from "../types";
 
@@ -158,7 +158,7 @@ export class Actor implements GameElement {
     });
   }
 
-  update(): void {
+  update(_ticker: Ticker): void {
     const yDiff = this.game.app.screen.height - this.rigidBody.position.y;
 
     if (yDiff < 0) {

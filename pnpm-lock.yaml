@@ -10,6 +10,9 @@ importers:
 
   hedgehog-mode:
     dependencies:
+      lodash:
+        specifier: ^4.17.21
+        version: 4.17.21
       matter-js:
         specifier: ^0.20.0
         version: 0.20.0
@@ -20,6 +23,9 @@ importers:
       '@eslint/js':
         specifier: ^9.7.0
         version: 9.10.0
+      '@types/lodash':
+        specifier: ^4.17.15
+        version: 4.17.15
       '@types/matter-js':
         specifier: ^0.19.8
         version: 0.19.8
@@ -912,6 +918,10 @@ packages:
 
   /@types/json5@0.0.29:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
+    dev: true
+
+  /@types/lodash@4.17.15:
+    resolution: {integrity: sha512-w/P33JFeySuhN6JLkysYUK2gEmy9kHHFN7E8ro0tkfmlDOgxBDzWEZ/J8cWA+fHqFevpswDTFZnDx+R9lbL6xw==}
     dev: true
 
   /@types/matter-js@0.19.8:
@@ -3383,7 +3393,6 @@ packages:
 
   /lodash@4.17.21:
     resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
-    dev: true
 
   /loose-envify@1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}

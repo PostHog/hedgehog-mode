@@ -1,5 +1,5 @@
 import type Matter from "matter-js";
-import { AnimatedSprite, Application } from "pixi.js";
+import { AnimatedSprite, Application, Ticker } from "pixi.js";
 import type { SpritesManager } from "./sprites/sprites";
 
 export type GameElement = {
@@ -8,7 +8,7 @@ export type GameElement = {
   onCollisionStart?: (element: GameElement, pair: Matter.Pair) => void;
   onCollisionEnd?: (element: GameElement, pair: Matter.Pair) => void;
   beforeUnload?: () => void;
-  update: () => void;
+  update: (ticker: Ticker) => void;
   isPointerOver: boolean;
   isInteractive: boolean;
   isFlammable?: boolean;

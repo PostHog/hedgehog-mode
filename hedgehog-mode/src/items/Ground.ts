@@ -1,3 +1,4 @@
+import { Ticker } from "pixi.js";
 import { Game, GameElement } from "../types";
 import Matter from "matter-js";
 

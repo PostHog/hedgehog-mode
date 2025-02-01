@@ -1,6 +1,7 @@
 import Matter from "matter-js";
 import { Actor } from "../actors/Actor";
 import { Game, GameElement } from "../types";
+import { Ticker } from "pixi.js";
 
 // TODO: How to make this collide to trigger fires but not part of the physics collisions
 export class FlameActor extends Actor {
@@ -43,8 +44,8 @@ export class FlameActor extends Actor {
     }, 2000);
   }
 
-  update(): void {
-    super.update();
+  update(ticker: Ticker): void {
+    super.update(ticker);
     this.rigidBody.angle = 0;
   }
 

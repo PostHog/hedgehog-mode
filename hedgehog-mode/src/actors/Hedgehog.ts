@@ -2,13 +2,68 @@ import { Actor } from "./Actor";
 import { Game, GameElement } from "../types";
 import Matter, { Constraint, Pair } from "matter-js";
 import { SyncedBox } from "../items/SyncedBox";
-import { AnimatedSprite, Sprite } from "pixi.js";
+import { AnimatedSprite, ColorMatrixFilter, Sprite, Ticker } from "pixi.js";
 import { HedgehogAccessory } from "./Accessories";
 import { FlameActor } from "../items/Flame";
 
+export const HEDGEHOG_COLOR_OPTIONS = [
+  "green",
+  "red",
+  "blue",
+  "purple",
+  "dark",
+  "light",
+  "greyscale",
+  "sepia",
+  "invert",
+  "rainbow",
+] as const;
+
+export type HedgehogActorColorOptions = (typeof HEDGEHOG_COLOR_OPTIONS)[number];
+
+const COLOR_TO_FILTER_MAP: Record<
+  HedgehogActorColorOptions,
+  (filter: ColorMatrixFilter) => void
+> = {
+  red: (filter) => {
+    filter.hue(350, true);
+    filter.saturate(1.2, true);
+    filter.brightness(0.9, true);
+  },
+  green: (filter) => {
+    filter.hue(60, true);
+    filter.saturate(1, true);
+  },
+  blue: (filter) => {
+    filter.hue(210, true);
+    filter.saturate(3, true);
+    filter.brightness(0.9, true);
+  },
+  purple: (filter) => {
+    filter.hue(240, true);
+  },
+  dark: (filter) => {
+    filter.brightness(0.7, true);
+  },
+  light: (filter) => {
+    filter.brightness(1.3, true);
+  },
+  sepia: (filter) => {
+    filter.saturate(3.0, true);
+    filter.brightness(0.7, true);
+  },
+  invert: (filter) => {
+    filter.negative(true);
+  },
+  greyscale: (filter) => {
+    filter.grayscale(0.3, true);
+  },
+  rainbow: (filter) => {},
+};
+
 export type HedgehogActorOptions = {
   skin?: string;
-  color?: string | null;
+  color?: HedgehogActorColorOptions | null;
   accessories?: HedgehogAccessory[];
   walking_enabled?: boolean;
   interactions_enabled?: boolean;
@@ -23,6 +78,9 @@ export class HedgehogActor extends Actor {
   accessorySprites: { [key: string]: Sprite } = {};
   overlayAnimation?: AnimatedSprite;
   isFlammable = true;
+  hue = 0;
+
+  private filter = new ColorMatrixFilter();
 
   hitBoxModifier = {
     left: 0.25,
@@ -60,6 +118,7 @@ export class HedgehogActor extends Actor {
       return;
     }
     super.updateSprite(spriteName);
+    this.sprite.filters = [this.filter];
   }
 
   private fireTimer?: NodeJS.Timeout;
@@ -94,7 +153,7 @@ export class HedgehogActor extends Actor {
       this.sprite.addChild(this.overlayAnimation);
     }
 
-    Matter.Body.setVelocity(this.rigidBody, {
+    this.setVelocity({
       x: (Math.random() - 0.5) * 20,
       y: this.getGround() ? -10 : this.rigidBody.velocity.y,
     });
@@ -106,7 +165,7 @@ export class HedgehogActor extends Actor {
       return;
     }
 
-    Matter.Body.setVelocity(this.rigidBody, {
+    this.setVelocity({
       x: 0,
       y: -10,
     });
@@ -247,13 +306,13 @@ export class HedgehogActor extends Actor {
     };
   }
 
-  update(): void {
-    super.update();
+  update(ticker: Ticker): void {
+    super.update(ticker);
 
     const xForce = 25 * this.walkSpeed * this.rigidBody.mass;
 
     if (xForce !== 0) {
-      Matter.Body.setVelocity(this.rigidBody, {
+      this.setVelocity({
         x: xForce,
         y: this.rigidBody.velocity.y,
       });
@@ -290,6 +349,21 @@ export class HedgehogActor extends Actor {
         sprite.y = 0;
       });
     }
+
+    this.updateColor(ticker);
+  }
+
+  private updateColor(ticker: Ticker) {
+    if (this.options.color === "rainbow") {
+      this.hue += 360 * (ticker.deltaMS / 1000);
+      this.hue = this.hue > 360 ? 0 : this.hue;
+      this.filter.hue(this.hue, false);
+    } else if (this.options.color) {
+      const options =
+        window.colorOptions ?? COLOR_TO_FILTER_MAP[this.options.color];
+      this.filter.reset();
+      options?.(this.filter);
+    }
   }
 
   private maybeSetElementOnFire(element: GameElement, pair?: Pair): void {
@@ -302,7 +376,6 @@ export class HedgehogActor extends Actor {
       element.setOnFire(1);
     }
 
-    console.log(pair);
     // Create little flames
     const contact = pair?.contacts?.[0];
     const flame = new FlameActor(this.game);

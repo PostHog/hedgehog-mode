@@ -64,7 +64,7 @@ export class Actor implements GameElement {
 
     const playerOptions: Matter.IBodyDefinition = {
       density: 0.001,
-      friction: 0.7,
+      friction: 0.2,
       frictionStatic: 0,
       frictionAir: 0.01,
       restitution: 0.5,

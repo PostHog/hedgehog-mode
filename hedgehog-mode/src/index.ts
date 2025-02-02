@@ -107,9 +107,7 @@ export class HedgeHogMode implements Game {
 
     window.addEventListener("resize", () => this.resize());
 
-    setTimeout(() => {
-      this.syncPlatforms();
-    }, 1000);
+    setTimeout(() => this.syncPlatforms(), 1000);
     this.syncPlatforms();
 
     // Add debug renderer

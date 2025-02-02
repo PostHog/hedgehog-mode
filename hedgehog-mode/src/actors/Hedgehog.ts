@@ -146,6 +146,8 @@ export class HedgehogActor extends Actor {
       duration: 0.5,
       ease: "elastic.out",
     });
+
+    this.setupSpiderHogRope();
   }
 
   updateSprite(sprite: string): void {
@@ -229,6 +231,42 @@ export class HedgehogActor extends Actor {
     if (this.health <= 0) {
       this.destroy();
     }
+  }
+
+  setupSpiderHogRope(): void {
+    this.game.app.stage.on("pointerdown", (e) => {
+      if (this.options.skin !== "spiderhog") {
+        return;
+      }
+
+      this.collisionFilterOverride = NO_PLATFORM_COLLISION_FILTER;
+
+      const ropeConstraint = Constraint.create({
+        pointA: { x: e.clientX, y: e.clientY },
+        bodyB: this.rigidBody,
+        length: 50,
+        stiffness: 0.01,
+        damping: 0.05,
+      });
+      Matter.World.addConstraint(this.game.engine.world, ropeConstraint);
+
+      const onDragMove = () => {
+        ropeConstraint.pointA.x = e.clientX;
+        ropeConstraint.pointA.y = e.clientY;
+      };
+
+      const onDragEnd = () => {
+        this.isDragging = false;
+        Matter.World.remove(this.game.engine.world, ropeConstraint);
+
+        this.game.app.stage.off("pointermove", onDragMove);
+        this.collisionFilterOverride = undefined;
+      };
+
+      this.game.app.stage.on("pointermove", onDragMove);
+      this.game.app.stage.on("pointerup", onDragEnd);
+      this.game.app.stage.on("pointerupoutside", onDragEnd);
+    });
   }
 
   setupKeyboardListeners(): () => void {

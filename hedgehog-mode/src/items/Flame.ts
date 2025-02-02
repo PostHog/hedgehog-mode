@@ -8,6 +8,8 @@ import { range } from "lodash";
 const FLAME_SCALE = 0.2;
 
 export class FlameActor extends Actor {
+  public isFlammable = false;
+
   static fireBurst(game: Game, position: Matter.Vector): void {
     range(10).forEach(() => {
       const flame = new FlameActor(game);
@@ -23,7 +25,6 @@ export class FlameActor extends Actor {
     });
   }
 
-  public isFlammable = false;
   hitBoxModifier = {
     left: 0.25,
     right: 0.24,

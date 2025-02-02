@@ -263,11 +263,6 @@ export class HedgehogActor extends Actor {
       if (["arrowleft", "a", "arrowright", "d"].includes(key)) {
         this.walkSpeed = 2;
 
-        // this.isControlledByUser = true;
-        // if (this.mainAnimation?.name !== "walk") {
-        //   this.setAnimation("walk");
-        // }
-
         const direction = ["arrowleft", "a"].includes(key) ? "left" : "right";
 
         const moonwalk = e.altKey;
@@ -291,10 +286,6 @@ export class HedgehogActor extends Actor {
     };
 
     const keyUpListener = (e: KeyboardEvent): void => {
-      // Reset friction
-      // if (shouldIgnoreInput(e) || !this.hedgehogConfig.controls_enabled) {
-      //   return;
-      // }
       const key = e.key.toLowerCase();
 
       if (["arrowleft", "a", "arrowright", "d"].includes(key)) {

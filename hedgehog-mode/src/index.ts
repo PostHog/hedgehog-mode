@@ -26,6 +26,7 @@ export class HedgeHogMode implements Game {
   pointerEventsEnabled = false;
   isDebugging = false;
   spritesManager: SpritesManager;
+  mousePosition?: Matter.Vector;
   elapsed?: number;
 
   constructor(private options: HedgehogModeConfig) {
@@ -138,6 +139,10 @@ export class HedgeHogMode implements Game {
     // Start the debug renderer
     Render.run(this.debugRender);
 
+    document.addEventListener("mousemove", (event) => {
+      this.mousePosition = { x: event.clientX, y: event.clientY };
+    });
+
     new GlobalKeyboardListeners(this);
     gsap.ticker.remove(gsap.updateRoot);
     await this.setupLevel();
@@ -173,7 +178,12 @@ export class HedgeHogMode implements Game {
     for (const el of this.elements) {
       el.update(ticker);
 
-      if (el.isPointerOver && el.isInteractive) {
+      if (
+        !shouldHavePointerEvents &&
+        el instanceof HedgehogActor &&
+        this.mousePosition && // Add null check
+        Matter.Query.point([el.rigidBody], this.mousePosition).length > 0
+      ) {
         shouldHavePointerEvents = true;
       }
     }
@@ -243,8 +253,12 @@ export class HedgeHogMode implements Game {
   }
 
   private syncPlatforms() {
-    // TODO: Move this to a config option
-    const boxes = Array.from(document.querySelectorAll(".border"));
+    if (!this.options.platformSelector) {
+      return;
+    }
+    const boxes = Array.from(
+      document.querySelectorAll(this.options.platformSelector)
+    );
     const existingBoxes = this.elements.filter(
       (el) => el instanceof SyncedPlatform
     );

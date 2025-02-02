@@ -5,7 +5,6 @@ import { Game, GameElement } from "../types";
 
 export class Actor implements GameElement {
   public sprite: AnimatedSprite;
-  public isPointerOver = false;
   public isDragging = false;
   public isFlammable = false;
   protected currentAnimation?: AvailableAnimations;
@@ -23,6 +22,8 @@ export class Actor implements GameElement {
     bottom: 0,
   };
 
+  forceAngle = 0;
+
   constructor(
     protected game: Game,
     private rigidBodyOptions: Matter.IBodyDefinition = {}
@@ -36,16 +37,6 @@ export class Actor implements GameElement {
     this.sprite.animationSpeed = 0.5;
 
     this.loadRigidBody();
-
-    // Setup a bunch of listeners for the sprite
-    this.sprite.on("pointerover", () => {
-      this.isPointerOver = true;
-    });
-    this.sprite.on("pointerout", () => {
-      if (!this.isDragging) {
-        this.isPointerOver = false;
-      }
-    });
 
     this.sprite.eventMode = "static";
     this.sprite.play();
@@ -178,6 +169,14 @@ export class Actor implements GameElement {
   }
 
   update(_ticker: Ticker): void {
+    // Check if below screen and if so then move up
+    if (this.rigidBody.position.y > this.game.app.screen.height) {
+      this.setPosition({
+        x: this.rigidBody.position.x,
+        y: 0,
+      });
+    }
+
     // Apply the collision filter override if it exists
     this.rigidBody.collisionFilter.mask =
       this.collisionFilterOverride?.mask ?? this.collisionFilter.mask;
@@ -210,6 +209,9 @@ export class Actor implements GameElement {
     const xOffsetDiff = width * this.hitBoxModifier.left;
     const xCenterDiff = (width - hitBoxWidth) / 2;
 
+    // Keep it upright (unless overidden)
+    this.rigidBody.angle = this.forceAngle;
+
     this.sprite.x = this.rigidBody.position.x - xOffsetDiff + xCenterDiff;
     this.sprite.y = this.rigidBody.position.y - yOffsetDiff + yCenterDiff;
     this.sprite.rotation = this.rigidBody.angle;
@@ -229,8 +231,6 @@ export class Actor implements GameElement {
       });
     }
 
-    // Keep it upright
-    this.rigidBody.angle = 0;
     // // TRICKY: The scale of the hitbox is different to the sprite
   }
 

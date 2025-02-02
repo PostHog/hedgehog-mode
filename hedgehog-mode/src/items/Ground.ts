@@ -13,7 +13,6 @@ const getGroundPosition = (): Matter.Vector => {
 
 export class Ground implements GameElement {
   rigidBody: Matter.Body;
-  isPointerOver = false;
   isInteractive = false;
   isFlammable = true;
 

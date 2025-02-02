@@ -6,7 +6,6 @@ const PLATFORM_HEIGHT = 5;
 
 export class SyncedPlatform implements GameElement {
   rigidBody: Matter.Body;
-  isPointerOver = false;
   isInteractive = false;
   lastRect: DOMRect | null = null;
 

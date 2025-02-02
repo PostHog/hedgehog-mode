@@ -10,7 +10,6 @@ export type GameElement = {
   onCollisionEnd?: (element: GameElement, pair: Matter.Pair) => void;
   beforeUnload?: () => void;
   update: (ticker: Ticker) => void;
-  isPointerOver: boolean;
   isInteractive: boolean;
   isFlammable?: boolean;
 };

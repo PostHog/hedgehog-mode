@@ -1,10 +1,28 @@
 import { Actor } from "../actors/Actor";
-import { Game } from "../types";
+import { Game, GameElement } from "../types";
 import { Ticker } from "pixi.js";
 import { COLLISIONS } from "../misc/collisions";
 import gsap from "gsap";
+import { range } from "lodash";
+
+const FLAME_SCALE = 0.2;
 
 export class FlameActor extends Actor {
+  static fireBurst(game: Game, position: Matter.Vector): void {
+    range(10).forEach(() => {
+      const flame = new FlameActor(game);
+      flame.setPosition({
+        x: position.x + (Math.random() - 0.5) * 10,
+        y: position.y + (Math.random() - 0.5) * 10,
+      });
+      flame.setVelocity({
+        x: (Math.random() - 0.5) * 10,
+        y: -10,
+      });
+      game.elements.push(flame);
+    });
+  }
+
   public isFlammable = false;
   hitBoxModifier = {
     left: 0.25,
@@ -24,6 +42,7 @@ export class FlameActor extends Actor {
       inertia: Infinity,
       inverseInertia: Infinity,
       label: "Flame",
+      isSensor: true,
       collisionFilter: {
         category: COLLISIONS.PROJECTILE,
         mask: COLLISIONS.PLATFORM,
@@ -50,9 +69,17 @@ export class FlameActor extends Actor {
 
   update(ticker: Ticker): void {
     this.sprite.alpha = (1 - this.fadeValue) * 0.75;
-    const scale = (1 - this.fadeValue) * 0.4;
+    const scale = (1 - this.fadeValue) * FLAME_SCALE;
     this.sprite.scale.set(scale, scale);
 
     super.update(ticker);
+  }
+
+  onCollisionStart(element: GameElement, pair: Matter.Pair): void {
+    pair.isActive = false;
+    // if (element instanceof HedgehogActor) {
+    //   console.log("COLLISION", element);
+    //   element.setOnFire();
+    // }
   }
 }

@@ -74,6 +74,11 @@ export type HedgehogActorOptions = {
   controls_enabled?: boolean;
 };
 
+const DEFAULT_COLLISION_FILTER = {
+  category: COLLISIONS.ACTOR,
+  mask: COLLISIONS.PLATFORM | COLLISIONS.ACTOR | COLLISIONS.PROJECTILE,
+};
+
 export class HedgehogActor extends Actor {
   direction: "left" | "right" = "right";
   jumps = 0;
@@ -98,7 +103,9 @@ export class HedgehogActor extends Actor {
     game: Game,
     private options: HedgehogActorOptions
   ) {
-    super(game, {});
+    super(game, {
+      collisionFilter: DEFAULT_COLLISION_FILTER,
+    });
     this.updateSprite("jump");
     this.setupKeyboardListeners();
     this.isInteractive = options.interactions_enabled ?? true;
@@ -315,7 +322,7 @@ export class HedgehogActor extends Actor {
       if (this.rigidBody.velocity.x !== 0) {
         this.updateSprite("walk");
       } else {
-        this.updateSprite("wave");
+        this.updateSprite("walk");
         this.sprite.stop();
       }
     }
@@ -365,19 +372,8 @@ export class HedgehogActor extends Actor {
     }
 
     // Create little flames
-    const contact = pair?.contacts?.[0];
-    range(3).forEach(() => {
-      const flame = new FlameActor(this.game);
-      flame.setPosition({
-        x: contact ? contact.vertex.x : this.rigidBody.position.x,
-        y: contact ? contact.vertex.y : this.rigidBody.position.y,
-      });
-      flame.setVelocity({
-        x: (Math.random() - 0.5) * 10,
-        y: -4,
-      });
-      this.game.elements.push(flame);
-    });
+    const contact = pair?.contacts?.[0].vertex ?? this.rigidBody.position;
+    FlameActor.fireBurst(this.game, contact);
   }
 
   onCollisionStart(element: GameElement, pair: Matter.Pair): void {

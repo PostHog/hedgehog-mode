@@ -7,6 +7,7 @@ import { HedgehogAccessory } from "./Accessories";
 import { FlameActor } from "../items/Flame";
 import gsap from "gsap";
 import { COLLISIONS } from "../misc/collisions";
+import { sample } from "lodash";
 
 export const HEDGEHOG_COLOR_OPTIONS = [
   "green",
@@ -68,7 +69,7 @@ export type HedgehogActorOptions = {
   skin?: string;
   color?: HedgehogActorColorOptions | null;
   accessories?: HedgehogAccessory[];
-  walking_enabled?: boolean;
+  ai_enabled?: boolean;
   interactions_enabled?: boolean;
   controls_enabled?: boolean;
 };
@@ -93,7 +94,6 @@ const NO_PLATFORM_COLLISION_FILTER = {
 };
 
 export class HedgehogActor extends Actor {
-  direction: "left" | "right" = "right";
   jumps = 0;
   walkSpeed = 0;
   ropeConstraint?: Constraint;
@@ -121,6 +121,7 @@ export class HedgehogActor extends Actor {
     super(game);
     this.updateSprite("jump");
     this.setupKeyboardListeners();
+    this.setupAI();
     this.isInteractive = options.interactions_enabled ?? true;
 
     this.setPosition({
@@ -160,6 +161,10 @@ export class HedgehogActor extends Actor {
     }
     super.updateSprite(spriteName);
     this.sprite.filters = [this.filter];
+  }
+
+  get currentSprite(): string {
+    return this.currentAnimation.split("/")[2];
   }
 
   private fireTimer?: NodeJS.Timeout;
@@ -256,7 +261,7 @@ export class HedgehogActor extends Actor {
       }
 
       if (["arrowleft", "a", "arrowright", "d"].includes(key)) {
-        this.walkSpeed = 0.05;
+        this.walkSpeed = 2;
 
         // this.isControlledByUser = true;
         // if (this.mainAnimation?.name !== "walk") {
@@ -306,6 +311,75 @@ export class HedgehogActor extends Actor {
     };
   }
 
+  setupAI(): void {
+    // The "AI" is just automatic actions occur when the player is idle for log enough and are just picking from a list of randomly possible things
+    // On an interval we are just choosing a random action and doing it for the given interval
+
+    // TODO: Move hold timer to the base. Use it in the user controls as a blocker for the AI
+    let _hold;
+
+    const hold = (time: number) => {
+      clearTimeout(_hold);
+      _hold = setTimeout(() => {
+        _hold = undefined;
+      }, time);
+    };
+
+    const actions: {
+      [key: string]: {
+        frequency: number;
+        act: () => void;
+      };
+    } = {
+      wait: {
+        frequency: 3,
+        act: () => {
+          this.walkSpeed = 0;
+          hold(Math.random() * 1000 * 5);
+        },
+      },
+      jump: {
+        frequency: 1,
+        act: () => {
+          this.jump();
+        },
+      },
+      wave: {
+        frequency: 2,
+        act: () => {
+          this.walkSpeed = 0;
+          this.updateSprite("wave");
+          this.sprite.play();
+        },
+      },
+      walk: {
+        frequency: 1,
+        act: () => {
+          const direction = sample(["left", "right"] as const);
+          this.setDirection(direction);
+          this.walkSpeed = direction === "left" ? -1 : 1;
+          hold(Math.random() * 1000 * 5);
+        },
+      },
+    };
+
+    const possibleActions: (() => void)[] = [];
+
+    Object.values(actions).forEach((action) => {
+      for (let i = 0; i < action.frequency; i++) {
+        possibleActions.push(action.act);
+      }
+    });
+
+    // TODO: Make setInterval clearable
+    setInterval(() => {
+      if (_hold) {
+        return;
+      }
+      sample(possibleActions)();
+    }, 1000);
+  }
+
   setDirection(direction: "left" | "right"): void {
     if (direction === "left" && this.sprite.scale.x > 0) {
       this.sprite.scale.x *= -1;
@@ -323,7 +397,7 @@ export class HedgehogActor extends Actor {
 
     super.update(ticker);
 
-    const xForce = 25 * this.walkSpeed;
+    const xForce = this.walkSpeed;
 
     if (xForce !== 0) {
       this.setVelocity({
@@ -332,15 +406,16 @@ export class HedgehogActor extends Actor {
       });
     }
 
+    // Set the appropriate animation
     if (!this.getGround()) {
       this.updateSprite("fall");
-    } else {
-      if (this.rigidBody.velocity.x !== 0) {
-        this.updateSprite("walk");
-      } else {
-        this.updateSprite("walk");
-        this.sprite.stop();
-      }
+    } else if (Math.abs(this.rigidBody.velocity.x) > 0.1) {
+      // If horizontal movement is noticeable then walk
+      this.updateSprite("walk");
+    } else if (["fall", "walk"].includes(this.currentSprite)) {
+      // NOTE:  wave is just used as a placeholder anim. WE should have a dedicated idle animation
+      this.updateSprite("wave");
+      this.sprite.stop();
     }
 
     // We want to make it look like the hedgehog's accessories are disconnected. If we are falling then we position them slightly above

@@ -100,29 +100,30 @@ export class GlobalKeyboardListeners {
           this.getPlayableHedgehog().setScale(0.5);
         },
       },
-      {
-        keys: [
-          "arrowup",
-          "arrowup",
-          "arrowdown",
-          "arrowdown",
-          "arrowleft",
-          "arrowright",
-          "arrowleft",
-          "arrowright",
-          "b",
-          "a",
-        ],
-        action: () => {
-          this.getPlayableHedgehog().jump();
-          // this.gravity = -2;
+      // {
+      // // konami code
+      //   keys: [
+      //     "arrowup",
+      //     "arrowup",
+      //     "arrowdown",
+      //     "arrowdown",
+      //     "arrowleft",
+      //     "arrowright",
+      //     "arrowleft",
+      //     "arrowright",
+      //     "b",
+      //     "a",
+      //   ],
+      //   action: () => {
+      //     this.getPlayableHedgehog().jump();
+      //     // this.gravity = -2;
 
-          // lemonToast.info("I must leave. My people need me!");
-          // setTimeout(() => {
-          //   this.gravity = GRAVITY_PIXELS;
-          // }, 2000);
-        },
-      },
+      //     // lemonToast.info("I must leave. My people need me!");
+      //     // setTimeout(() => {
+      //     //   this.gravity = GRAVITY_PIXELS;
+      //     // }, 2000);
+      //   },
+      // },
     ];
 
     const keyDownListener = (e: KeyboardEvent): void => {

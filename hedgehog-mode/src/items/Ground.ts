@@ -7,7 +7,7 @@ const GROUND_HEIGHT = 100;
 const getGroundPosition = (): Matter.Vector => {
   return {
     x: window.innerWidth * 0.5,
-    y: window.innerHeight + GROUND_HEIGHT,
+    y: window.innerHeight + GROUND_HEIGHT * 0.5,
   };
 };
 
@@ -23,7 +23,7 @@ export class Ground implements GameElement {
     this.rigidBody = Matter.Bodies.rectangle(
       getGroundPosition().x,
       getGroundPosition().y,
-      window.innerWidth * 3,
+      window.innerWidth * 3, // Larger than the screen to avoid clipping
       GROUND_HEIGHT,
       {
         isStatic: true,

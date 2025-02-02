@@ -315,6 +315,13 @@ export class HedgehogActor extends Actor {
   }
 
   update(ticker: Ticker): void {
+    if (this.rigidBody.velocity.y < 0) {
+      // We are moving upwards so we don't want to collide with platforms
+      this.collisionFilter = NO_PLATFORM_COLLISION_FILTER;
+    } else {
+      this.collisionFilter = DEFAULT_COLLISION_FILTER;
+    }
+
     super.update(ticker);
 
     const xForce = 25 * this.walkSpeed * this.rigidBody.mass;

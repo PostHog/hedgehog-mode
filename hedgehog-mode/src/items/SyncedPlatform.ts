@@ -62,6 +62,9 @@ export class SyncedPlatform implements GameElement {
       x: rect.x + rect.width / 2,
       y: rect.y + PLATFORM_HEIGHT / 2,
     });
+
+    // TODO: Fix resizing of body
+
     this.rigidBody.isSensor = isOffScreen;
   }
 }

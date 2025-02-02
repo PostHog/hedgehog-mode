@@ -22,10 +22,9 @@ export class HedgeHogMode implements Game {
   engine: Matter.Engine;
   debugRender?: Matter.Render;
   elements: GameElement[] = []; // TODO: Type better
-  isDebugging = true;
   totalElapsedTime = 0;
-
   pointerEventsEnabled = false;
+  isDebugging = false;
   spritesManager: SpritesManager;
   elapsed?: number;
 

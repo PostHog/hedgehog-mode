@@ -70,9 +70,19 @@ export default function Home() {
         className="fixed inset-0 flex flex-col overflow-hidden"
         style={{ backgroundColor: "#eeefe9" }}
       >
-        <Logo />
+        <div className="relative flex-1 overflow-y-auto">
+          <div className="relative flex flex-col w-full h-full">
+            <Logo />
+          </div>
+          <div className="relative flex flex-col w-full h-full">
+            <Logo />
+          </div>
+          <div className="relative flex flex-col w-full h-full">
+            <Logo />
+          </div>
+        </div>
 
-        <div className="flex flex-row gap-2 p-12">
+        <div className="absolute bottom-0 z-10 flex flex-row gap-2 p-12">
           <Button onClick={() => game?.spawnHedgehog()}>Spawn hedgehog</Button>
         </div>
 

@@ -33,6 +33,11 @@ export class FlameActor extends Actor {
 
   fadeValue = 0;
 
+  collisionFilter = {
+    category: COLLISIONS.PROJECTILE,
+    mask: COLLISIONS.PLATFORM | COLLISIONS.GROUND,
+  };
+
   constructor(game: Game) {
     super(game, {
       friction: 0.7,
@@ -42,11 +47,6 @@ export class FlameActor extends Actor {
       inertia: Infinity,
       inverseInertia: Infinity,
       label: "Flame",
-      isSensor: true,
-      collisionFilter: {
-        category: COLLISIONS.PROJECTILE,
-        mask: COLLISIONS.PLATFORM,
-      },
     });
 
     this.loadSprite("overlays/fire/tile");

@@ -5,7 +5,6 @@ import { SyncedBox } from "../items/SyncedBox";
 import { AnimatedSprite, ColorMatrixFilter, Sprite, Ticker } from "pixi.js";
 import { HedgehogAccessory } from "./Accessories";
 import { FlameActor } from "../items/Flame";
-import { range } from "lodash";
 import gsap from "gsap";
 import { COLLISIONS } from "../misc/collisions";
 
@@ -74,9 +73,23 @@ export type HedgehogActorOptions = {
   controls_enabled?: boolean;
 };
 
-const DEFAULT_COLLISION_FILTER = {
+const BASE_COLLISION_FILTER = {
   category: COLLISIONS.ACTOR,
-  mask: COLLISIONS.PLATFORM | COLLISIONS.ACTOR | COLLISIONS.PROJECTILE,
+  mask:
+    COLLISIONS.ACTOR |
+    COLLISIONS.PLATFORM |
+    COLLISIONS.PROJECTILE |
+    COLLISIONS.GROUND,
+};
+
+const DEFAULT_COLLISION_FILTER = {
+  ...BASE_COLLISION_FILTER,
+  category: COLLISIONS.ACTOR,
+};
+
+const NO_PLATFORM_COLLISION_FILTER = {
+  ...BASE_COLLISION_FILTER,
+  mask: COLLISIONS.ACTOR | COLLISIONS.PROJECTILE | COLLISIONS.GROUND,
 };
 
 export class HedgehogActor extends Actor {
@@ -99,13 +112,13 @@ export class HedgehogActor extends Actor {
     bottom: 0.05,
   };
 
+  protected collisionFilter = DEFAULT_COLLISION_FILTER;
+
   constructor(
     game: Game,
     private options: HedgehogActorOptions
   ) {
-    super(game, {
-      collisionFilter: DEFAULT_COLLISION_FILTER,
-    });
+    super(game);
     this.updateSprite("jump");
     this.setupKeyboardListeners();
     this.isInteractive = options.interactions_enabled ?? true;
@@ -228,18 +241,15 @@ export class HedgehogActor extends Actor {
         lastKeys.shift();
       }
 
-      // if (["arrowdown", "s"].includes(key)) {
-      //   if (this.ground === document.body) {
-      //     if (this.mainAnimation?.name !== "wave") {
-      //       this.setAnimation("wave");
-      //     }
-      //   } else if (this.ground) {
-      //     const box = elementToBox(this.ground);
-      //     this.ignoreGroundAboveY = box.y + box.height - SPRITE_SIZE;
-      //     this.ground = null;
-      //     this.setAnimation("fall");
-      //   }
-      // }
+      if (["arrowdown", "s"].includes(key)) {
+        // Temporarily disable platform collisions
+        this.collisionFilterOverride = NO_PLATFORM_COLLISION_FILTER;
+
+        // TODO: Do this more intelligently with timer management
+        setTimeout(() => {
+          this.collisionFilterOverride = undefined;
+        }, 1000);
+      }
 
       if ([" ", "w", "arrowup"].includes(key)) {
         this.jump();
@@ -419,7 +429,7 @@ export class HedgehogActor extends Actor {
       y: -5,
     });
 
-    this.rigidBody.collisionFilter = {
+    this.collisionFilter = {
       category: COLLISIONS.NONE,
       mask: COLLISIONS.NONE,
     };

@@ -6,7 +6,6 @@ export class SyncedBox implements GameElement {
   rigidBody: Matter.Body;
   isPointerOver = false;
   isInteractive = false;
-
   lastRect: DOMRect | null = null;
 
   constructor(
@@ -14,7 +13,26 @@ export class SyncedBox implements GameElement {
     public ref: HTMLElement
   ) {
     // update just once to set the sprite initial position
-    this.update();
+
+    const rect = this.ref.getBoundingClientRect();
+
+    this.rigidBody = Matter.Bodies.rectangle(
+      rect.x + rect.width / 2,
+      rect.y + rect.height / 2,
+      rect.width,
+      rect.height,
+      {
+        isStatic: true,
+        isSensor: true,
+        label: "SyncedBox",
+        collisionFilter: {
+          category: COLLISIONS.PLATFORM,
+          mask: COLLISIONS.PLATFORM | COLLISIONS.ACTOR | COLLISIONS.PROJECTILE,
+        },
+      }
+    );
+
+    Matter.Composite.add(this.game.engine.world, this.rigidBody);
   }
 
   update(): void {
@@ -36,28 +54,16 @@ export class SyncedBox implements GameElement {
 
     this.lastRect = rect;
 
-    const oldBody = this.rigidBody;
+    const isOffScreen =
+      rect.y > this.game.app.screen.height ||
+      rect.x > this.game.app.screen.width ||
+      rect.y + rect.height < 0 ||
+      rect.x + rect.width < 0;
 
-    this.rigidBody = Matter.Bodies.rectangle(
-      rect.x + rect.width / 2,
-      rect.y + rect.height / 2,
-      rect.width,
-      rect.height,
-      {
-        isStatic: true,
-        label: "SyncedBox",
-        collisionFilter: {
-          category: COLLISIONS.PLATFORM,
-          mask: COLLISIONS.PLATFORM | COLLISIONS.ACTOR | COLLISIONS.PROJECTILE,
-        },
-      }
-    );
-
-    Matter.Composite.add(this.game.engine.world, this.rigidBody);
-
-    if (oldBody) {
-      // destroy it
-      Matter.Composite.remove(this.game.engine.world, oldBody);
-    }
+    Matter.Body.setPosition(this.rigidBody, {
+      x: rect.x + rect.width / 2,
+      y: rect.y + rect.height / 2,
+    });
+    this.rigidBody.isSensor = isOffScreen;
   }
 }

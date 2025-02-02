@@ -29,7 +29,7 @@ export class Ground implements GameElement {
         isStatic: true,
         label: "Ground",
         collisionFilter: {
-          category: COLLISIONS.PLATFORM,
+          category: COLLISIONS.GROUND,
           mask: COLLISIONS.PLATFORM | COLLISIONS.ACTOR | COLLISIONS.PROJECTILE,
         },
       }

@@ -10,7 +10,7 @@ import {
   HedgehogActorOptions,
 } from "./actors/Hedgehog";
 import { Ground } from "./items/Ground";
-import { SyncedBox } from "./items/SyncedBox";
+import { SyncedPlatform } from "./items/SyncedPlatfomr";
 import { getRandomAccesoryCombo } from "./actors/Accessories";
 import { Actor } from "./actors/Actor";
 import { sample } from "lodash";
@@ -246,7 +246,9 @@ export class HedgeHogMode implements Game {
   private syncBoxes() {
     // TODO: Move this to a config option
     const boxes = Array.from(document.querySelectorAll(".border"));
-    const existingBoxes = this.elements.filter((el) => el instanceof SyncedBox);
+    const existingBoxes = this.elements.filter(
+      (el) => el instanceof SyncedPlatform
+    );
 
     boxes.forEach((box) => {
       // TODO: Make this much faster...
@@ -255,7 +257,7 @@ export class HedgeHogMode implements Game {
         return;
       }
 
-      const syncedBox = new SyncedBox(this, box as HTMLElement);
+      const syncedBox = new SyncedPlatform(this, box as HTMLElement);
       this.elements.push(syncedBox);
     });
   }

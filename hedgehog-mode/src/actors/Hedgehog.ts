@@ -1,7 +1,7 @@
 import { Actor } from "./Actor";
 import { Game, GameElement } from "../types";
 import Matter, { Constraint, Pair } from "matter-js";
-import { SyncedBox } from "../items/SyncedBox";
+import { SyncedPlatform } from "../items/SyncedPlatfomr";
 import { AnimatedSprite, ColorMatrixFilter, Sprite, Ticker } from "pixi.js";
 import { HedgehogAccessory } from "./Accessories";
 import { FlameActor } from "../items/Flame";
@@ -397,7 +397,7 @@ export class HedgehogActor extends Actor {
       this.game.log("Hit something above");
       // We check if it is a platform and if so we ignore it
 
-      if (element instanceof SyncedBox) {
+      if (element instanceof SyncedPlatform) {
         pair.isActive = false;
       }
     }

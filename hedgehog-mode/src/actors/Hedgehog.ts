@@ -109,7 +109,7 @@ export class HedgehogActor extends Actor {
     left: 0.25,
     right: 0.24,
     top: 0.2,
-    bottom: 0.05,
+    bottom: 0.075,
   };
 
   protected collisionFilter = DEFAULT_COLLISION_FILTER;

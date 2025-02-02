@@ -182,7 +182,8 @@ export class HedgeHogMode implements Game {
         !shouldHavePointerEvents &&
         el instanceof HedgehogActor &&
         this.mousePosition && // Add null check
-        Matter.Query.point([el.rigidBody], this.mousePosition).length > 0
+        (Matter.Query.point([el.rigidBody], this.mousePosition) ||
+          el.isDragging)
       ) {
         shouldHavePointerEvents = true;
       }

@@ -87,6 +87,20 @@ export class GlobalKeyboardListeners {
         },
       },
       {
+        // giant
+        keys: ["g", "i", "a", "n", "t"],
+        action: () => {
+          this.getPlayableHedgehog().setScale(2);
+        },
+      },
+      {
+        // tiny
+        keys: ["t", "i", "n", "y"],
+        action: () => {
+          this.getPlayableHedgehog().setScale(0.5);
+        },
+      },
+      {
         keys: [
           "arrowup",
           "arrowup",

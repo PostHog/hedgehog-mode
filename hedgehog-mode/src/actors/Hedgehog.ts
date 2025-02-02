@@ -307,11 +307,10 @@ export class HedgehogActor extends Actor {
   }
 
   setDirection(direction: "left" | "right"): void {
-    if (direction === "left") {
-      this.sprite.scale.x = -1;
-    } else {
-      this.sprite.scale.x = 1;
-    }
+    if (direction === "left" && this.sprite.scale.x > 0) {
+      this.sprite.scale.x *= -1;
+    } else if (direction !== "left" && this.sprite.scale.x < 0)
+      this.sprite.scale.x *= -1;
   }
 
   update(ticker: Ticker): void {
@@ -324,7 +323,7 @@ export class HedgehogActor extends Actor {
 
     super.update(ticker);
 
-    const xForce = 25 * this.walkSpeed * this.rigidBody.mass;
+    const xForce = 25 * this.walkSpeed;
 
     if (xForce !== 0) {
       this.setVelocity({

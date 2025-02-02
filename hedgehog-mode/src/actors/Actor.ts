@@ -35,7 +35,7 @@ export class Actor implements GameElement {
     );
     this.sprite.animationSpeed = 0.5;
 
-    this.maybeLoadRigidBody();
+    this.loadRigidBody();
 
     // Setup a bunch of listeners for the sprite
     this.sprite.on("pointerover", () => {
@@ -57,7 +57,18 @@ export class Actor implements GameElement {
     this.setupPointerEvents();
   }
 
-  private maybeLoadRigidBody(): void {
+  private loadRigidBody(reset = false): void {
+    // If reset is passed then we recreate the rigid body
+    let x = window.innerWidth / 2;
+    let y = window.innerHeight / 2;
+
+    if (reset && this.rigidBody) {
+      x = this.rigidBody.position.x;
+      y = this.rigidBody.position.y;
+      Matter.Composite.remove(this.game.engine.world, this.rigidBody);
+      this.rigidBody = null;
+    }
+
     if (this.rigidBody) {
       return;
     }
@@ -79,8 +90,8 @@ export class Actor implements GameElement {
     const height = this.sprite.height;
 
     this.rigidBody = Matter.Bodies.rectangle(
-      window.innerWidth / 2,
-      window.innerHeight / 2,
+      x,
+      y,
       width -
         width * this.hitBoxModifier.left -
         width * this.hitBoxModifier.right,
@@ -127,7 +138,9 @@ export class Actor implements GameElement {
 
   public setScale(scale: number): void {
     this.sprite.scale.set(scale, scale);
-    Matter.Body.scale(this.rigidBody, scale, scale);
+    // We need to reload the body whenever the scale changes
+    // Ideally we would just fix this
+    this.loadRigidBody(true);
   }
 
   setupPointerEvents(): void {

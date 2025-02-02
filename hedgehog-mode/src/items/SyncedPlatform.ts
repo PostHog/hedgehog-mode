@@ -2,6 +2,8 @@ import { COLLISIONS } from "../misc/collisions";
 import { Game, GameElement } from "../types";
 import Matter from "matter-js";
 
+const PLATFORM_HEIGHT = 5;
+
 export class SyncedPlatform implements GameElement {
   rigidBody: Matter.Body;
   isPointerOver = false;
@@ -18,13 +20,13 @@ export class SyncedPlatform implements GameElement {
 
     this.rigidBody = Matter.Bodies.rectangle(
       rect.x + rect.width / 2,
-      rect.y + rect.height / 2,
+      rect.y + PLATFORM_HEIGHT / 2,
       rect.width,
-      rect.height,
+      PLATFORM_HEIGHT,
       {
         isStatic: true,
         isSensor: true,
-        label: "SyncedBox",
+        label: "SyncedPlatform",
         collisionFilter: {
           category: COLLISIONS.PLATFORM,
           mask: COLLISIONS.PLATFORM | COLLISIONS.ACTOR | COLLISIONS.PROJECTILE,
@@ -36,10 +38,6 @@ export class SyncedPlatform implements GameElement {
   }
 
   update(): void {
-    // TODO: Remove if out of screen bounds or if removed from DOM
-    // Check the element is still in the DOM
-    // Get its bounds - if they have changed then update the rigid body position
-
     const rect = this.ref.getBoundingClientRect();
 
     if (
@@ -62,7 +60,7 @@ export class SyncedPlatform implements GameElement {
 
     Matter.Body.setPosition(this.rigidBody, {
       x: rect.x + rect.width / 2,
-      y: rect.y + rect.height / 2,
+      y: rect.y + PLATFORM_HEIGHT / 2,
     });
     this.rigidBody.isSensor = isOffScreen;
   }

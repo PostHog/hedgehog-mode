@@ -44,6 +44,7 @@ export default function Home() {
     if (ref) {
       const hedgeHogMode = new HedgeHogMode({
         assetsUrl: "/assets",
+        platformSelector: ".border",
       });
       hedgeHogMode.render(ref);
       setGame(hedgeHogMode);
@@ -88,13 +89,7 @@ export default function Home() {
 
         <div
           id="game"
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-          }}
+          className="fixed inset-0 z-20"
           ref={(r) => setRef(r)}
         ></div>
       </main>

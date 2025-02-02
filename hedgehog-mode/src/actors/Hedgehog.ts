@@ -1,7 +1,7 @@
 import { Actor } from "./Actor";
 import { Game, GameElement } from "../types";
 import Matter, { Constraint, Pair } from "matter-js";
-import { SyncedPlatform } from "../items/SyncedPlatfomr";
+import { SyncedPlatform } from "../items/SyncedPlatform";
 import { AnimatedSprite, ColorMatrixFilter, Sprite, Ticker } from "pixi.js";
 import { HedgehogAccessory } from "./Accessories";
 import { FlameActor } from "../items/Flame";

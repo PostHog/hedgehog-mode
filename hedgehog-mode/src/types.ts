@@ -17,6 +17,8 @@ export type GameElement = {
 
 export type HedgehogModeConfig = {
   assetsUrl: string;
+  // Argument passed to document.querySelectorAll to find items to be used as platforms
+  platformSelector?: string;
 };
 
 export type Game = {

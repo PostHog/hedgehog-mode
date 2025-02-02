@@ -10,7 +10,7 @@ import {
   HedgehogActorOptions,
 } from "./actors/Hedgehog";
 import { Ground } from "./items/Ground";
-import { SyncedPlatform } from "./items/SyncedPlatfomr";
+import { SyncedPlatform } from "./items/SyncedPlatform";
 import { getRandomAccesoryCombo } from "./actors/Accessories";
 import { Actor } from "./actors/Actor";
 import { sample } from "lodash";
@@ -108,9 +108,9 @@ export class HedgeHogMode implements Game {
     window.addEventListener("resize", () => this.resize());
 
     setTimeout(() => {
-      this.syncBoxes();
+      this.syncPlatforms();
     }, 1000);
-    this.syncBoxes();
+    this.syncPlatforms();
 
     // Add debug renderer
     this.debugRender = Render.create({
@@ -243,7 +243,7 @@ export class HedgeHogMode implements Game {
     Matter.Render.setPixelRatio(this.debugRender, window.devicePixelRatio); // added this
   }
 
-  private syncBoxes() {
+  private syncPlatforms() {
     // TODO: Move this to a config option
     const boxes = Array.from(document.querySelectorAll(".border"));
     const existingBoxes = this.elements.filter(
@@ -257,8 +257,8 @@ export class HedgeHogMode implements Game {
         return;
       }
 
-      const syncedBox = new SyncedPlatform(this, box as HTMLElement);
-      this.elements.push(syncedBox);
+      const platform = new SyncedPlatform(this, box as HTMLElement);
+      this.elements.push(platform);
     });
   }
 

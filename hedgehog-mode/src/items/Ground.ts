@@ -2,7 +2,14 @@ import { Game, GameElement } from "../types";
 import Matter from "matter-js";
 import { COLLISIONS } from "../misc/collisions";
 
-const GROUND_HEIGHT = 20;
+const GROUND_HEIGHT = 100;
+
+const getGroundPosition = (): Matter.Vector => {
+  return {
+    x: window.innerWidth * 0.5,
+    y: window.innerHeight + GROUND_HEIGHT,
+  };
+};
 
 export class Ground implements GameElement {
   rigidBody: Matter.Body;
@@ -14,9 +21,9 @@ export class Ground implements GameElement {
     // Ground should be set to the bottom of the screen
 
     this.rigidBody = Matter.Bodies.rectangle(
-      window.innerWidth / 2,
-      window.innerHeight + GROUND_HEIGHT * 0.5,
-      window.innerWidth,
+      getGroundPosition().x,
+      getGroundPosition().y,
+      window.innerWidth * 3,
       GROUND_HEIGHT,
       {
         isStatic: true,
@@ -35,11 +42,6 @@ export class Ground implements GameElement {
   }
 
   update(): void {
-    Matter.Body.setPosition(this.rigidBody, {
-      x: window.innerWidth / 2,
-      y: window.innerHeight + GROUND_HEIGHT * 0.5,
-    });
-
-    // TODO: Fix the width scaling
+    Matter.Body.setPosition(this.rigidBody, getGroundPosition());
   }
 }

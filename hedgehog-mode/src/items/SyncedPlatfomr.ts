@@ -2,7 +2,7 @@ import { COLLISIONS } from "../misc/collisions";
 import { Game, GameElement } from "../types";
 import Matter from "matter-js";
 
-export class SyncedBox implements GameElement {
+export class SyncedPlatform implements GameElement {
   rigidBody: Matter.Body;
   isPointerOver = false;
   isInteractive = false;

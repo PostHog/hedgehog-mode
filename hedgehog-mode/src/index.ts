@@ -4,17 +4,22 @@ import Matter, { Render } from "matter-js";
 import { Application, Ticker } from "pixi.js";
 import { Game, GameElement, HedgehogModeConfig } from "./types";
 import { SpritesManager } from "./sprites/sprites";
-import {
-  HEDGEHOG_COLOR_OPTIONS,
-  HedgehogActor,
-  HedgehogActorOptions,
-} from "./actors/Hedgehog";
+import { HedgehogActor, HedgehogActorOptions } from "./actors/Hedgehog";
 import { Ground } from "./items/Ground";
 import { SyncedPlatform } from "./items/SyncedPlatform";
-import { getRandomAccesoryCombo } from "./actors/Accessories";
 import { Actor } from "./actors/Actor";
-import { sample } from "lodash";
 import { GlobalKeyboardListeners } from "./misc/GlobalKeyboardListeners";
+
+export type {
+  HedgehogActorColorOption,
+  HedgehogActorOptions,
+} from "./actors/Hedgehog";
+export { HedgehogActorColorOptions } from "./actors/Hedgehog";
+export {
+  HedgehogAccessories,
+  getRandomAccesoryCombo,
+} from "./actors/Accessories";
+export type { HedgehogAccessory } from "./actors/Accessories";
 
 export class HedgeHogMode implements Game {
   ref?: HTMLDivElement;
@@ -59,12 +64,6 @@ export class HedgeHogMode implements Game {
   }
 
   spawnHedgehog(options: HedgehogActorOptions = {}): HedgehogActor {
-    if (!options.accessories) {
-      options.accessories = getRandomAccesoryCombo();
-    }
-    if (!options.color) {
-      options.color = sample([...HEDGEHOG_COLOR_OPTIONS, undefined]);
-    }
     const actor = new HedgehogActor(this, options);
     this.spawnActor(actor);
     return actor;
@@ -143,26 +142,7 @@ export class HedgeHogMode implements Game {
 
     new GlobalKeyboardListeners(this);
     gsap.ticker.remove(gsap.updateRoot);
-    await this.setupLevel();
-  }
-
-  private async setupLevel() {
     this.elements.push(new Ground(this));
-
-    this.spawnHedgehog({
-      controls_enabled: true,
-      player: true,
-      color: "rainbow",
-    });
-
-    for (let i = 0; i < 20; i++) {
-      this.spawnHedgehog({
-        controls_enabled: false,
-        color: sample(HEDGEHOG_COLOR_OPTIONS),
-      });
-
-      await new Promise((resolve) => setTimeout(resolve, 100));
-    }
   }
 
   private update(ticker: Ticker) {

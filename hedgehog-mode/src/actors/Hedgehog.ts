@@ -9,7 +9,7 @@ import gsap from "gsap";
 import { COLLISIONS } from "../misc/collisions";
 import { sample } from "lodash";
 
-export const HEDGEHOG_COLOR_OPTIONS = [
+export const HedgehogActorColorOptions = [
   "green",
   "red",
   "blue",
@@ -22,10 +22,21 @@ export const HEDGEHOG_COLOR_OPTIONS = [
   "rainbow",
 ] as const;
 
-export type HedgehogActorColorOptions = (typeof HEDGEHOG_COLOR_OPTIONS)[number];
+export type HedgehogActorColorOption =
+  (typeof HedgehogActorColorOptions)[number];
+
+export type HedgehogActorOptions = {
+  player?: boolean;
+  skin?: string;
+  color?: HedgehogActorColorOption | null;
+  accessories?: HedgehogAccessory[];
+  ai_enabled?: boolean;
+  interactions_enabled?: boolean;
+  controls_enabled?: boolean;
+};
 
 const COLOR_TO_FILTER_MAP: Record<
-  HedgehogActorColorOptions,
+  HedgehogActorColorOption,
   (filter: ColorMatrixFilter) => void
 > = {
   red: (filter) => {
@@ -62,16 +73,6 @@ const COLOR_TO_FILTER_MAP: Record<
     filter.grayscale(0.3, true);
   },
   rainbow: (filter) => {},
-};
-
-export type HedgehogActorOptions = {
-  player?: boolean;
-  skin?: string;
-  color?: HedgehogActorColorOptions | null;
-  accessories?: HedgehogAccessory[];
-  ai_enabled?: boolean;
-  interactions_enabled?: boolean;
-  controls_enabled?: boolean;
 };
 
 const BASE_COLLISION_FILTER = {
@@ -132,7 +133,6 @@ export class HedgehogActor extends Actor {
       x: (Math.random() - 0.5) * 5,
       y: -5,
     });
-
     this.syncAccessories();
 
     this.sprite.scale = {
@@ -177,6 +177,7 @@ export class HedgehogActor extends Actor {
 
   updateOptions(options: Partial<HedgehogActorOptions>): void {
     this.options = { ...this.options, ...options };
+    this.syncAccessories();
   }
 
   setOnFire(times: number = 3): void {
@@ -514,12 +515,18 @@ export class HedgehogActor extends Actor {
   }
 
   private syncAccessories(): void {
+    // TODO: Remove old accessories
+    Object.values(this.accessorySprites).forEach((sprite) => {
+      this.sprite.removeChild(sprite);
+    });
+
+    this.accessorySprites = {};
+
     this.options.accessories?.forEach((accessory) => {
       const frame = this.game.spritesManager.getSpriteFrames(
         `accessories/${accessory}.png`
       );
 
-      // Add debug logs to check the frame
       if (!frame) {
         this.game.log("Frame not found!", `accessories/${accessory}.png`);
         return;

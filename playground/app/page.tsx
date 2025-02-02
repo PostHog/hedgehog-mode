@@ -1,7 +1,13 @@
 "use client";
-import { HedgeHogMode } from "@posthog/hedgehog-mode";
+import {
+  HedgeHogMode,
+  HedgehogActorColorOption,
+  HedgehogActorColorOptions,
+  getRandomAccesoryCombo,
+} from "@posthog/hedgehog-mode";
 import { useEffect, useState } from "react";
 import { Logo } from "./logo";
+import { sample } from "lodash";
 
 const Button = ({
   children,
@@ -40,15 +46,37 @@ export default function Home() {
     }[]
   >([]);
 
-  useEffect(() => {
+  const setupHedgehogMode = async () => {
     if (ref) {
       const hedgeHogMode = new HedgeHogMode({
         assetsUrl: "/assets",
         platformSelector: ".border",
       });
-      hedgeHogMode.render(ref);
+      await hedgeHogMode.render(ref);
       setGame(hedgeHogMode);
+
+      hedgeHogMode.spawnHedgehog({
+        skin: "spiderhog", // TODO: Remove
+        controls_enabled: true,
+        player: true,
+        color: "rainbow",
+        accessories: getRandomAccesoryCombo(),
+      });
+
+      for (let i = 0; i < 20; i++) {
+        hedgeHogMode.spawnHedgehog({
+          controls_enabled: false,
+          accessories: getRandomAccesoryCombo(),
+          color: sample(HedgehogActorColorOptions),
+        });
+
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      }
     }
+  };
+
+  useEffect(() => {
+    setupHedgehogMode();
   }, [ref]);
 
   useEffect(() => {

@@ -1,8 +1,10 @@
+import { sample } from "lodash";
+
 export type AccessoryInfo = {
   group: "headwear" | "eyewear" | "other";
 };
 
-export const standardAccessories = {
+export const HedgehogAccessories = {
   beret: {
     group: "headwear",
   },
@@ -54,22 +56,18 @@ export const standardAccessories = {
   },
 };
 
-export type HedgehogAccessory = keyof typeof standardAccessories;
-
-const pickRandom = <T>(arr: T[]): T => {
-  return arr[Math.floor(Math.random() * arr.length)];
-};
+export type HedgehogAccessory = keyof typeof HedgehogAccessories;
 
 export const getRandomAccesoryCombo = (): HedgehogAccessory[] => {
   return [
-    pickRandom(
-      Object.keys(standardAccessories).filter(
-        (accessory) => standardAccessories[accessory].group === "headwear"
+    sample(
+      Object.keys(HedgehogAccessories).filter(
+        (accessory) => HedgehogAccessories[accessory].group === "headwear"
       ) as HedgehogAccessory[]
     ),
-    pickRandom(
-      Object.keys(standardAccessories).filter(
-        (accessory) => standardAccessories[accessory].group === "eyewear"
+    sample(
+      Object.keys(HedgehogAccessories).filter(
+        (accessory) => HedgehogAccessories[accessory].group === "eyewear"
       ) as HedgehogAccessory[]
     ),
   ];

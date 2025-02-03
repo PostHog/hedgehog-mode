@@ -1,7 +1,6 @@
 "use client";
 import {
   HedgeHogMode,
-  HedgehogActorColorOption,
   HedgehogActorColorOptions,
   getRandomAccesoryCombo,
 } from "@posthog/hedgehog-mode";

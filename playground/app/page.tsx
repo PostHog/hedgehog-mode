@@ -45,6 +45,14 @@ export default function Home() {
     }[]
   >([]);
 
+  const spawnHedgehog = (hedgehogMode = game) => {
+    hedgehogMode?.spawnHedgehog({
+      controls_enabled: false,
+      accessories: getRandomAccesoryCombo(),
+      color: sample(HedgehogActorColorOptions),
+    });
+  };
+
   const setupHedgehogMode = async () => {
     if (ref) {
       const hedgeHogMode = new HedgeHogMode({
@@ -63,11 +71,7 @@ export default function Home() {
       });
 
       for (let i = 0; i < 20; i++) {
-        hedgeHogMode.spawnHedgehog({
-          controls_enabled: false,
-          accessories: getRandomAccesoryCombo(),
-          color: sample(HedgehogActorColorOptions),
-        });
+        spawnHedgehog(hedgeHogMode);
 
         await new Promise((resolve) => setTimeout(resolve, 100));
       }
@@ -111,7 +115,7 @@ export default function Home() {
         </div>
 
         <div className="absolute bottom-0 z-10 flex flex-row gap-2 p-12">
-          <Button onClick={() => game?.spawnHedgehog()}>Spawn hedgehog</Button>
+          <Button onClick={() => spawnHedgehog()}>Spawn hedgehog</Button>
         </div>
 
         <div

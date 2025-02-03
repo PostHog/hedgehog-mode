@@ -169,14 +169,6 @@ export class Actor implements GameElement {
   }
 
   update(_ticker: Ticker): void {
-    // Check if below screen and if so then move up
-    if (this.rigidBody.position.y > this.game.app.screen.height) {
-      this.setPosition({
-        x: this.rigidBody.position.x,
-        y: 0,
-      });
-    }
-
     // Apply the collision filter override if it exists
     this.rigidBody.collisionFilter.mask =
       this.collisionFilterOverride?.mask ?? this.collisionFilter.mask;

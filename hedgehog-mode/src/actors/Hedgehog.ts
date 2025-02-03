@@ -463,6 +463,14 @@ export class HedgehogActor extends Actor {
       });
     }
 
+    // Check if below screen and if so then move up
+    if (this.rigidBody.position.y > this.game.app.screen.height) {
+      this.setPosition({
+        x: this.rigidBody.position.x,
+        y: 0,
+      });
+    }
+
     this.updateColor(ticker);
   }
 

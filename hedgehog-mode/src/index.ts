@@ -93,7 +93,8 @@ export class HedgeHogMode implements Game {
       resizeTo: window,
       resolution: window.devicePixelRatio || 1, // Use the device pixel ratio
       autoDensity: true, // Adjust canvas to account for device pixel ratio
-      antialias: false, // We have pixel art, so no need for antialiasing
+      antialias: true, // We have pixel art, so no need for antialiasing
+      roundPixels: true,
     });
 
     await this.spritesManager.load();

@@ -38,7 +38,7 @@ jobs:
 
       - name: Install dependencies
         if: steps.check-package-version.outputs.is-new-version == 'true'
-        run: pnpm --frozen-lockfile
+        run: pnpm install
 
       - name: Build
         if: steps.check-package-version.outputs.is-new-version == 'true'

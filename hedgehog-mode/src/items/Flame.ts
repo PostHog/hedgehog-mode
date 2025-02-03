@@ -7,10 +7,15 @@ import { range } from "lodash";
 
 const FLAME_SCALE = 0.2;
 
+let TOTAL_NUM_FLAMES = 0;
+
 export class FlameActor extends Actor {
   public isFlammable = false;
 
   static fireBurst(game: Game, position: Matter.Vector): void {
+    if (TOTAL_NUM_FLAMES > 200) {
+      return;
+    }
     range(10).forEach(() => {
       const flame = new FlameActor(game);
       flame.setPosition({
@@ -66,6 +71,8 @@ export class FlameActor extends Actor {
         },
       });
     }, 1000);
+
+    TOTAL_NUM_FLAMES++;
   }
 
   update(ticker: Ticker): void {
@@ -82,5 +89,9 @@ export class FlameActor extends Actor {
     //   console.log("COLLISION", element);
     //   element.setOnFire();
     // }
+  }
+
+  beforeUnload(): void {
+    TOTAL_NUM_FLAMES--;
   }
 }

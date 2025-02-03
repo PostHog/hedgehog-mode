@@ -7,8 +7,8 @@ import { HedgehogAccessory } from "./Accessories";
 import { FlameActor } from "../items/Flame";
 import gsap from "gsap";
 import { COLLISIONS } from "../misc/collisions";
-import { sample } from "lodash";
 import { HedgehogActorAI } from "./hedgehog/ai";
+import { HedgehogActorControls } from "./hedgehog/controls";
 
 export const HedgehogActorColorOptions = [
   "green",
@@ -85,12 +85,12 @@ const BASE_COLLISION_FILTER = {
     COLLISIONS.GROUND,
 };
 
-const DEFAULT_COLLISION_FILTER = {
+export const DEFAULT_COLLISION_FILTER = {
   ...BASE_COLLISION_FILTER,
   category: COLLISIONS.ACTOR,
 };
 
-const NO_PLATFORM_COLLISION_FILTER = {
+export const NO_PLATFORM_COLLISION_FILTER = {
   ...BASE_COLLISION_FILTER,
   mask: COLLISIONS.ACTOR | COLLISIONS.PROJECTILE | COLLISIONS.GROUND,
 };
@@ -105,7 +105,7 @@ export class HedgehogActor extends Actor {
   hue = 0;
   health = 100;
   ai: HedgehogActorAI;
-
+  controls: HedgehogActorControls;
   private filter = new ColorMatrixFilter();
 
   hitBoxModifier = {
@@ -119,13 +119,13 @@ export class HedgehogActor extends Actor {
 
   constructor(
     game: Game,
-    private options: HedgehogActorOptions
+    public options: HedgehogActorOptions
   ) {
     super(game);
     this.updateSprite("jump");
-    this.setupKeyboardListeners();
     this.isInteractive = options.interactions_enabled ?? true;
     this.ai = new HedgehogActorAI(this);
+    this.controls = new HedgehogActorControls(this);
 
     this.setPosition({
       x: window.innerWidth * Math.random(),
@@ -271,80 +271,6 @@ export class HedgehogActor extends Actor {
       this.game.app.stage.on("pointerup", onDragEnd);
       this.game.app.stage.on("pointerupoutside", onDragEnd);
     });
-  }
-
-  setupKeyboardListeners(): () => void {
-    const lastKeys: string[] = [];
-
-    const keyDownListener = (e: KeyboardEvent): void => {
-      if (!this.options.controls_enabled) {
-        return;
-      }
-
-      const key = e.key.toLowerCase();
-
-      lastKeys.push(key);
-      if (lastKeys.length > 20) {
-        lastKeys.shift();
-      }
-
-      if (["arrowdown", "s"].includes(key)) {
-        // Temporarily disable platform collisions
-        this.collisionFilterOverride = NO_PLATFORM_COLLISION_FILTER;
-
-        // TODO: Do this more intelligently with timer management
-        setTimeout(() => {
-          this.collisionFilterOverride = undefined;
-        }, 1000);
-        this.ai.pause(5000);
-      }
-
-      if ([" ", "w", "arrowup"].includes(key)) {
-        this.jump();
-        this.ai.pause(5000);
-      }
-
-      if (["arrowleft", "a", "arrowright", "d"].includes(key)) {
-        this.walkSpeed = 2;
-
-        const direction = ["arrowleft", "a"].includes(key) ? "left" : "right";
-
-        const moonwalk = e.altKey;
-        const running = e.shiftKey;
-
-        if (running) {
-          this.walkSpeed *= 2;
-        }
-
-        this.walkSpeed =
-          direction === "left" ? -this.walkSpeed : this.walkSpeed;
-
-        if (moonwalk) {
-          direction === "left" ? "right" : "left";
-          // IMPORTANT: Moonwalking is hard so he moves slightly slower of course
-          this.walkSpeed *= 0.8;
-        }
-
-        this.setDirection(direction);
-        this.ai.pause(5000);
-      }
-    };
-
-    const keyUpListener = (e: KeyboardEvent): void => {
-      const key = e.key.toLowerCase();
-
-      if (["arrowleft", "a", "arrowright", "d"].includes(key)) {
-        this.walkSpeed = 0;
-      }
-    };
-
-    window.addEventListener("keydown", keyDownListener);
-    window.addEventListener("keyup", keyUpListener);
-
-    return () => {
-      window.removeEventListener("keydown", keyDownListener);
-      window.removeEventListener("keyup", keyUpListener);
-    };
   }
 
   setDirection(direction: "left" | "right"): void {
@@ -508,7 +434,7 @@ export class HedgehogActor extends Actor {
   }
 
   beforeUnload(): void {
-    clearInterval(this.aiInterval);
+    this.ai.enable(false);
     Object.values(this.accessorySprites).forEach((sprite) => {
       this.game.app.stage.removeChild(sprite);
     });

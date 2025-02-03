@@ -10,7 +10,7 @@ export class Actor implements GameElement {
   protected currentAnimation?: AvailableAnimations;
   protected connectedElements: GameElement[] = [];
   protected collisionFilter: Matter.ICollisionFilter;
-  protected collisionFilterOverride?: Matter.ICollisionFilter;
+  collisionFilterOverride?: Matter.ICollisionFilter;
 
   rigidBody: Matter.Body;
   isInteractive = false;

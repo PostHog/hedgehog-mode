@@ -27,6 +27,14 @@ jobs:
         with:
           node-version: 18
           registry-url: https://registry.npmjs.org
+          scope: "@posthog"
+
+      - uses: pnpm/action-setup@v4
+        if: steps.check-package-version.outputs.is-new-version == 'true'
+        name: Install pnpm
+        with:
+          version: 8
+          run_install: false
 
       - name: Install dependencies
         if: steps.check-package-version.outputs.is-new-version == 'true'
@@ -48,7 +56,7 @@ jobs:
             tag="latest"
           fi
 
-          npm publish --access public --tag $tag
+          pnpm publish --access public --tag $tag
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           VERSION: ${{ steps.check-package-version.outputs.committed-version }}

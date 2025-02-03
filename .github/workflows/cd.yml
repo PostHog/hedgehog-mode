@@ -1,31 +1,63 @@
-name: Publish to GitHub Package Registry
+name: "Release"
 
 on:
   push:
     branches:
       - main
+      - feat/parity
 
 jobs:
-  build:
+  release:
+    name: Publish
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout the repository
+        uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v4
-        name: Install pnpm
+      - name: Check package version and detect an update
+        id: check-package-version
+        uses: PostHog/check-package-version@v2
         with:
-          version: 8
-          run_install: false
+          path: hedgehog-mode
 
-      - name: Use Node.js 18.x
+      - name: Set up Node 18
         uses: actions/setup-node@v4
+        if: steps.check-package-version.outputs.is-new-version == 'true'
         with:
-          registry-url: https://npm.pkg.github.com/
-          node-version: 18.x
-          scope: "@posthog"
+          node-version: 18
+          registry-url: https://registry.npmjs.org
 
-      - name: pnpm install, build, and test
+      - name: Install dependencies
+        if: steps.check-package-version.outputs.is-new-version == 'true'
+        run: pnpm --frozen-lockfile
+
+      - name: Build
+        if: steps.check-package-version.outputs.is-new-version == 'true'
+        run: pnpm build
+
+      - name: Publish the package in the npm registry
+        id: publish-package
+        if: steps.check-package-version.outputs.is-new-version == 'true'
+        working-directory: hedgehog-mode
         run: |
-          pnpm install
-          pnpm build
+          tag="alpha"
+          echo ::set-output name=tag::alpha
+          if [[ $VERSION =~ ^[0-9]+(\.[0-9]+){2,3}$ ]]; then
+            echo ::set-output name=tag::latest
+            tag="latest"
+          fi
+
+          npm publish --access public --tag $tag
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          VERSION: ${{ steps.check-package-version.outputs.committed-version }}
+
+      - name: Create GitHub release
+        if: steps.check-package-version.outputs.is-new-version == 'true' && steps.publish-package.outputs.tag == 'latest'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.check-package-version.outputs.committed-version }}
+          release_name: ${{ steps.check-package-version.outputs.committed-version }}

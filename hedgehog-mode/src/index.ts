@@ -39,6 +39,20 @@ export class HedgeHogMode implements Game {
     this.setupDebugListeners();
   }
 
+  destroy(): void {
+    this.app.ticker.stop();
+    this.app.destroy();
+    Render.stop(this.debugRender);
+    Matter.World.clear(this.engine.world, false);
+    Matter.Engine.clear(this.engine);
+    this.debugRender.canvas.remove();
+    this.debugRender.canvas = null;
+    this.debugRender.context = null;
+    this.debugRender.textures = {};
+
+    this.ref?.remove();
+  }
+
   setupDebugListeners(): void {
     let dCount = 0;
     window.addEventListener("keydown", (e) => {

@@ -98,6 +98,8 @@ export default function Home() {
 
         <div className="absolute bottom-0 z-10 flex flex-row gap-2 p-12">
           <Button onClick={() => spawnHedgehog()}>Spawn hedgehog</Button>
+
+          <Button onClick={() => game?.destroy()}>Stop game</Button>
         </div>
 
         <div

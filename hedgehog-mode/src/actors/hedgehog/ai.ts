@@ -54,7 +54,6 @@ export class HedgehogActorAI {
   };
 
   enable(isEnabled: boolean = true): void {
-    console.log("enable fired!", isEnabled);
     if (isEnabled === this.enabled) {
       return;
     }
@@ -74,7 +73,6 @@ export class HedgehogActorAI {
   }
 
   private run(): void {
-    console.log("run fired!");
     if (!this.enabled) {
       return;
     }

@@ -1,0 +1,86 @@
+import { sample } from "lodash";
+import type { HedgehogActor } from "../Hedgehog";
+
+export class HedgehogActorAI {
+  private actionInterval?: NodeJS.Timeout;
+  private enabled = false;
+  private possibleActions: (() => void)[] = [];
+
+  constructor(private actor: HedgehogActor) {
+    Object.values(this.actions).forEach((action) => {
+      for (let i = 0; i < action.frequency; i++) {
+        this.possibleActions.push(action.act);
+      }
+    });
+  }
+
+  actions: {
+    [key: string]: {
+      frequency: number;
+      act: () => void;
+    };
+  } = {
+    wait: {
+      frequency: 3,
+      act: () => {
+        this.actor.walkSpeed = 0;
+        this.pause(Math.random() * 1000 * 5);
+      },
+    },
+    jump: {
+      frequency: 1,
+      act: () => {
+        this.actor.jump();
+      },
+    },
+    wave: {
+      frequency: 2,
+      act: () => {
+        this.actor.walkSpeed = 0;
+        this.actor.updateSprite("wave");
+        this.actor.sprite.play();
+        this.pause(1000);
+      },
+    },
+    walk: {
+      frequency: 1,
+      act: () => {
+        const direction = sample(["left", "right"] as const);
+        this.actor.setDirection(direction);
+        this.actor.walkSpeed = direction === "left" ? -1 : 1;
+        this.pause(Math.random() * 1000 * 5);
+      },
+    },
+  };
+
+  enable(isEnabled: boolean = true): void {
+    console.log("enable fired!", isEnabled);
+    if (isEnabled === this.enabled) {
+      return;
+    }
+    this.enabled = isEnabled;
+    if (isEnabled) {
+      this.run();
+    } else {
+      clearTimeout(this.actionInterval);
+    }
+  }
+
+  pause(time: number): void {
+    clearTimeout(this.actionInterval);
+    this.actionInterval = setTimeout(() => {
+      this.run();
+    }, time);
+  }
+
+  private run(): void {
+    console.log("run fired!");
+    if (!this.enabled) {
+      return;
+    }
+    sample(this.possibleActions)();
+    if (!this.actionInterval) {
+      this.pause(1000);
+    }
+  }
+}

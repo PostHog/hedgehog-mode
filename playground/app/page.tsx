@@ -5,24 +5,9 @@ import {
   getRandomAccesoryCombo,
 } from "@posthog/hedgehog-mode";
 import { useEffect, useState } from "react";
-import { Logo } from "./logo";
+import { Logo } from "../components/logo";
 import { sample } from "lodash";
-
-const Button = ({
-  children,
-  ...props
-}: {
-  children: React.ReactNode;
-} & React.ButtonHTMLAttributes<HTMLButtonElement>) => {
-  return (
-    <button
-      className="p-2 text-white transition-colors bg-orange-500 border rounded-md hover:bg-orange-600"
-      {...props}
-    >
-      {children}
-    </button>
-  );
-};
+import { Button } from "../components/Button";
 
 export default function Home() {
   const [ref, setRef] = useState<HTMLDivElement | null>(null);
@@ -98,10 +83,7 @@ export default function Home() {
 
   return (
     <div>
-      <main
-        className="fixed inset-0 flex flex-col overflow-hidden"
-        style={{ backgroundColor: "#eeefe9" }}
-      >
+      <main className="fixed inset-0 flex flex-col overflow-hidden">
         <div className="relative flex-1 overflow-y-auto">
           <div className="relative flex flex-col w-full h-full">
             <Logo />

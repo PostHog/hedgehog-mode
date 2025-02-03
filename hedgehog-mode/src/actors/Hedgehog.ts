@@ -8,6 +8,7 @@ import { FlameActor } from "../items/Flame";
 import gsap from "gsap";
 import { COLLISIONS } from "../misc/collisions";
 import { sample } from "lodash";
+import { HedgehogActorAI } from "./hedgehog/ai";
 
 export const HedgehogActorColorOptions = [
   "green",
@@ -103,6 +104,7 @@ export class HedgehogActor extends Actor {
   isFlammable = true;
   hue = 0;
   health = 100;
+  ai: HedgehogActorAI;
 
   private filter = new ColorMatrixFilter();
 
@@ -122,8 +124,8 @@ export class HedgehogActor extends Actor {
     super(game);
     this.updateSprite("jump");
     this.setupKeyboardListeners();
-    this.setupAI();
     this.isInteractive = options.interactions_enabled ?? true;
+    this.ai = new HedgehogActorAI(this);
 
     this.setPosition({
       x: window.innerWidth * Math.random(),
@@ -133,7 +135,6 @@ export class HedgehogActor extends Actor {
       x: (Math.random() - 0.5) * 5,
       y: -5,
     });
-    this.syncAccessories();
 
     this.sprite.scale = {
       x: 0,
@@ -147,6 +148,7 @@ export class HedgehogActor extends Actor {
       ease: "elastic.out",
     });
 
+    this.updateOptions(options);
     this.setupSpiderHogRope();
   }
 
@@ -177,6 +179,7 @@ export class HedgehogActor extends Actor {
 
   updateOptions(options: Partial<HedgehogActorOptions>): void {
     this.options = { ...this.options, ...options };
+    this.ai.enable(this.options.ai_enabled ?? true);
     this.syncAccessories();
   }
 
@@ -293,10 +296,12 @@ export class HedgehogActor extends Actor {
         setTimeout(() => {
           this.collisionFilterOverride = undefined;
         }, 1000);
+        this.ai.pause(5000);
       }
 
       if ([" ", "w", "arrowup"].includes(key)) {
         this.jump();
+        this.ai.pause(5000);
       }
 
       if (["arrowleft", "a", "arrowright", "d"].includes(key)) {
@@ -321,6 +326,7 @@ export class HedgehogActor extends Actor {
         }
 
         this.setDirection(direction);
+        this.ai.pause(5000);
       }
     };
 
@@ -339,75 +345,6 @@ export class HedgehogActor extends Actor {
       window.removeEventListener("keydown", keyDownListener);
       window.removeEventListener("keyup", keyUpListener);
     };
-  }
-
-  setupAI(): void {
-    // The "AI" is just automatic actions occur when the player is idle for log enough and are just picking from a list of randomly possible things
-    // On an interval we are just choosing a random action and doing it for the given interval
-
-    // TODO: Move hold timer to the base. Use it in the user controls as a blocker for the AI
-    let _hold;
-
-    const hold = (time: number) => {
-      clearTimeout(_hold);
-      _hold = setTimeout(() => {
-        _hold = undefined;
-      }, time);
-    };
-
-    const actions: {
-      [key: string]: {
-        frequency: number;
-        act: () => void;
-      };
-    } = {
-      wait: {
-        frequency: 3,
-        act: () => {
-          this.walkSpeed = 0;
-          hold(Math.random() * 1000 * 5);
-        },
-      },
-      jump: {
-        frequency: 1,
-        act: () => {
-          this.jump();
-        },
-      },
-      wave: {
-        frequency: 2,
-        act: () => {
-          this.walkSpeed = 0;
-          this.updateSprite("wave");
-          this.sprite.play();
-        },
-      },
-      walk: {
-        frequency: 1,
-        act: () => {
-          const direction = sample(["left", "right"] as const);
-          this.setDirection(direction);
-          this.walkSpeed = direction === "left" ? -1 : 1;
-          hold(Math.random() * 1000 * 5);
-        },
-      },
-    };
-
-    const possibleActions: (() => void)[] = [];
-
-    Object.values(actions).forEach((action) => {
-      for (let i = 0; i < action.frequency; i++) {
-        possibleActions.push(action.act);
-      }
-    });
-
-    // TODO: Make setInterval clearable
-    setInterval(() => {
-      if (_hold) {
-        return;
-      }
-      sample(possibleActions)();
-    }, 1000);
   }
 
   setDirection(direction: "left" | "right"): void {
@@ -571,6 +508,7 @@ export class HedgehogActor extends Actor {
   }
 
   beforeUnload(): void {
+    clearInterval(this.aiInterval);
     Object.values(this.accessorySprites).forEach((sprite) => {
       this.game.app.stage.removeChild(sprite);
     });

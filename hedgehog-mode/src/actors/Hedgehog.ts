@@ -107,9 +107,9 @@ export class HedgehogActor extends Actor {
   private filter = new ColorMatrixFilter();
 
   hitBoxModifier = {
-    left: 0.25,
+    left: 0.24,
     right: 0.24,
-    top: 0.2,
+    top: 0.35,
     bottom: 0.075,
   };
 

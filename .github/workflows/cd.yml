@@ -60,12 +60,3 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           VERSION: ${{ steps.check-package-version.outputs.committed-version }}
-
-      - name: Create GitHub release
-        if: steps.check-package-version.outputs.is-new-version == 'true' && steps.publish-package.outputs.tag == 'latest'
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ steps.check-package-version.outputs.committed-version }}
-          release_name: ${{ steps.check-package-version.outputs.committed-version }}

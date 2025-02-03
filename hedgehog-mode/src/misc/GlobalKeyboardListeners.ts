@@ -1,6 +1,7 @@
-import { range } from "lodash";
-import { HedgehogActor } from "../actors/Hedgehog";
+import { range, sample } from "lodash";
+import { HedgehogActor, HedgehogActorColorOptions } from "../actors/Hedgehog";
 import { Game } from "../types";
+import { getRandomAccesoryCombo } from "../actors/Accessories";
 
 export class GlobalKeyboardListeners {
   constructor(private game: Game) {
@@ -22,6 +23,13 @@ export class GlobalKeyboardListeners {
   setupKeyboardListeners(): () => void {
     const lastKeys: string[] = [];
 
+    const spawnHedgehog = () =>
+      this.game.spawnHedgehog({
+        controls_enabled: false,
+        accessories: getRandomAccesoryCombo(),
+        color: sample(HedgehogActorColorOptions),
+      });
+
     const secretMap: {
       keys: string[];
       action: () => void;
@@ -30,18 +38,18 @@ export class GlobalKeyboardListeners {
         keys: ["c", "h", "a", "o", "s"],
         action: async () => {
           for (const _ of range(10)) {
-            this.game.spawnHedgehog();
+            spawnHedgehog();
             await new Promise((r) => setTimeout(r, 100));
           }
         },
       },
       {
         keys: ["s", "p", "a", "w", "n"],
-        action: () => this.game.spawnHedgehog(),
+        action: () => spawnHedgehog(),
       },
       {
         keys: ["h", "e", "d", "g", "e", "h", "o", "g"],
-        action: () => this.game.spawnHedgehog(),
+        action: () => spawnHedgehog(),
       },
       {
         keys: ["f", "f", "f"],

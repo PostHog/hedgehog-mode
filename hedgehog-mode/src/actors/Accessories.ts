@@ -70,5 +70,15 @@ export const getRandomAccesoryCombo = (): HedgehogAccessory[] => {
         (accessory) => HedgehogAccessories[accessory].group === "eyewear"
       ) as HedgehogAccessory[]
     ),
-  ];
+    sample([
+      ...(Object.keys(HedgehogAccessories).filter(
+        (accessory) => HedgehogAccessories[accessory].group === "other"
+      ) as HedgehogAccessory[]),
+      // A few undefined to make it less likely to have the other accessories
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+    ]),
+  ].filter((accessory) => accessory !== undefined);
 };

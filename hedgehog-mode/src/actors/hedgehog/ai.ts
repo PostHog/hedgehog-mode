@@ -83,13 +83,14 @@ export class HedgehogActorAI {
 
     this.actor.walkSpeed = 0;
 
+    clearTimeout(this.actionInterval);
+    this.actionInterval = undefined;
+
     if (action) {
       this.actions[action]?.act();
     } else {
       sample(this.possibleActions)();
     }
-    if (!this.actionInterval) {
-      this.pause(1000);
-    }
+    this.pause(1000);
   }
 }

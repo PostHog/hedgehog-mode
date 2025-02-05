@@ -34,16 +34,20 @@ export class HedgehogActorAI {
       },
     },
     wave: {
-      frequency: 2,
+      frequency: 1,
       act: () => {
         this.actor.walkSpeed = 0;
-        this.actor.updateSprite("wave");
-        this.actor.sprite.play();
-        this.pause(1000);
+        this.actor.updateSprite("wave", {
+          reset: true,
+          onComplete: () => {
+            this.actor.walkSpeed = 0;
+            this.pause(1000);
+          },
+        });
       },
     },
     walk: {
-      frequency: 1,
+      frequency: 10,
       act: () => {
         const direction = sample(["left", "right"] as const);
         this.actor.setDirection(direction);
@@ -72,11 +76,18 @@ export class HedgehogActorAI {
     }, time);
   }
 
-  private run(): void {
+  run(action?: string): void {
     if (!this.enabled) {
       return;
     }
-    sample(this.possibleActions)();
+
+    this.actor.walkSpeed = 0;
+
+    if (action) {
+      this.actions[action]?.act();
+    } else {
+      sample(this.possibleActions)();
+    }
     if (!this.actionInterval) {
       this.pause(1000);
     }

@@ -1,6 +1,6 @@
 import { Actor } from "./Actor";
 import { Game, GameElement } from "../types";
-import Matter, { Constraint, Pair } from "matter-js";
+import Matter, { Bodies, Composites, Constraint, Pair } from "matter-js";
 import { SyncedPlatform } from "../items/SyncedPlatform";
 import { AnimatedSprite, ColorMatrixFilter, Sprite, Ticker } from "pixi.js";
 import { HedgehogAccessory } from "./Accessories";
@@ -152,7 +152,10 @@ export class HedgehogActor extends Actor {
     this.setupSpiderHogRope();
   }
 
-  updateSprite(sprite: string): void {
+  updateSprite(
+    sprite: string,
+    options: { reset?: boolean; onComplete?: () => void } = {}
+  ): void {
     const possibleAnimation = `skins/${this.options.skin ?? "default"}/${sprite}/tile`;
 
     // Set the sprite but selecting the skin as well
@@ -163,7 +166,7 @@ export class HedgehogActor extends Actor {
       this.game.log(`Tried to load ${possibleAnimation} but it doesn't exist`);
       return;
     }
-    super.updateSprite(spriteName);
+    super.updateSprite(spriteName, options);
     this.sprite.filters = [this.filter];
   }
 
@@ -175,6 +178,21 @@ export class HedgehogActor extends Actor {
 
   public get isOnFire(): boolean {
     return !!this.fireTimer;
+  }
+
+  setupPointerEvents(): void {
+    super.setupPointerEvents();
+
+    // this.sprite.on("click", () => {
+    //   // TODO: Emit click event
+    //   console.log("click");
+    // });
+
+    this.sprite.on("pointerover", () => {
+      this.ai.run("wave");
+    });
+
+    this.sprite.on("pointerout", () => {});
   }
 
   updateOptions(options: Partial<HedgehogActorOptions>): void {
@@ -238,38 +256,69 @@ export class HedgehogActor extends Actor {
   }
 
   setupSpiderHogRope(): void {
-    this.game.app.stage.on("pointerdown", (e) => {
+    window.addEventListener("pointerdown", (e) => {
       if (this.options.skin !== "spiderhog") {
         return;
       }
 
       this.collisionFilterOverride = NO_PLATFORM_COLLISION_FILTER;
 
-      const ropeConstraint = Constraint.create({
-        pointA: { x: e.clientX, y: e.clientY },
-        bodyB: this.rigidBody,
-        length: 50,
-        stiffness: 0.01,
-        damping: 0.05,
+      const rope = Composites.stack(400, 100, 1, 8, 0, 5, (x, y) => {
+        return Bodies.rectangle(x, y, 5, 20, {
+          density: 0.0005,
+          frictionAir: 0.02,
+        });
       });
-      Matter.World.addConstraint(this.game.engine.world, ropeConstraint);
+      Composites.chain(rope, 0.5, 0, -0.5, 0, {
+        stiffness: 0.9,
+        render: { visible: true },
+      });
 
-      const onDragMove = () => {
-        ropeConstraint.pointA.x = e.clientX;
-        ropeConstraint.pointA.y = e.clientY;
+      const firstLink = rope.bodies[0];
+      const lastLink = rope.bodies[rope.bodies.length - 1];
+
+      const webAnchor = Constraint.create({
+        pointA: { x: e.clientX, y: e.clientY },
+        bodyB: firstLink,
+        length: 0,
+        stiffness: 1,
+        render: { visible: true },
+      });
+
+      const webAttachment = Constraint.create({
+        bodyA: lastLink,
+        bodyB: this.rigidBody,
+        length: 10,
+        stiffness: 1,
+        render: { visible: true },
+      });
+
+      Matter.World.add(this.game.engine.world, [
+        rope,
+        webAnchor,
+        webAttachment,
+      ]);
+
+      const onDragMove = (e: PointerEvent) => {
+        webAnchor.pointA.x = e.clientX;
+        webAnchor.pointA.y = e.clientY;
       };
 
-      const onDragEnd = () => {
+      const onDragEnd = (e: PointerEvent) => {
         this.isDragging = false;
-        Matter.World.remove(this.game.engine.world, ropeConstraint);
+        Matter.World.remove(this.game.engine.world, [
+          rope,
+          webAnchor,
+          webAttachment,
+        ]);
 
-        this.game.app.stage.off("pointermove", onDragMove);
+        window.removeEventListener("pointermove", onDragMove);
         this.collisionFilterOverride = undefined;
       };
 
-      this.game.app.stage.on("pointermove", onDragMove);
-      this.game.app.stage.on("pointerup", onDragEnd);
-      this.game.app.stage.on("pointerupoutside", onDragEnd);
+      window.addEventListener("pointermove", onDragMove);
+      window.addEventListener("pointerup", onDragEnd);
+      window.addEventListener("pointerupoutside", onDragEnd);
     });
   }
 

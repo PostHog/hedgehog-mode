@@ -102,12 +102,15 @@ export class Actor implements GameElement {
     };
   }
 
-  protected updateSprite(animation: AvailableAnimations, reset = false): void {
+  protected updateSprite(
+    animation: AvailableAnimations,
+    options: { reset?: boolean; onComplete?: () => void } = {}
+  ): void {
     if (!this.currentAnimation) {
       return this.loadSprite(animation);
     }
 
-    if (this.currentAnimation === animation && !reset) {
+    if (this.currentAnimation === animation && !options.reset) {
       return;
     }
 
@@ -116,6 +119,12 @@ export class Actor implements GameElement {
     this.sprite.textures =
       this.game.spritesManager.getAnimatedSpriteFrames(animation);
     this.sprite.currentFrame = 0;
+    if (options.onComplete) {
+      this.sprite.loop = false;
+      this.sprite.onComplete = options.onComplete;
+    } else {
+      this.sprite.loop = true;
+    }
     this.sprite.play();
   }
 

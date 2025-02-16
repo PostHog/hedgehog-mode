@@ -40,6 +40,7 @@ console.log(
 );
 
 class App {
+  interactive = false;
   constructor() {
     this.start();
   }
@@ -72,6 +73,14 @@ class App {
     });
 
     await spawnHedgehog(100);
+
+    setInterval(() => {
+      // TODO: Change this to callbacks
+      if (this.interactive !== hedgeHogMode.pointerEventsEnabled) {
+        this.interactive = hedgeHogMode.pointerEventsEnabled;
+        (window as any).electron.allowInteraction(this.interactive);
+      }
+    }, 100);
   }
 }
 

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, screen } from "electron";
+import { app, BrowserWindow, ipcMain, screen } from "electron";
 import path from "node:path";
 import started from "electron-squirrel-startup";
 
@@ -36,10 +36,20 @@ const createWindow = () => {
   );
   mainWindow.setPosition(0, 0);
 
-  mainWindow.setIgnoreMouseEvents(true);
+  mainWindow.setIgnoreMouseEvents(true, { forward: true });
+
+  mainWindow.on("closed", () => {
+    ipcMain.removeAllListeners("allow-interaction");
+  });
+
+  ipcMain.on("allow-interaction", (_event, allow: boolean) => {
+    mainWindow.setIgnoreMouseEvents(!allow, { forward: true });
+  });
 
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools({
+    mode: "detach",
+  });
 };
 
 // This method will be called when Electron has finished

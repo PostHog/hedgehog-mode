@@ -160,10 +160,9 @@ export class HedgehogActor extends Actor {
   setupPointerEvents(): void {
     super.setupPointerEvents();
 
-    // this.sprite.on("click", () => {
-    //   // TODO: Emit click event
-    //   console.log("click");
-    // });
+    this.sprite.on("click", (e) => {
+      this.options.onClick?.();
+    });
 
     this.sprite.on("pointerover", () => {
       this.ai.run("wave");

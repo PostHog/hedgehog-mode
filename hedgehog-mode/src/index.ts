@@ -192,6 +192,8 @@ export class HedgeHogMode implements Game {
 
     // Start the Matter.js runner
     Runner.run(this.runner, this.engine);
+    // Start the debug renderer
+    Render.run(this.debugRender);
 
     document.addEventListener("mousemove", (event) => {
       this.mousePosition = { x: event.clientX, y: event.clientY };

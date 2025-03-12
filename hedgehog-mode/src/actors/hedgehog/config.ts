@@ -115,4 +115,5 @@ export type HedgehogActorOptions = {
   ai_enabled?: boolean;
   interactions_enabled?: boolean;
   controls_enabled?: boolean;
+  onClick?: () => void;
 };

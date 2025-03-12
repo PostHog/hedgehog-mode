@@ -27,7 +27,7 @@ export type HedgehogActorColorOption =
   (typeof HedgehogActorColorOptions)[number];
 
 export type HedgehogActorOptions = {
-  id: string;
+  id?: string;
   player?: boolean;
   skin?: string;
   color?: HedgehogActorColorOption | null;

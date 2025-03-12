@@ -16,6 +16,7 @@ export type {
   HedgehogActorColorOption,
   HedgehogActorAccessoryOption as HedgehogAccessoryOption,
   HedgehogActorSkinOption,
+  HedgehogActorAccessoryInfo,
 } from "./actors/hedgehog/config";
 export {
   HedgehogActorColorOptions,

@@ -19,7 +19,7 @@ export const HedgehogActorColorOptions = [
 export type HedgehogActorColorOption =
   (typeof HedgehogActorColorOptions)[number];
 
-export type AccessoryInfo = {
+export type HedgehogActorAccessoryInfo = {
   group: "headwear" | "eyewear" | "other";
 };
 

@@ -14,7 +14,7 @@ import { HedgehogActorOptions } from "./actors/hedgehog/config";
 export type {
   HedgehogActorOptions,
   HedgehogActorColorOption,
-  HedgehogActorAccessoryOption as HedgehogAccessoryOption,
+  HedgehogActorAccessoryOption,
   HedgehogActorSkinOption,
   HedgehogActorAccessoryInfo,
 } from "./actors/hedgehog/config";

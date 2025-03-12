@@ -48,16 +48,18 @@ export class HedgeHogMode implements Game {
 
   destroy(): void {
     Runner.stop(this.runner);
-    this.app.destroy();
+    this.app.destroy({
+      removeView: true,
+    });
     Render.stop(this.debugRender);
     Matter.World.clear(this.engine.world, false);
     Matter.Engine.clear(this.engine);
-    this.debugRender.canvas.remove();
-    this.debugRender.canvas = null;
-    this.debugRender.context = null;
-    this.debugRender.textures = {};
-
-    this.ref?.remove();
+    if (this.debugRender) {
+      this.debugRender.canvas.remove();
+      this.debugRender.canvas = null;
+      this.debugRender.context = null;
+      this.debugRender.textures = {};
+    }
   }
 
   setupDebugListeners(): void {
@@ -96,6 +98,7 @@ export class HedgeHogMode implements Game {
 
   async render(ref: HTMLDivElement): Promise<void> {
     this.ref = ref;
+
     this.setPointerEvents(false);
     // Create the application helper and add its render target to the page
     this.app = new Application();

@@ -13,7 +13,7 @@ export class GlobalKeyboardListeners {
 
   private getPlayableHedgehog(): HedgehogActor {
     return this.game.elements.find(
-      (element) => element instanceof HedgehogActor && element.isInteractive
+      (element) => element instanceof HedgehogActor && element.options.player
     ) as HedgehogActor;
   }
 

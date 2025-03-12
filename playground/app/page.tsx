@@ -33,6 +33,7 @@ export default function Home() {
   const spawnHedgehog = async (count: number, hedgehogMode = game) => {
     for (let i = 0; i < count; i++) {
       hedgehogMode?.spawnHedgehog({
+        id: `hedgehog-${i}`,
         controls_enabled: false,
         accessories: getRandomAccesoryCombo(),
         color: sample(HedgehogActorColorOptions),
@@ -52,6 +53,7 @@ export default function Home() {
       setGame(hedgeHogMode);
 
       hedgeHogMode.spawnHedgehog({
+        id: "hedgehog-1",
         skin: "spiderhog", // TODO: Remove
         controls_enabled: true,
         player: true,

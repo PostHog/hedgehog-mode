@@ -20,6 +20,8 @@ export {
   getRandomAccesoryCombo,
 } from "./actors/Accessories";
 export type { HedgehogAccessory } from "./actors/Accessories";
+export { StaticHedgehogRenderer } from "./static-renderer/StaticHedgehog";
+export type { StaticHedgehogRenderOptions } from "./static-renderer/StaticHedgehog";
 
 export class HedgeHogMode implements Game {
   ref?: HTMLDivElement;
@@ -77,7 +79,7 @@ export class HedgeHogMode implements Game {
     this.pointerEventsEnabled = enabled;
   }
 
-  spawnHedgehog(options: HedgehogActorOptions = {}): HedgehogActor {
+  spawnHedgehog(options: HedgehogActorOptions | undefined): HedgehogActor {
     const actor = new HedgehogActor(this, options);
     this.spawnActor(actor);
     return actor;

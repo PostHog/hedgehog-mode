@@ -27,6 +27,7 @@ export type HedgehogActorColorOption =
   (typeof HedgehogActorColorOptions)[number];
 
 export type HedgehogActorOptions = {
+  id: string;
   player?: boolean;
   skin?: string;
   color?: HedgehogActorColorOption | null;
@@ -36,7 +37,7 @@ export type HedgehogActorOptions = {
   controls_enabled?: boolean;
 };
 
-const COLOR_TO_FILTER_MAP: Record<
+export const COLOR_TO_FILTER_MAP: Record<
   HedgehogActorColorOption,
   (filter: ColorMatrixFilter) => void
 > = {

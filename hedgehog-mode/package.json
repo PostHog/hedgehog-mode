@@ -13,12 +13,6 @@
     "lint": "eslint .",
     "format": "prettier --write ."
   },
-  "keywords": [
-    "typescript",
-    "github packages",
-    "npm packages",
-    "boilerplate"
-  ],
   "author": "Ben White",
   "license": "MIT",
   "repository": {

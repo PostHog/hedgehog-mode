@@ -1,6 +1,6 @@
 import { Application, ColorMatrixFilter, Container, Sprite } from "pixi.js";
 import { COLOR_TO_FILTER_MAP, HedgehogActorOptions } from "../actors/Hedgehog";
-import { SpritesManager } from "../sprites/sprites";
+import { AvailableSpriteFrames, SpritesManager } from "../sprites/sprites";
 import { HedgehogModeConfig } from "../types";
 
 export type StaticHedgehogRenderOptions = HedgehogActorOptions;
@@ -41,7 +41,9 @@ export class StaticHedgehogRenderer {
 
     // Create base sprite
     const spriteName = `skins/${options.skin ?? "default"}/wave/tile000.png`;
-    const frame = this.spritesManager.getSpriteFrames(spriteName);
+    const frame = this.spritesManager.getSpriteFrames(
+      spriteName as AvailableSpriteFrames
+    );
     if (!frame) {
       throw new Error(`Sprite not found: ${spriteName}`);
     }

@@ -117,7 +117,8 @@ export class HedgeHogMode implements Game {
         return;
       }
 
-      const deltaMS = currentTime - this.lastTime;
+      const deltaMS =
+        (currentTime - this.lastTime) * this.engine.timing.timeScale;
       this.totalElapsedTime += deltaMS / 1000;
       gsap.updateRoot(this.totalElapsedTime);
 
@@ -239,6 +240,7 @@ export class HedgeHogMode implements Game {
 
   setSpeed(speed: number) {
     this.engine.timing.timeScale = speed;
+    gsap.globalTimeline.timeScale(speed);
   }
 
   removeElement(element: GameElement): void {

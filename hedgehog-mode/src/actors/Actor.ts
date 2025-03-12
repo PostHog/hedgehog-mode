@@ -34,7 +34,6 @@ export class Actor implements GameElement {
     this.sprite = new AnimatedSprite(
       this.game.spritesManager.getAnimatedSpriteFrames(animation)
     );
-    this.sprite.animationSpeed = 0.5;
 
     this.loadRigidBody();
 
@@ -109,6 +108,8 @@ export class Actor implements GameElement {
     if (!this.currentAnimation) {
       return this.loadSprite(animation);
     }
+
+    this.sprite.animationSpeed = this.game.engine.timing.timeScale * 0.5;
 
     if (this.currentAnimation === animation && !options.reset) {
       return;

@@ -114,10 +114,15 @@ export class GlobalKeyboardListeners {
       {
         keys: ["s", "l", "o", "w"],
         action: () => {
-          this.game.setSpeed(0.5);
-          setTimeout(() => {
-            this.game.setSpeed(1);
-          }, 2000);
+          this.game.setSpeed(
+            this.game.engine.timing.timeScale === 0.5 ? 1 : 0.5
+          );
+        },
+      },
+      {
+        keys: ["f", "a", "s", "t"],
+        action: () => {
+          this.game.setSpeed(this.game.engine.timing.timeScale === 2 ? 1 : 2);
         },
       },
       // {

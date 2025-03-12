@@ -4,24 +4,27 @@ import Matter, { Render } from "matter-js";
 import { Application, Ticker } from "pixi.js";
 import { Game, GameElement, HedgehogModeConfig } from "./types";
 import { SpritesManager } from "./sprites/sprites";
-import { HedgehogActor, HedgehogActorOptions } from "./actors/Hedgehog";
+import { HedgehogActor } from "./actors/Hedgehog";
 import { Ground } from "./items/Ground";
 import { SyncedPlatform } from "./items/SyncedPlatform";
 import { Actor } from "./actors/Actor";
 import { GlobalKeyboardListeners } from "./misc/GlobalKeyboardListeners";
+import { HedgehogActorOptions } from "./actors/hedgehog/config";
 
 export type {
-  HedgehogActorColorOption,
   HedgehogActorOptions,
-} from "./actors/Hedgehog";
-export { HedgehogActorColorOptions } from "./actors/Hedgehog";
+  HedgehogActorColorOption,
+  HedgehogActorAccessoryOption as HedgehogAccessoryOption,
+  HedgehogActorSkinOption,
+} from "./actors/hedgehog/config";
 export {
-  HedgehogAccessories,
+  HedgehogActorColorOptions,
   getRandomAccesoryCombo,
-} from "./actors/Accessories";
-export type { HedgehogAccessory } from "./actors/Accessories";
+  HedgehogActorAccessoryOptions,
+  HedgehogActorSkinOptions,
+  HedgehogActorAccessories,
+} from "./actors/hedgehog/config";
 export { StaticHedgehogRenderer } from "./static-renderer/StaticHedgehog";
-export type { StaticHedgehogRenderOptions } from "./static-renderer/StaticHedgehog";
 
 export class HedgeHogMode implements Game {
   ref?: HTMLDivElement;

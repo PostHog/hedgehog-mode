@@ -1,7 +1,10 @@
 import { range, sample } from "lodash";
-import { HedgehogActor, HedgehogActorColorOptions } from "../actors/Hedgehog";
+import { HedgehogActor } from "../actors/Hedgehog";
 import { Game } from "../types";
-import { getRandomAccesoryCombo } from "../actors/Accessories";
+import {
+  getRandomAccesoryCombo,
+  HedgehogActorColorOptions,
+} from "../actors/hedgehog/config";
 
 export class GlobalKeyboardListeners {
   constructor(private game: Game) {

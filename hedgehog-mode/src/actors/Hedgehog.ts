@@ -3,39 +3,15 @@ import { Game, GameElement } from "../types";
 import Matter, { Bodies, Composites, Constraint, Pair } from "matter-js";
 import { SyncedPlatform } from "../items/SyncedPlatform";
 import { AnimatedSprite, ColorMatrixFilter, Sprite, Ticker } from "pixi.js";
-import { HedgehogAccessory } from "./Accessories";
 import { FlameActor } from "../items/Flame";
 import gsap from "gsap";
 import { COLLISIONS } from "../misc/collisions";
 import { HedgehogActorAI } from "./hedgehog/ai";
 import { HedgehogActorControls } from "./hedgehog/controls";
-
-export const HedgehogActorColorOptions = [
-  "green",
-  "red",
-  "blue",
-  "purple",
-  "dark",
-  "light",
-  "greyscale",
-  "sepia",
-  "invert",
-  "rainbow",
-] as const;
-
-export type HedgehogActorColorOption =
-  (typeof HedgehogActorColorOptions)[number];
-
-export type HedgehogActorOptions = {
-  id?: string;
-  player?: boolean;
-  skin?: string;
-  color?: HedgehogActorColorOption | null;
-  accessories?: HedgehogAccessory[];
-  ai_enabled?: boolean;
-  interactions_enabled?: boolean;
-  controls_enabled?: boolean;
-};
+import {
+  HedgehogActorColorOption,
+  HedgehogActorOptions,
+} from "./hedgehog/config";
 
 export const COLOR_TO_FILTER_MAP: Record<
   HedgehogActorColorOption,

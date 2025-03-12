@@ -1,9 +1,8 @@
 import { Application, ColorMatrixFilter, Container, Sprite } from "pixi.js";
-import { COLOR_TO_FILTER_MAP, HedgehogActorOptions } from "../actors/Hedgehog";
+import { COLOR_TO_FILTER_MAP } from "../actors/Hedgehog";
 import { AvailableSpriteFrames, SpritesManager } from "../sprites/sprites";
 import { HedgehogModeConfig } from "../types";
-
-export type StaticHedgehogRenderOptions = HedgehogActorOptions;
+import { HedgehogActorOptions } from "../actors/hedgehog/config";
 
 export class StaticHedgehogRenderer {
   private resultCache: Map<string, string> = new Map();
@@ -35,7 +34,7 @@ export class StaticHedgehogRenderer {
     });
   }
 
-  private createContainer(options: StaticHedgehogRenderOptions): Container {
+  private createContainer(options: HedgehogActorOptions): Container {
     const container = new Container();
     const filter = new ColorMatrixFilter();
 
@@ -84,7 +83,7 @@ export class StaticHedgehogRenderer {
     return container;
   }
 
-  private getOptionsHash(options: StaticHedgehogRenderOptions): string {
+  private getOptionsHash(options: HedgehogActorOptions): string {
     return JSON.stringify({
       skin: options.skin,
       color: options.color,
@@ -109,16 +108,14 @@ export class StaticHedgehogRenderer {
     return dataURL;
   }
 
-  private async performRender(
-    options: StaticHedgehogRenderOptions
-  ): Promise<string> {
+  private async performRender(options: HedgehogActorOptions): Promise<string> {
     await this.ensureInitialized();
     const container = this.createContainer(options);
     const dataURL = await this.renderToDataURL(container);
     return dataURL;
   }
 
-  public async render(options: StaticHedgehogRenderOptions): Promise<string> {
+  public async render(options: HedgehogActorOptions): Promise<string> {
     const hash = this.getOptionsHash(options);
 
     // Check the result cache first

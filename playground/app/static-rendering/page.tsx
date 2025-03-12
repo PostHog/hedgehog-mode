@@ -1,10 +1,10 @@
 "use client";
 
 import {
+  HedgehogActorOptions,
   getRandomAccesoryCombo,
   HedgehogActorColorOptions,
   StaticHedgehogRenderer,
-  StaticHedgehogRenderOptions,
 } from "@posthog/hedgehog-mode";
 import { sample } from "lodash";
 import { range } from "lodash";
@@ -21,7 +21,7 @@ export default function StaticRendering() {
   }
 
   useEffect(() => {
-    const HEDGEHOGS: StaticHedgehogRenderOptions[] = range(1000).map((i) => ({
+    const HEDGEHOGS: HedgehogActorOptions[] = range(1000).map((i) => ({
       id: `hedgehog-${i}`,
       accessories: getRandomAccesoryCombo(),
       color: sample(HedgehogActorColorOptions),

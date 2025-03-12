@@ -1,7 +1,8 @@
 import type Matter from "matter-js";
 import { AnimatedSprite, Application, Ticker } from "pixi.js";
 import type { SpritesManager } from "./sprites/sprites";
-import type { HedgehogActor, HedgehogActorOptions } from "./actors/Hedgehog";
+import type { HedgehogActor } from "./actors/Hedgehog";
+import { HedgehogActorOptions } from "./actors/hedgehog/config";
 
 export type GameElement = {
   readonly sprite?: AnimatedSprite;

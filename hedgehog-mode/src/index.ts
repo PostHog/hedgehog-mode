@@ -1,7 +1,7 @@
 import gsap from "gsap";
 
-import Matter, { Render } from "matter-js";
-import { Application, Ticker } from "pixi.js";
+import Matter, { Render, Runner } from "matter-js";
+import { Application } from "pixi.js";
 import { Game, GameElement, HedgehogModeConfig } from "./types";
 import { SpritesManager } from "./sprites/sprites";
 import { HedgehogActor } from "./actors/Hedgehog";
@@ -31,6 +31,7 @@ export class HedgeHogMode implements Game {
   ref?: HTMLDivElement;
   app: Application;
   engine: Matter.Engine;
+  runner: Matter.Runner;
   debugRender?: Matter.Render;
   elements: GameElement[] = []; // TODO: Type better
   totalElapsedTime = 0;
@@ -38,7 +39,7 @@ export class HedgeHogMode implements Game {
   isDebugging = false;
   spritesManager: SpritesManager;
   mousePosition?: Matter.Vector;
-  elapsed?: number;
+  lastTime?: number;
 
   constructor(private options: HedgehogModeConfig) {
     this.spritesManager = new SpritesManager(options);
@@ -46,7 +47,7 @@ export class HedgeHogMode implements Game {
   }
 
   destroy(): void {
-    this.app.ticker.stop();
+    Runner.stop(this.runner);
     this.app.destroy();
     Render.stop(this.debugRender);
     Matter.World.clear(this.engine.world, false);
@@ -99,6 +100,7 @@ export class HedgeHogMode implements Game {
     // Create the application helper and add its render target to the page
     this.app = new Application();
     this.engine = Matter.Engine.create();
+    this.runner = Runner.create();
 
     Matter.Events.on(this.engine, "collisionStart", (event) =>
       this.onCollisionStart(event)
@@ -108,12 +110,48 @@ export class HedgeHogMode implements Game {
       this.onCollisionEnd(event)
     );
 
+    Matter.Events.on(this.engine, "afterUpdate", () => {
+      const currentTime = performance.now();
+      if (!this.lastTime) {
+        this.lastTime = currentTime;
+        return;
+      }
+
+      const deltaMS = currentTime - this.lastTime;
+      this.totalElapsedTime += deltaMS / 1000;
+      gsap.updateRoot(this.totalElapsedTime);
+
+      // Update all game elements
+      let shouldHavePointerEvents = false;
+      for (const el of this.elements) {
+        el.update({ deltaMS, deltaTime: deltaMS / 1000 });
+
+        if (
+          !shouldHavePointerEvents &&
+          el instanceof HedgehogActor &&
+          this.mousePosition &&
+          (Matter.Query.point([el.rigidBody], this.mousePosition).length ||
+            el.isDragging)
+        ) {
+          shouldHavePointerEvents = true;
+        }
+      }
+
+      if (shouldHavePointerEvents !== this.pointerEventsEnabled) {
+        this.setPointerEvents(shouldHavePointerEvents);
+      }
+
+      // Render PIXI stage
+      this.app.render();
+      this.lastTime = currentTime;
+    });
+
     await this.app.init({
       backgroundAlpha: 0,
       resizeTo: window,
-      resolution: window.devicePixelRatio || 1, // Use the device pixel ratio
-      autoDensity: true, // Adjust canvas to account for device pixel ratio
-      antialias: true, // We have pixel art, so no need for antialiasing
+      resolution: window.devicePixelRatio || 1,
+      autoDensity: true,
+      antialias: true,
       roundPixels: true,
     });
 
@@ -121,9 +159,6 @@ export class HedgeHogMode implements Game {
     ref.appendChild(this.app.canvas);
     this.app.stage.eventMode = "static";
     this.app.stage.hitArea = this.app.screen;
-
-    // Add a ticker callback to move the sprite back and forth
-    this.app.ticker.add((ticker) => this.update(ticker));
 
     window.addEventListener("resize", () => this.resize());
 
@@ -154,8 +189,8 @@ export class HedgeHogMode implements Game {
     debugCanvas.style.pointerEvents = "none";
     debugCanvas.style.opacity = this.isDebugging ? "0.5" : "0";
 
-    // Start the debug renderer
-    Render.run(this.debugRender);
+    // Start the Matter.js runner
+    Runner.run(this.runner, this.engine);
 
     document.addEventListener("mousemove", (event) => {
       this.mousePosition = { x: event.clientX, y: event.clientY };
@@ -164,33 +199,6 @@ export class HedgeHogMode implements Game {
     new GlobalKeyboardListeners(this);
     gsap.ticker.remove(gsap.updateRoot);
     this.elements.push(new Ground(this));
-  }
-
-  private update(ticker: Ticker) {
-    this.totalElapsedTime += ticker.deltaMS / 1000;
-    gsap.updateRoot(this.totalElapsedTime);
-
-    Matter.Engine.update(this.engine, ticker.deltaMS);
-
-    let shouldHavePointerEvents = false;
-
-    for (const el of this.elements) {
-      el.update(ticker);
-
-      if (
-        !shouldHavePointerEvents &&
-        el instanceof HedgehogActor &&
-        this.mousePosition && // Add null check
-        (Matter.Query.point([el.rigidBody], this.mousePosition).length ||
-          el.isDragging)
-      ) {
-        shouldHavePointerEvents = true;
-      }
-    }
-
-    if (shouldHavePointerEvents !== this.pointerEventsEnabled) {
-      this.setPointerEvents(shouldHavePointerEvents);
-    }
   }
 
   private onCollisionStart(event: Matter.IEventCollision<Matter.Engine>) {
@@ -227,6 +235,10 @@ export class HedgeHogMode implements Game {
 
   private findElementWithRigidBody(rb: Matter.Body) {
     return this.elements.find((element) => element.rigidBody === rb);
+  }
+
+  setSpeed(speed: number) {
+    this.engine.timing.timeScale = speed;
   }
 
   removeElement(element: GameElement): void {

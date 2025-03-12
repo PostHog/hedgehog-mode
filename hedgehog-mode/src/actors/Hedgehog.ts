@@ -1,8 +1,8 @@
 import { Actor } from "./Actor";
-import { Game, GameElement } from "../types";
+import { Game, GameElement, UpdateTicker } from "../types";
 import Matter, { Bodies, Composites, Constraint, Pair } from "matter-js";
 import { SyncedPlatform } from "../items/SyncedPlatform";
-import { AnimatedSprite, ColorMatrixFilter, Sprite, Ticker } from "pixi.js";
+import { AnimatedSprite, ColorMatrixFilter, Sprite } from "pixi.js";
 import { FlameActor } from "../items/Flame";
 import gsap from "gsap";
 import { COLLISIONS } from "../misc/collisions";
@@ -306,7 +306,7 @@ export class HedgehogActor extends Actor {
       this.sprite.scale.x *= -1;
   }
 
-  update(ticker: Ticker): void {
+  update(ticker: UpdateTicker): void {
     if (this.rigidBody.velocity.y < -0.1) {
       // We are moving upwards so we don't want to collide with platforms
       this.collisionFilter = NO_PLATFORM_COLLISION_FILTER;
@@ -363,7 +363,7 @@ export class HedgehogActor extends Actor {
     this.updateColor(ticker);
   }
 
-  private updateColor(ticker: Ticker) {
+  private updateColor(ticker: UpdateTicker) {
     if (this.options.color === "rainbow") {
       this.hue += 360 * (ticker.deltaMS / 1000);
       this.hue = this.hue > 360 ? 0 : this.hue;

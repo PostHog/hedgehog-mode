@@ -111,6 +111,15 @@ export class GlobalKeyboardListeners {
           this.getPlayableHedgehog().setScale(0.5);
         },
       },
+      {
+        keys: ["s", "l", "o", "w"],
+        action: () => {
+          this.game.setSpeed(0.5);
+          setTimeout(() => {
+            this.game.setSpeed(1);
+          }, 2000);
+        },
+      },
       // {
       // // konami code
       //   keys: [

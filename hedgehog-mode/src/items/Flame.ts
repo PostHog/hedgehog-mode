@@ -1,6 +1,5 @@
 import { Actor } from "../actors/Actor";
-import { Game, GameElement } from "../types";
-import { Ticker } from "pixi.js";
+import { Game, GameElement, UpdateTicker } from "../types";
 import { COLLISIONS } from "../misc/collisions";
 import gsap from "gsap";
 import { range } from "lodash";
@@ -75,7 +74,7 @@ export class FlameActor extends Actor {
     TOTAL_NUM_FLAMES++;
   }
 
-  update(ticker: Ticker): void {
+  update(ticker: UpdateTicker): void {
     this.sprite.alpha = (1 - this.fadeValue) * 0.75;
     const scale = (1 - this.fadeValue) * FLAME_SCALE;
     this.sprite.scale.set(scale, scale);

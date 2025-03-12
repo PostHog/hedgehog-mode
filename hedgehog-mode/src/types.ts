@@ -1,8 +1,13 @@
 import type Matter from "matter-js";
-import { AnimatedSprite, Application, Ticker } from "pixi.js";
+import { AnimatedSprite, Application } from "pixi.js";
 import type { SpritesManager } from "./sprites/sprites";
 import type { HedgehogActor } from "./actors/Hedgehog";
 import { HedgehogActorOptions } from "./actors/hedgehog/config";
+
+export type UpdateTicker = {
+  deltaMS: number;
+  deltaTime: number;
+};
 
 export type GameElement = {
   readonly sprite?: AnimatedSprite;
@@ -10,7 +15,7 @@ export type GameElement = {
   onCollisionStart?: (element: GameElement, pair: Matter.Pair) => void;
   onCollisionEnd?: (element: GameElement, pair: Matter.Pair) => void;
   beforeUnload?: () => void;
-  update: (ticker: Ticker) => void;
+  update: (ticker: UpdateTicker) => void;
   isInteractive: boolean;
   isFlammable?: boolean;
 };
@@ -31,4 +36,5 @@ export type Game = {
   spawnHedgehog: (options?: HedgehogActorOptions) => HedgehogActor;
   removeElement: (element: GameElement) => void;
   log: (...args: unknown[]) => void;
+  setSpeed: (speed: number) => void;
 };

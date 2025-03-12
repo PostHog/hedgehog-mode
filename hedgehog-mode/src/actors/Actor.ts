@@ -1,7 +1,7 @@
 import Matter, { Constraint } from "matter-js";
-import { AnimatedSprite, Ticker } from "pixi.js";
+import { AnimatedSprite } from "pixi.js";
 import { AvailableAnimations } from "../sprites/sprites";
-import { Game, GameElement } from "../types";
+import { Game, GameElement, UpdateTicker } from "../types";
 
 export class Actor implements GameElement {
   public sprite: AnimatedSprite;
@@ -177,7 +177,7 @@ export class Actor implements GameElement {
     });
   }
 
-  update(_ticker: Ticker): void {
+  update(ticker: UpdateTicker): void {
     // Apply the collision filter override if it exists
     this.rigidBody.collisionFilter.mask =
       this.collisionFilterOverride?.mask ?? this.collisionFilter.mask;

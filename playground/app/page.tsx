@@ -1,6 +1,5 @@
 "use client";
 import {
-  HedgeHogMode,
   HedgehogActorColorOptions,
   getRandomAccesoryCombo,
 } from "@posthog/hedgehog-mode";
@@ -12,7 +11,7 @@ import { HedgehogModeGame } from "@/components/HedgehogModeGame";
 export default function Home() {
   const spawnHedgehog = async (count: number) => {
     for (let i = 0; i < count; i++) {
-      (window as any).hedgehogMode?.spawnHedgehog({
+      window.hedgehogMode?.spawnHedgehog({
         id: `hedgehog-${i}`,
         controls_enabled: false,
         accessories: getRandomAccesoryCombo(),
@@ -44,7 +43,7 @@ export default function Home() {
             Spawn 100 hedgehogs
           </Button>
 
-          <Button onClick={() => (window as any).hedgehogMode?.destroy()}>
+          <Button onClick={() => window.hedgehogMode?.destroy()}>
             Stop game
           </Button>
         </div>

@@ -3,7 +3,13 @@ import type { HedgehogActor } from "../Hedgehog";
 import { Game, GameUIDialogBoxProps } from "../../types";
 
 export class HedgehogActorInterface {
-  private messages: GameUIDialogBoxProps["messages"][] = [
+  private messages: (
+    | GameUIDialogBoxProps["messages"]
+    | {
+        onStart?: () => void;
+        messages: GameUIDialogBoxProps["messages"];
+      }
+  )[] = [
     [
       {
         words: [
@@ -211,6 +217,16 @@ export class HedgehogActorInterface {
         ],
       },
     ],
+    {
+      onStart: () => {
+        this.actor.setOnFire();
+      },
+      messages: [
+        {
+          words: ["OUCH! OUCH! OUCH!"],
+        },
+      ],
+    },
   ];
 
   constructor(
@@ -254,9 +270,17 @@ export class HedgehogActorInterface {
     const selectedMessages = sample(this.messages);
 
     if (selectedMessages) {
+      const messages = Array.isArray(selectedMessages)
+        ? selectedMessages
+        : selectedMessages.messages;
+
+      if (!Array.isArray(selectedMessages)) {
+        selectedMessages.onStart?.();
+      }
+
       this.game.gameUI?.showDialogBox({
         actor: this.actor,
-        messages: selectedMessages,
+        messages,
       });
     }
   }

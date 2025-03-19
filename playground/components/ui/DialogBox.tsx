@@ -62,11 +62,8 @@ export function DialogBox({
   const [messageIndex, setMessageIndex] = useState<number>(0);
   const ref = useRef<HTMLDivElement>(null);
   const [hovering, setHovering] = useState<boolean>(false);
-
-  useEffect(() => {
-    setMessageIndex(0);
-    setHovering(false);
-  }, [messages]);
+  const [animationCompleted, setAnimationCompleted] = useState<boolean>(false);
+  const message = messages[messageIndex];
 
   const setPosition = useCallback(
     (actor?: GameUIDialogBoxProps["actor"]) => {
@@ -96,6 +93,11 @@ export function DialogBox({
   );
 
   useEffect(() => {
+    setMessageIndex(0);
+    setHovering(false);
+  }, [messages]);
+
+  useEffect(() => {
     if (actor) {
       let cancel: number | null = null;
       const updatePosition = () => {
@@ -113,9 +115,6 @@ export function DialogBox({
     }
   }, [actor, setPosition]);
 
-  const [animationCompleted, setAnimationCompleted] = useState<boolean>(false);
-
-  const message = messages[messageIndex];
   const setIndex = useCallback(
     (index: number) => {
       const isForward = index > messageIndex;
@@ -152,6 +151,20 @@ export function DialogBox({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [setIndex]);
+
+  // Add keyboard listener for Enter and Space
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if ((event.key === "Enter" || event.key === " ") && message) {
+        setIndex(messageIndex + 1);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyPress);
+    return () => {
+      document.removeEventListener("keydown", handleKeyPress);
+    };
+  }, [message, messageIndex, setIndex]);
 
   if (!message) {
     return null;

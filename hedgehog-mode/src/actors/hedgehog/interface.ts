@@ -2,6 +2,76 @@ import { sample } from "lodash";
 import type { HedgehogActor } from "../Hedgehog";
 import { Game, GameUIDialogBoxProps } from "../../types";
 
+const cheatSheetMessages: GameUIDialogBoxProps["messages"] = [
+  {
+    words: [
+      {
+        text: "omg you found me!",
+        style: { fontWeight: "bold", color: "purple" },
+      },
+      "i know all the easter eggs...",
+    ],
+  },
+  {
+    words: [
+      "type",
+      { text: "chaos", style: { color: "red" } },
+      "for mayhem,",
+      { text: "spawn", style: { color: "blue" } },
+      "or",
+      { text: "hedgehog", style: { color: "green" } },
+      "for friends",
+    ],
+  },
+  {
+    words: [
+      "try",
+      { text: "fff", style: { color: "orange" } },
+      "or",
+      { text: "fire", style: { color: "orange" } },
+      "to heat things up.",
+      { text: "hello", style: { fontWeight: "bold" } },
+      "to wave or",
+      { text: "heatmaps", style: { color: "red" } },
+      "to be cruel",
+    ],
+  },
+  {
+    words: [
+      "become",
+      { text: "spiderhog", style: { color: "red" } },
+      "or go",
+      { text: "rainbow", style: { color: "purple" } },
+    ],
+  },
+  {
+    words: [
+      "feel",
+      { text: "giant", style: { fontWeight: "bold", fontSize: "1.2em" } },
+      "or get",
+      { text: "tiny.", style: { fontSize: "0.8em" } },
+      "go",
+      { text: "slow", style: { fontStyle: "italic" } },
+      "or",
+      { text: "fast", style: { fontWeight: "bold" } },
+      "- it's up to you!",
+    ],
+  },
+  {
+    words: [
+      "have fun",
+      {
+        text: "please don't tell anyone you found me.",
+        style: { fontStyle: "italic", fontSize: "0.8em" },
+      },
+      {
+        text: "tim will come for me...",
+        style: { fontStyle: "italic", fontSize: "0.7em" },
+      },
+    ],
+  },
+];
+
 export class HedgehogActorInterface {
   private messages: (
     | GameUIDialogBoxProps["messages"]
@@ -216,6 +286,7 @@ export class HedgehogActorInterface {
         },
       ],
     },
+    cheatSheetMessages,
   ];
 
   constructor(
@@ -272,5 +343,12 @@ export class HedgehogActorInterface {
         messages,
       });
     }
+  }
+
+  triggerCheatSheet(): void {
+    this.game.gameUI?.showDialogBox({
+      actor: this.actor,
+      messages: cheatSheetMessages,
+    });
   }
 }

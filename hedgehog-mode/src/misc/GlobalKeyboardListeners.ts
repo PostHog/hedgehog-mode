@@ -88,6 +88,12 @@ export class GlobalKeyboardListeners {
         },
       },
       {
+        keys: ["c", "h", "e", "a", "t", "c", "o", "d", "e", "s"],
+        action: () => {
+          this.getPlayableHedgehog().interface.triggerCheatSheet();
+        },
+      },
+      {
         keys: ["r", "a", "i", "n", "b", "o", "w"],
         action: () => {
           this.getAllHedgehogs().forEach((hedgehog) => {

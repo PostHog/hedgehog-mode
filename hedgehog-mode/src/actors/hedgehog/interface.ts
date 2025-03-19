@@ -1,9 +1,9 @@
 import { sample } from "lodash";
 import type { HedgehogActor } from "../Hedgehog";
-import { Game } from "../../types";
+import { Game, GameUIDialogBoxProps } from "../../types";
 
 export class HedgehogActorInterface {
-  private messages = [
+  private messages: GameUIDialogBoxProps["messages"][] = [
     [
       {
         words: [
@@ -257,9 +257,6 @@ export class HedgehogActorInterface {
       this.game.gameUI?.showDialogBox({
         actor: this.actor,
         messages: selectedMessages,
-        onEnd: () => {
-          console.log("Dialog box ended");
-        },
       });
     }
   }

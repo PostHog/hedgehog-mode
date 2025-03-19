@@ -163,7 +163,6 @@ export class HedgehogActor extends Actor {
     super.setupPointerEvents();
 
     this.sprite.on("click", (e) => {
-      console.log("Clicked!");
       if (this.options.onClick) {
         this.options.onClick();
       } else {

@@ -14,9 +14,6 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
 
   const uiShowing = dialogBox !== null;
 
-  console.log("Messages", dialogBox);
-
-  console.log("UI showing", uiShowing);
   // To game should control the UI largely so we add an event listener for game modal popups
   useEffect(() => {
     game.setUI({

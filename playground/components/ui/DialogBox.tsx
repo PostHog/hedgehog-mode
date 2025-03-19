@@ -132,7 +132,7 @@ export function DialogBox({
     }
 
     if (index === messages.length) {
-      onEnd();
+      onEnd?.();
     }
   };
 

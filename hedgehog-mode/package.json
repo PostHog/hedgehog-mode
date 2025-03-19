@@ -33,7 +33,9 @@
     "typescript-eslint": "^7.16.1",
     "vite": "^5.3.4",
     "vite-plugin-dts": "^3.9.1",
-    "vitest": "^2.0.3"
+    "vitest": "^2.0.3",
+    "react": "^18.0.0",
+    "@types/react": "^18.0.0"
   },
   "engines": {
     "node": ">=18"
@@ -43,5 +45,13 @@
     "lodash": "^4.17.21",
     "matter-js": "^0.20.0",
     "pixi.js": "^8.4.0"
+  },
+  "peerDependencies": {
+    "react": "^16.8.0 || ^17.0.0 || ^18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": false
+    }
   }
 }

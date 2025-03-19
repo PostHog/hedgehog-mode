@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import type Matter from "matter-js";
 import { AnimatedSprite, Application } from "pixi.js";
 import type { SpritesManager } from "./sprites/sprites";
@@ -45,7 +46,7 @@ export type GameUI = {
 };
 
 export type GameUIAnimatedTextProps = {
-  words: (string | { text: string; style?: CSSStyleDeclaration })[];
+  words: (string | { text: string; style?: CSSProperties })[];
   duration?: number;
   disableAnimation?: boolean;
   onComplete?: () => void;
@@ -58,6 +59,6 @@ export type GameUIDialogBoxProps = {
   }[];
   width?: number;
   position?: { x: number; y: number };
-  onEnd: () => void;
+  onEnd?: () => void;
   actor?: HedgehogActor;
 };

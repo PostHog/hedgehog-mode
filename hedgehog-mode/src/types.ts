@@ -37,4 +37,27 @@ export type Game = {
   removeElement: (element: GameElement) => void;
   log: (...args: unknown[]) => void;
   setSpeed: (speed: number) => void;
+  gameUI?: GameUI;
+};
+
+export type GameUI = {
+  showDialogBox: (dialogBox: GameUIDialogBoxProps) => void;
+};
+
+export type GameUIAnimatedTextProps = {
+  words: (string | { text: string; style?: CSSStyleDeclaration })[];
+  duration?: number;
+  disableAnimation?: boolean;
+  onComplete?: () => void;
+};
+
+export type GameUIDialogBoxProps = {
+  messages: {
+    words: GameUIAnimatedTextProps["words"];
+    onComplete?: () => void;
+  }[];
+  width?: number;
+  position?: { x: number; y: number };
+  onEnd: () => void;
+  actor?: HedgehogActor;
 };

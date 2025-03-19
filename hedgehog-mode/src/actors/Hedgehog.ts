@@ -12,6 +12,7 @@ import {
   HedgehogActorColorOption,
   HedgehogActorOptions,
 } from "./hedgehog/config";
+import { HedgehogActorInterface } from "./hedgehog/interface";
 
 export const COLOR_TO_FILTER_MAP: Record<
   HedgehogActorColorOption,
@@ -84,6 +85,7 @@ export class HedgehogActor extends Actor {
   ai: HedgehogActorAI;
   controls: HedgehogActorControls;
   private filter = new ColorMatrixFilter();
+  interface: HedgehogActorInterface;
 
   hitBoxModifier = {
     left: 0.24,
@@ -103,7 +105,7 @@ export class HedgehogActor extends Actor {
     this.isInteractive = options.interactions_enabled ?? true;
     this.ai = new HedgehogActorAI(this);
     this.controls = new HedgehogActorControls(this);
-
+    this.interface = new HedgehogActorInterface(game, this);
     this.setPosition({
       x: window.innerWidth * Math.random(),
       y: Math.random() * 200,
@@ -161,7 +163,12 @@ export class HedgehogActor extends Actor {
     super.setupPointerEvents();
 
     this.sprite.on("click", (e) => {
-      this.options.onClick?.();
+      console.log("Clicked!");
+      if (this.options.onClick) {
+        this.options.onClick();
+      } else {
+        this.interface.onClick();
+      }
     });
 
     this.sprite.on("pointerover", () => {

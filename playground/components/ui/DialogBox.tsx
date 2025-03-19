@@ -1,0 +1,176 @@
+import { useEffect, useRef, useState, useCallback } from "react";
+import { AnimatedText } from "./AnimatedText";
+import { GameUIDialogBoxProps } from "@posthog/hedgehog-mode";
+
+const Chevron = () => {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+      <g
+        id="SVGRepo_tracerCarrier"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></g>
+      <g id="SVGRepo_iconCarrier">
+        {" "}
+        <path
+          d="M15 6L9 12L15 18"
+          stroke="#000000"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        ></path>{" "}
+      </g>
+    </svg>
+  );
+};
+const ArrowButton = ({
+  onClick,
+  direction,
+  disabled,
+}: {
+  onClick: () => void;
+  direction: "left" | "right";
+  disabled?: boolean;
+}) => {
+  return (
+    <div
+      onClick={onClick}
+      className={`cursor-pointer flex items-center justify-center opacity-50 hover:opacity-100 transition-opacity duration-300`}
+      style={{
+        pointerEvents: disabled ? "none" : "auto",
+      }}
+    >
+      <div
+        className={`text-2xl align-middle p-1 h-6 w-6 flex items-center justify-center ${
+          direction === "right" ? "rotate-180" : ""
+        }`}
+      >
+        <Chevron />
+      </div>
+    </div>
+  );
+};
+
+const WINDOW_MARGIN = 10;
+
+export function DialogBox({
+  messages,
+  actor,
+  width = 300,
+  onEnd,
+}: GameUIDialogBoxProps) {
+  const [messageIndex, setMessageIndex] = useState<number>(0);
+  const ref = useRef<HTMLDivElement>(null);
+  const [hovering, setHovering] = useState<boolean>(false);
+
+  useEffect(() => {
+    setMessageIndex(0);
+    setHovering(false);
+  }, [messages]);
+
+  const setPosition = useCallback(
+    (actor?: GameUIDialogBoxProps["actor"]) => {
+      if (hovering) {
+        return;
+      }
+
+      const pos = actor?.rigidBody?.position || { y: 999999999, x: 999999999 };
+
+      if (ref.current && pos) {
+        let x = pos.x - width / 2;
+        let y = window.innerHeight - pos.y + 40; // offset for height of the hedgehog
+        const height = ref.current.clientHeight;
+
+        x = Math.max(WINDOW_MARGIN, x);
+        x = Math.min(window.innerWidth - width - WINDOW_MARGIN, x);
+
+        y = Math.max(WINDOW_MARGIN, y);
+        y = Math.min(window.innerHeight - height - WINDOW_MARGIN, y);
+        ref.current.style.left = `${x}px`;
+        ref.current.style.bottom = `${y}px`;
+        // Translate to ensure it is in the frame
+        // ref.current.style.transform = `translate(-50%, 0)`;
+      }
+    },
+    [hovering]
+  );
+
+  useEffect(() => {
+    if (actor) {
+      let cancel: number | null = null;
+      const updatePosition = () => {
+        setPosition(actor);
+        cancel = requestAnimationFrame(updatePosition);
+      };
+
+      updatePosition();
+
+      return () => {
+        if (cancel) {
+          cancelAnimationFrame(cancel);
+        }
+      };
+    }
+  }, [actor, setPosition]);
+
+  const [animationCompleted, setAnimationCompleted] = useState<boolean>(false);
+
+  const message = messages[messageIndex];
+  const setIndex = (index: number) => {
+    const isForward = index > messageIndex;
+
+    if (isForward && !animationCompleted) {
+      setAnimationCompleted(true);
+      return;
+    }
+    setAnimationCompleted(false);
+
+    setMessageIndex(Math.max(0, Math.min(messages.length - 1, index)));
+
+    if (isForward) {
+      messages[messageIndex]?.onComplete?.();
+    }
+
+    if (index === messages.length) {
+      onEnd();
+    }
+  };
+
+  if (!message) {
+    return null;
+  }
+
+  // Get left, right values within the window size
+
+  return (
+    <div
+      ref={ref}
+      className="border-2 border-gray-900 bg-white rounded-lg shadow-lg p-2 absolute"
+      style={{
+        width,
+      }}
+      onMouseEnter={() => setHovering(true)}
+      onMouseLeave={() => setHovering(false)}
+    >
+      <AnimatedText
+        key={messageIndex}
+        words={message.words}
+        onComplete={() => setAnimationCompleted(true)}
+        disableAnimation={animationCompleted}
+      />
+
+      <div className="flex flex-row justify-end">
+        <ArrowButton
+          onClick={() => setIndex(messageIndex - 1)}
+          direction="left"
+          disabled={messageIndex === 0}
+        />
+        <ArrowButton
+          onClick={() => setIndex(messageIndex + 1)}
+          direction="right"
+        />
+      </div>
+    </div>
+  );
+}

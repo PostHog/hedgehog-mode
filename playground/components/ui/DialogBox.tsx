@@ -58,7 +58,7 @@ export function DialogBox({
   actor,
   width = 300,
   onEnd,
-}: GameUIDialogBoxProps) {
+}: GameUIDialogBoxProps & { onClickOutside?: () => void }) {
   const [messageIndex, setMessageIndex] = useState<number>(0);
   const ref = useRef<HTMLDivElement>(null);
   const [hovering, setHovering] = useState<boolean>(false);
@@ -116,25 +116,42 @@ export function DialogBox({
   const [animationCompleted, setAnimationCompleted] = useState<boolean>(false);
 
   const message = messages[messageIndex];
-  const setIndex = (index: number) => {
-    const isForward = index > messageIndex;
+  const setIndex = useCallback(
+    (index: number) => {
+      const isForward = index > messageIndex;
 
-    if (isForward && !animationCompleted) {
-      setAnimationCompleted(true);
-      return;
-    }
-    setAnimationCompleted(false);
+      if (isForward && !animationCompleted) {
+        setAnimationCompleted(true);
+        return;
+      }
+      setAnimationCompleted(false);
 
-    setMessageIndex(Math.max(0, Math.min(messages.length - 1, index)));
+      setMessageIndex(Math.max(0, Math.min(messages.length - 1, index)));
 
-    if (isForward) {
-      messages[messageIndex]?.onComplete?.();
-    }
+      if (isForward) {
+        messages[messageIndex]?.onComplete?.();
+      }
 
-    if (index === messages.length) {
-      onEnd?.();
-    }
-  };
+      if (index === messages.length) {
+        onEnd?.();
+      }
+    },
+    [messageIndex, messages.length, animationCompleted, onEnd]
+  );
+
+  // Add useEffect for click outside detection
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (ref.current && !ref.current.contains(event.target as Node)) {
+        setIndex(messageIndex + 1);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [setIndex]);
 
   if (!message) {
     return null;

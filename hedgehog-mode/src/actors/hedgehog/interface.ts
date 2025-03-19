@@ -13,33 +13,32 @@ export class HedgehogActorInterface {
     [
       {
         words: [
-          "Ah yes, another ",
+          "ah yes, another",
           { text: "brilliant", style: { fontWeight: "bold" } },
-          " idea at 2 AM.",
+          "idea at 2am",
         ],
       },
       {
         words: [
-          "Have you considered pivoting to ",
+          "have you considered pivoting to",
           { text: "AI", style: { color: "blue", fontWeight: "bold" } },
-          " yet?",
+          "yet?",
         ],
       },
     ],
     [
       {
         words: [
-          "Growth hacking? More like ",
+          "growth hacking? more like ",
           { text: "hope hacking", style: { fontStyle: "italic" } },
-          ".",
         ],
       },
     ],
-    [{ words: ["VCs love hedgehogs. Trust me, I’m a hedgehog."] }],
+    [{ words: ["vcs love hedgehogs... trust me, i'm a hedgehog"] }],
     [
       {
         words: [
-          "Which job is more ridiculous - the designer who's sole purpose is to draw me...",
+          "which job is more ridiculous - the designer who's sole purpose is to draw me...",
         ],
       },
       {
@@ -49,91 +48,85 @@ export class HedgehogActorInterface {
         words: [".    .    ."],
       },
       {
-        words: ["I mean... it's both."],
+        words: ["i mean... it's both"],
       },
     ],
     [
       {
         words: [
-          "Clicking me doesn’t increase ",
+          "clicking me doesn't increase",
           { text: "retention", style: { fontWeight: "bold" } },
-          ".",
         ],
       },
     ],
     [
       {
         words: [
-          "Not everything needs analytics. Just let me ",
+          "not everything needs analytics. just let me",
           { text: "vibe", style: { fontStyle: "italic" } },
-          ".",
         ],
       },
     ],
     [
       {
         words: [
-          "Another day, another click. Living the ",
+          "another day, another click. living the",
           { text: "dream", style: { fontStyle: "italic" } },
-          ".",
         ],
       },
     ],
-    [{ words: ["I have no idea what I’m doing."] }],
+    [{ words: ["i have no idea what i'm doing"] }],
     [
       {
         words: [
-          "Can we ship it? ",
-          { text: "No", style: { fontWeight: "bold", color: "red" } },
-          ". Will we ship it? Also ",
+          "can we ship it?",
           { text: "no", style: { fontWeight: "bold", color: "red" } },
-          ".",
+          ". will we ship it? also",
+          { text: "no", style: { fontWeight: "bold", color: "red" } },
         ],
       },
     ],
-    [{ words: ["Ben wrote 85% of this code.."] }],
-    [{ words: ["We should probably A/B test this click."] }],
+    [{ words: ["ben wrote 85% of this code..."] }],
+    [{ words: ["we should probably a/b test this click"] }],
     [
       {
         words: [
-          "No, the feature isn’t broken. It’s an ",
+          "no, the feature isn't broken. it's an",
           { text: "experiment", style: { fontStyle: "italic" } },
-          ".",
         ],
       },
     ],
-    [{ words: ["Works on my machine."] }],
+    [{ words: ["works on my machine"] }],
     [
       {
         words: [
-          "The PR is just ‘",
+          "the pr is just",
           { text: "fix", style: { fontStyle: "italic" } },
-          "’ with no description.",
+          "with no description",
         ],
       },
     ],
     [
       {
         words: [
-          "Deploying on Friday? ",
-          { text: "Brave", style: { fontWeight: "bold" } },
-          ".",
+          "deploying on friday?",
+          { text: "brave", style: { fontWeight: "bold" } },
         ],
       },
     ],
-    [{ words: ["Backend’s on fire, but hey, frontend looks great."] }],
+    [{ words: ["backend's on fire, but hey, frontend looks great"] }],
     [
       {
         words: [
-          "Numbers look good - ",
-          { text: "I love PostHog...", style: { fontWeight: "bold" } },
+          "numbers look good -",
+          { text: "i love posthog...", style: { fontWeight: "bold" } },
         ],
       },
       {
         words: [
-          " Numbers look bad - ",
+          "numbers look bad -",
           {
-            text: "No, it must be the app that is broken",
+            text: "no, it must be the app that is broken",
             style: { fontWeight: "bold" },
           },
         ],
@@ -142,78 +135,74 @@ export class HedgehogActorInterface {
     [
       {
         words: [
-          "Disrupting the hedgehog industry with ",
-          { text: "Web3", style: { color: "purple" } },
-          ".",
+          "disrupting the hedgehog industry with",
+          { text: "web3", style: { color: "purple" } },
         ],
       },
     ],
     [
       {
         words: [
-          "Go-to-market strategy: ",
-          { text: "Hope", style: { fontWeight: "bold", fontStyle: "italic" } },
-          ".",
+          "go-to-market strategy:",
+          { text: "hope", style: { fontWeight: "bold", fontStyle: "italic" } },
         ],
       },
     ],
-    [{ words: ["It's a startup. Shut the fudge up. Do the work."] }],
-    [{ words: ["More dashboards! That’ll solve it."] }],
+    [{ words: ["it's a startup. shut the fudge up. do the work"] }],
+    [{ words: ["more dashboards! that'll solve it"] }],
     [
       {
         words: [
-          "Users love your product. All ",
+          "users love your product. all",
           { text: "5", style: { fontWeight: "bold", color: "red" } },
-          " of them.",
+          "of them",
         ],
       },
     ],
-    [{ words: ["Correlation ≠ causation. But let’s ignore that."] }],
+    [{ words: ["correlation ≠ causation. but let's ignore that"] }],
     [
       {
         words: [
-          "Retention is just a fancy word for ‘",
+          "retention is just a fancy word for",
           { text: "please stay", style: { fontStyle: "italic" } },
-          ".’",
         ],
       },
     ],
     [
       {
         words: [
-          "Growth hacking = making a button ",
+          "growth hacking = making a button",
           { text: "red", style: { color: "red", fontWeight: "bold" } },
-          ".",
         ],
       },
     ],
     [
       {
         words: [
-          "SEO tip: Just add ‘",
+          "seo tip: just add",
           { text: "AI", style: { fontWeight: "bold" } },
-          "’ everywhere.",
+          "everywhere",
         ],
       },
     ],
     [
       {
         words: [
-          "Brand voice? It’s just ",
+          "brand voice? it's just",
           { text: "sarcasm", style: { fontStyle: "italic" } },
-          " and hope.",
+          "and hope",
         ],
       },
     ],
-    [{ words: ["If it works, ship it. If it doesn’t, call it beta."] }],
-    [{ words: ["For the last time - yes, we did call it PostHog."] }],
-    [{ words: ["We track everything. Even this click."] }],
+    [{ words: ["if it works, ship it. if it doesn't, call it beta"] }],
+    [{ words: ["for the last time - yes, we did call it posthog"] }],
+    [{ words: ["we track everything. even this click"] }],
     [
       {
         words: [
-          "PostHog: Because ",
-          { text: "Google Analytics", style: { fontWeight: "bold" } },
-          " is a dumpster fire.",
+          "posthog: because",
+          { text: "GA", style: { fontWeight: "bold" } },
+          "is a dumpster fire",
         ],
       },
     ],
@@ -223,7 +212,7 @@ export class HedgehogActorInterface {
       },
       messages: [
         {
-          words: ["OUCH! OUCH! OUCH!"],
+          words: ["ouch! ouch! ouch!"],
         },
       ],
     },
@@ -240,8 +229,8 @@ export class HedgehogActorInterface {
           messages: [
             {
               words: [
-                "Hedgehog",
-                "Mode",
+                "hedgehog",
+                "mode",
                 { text: "is", style: { fontStyle: "italic" } },
                 {
                   text: "coming soon",
@@ -250,15 +239,15 @@ export class HedgehogActorInterface {
               ],
             },
             {
-              words: ["Ben is very excited for this..."],
+              words: ["ben is very excited for this..."],
             },
             {
               words: [
-                "...I'm worried he is losing sight of the big picture...",
+                "...i'm worried he is losing sight of the big picture...",
               ],
             },
             {
-              words: ["...it's like a cry for help or something."],
+              words: ["...it's like a cry for help or something"],
             },
           ],
         });

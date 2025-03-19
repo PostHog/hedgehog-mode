@@ -23,10 +23,6 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
     });
   }, [game]);
 
-  useEffect(() => {
-    console.log("UI showing", uiShowing);
-  }, [uiShowing]);
-
   return (
     <div
       className="fixed inset-0 z-20 font-mono"

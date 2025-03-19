@@ -70,10 +70,9 @@ export function HedgehogModeGame() {
 
       hedgeHogMode.spawnHedgehog({
         id: "hedgehog-1",
-        skin: "spiderhog", // TODO: Remove
         controls_enabled: true,
         player: true,
-        color: "rainbow",
+        color: sample(HedgehogActorColorOptions),
         accessories: getRandomAccesoryCombo(),
       });
 

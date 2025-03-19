@@ -119,6 +119,10 @@ export function DialogBox({
     (index: number) => {
       const isForward = index > messageIndex;
 
+      if (index < 0) {
+        return;
+      }
+
       if (isForward && !animationCompleted) {
         setAnimationCompleted(true);
         return;

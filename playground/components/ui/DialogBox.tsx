@@ -36,10 +36,9 @@ const ArrowButton = ({
   return (
     <div
       onClick={onClick}
-      className={`cursor-pointer flex items-center justify-center opacity-50 hover:opacity-100 transition-opacity duration-300`}
-      style={{
-        pointerEvents: disabled ? "none" : "auto",
-      }}
+      className={`cursor-pointer flex items-center justify-center  transition-opacity duration-300 ${
+        disabled ? "opacity-25" : "opacity-50 hover:opacity-100"
+      }`}
     >
       <div
         className={`text-2xl align-middle p-1 h-6 w-6 flex items-center justify-center ${

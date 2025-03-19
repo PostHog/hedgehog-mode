@@ -30,7 +30,22 @@ export class HedgehogActorInterface {
       },
     ],
     [{ words: ["VCs love hedgehogs. Trust me, I’m a hedgehog."] }],
-    [{ words: ["I was supposed to be a logo. Now I have a job."] }],
+    [
+      {
+        words: [
+          "Which job is more ridiculous - the designer who's sole purpose is to draw me...",
+        ],
+      },
+      {
+        words: ["...or the engineer who's sole purpose is to make me..."],
+      },
+      {
+        words: [".    .    ."],
+      },
+      {
+        words: ["I mean... it's both."],
+      },
+    ],
     [
       {
         words: [
@@ -81,8 +96,8 @@ export class HedgehogActorInterface {
         ],
       },
     ],
+    [{ words: ["Works on my machine."] }],
     [
-      { words: ["Works on my machine."] },
       {
         words: [
           "The PR is just ‘",
@@ -90,6 +105,8 @@ export class HedgehogActorInterface {
           "’ with no description.",
         ],
       },
+    ],
+    [
       {
         words: [
           "Deploying on Friday? ",
@@ -97,7 +114,24 @@ export class HedgehogActorInterface {
           ".",
         ],
       },
-      { words: ["Backend’s on fire, but hey, frontend looks great."] },
+    ],
+    [{ words: ["Backend’s on fire, but hey, frontend looks great."] }],
+    [
+      {
+        words: [
+          "Numbers look good - ",
+          { text: "I love PostHog...", style: { fontWeight: "bold" } },
+        ],
+      },
+      {
+        words: [
+          " Numbers look bad - ",
+          {
+            text: "No, it must be the app that is broken",
+            style: { fontWeight: "bold" },
+          },
+        ],
+      },
     ],
     [
       {
@@ -118,8 +152,8 @@ export class HedgehogActorInterface {
       },
     ],
     [{ words: ["It's a startup. Shut the fudge up. Do the work."] }],
+    [{ words: ["More dashboards! That’ll solve it."] }],
     [
-      { words: ["More dashboards! That’ll solve it."] },
       {
         words: [
           "Users love your product. All ",
@@ -127,7 +161,9 @@ export class HedgehogActorInterface {
           " of them.",
         ],
       },
-      { words: ["Correlation ≠ causation. But let’s ignore that."] },
+    ],
+    [{ words: ["Correlation ≠ causation. But let’s ignore that."] }],
+    [
       {
         words: [
           "Retention is just a fancy word for ‘",
@@ -145,7 +181,6 @@ export class HedgehogActorInterface {
         ],
       },
     ],
-    [{ words: ["Yes, we have a newsletter. No, you won’t read it."] }],
     [
       {
         words: [

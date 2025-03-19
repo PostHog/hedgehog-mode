@@ -59,13 +59,20 @@ const cheatSheetMessages: GameUIDialogBoxProps["messages"] = [
   },
   {
     words: [
-      "have fun",
+      {
+        text: "have fun!",
+        style: { fontStyle: "bold", fontSize: "1.4em" },
+      },
       {
         text: "please don't tell anyone you found me.",
         style: { fontStyle: "italic", fontSize: "0.8em" },
       },
       {
-        text: "tim will come for me...",
+        text: "tim will not be happy.",
+        style: { fontStyle: "italic", fontSize: "0.7em" },
+      },
+      {
+        text: "he might fire ben, or worse me...",
         style: { fontStyle: "italic", fontSize: "0.7em" },
       },
     ],

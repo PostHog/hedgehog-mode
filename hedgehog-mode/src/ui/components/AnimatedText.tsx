@@ -22,7 +22,7 @@ export function AnimatedText({
   }, []);
 
   return (
-    <p className="font-medium text-sm">
+    <div className="AnimatedText">
       {words.map((word) => {
         const subwords =
           typeof word === "string" ? word.split(" ") : word.text.split(" ");
@@ -32,7 +32,7 @@ export function AnimatedText({
           return (
             <span
               key={index}
-              className={`mr-2 select-none whitespace-nowrap`}
+              className="AnimatedTextWord"
               style={typeof word === "object" ? word.style : undefined}
             >
               {letters.map((letter) => {
@@ -40,9 +40,7 @@ export function AnimatedText({
                 return (
                   <span
                     key={letterIndex}
-                    className={`inline-block ${
-                      disableAnimation ? "" : "animate-letter-pop opacity-0"
-                    }`}
+                    className={`AnimatedTextLetter Animation_LetterPop`}
                     style={{
                       animationDelay: `${letterIndex * letterDelay}ms`,
                       animationDuration: `400ms`,
@@ -56,6 +54,6 @@ export function AnimatedText({
           );
         });
       })}
-    </p>
+    </div>
   );
 }

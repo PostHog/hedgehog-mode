@@ -19,10 +19,10 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
 
   return (
     <div
-      className="fixed inset-0 z-20 font-mono"
+      className="GameUI"
       style={{ pointerEvents: uiShowing ? "auto" : "none" }}
     >
-      <div className="flex flex-col items-center justify-center h-full">
+      <div className="GameUIContainer">
         <DialogBox
           actor={dialogBox?.actor}
           position={{ x: window.innerWidth / 2, y: window.innerHeight / 2 }}

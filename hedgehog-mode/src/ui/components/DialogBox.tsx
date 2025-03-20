@@ -37,13 +37,13 @@ const ArrowButton = ({
   return (
     <div
       onClick={onClick}
-      className={`cursor-pointer flex items-center justify-center  transition-opacity duration-300 ${
-        disabled ? "opacity-25" : "opacity-50 hover:opacity-100"
+      className={`DialogBoxArrowButton ${
+        disabled ? "DialogBoxArrowButton--disabled" : ""
       }`}
     >
       <div
-        className={`text-2xl align-middle p-1 h-6 w-6 flex items-center justify-center ${
-          direction === "right" ? "rotate-180" : ""
+        className={`DialogBoxArrowIcon ${
+          direction === "right" ? "DialogBoxArrowIcon--right" : ""
         }`}
       >
         <Chevron />
@@ -86,8 +86,6 @@ export function DialogBox({
         y = Math.min(window.innerHeight - height - WINDOW_MARGIN, y);
         ref.current.style.left = `${x}px`;
         ref.current.style.bottom = `${y}px`;
-        // Translate to ensure it is in the frame
-        // ref.current.style.transform = `translate(-50%, 0)`;
       }
     },
     [hovering]
@@ -143,7 +141,6 @@ export function DialogBox({
     [messageIndex, messages.length, animationCompleted, onEnd]
   );
 
-  // Add useEffect for click outside detection
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (ref.current && !ref.current.contains(event.target as Node)) {
@@ -157,7 +154,6 @@ export function DialogBox({
     };
   }, [setIndex]);
 
-  // Add keyboard listener for Enter and Space
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if ((event.key === "Enter" || event.key === " ") && message) {
@@ -175,12 +171,10 @@ export function DialogBox({
     return null;
   }
 
-  // Get left, right values within the window size
-
   return (
     <div
       ref={ref}
-      className="border-2 border-gray-900 bg-white rounded-lg shadow-lg p-2 absolute"
+      className="DialogBox"
       style={{
         width,
       }}
@@ -194,7 +188,7 @@ export function DialogBox({
         disableAnimation={animationCompleted}
       />
 
-      <div className="flex flex-row justify-end">
+      <div className="DialogBoxControls">
         <ArrowButton
           onClick={() => setIndex(messageIndex - 1)}
           direction="left"

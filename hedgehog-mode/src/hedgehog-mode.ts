@@ -31,9 +31,9 @@ export type * from "./types";
 
 export class HedgeHogMode implements Game {
   ref?: HTMLDivElement;
-  app: Application;
-  engine: Matter.Engine;
-  runner: Matter.Runner;
+  app!: Application;
+  engine!: Matter.Engine;
+  runner!: Matter.Runner;
   debugRender?: Matter.Render;
   elements: GameElement[] = []; // TODO: Type better
   totalElapsedTime = 0;
@@ -42,7 +42,7 @@ export class HedgeHogMode implements Game {
   spritesManager: SpritesManager;
   mousePosition?: Matter.Vector;
   lastTime?: number;
-  gameUI: GameUI;
+  gameUI!: GameUI;
 
   constructor(private options: HedgehogModeConfig) {
     this.spritesManager = new SpritesManager(options);
@@ -54,13 +54,13 @@ export class HedgeHogMode implements Game {
     this.app.destroy({
       removeView: true,
     });
-    Render.stop(this.debugRender);
-    Matter.World.clear(this.engine.world, false);
-    Matter.Engine.clear(this.engine);
     if (this.debugRender) {
+      Render.stop(this.debugRender);
+      Matter.World.clear(this.engine.world, false);
+      Matter.Engine.clear(this.engine);
       this.debugRender.canvas.remove();
-      this.debugRender.canvas = null;
-      this.debugRender.context = null;
+      this.debugRender.canvas = document.createElement("canvas");
+      this.debugRender.context = this.debugRender.canvas.getContext("2d")!;
       this.debugRender.textures = {};
     }
   }
@@ -73,9 +73,11 @@ export class HedgeHogMode implements Game {
         if (dCount === 5) {
           dCount = 0;
           this.isDebugging = !this.isDebugging;
-          this.debugRender.canvas.style.opacity = this.isDebugging
-            ? "0.5"
-            : "0";
+          if (this.debugRender?.canvas) {
+            this.debugRender.canvas.style.opacity = this.isDebugging
+              ? "0.5"
+              : "0";
+          }
         }
       } else {
         dCount = 0;
@@ -94,7 +96,7 @@ export class HedgeHogMode implements Game {
   }
 
   spawnHedgehog(options: HedgehogActorOptions | undefined): HedgehogActor {
-    const actor = new HedgehogActor(this, options);
+    const actor = new HedgehogActor(this, options || {});
     this.spawnActor(actor);
     return actor;
   }
@@ -257,25 +259,28 @@ export class HedgeHogMode implements Game {
 
   removeElement(element: GameElement): void {
     element.beforeUnload?.();
-    Matter.Composite.remove(this.engine.world, element.rigidBody); // stop physics simulation
-    this.app.stage.removeChild(element.sprite); // stop drawing on the canvas
-    this.elements = this.elements.filter((el) => el != element); // stop updating
+    if (element.rigidBody) {
+      Matter.Composite.remove(this.engine.world, element.rigidBody);
+    }
+    if (element.sprite) {
+      this.app.stage.removeChild(element.sprite);
+    }
+    this.elements = this.elements.filter((el) => el != element);
     this.log(`Removed element. Elements left: ${this.elements.length}`);
   }
 
   private resize() {
-    if (!this.debugRender) {
+    if (!this.debugRender || !this.ref) {
       return;
     }
 
-    // Function to handle resizing
     this.debugRender.bounds.max.x = this.ref.clientWidth;
     this.debugRender.bounds.max.y = this.ref.clientHeight;
     this.debugRender.options.width = this.ref.clientWidth;
     this.debugRender.options.height = this.ref.clientHeight;
     this.debugRender.canvas.width = this.ref.clientWidth;
     this.debugRender.canvas.height = this.ref.clientHeight;
-    Matter.Render.setPixelRatio(this.debugRender, window.devicePixelRatio); // added this
+    Matter.Render.setPixelRatio(this.debugRender, window.devicePixelRatio);
   }
 
   private syncPlatforms() {

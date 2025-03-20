@@ -23,7 +23,14 @@ export default defineConfig(({ mode }) => {
         },
       },
     },
-    resolve: { alias: { src: resolve("src/") } },
+    resolve: {
+      alias: { src: resolve("src/") },
+      dedupe: ["react", "react-dom"],
+    },
+    optimizeDeps: {
+      include: ["react", "react-dom"],
+      exclude: ["@posthog/hedgehog-mode"],
+    },
     test: {
       globals: true,
       include: ["test/*.test.ts"],

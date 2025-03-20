@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { sample } from "lodash";
 import { HedgeHogMode } from "./hedgehog-mode";
 import {
@@ -6,9 +6,10 @@ import {
   HedgehogActorColorOptions,
 } from "./actors/hedgehog/config";
 import { HedgehogModeUI } from "./ui/GameUI";
+import root from "react-shadow";
+import { styles } from "./ui/styles";
 
 export function HedgehogModeRenderer() {
-  const [ref, setRef] = useState<HTMLDivElement | null>(null);
   const [game, setGame] = useState<HedgeHogMode | null>(null);
 
   const spawnHedgehog = async (count: number, hedgehogMode = game) => {
@@ -24,37 +25,37 @@ export function HedgehogModeRenderer() {
     }
   };
 
-  const setupHedgehogMode = async () => {
-    if (ref) {
-      const hedgeHogMode = new HedgeHogMode({
-        assetsUrl: "/assets",
-        platformSelector: ".border",
-      });
-      await hedgeHogMode.render(ref);
-      setGame(hedgeHogMode);
+  const setupHedgehogMode = async (container: HTMLDivElement) => {
+    const hedgeHogMode = new HedgeHogMode({
+      assetsUrl: "/assets",
+      platformSelector: ".border",
+    });
+    await hedgeHogMode.render(container);
+    setGame(hedgeHogMode);
 
-      hedgeHogMode.spawnHedgehog({
-        id: "hedgehog-1",
-        controls_enabled: true,
-        player: true,
-        color: sample(HedgehogActorColorOptions),
-        accessories: getRandomAccesoryCombo(),
-      });
+    hedgeHogMode.spawnHedgehog({
+      id: "hedgehog-1",
+      controls_enabled: true,
+      player: true,
+      color: sample(HedgehogActorColorOptions),
+      accessories: getRandomAccesoryCombo(),
+    });
 
-      spawnHedgehog(20, hedgeHogMode);
-    }
+    spawnHedgehog(20, hedgeHogMode);
   };
 
-  useEffect(() => {
-    setupHedgehogMode();
-  }, [ref]);
-
   return (
-    <>
-      <div></div>
-      <div className="fixed inset-0 z-20" ref={(r) => setRef(r)}></div>
-      {/* UI */}
+    <root.div className="GameContainer">
+      <style>{styles}</style>
+      <div
+        className="GameContainer"
+        ref={(el) => {
+          if (el && !game) {
+            setupHedgehogMode(el);
+          }
+        }}
+      />
       {game && <HedgehogModeUI game={game} />}
-    </>
+    </root.div>
   );
 }

@@ -13,6 +13,15 @@ export default defineConfig(({ mode }) => {
         fileName: "index",
       },
       sourcemap: true,
+      rollupOptions: {
+        external: ["react", "react-dom"],
+        output: {
+          globals: {
+            react: "React",
+            "react-dom": "ReactDOM",
+          },
+        },
+      },
     },
     resolve: { alias: { src: resolve("src/") } },
     test: {

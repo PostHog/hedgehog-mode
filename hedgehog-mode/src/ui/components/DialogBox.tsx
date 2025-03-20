@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { AnimatedText } from "./AnimatedText";
 import { GameUIDialogBoxProps } from "../../types";
+
 const Chevron = () => {
   return (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -23,6 +24,7 @@ const Chevron = () => {
     </svg>
   );
 };
+
 const ArrowButton = ({
   onClick,
   direction,

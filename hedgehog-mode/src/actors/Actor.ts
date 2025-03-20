@@ -24,7 +24,7 @@ export const NO_PLATFORM_COLLISION_FILTER = {
 };
 
 export class Actor implements GameElement {
-  public sprite: AnimatedSprite;
+  public sprite?: AnimatedSprite;
   public isDragging = false;
   public isFlammable = false;
   protected currentAnimation?: AvailableAnimations;
@@ -32,7 +32,7 @@ export class Actor implements GameElement {
   protected collisionFilter: Matter.ICollisionFilter = DEFAULT_COLLISION_FILTER;
   collisionFilterOverride?: Matter.ICollisionFilter;
 
-  rigidBody: Matter.Body;
+  rigidBody: Matter.Body | null = null;
   isInteractive = false;
 
   hitBoxModifier = {
@@ -60,8 +60,8 @@ export class Actor implements GameElement {
     this.sprite.eventMode = "static";
     this.sprite.play();
     this.sprite.anchor.set(0.5);
-    this.sprite.x = this.rigidBody.position.x;
-    this.sprite.y = this.rigidBody.position.y;
+    this.sprite.x = this.rigidBody!.position.x;
+    this.sprite.y = this.rigidBody!.position.y;
     this.game.app.stage.addChild(this.sprite);
 
     this.setupPointerEvents();
@@ -96,8 +96,8 @@ export class Actor implements GameElement {
       ...this.rigidBodyOptions,
     };
 
-    const width = this.sprite.width;
-    const height = this.sprite.height;
+    const width = this.sprite!.width;
+    const height = this.sprite!.height;
 
     this.rigidBody = Matter.Bodies.rectangle(
       x,
@@ -116,8 +116,8 @@ export class Actor implements GameElement {
 
   protected getRigidBodyDimensions(): { width: number; height: number } {
     return {
-      width: this.rigidBody.bounds.max.x - this.rigidBody.bounds.min.x,
-      height: this.rigidBody.bounds.max.y - this.rigidBody.bounds.min.y,
+      width: this.rigidBody!.bounds.max.x - this.rigidBody!.bounds.min.x,
+      height: this.rigidBody!.bounds.max.y - this.rigidBody!.bounds.min.y,
     };
   }
 
@@ -128,50 +128,51 @@ export class Actor implements GameElement {
     if (!this.currentAnimation) {
       return this.loadSprite(animation);
     }
+    const sprite = this.sprite!;
 
-    this.sprite.animationSpeed = this.game.engine.timing.timeScale * 0.5;
+    sprite.animationSpeed = this.game.engine.timing.timeScale * 0.5;
 
     if (this.currentAnimation === animation && !options.reset) {
       return;
     }
 
     this.currentAnimation = animation;
-    this.sprite.stop();
-    this.sprite.textures =
+    sprite.stop();
+    sprite.textures =
       this.game.spritesManager.getAnimatedSpriteFrames(animation);
-    this.sprite.currentFrame = 0;
+    sprite.currentFrame = 0;
     if (options.onComplete) {
-      this.sprite.loop = false;
-      this.sprite.onComplete = options.onComplete;
+      sprite.loop = false;
+      sprite.onComplete = options.onComplete;
     } else {
-      this.sprite.loop = true;
+      sprite.loop = true;
     }
-    this.sprite.play();
+    sprite.play();
   }
 
   public setVelocity(vector: Matter.Vector): void {
-    Matter.Body.setVelocity(this.rigidBody, vector);
+    Matter.Body.setVelocity(this.rigidBody!, vector);
   }
 
   public setPosition(position: Matter.Vector): void {
-    Matter.Body.setPosition(this.rigidBody, position);
+    Matter.Body.setPosition(this.rigidBody!, position);
   }
 
   public setScale(scale: number): void {
-    this.sprite.scale.set(scale, scale);
+    this.sprite!.scale.set(scale, scale);
     // We need to reload the body whenever the scale changes
     // Ideally we would just fix this
     this.loadRigidBody(true);
   }
 
   setupPointerEvents(): void {
-    this.sprite.on("pointerdown", (e) => {
+    this.sprite!.on("pointerdown", (e) => {
       if (!this.isInteractive) {
         return;
       }
       const ropeConstraint = Constraint.create({
         pointA: { x: e.clientX, y: e.clientY },
-        bodyB: this.rigidBody,
+        bodyB: this.rigidBody!,
         stiffness: 0.2,
         damping: 1,
         length: 2,
@@ -200,22 +201,24 @@ export class Actor implements GameElement {
 
   update(ticker: UpdateTicker): void {
     // Apply the collision filter override if it exists
-    this.rigidBody.collisionFilter.mask =
+    this.rigidBody!.collisionFilter.mask =
       this.collisionFilterOverride?.mask ?? this.collisionFilter.mask;
-    this.rigidBody.collisionFilter.category =
+    this.rigidBody!.collisionFilter.category =
       this.collisionFilterOverride?.category ?? this.collisionFilter.category;
 
-    const yDiff = this.game.app.screen.height - this.rigidBody.position.y;
+    const yDiff = this.game.app.screen.height - this.rigidBody!.position.y;
 
     if (yDiff < 0) {
       this.setPosition({
-        x: this.rigidBody.position.x,
-        y: Math.max(this.rigidBody.position.y - yDiff, 0),
+        x: this.rigidBody!.position.x,
+        y: Math.max(this.rigidBody!.position.y - yDiff, 0),
       });
     }
 
     // TRICKY: This offsets the rendered sprite to match the hitbox
-    const { height, width } = this.sprite;
+    const sprite = this.sprite!;
+    const rigidBody = this.rigidBody!;
+    const { height, width } = sprite;
     const hitBoxHeight =
       height -
       height * this.hitBoxModifier.top -
@@ -232,24 +235,24 @@ export class Actor implements GameElement {
     const xCenterDiff = (width - hitBoxWidth) / 2;
 
     // Keep it upright (unless overidden)
-    this.rigidBody.angle = this.forceAngle;
+    rigidBody.angle = this.forceAngle;
 
-    this.sprite.x = this.rigidBody.position.x - xOffsetDiff + xCenterDiff;
-    this.sprite.y = this.rigidBody.position.y - yOffsetDiff + yCenterDiff;
-    this.sprite.rotation = this.rigidBody.angle;
+    sprite.x = rigidBody.position.x - xOffsetDiff + xCenterDiff;
+    sprite.y = rigidBody.position.y - yOffsetDiff + yCenterDiff;
+    sprite.rotation = rigidBody.angle;
 
     const { width: rigidBodyWidth } = this.getRigidBodyDimensions();
-    if (this.rigidBody.position.x > window.innerWidth + rigidBodyWidth) {
+    if (rigidBody.position.x > window.innerWidth + rigidBodyWidth) {
       this.setPosition({
         x: 0,
-        y: this.rigidBody.position.y,
+        y: rigidBody.position.y,
       });
     }
 
-    if (this.rigidBody.position.x < 0 - rigidBodyWidth) {
+    if (rigidBody.position.x < 0 - rigidBodyWidth) {
       this.setPosition({
         x: window.innerWidth,
-        y: this.rigidBody.position.y,
+        y: rigidBody.position.y,
       });
     }
 
@@ -271,7 +274,7 @@ export class Actor implements GameElement {
   getGround(): GameElement | undefined {
     const ground = this.connectedElements.find((el) => {
       // Considered ground if it is below us
-      return el.rigidBody?.position.y >= this.rigidBody.position.y;
+      return el.rigidBody!.position.y >= this.rigidBody!.position.y;
     });
 
     // Slight optimization: If we find ground then lets move it to the front of the array

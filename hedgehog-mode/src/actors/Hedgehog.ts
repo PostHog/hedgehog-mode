@@ -100,12 +100,12 @@ export class HedgehogActor extends Actor {
       y: -5,
     });
 
-    this.sprite.scale = {
+    this.sprite!.scale = {
       x: 0,
       y: 0,
     };
 
-    gsap.to(this.sprite.scale, {
+    gsap.to(this.sprite!.scale, {
       x: 1,
       y: 1,
       duration: 0.5,
@@ -131,11 +131,11 @@ export class HedgehogActor extends Actor {
       return;
     }
     super.updateSprite(spriteName, options);
-    this.sprite.filters = [this.filter];
+    this.sprite!.filters = [this.filter];
   }
 
   get currentSprite(): string {
-    return this.currentAnimation.split("/")[2];
+    return this.currentAnimation!.split("/")[2];
   }
 
   private fireTimer?: NodeJS.Timeout;
@@ -147,7 +147,7 @@ export class HedgehogActor extends Actor {
   setupPointerEvents(): void {
     super.setupPointerEvents();
 
-    this.sprite.on("click", (e) => {
+    this.sprite!.on("click", (e) => {
       if (this.options.onClick) {
         this.options.onClick();
       } else {
@@ -155,11 +155,11 @@ export class HedgehogActor extends Actor {
       }
     });
 
-    this.sprite.on("pointerover", () => {
+    this.sprite!.on("pointerover", () => {
       this.ai.run("wave");
     });
 
-    this.sprite.on("pointerout", () => {});
+    this.sprite!.on("pointerout", () => {});
   }
 
   updateOptions(options: Partial<HedgehogActorOptions>): void {
@@ -172,7 +172,7 @@ export class HedgehogActor extends Actor {
     clearTimeout(this.fireTimer);
     this.fireTimer = setTimeout(() => {
       if (times <= 1) {
-        this.sprite.removeChild(this.overlayAnimation);
+        this.sprite!.removeChild(this.overlayAnimation!);
         this.overlayAnimation = undefined;
         this.fireTimer = undefined;
         return;
@@ -191,12 +191,12 @@ export class HedgehogActor extends Actor {
       this.overlayAnimation.play();
       this.overlayAnimation.anchor.set(0.5);
       this.overlayAnimation.alpha = 0.75;
-      this.sprite.addChild(this.overlayAnimation);
+      this.sprite!.addChild(this.overlayAnimation);
     }
 
     this.setVelocity({
       x: (Math.random() - 0.5) * 20,
-      y: this.getGround() ? -10 : this.rigidBody.velocity.y,
+      y: this.getGround() ? -10 : this.rigidBody!.velocity.y,
     });
   }
 
@@ -230,12 +230,20 @@ export class HedgehogActor extends Actor {
 
       this.collisionFilterOverride = NO_PLATFORM_COLLISION_FILTER;
 
-      const rope = Composites.stack(400, 100, 1, 8, 0, 5, (x, y) => {
-        return Bodies.rectangle(x, y, 5, 20, {
-          density: 0.0005,
-          frictionAir: 0.02,
-        });
-      });
+      const rope = Composites.stack(
+        400,
+        100,
+        1,
+        8,
+        0,
+        5,
+        (x: number, y: number) => {
+          return Bodies.rectangle(x, y, 5, 20, {
+            density: 0.0005,
+            frictionAir: 0.02,
+          });
+        }
+      );
       Composites.chain(rope, 0.5, 0, -0.5, 0, {
         stiffness: 0.9,
         render: { visible: true },
@@ -254,7 +262,7 @@ export class HedgehogActor extends Actor {
 
       const webAttachment = Constraint.create({
         bodyA: lastLink,
-        bodyB: this.rigidBody,
+        bodyB: this.rigidBody!,
         length: 10,
         stiffness: 1,
         render: { visible: true },
@@ -285,19 +293,19 @@ export class HedgehogActor extends Actor {
 
       window.addEventListener("pointermove", onDragMove);
       window.addEventListener("pointerup", onDragEnd);
-      window.addEventListener("pointerupoutside", onDragEnd);
+      window.addEventListener("pointercancel", onDragEnd);
     });
   }
 
   setDirection(direction: "left" | "right"): void {
-    if (direction === "left" && this.sprite.scale.x > 0) {
-      this.sprite.scale.x *= -1;
-    } else if (direction !== "left" && this.sprite.scale.x < 0)
-      this.sprite.scale.x *= -1;
+    if (direction === "left" && this.sprite!.scale.x > 0) {
+      this.sprite!.scale.x *= -1;
+    } else if (direction !== "left" && this.sprite!.scale.x < 0)
+      this.sprite!.scale.x *= -1;
   }
 
   update(ticker: UpdateTicker): void {
-    if (this.rigidBody.velocity.y < -0.1) {
+    if (this.rigidBody!.velocity.y < -0.1) {
       // We are moving upwards so we don't want to collide with platforms
       this.collisionFilter = NO_PLATFORM_COLLISION_FILTER;
     } else {
@@ -311,27 +319,27 @@ export class HedgehogActor extends Actor {
     if (xForce !== 0) {
       this.setVelocity({
         x: xForce,
-        y: this.rigidBody.velocity.y,
+        y: this.rigidBody!.velocity.y,
       });
     }
 
     // Set the appropriate animation
     if (!this.getGround()) {
       this.updateSprite("fall");
-    } else if (Math.abs(this.rigidBody.velocity.x) > 0.1) {
+    } else if (Math.abs(this.rigidBody!.velocity.x) > 0.1) {
       // If horizontal movement is noticeable then walk
       this.updateSprite("walk");
     } else if (["fall", "walk"].includes(this.currentSprite)) {
       // NOTE:  wave is just used as a placeholder anim. WE should have a dedicated idle animation
       this.updateSprite("wave");
-      this.sprite.stop();
+      this.sprite!.stop();
     }
 
     // We want to make it look like the hedgehog's accessories are disconnected. If we are falling then we position them slightly above
-    if (this.rigidBody.velocity.y > 0.1) {
+    if (this.rigidBody!.velocity.y > 0.1) {
       const yOffsetDiff = Math.max(
         -10,
-        Math.min(0, -this.rigidBody.velocity.y)
+        Math.min(0, -this.rigidBody!.velocity.y)
       );
       Object.values(this.accessorySprites).forEach((sprite) => {
         sprite.y = yOffsetDiff;
@@ -343,9 +351,9 @@ export class HedgehogActor extends Actor {
     }
 
     // Check if below screen and if so then move up
-    if (this.rigidBody.position.y > this.game.app.screen.height) {
+    if (this.rigidBody!.position.y > this.game.app.screen.height) {
       this.setPosition({
-        x: this.rigidBody.position.x,
+        x: this.rigidBody!.position.x,
         y: 0,
       });
     }
@@ -380,7 +388,7 @@ export class HedgehogActor extends Actor {
     }
 
     // Create little flames
-    const contact = pair?.contacts?.[0].vertex ?? this.rigidBody.position;
+    const contact = pair?.contacts?.[0].vertex ?? this.rigidBody!.position;
     FlameActor.fireBurst(this.game, contact);
   }
 
@@ -388,7 +396,7 @@ export class HedgehogActor extends Actor {
     super.onCollisionStart(element, pair);
     this.maybeSetElementOnFire(element, pair);
 
-    if (element.rigidBody.bounds.min.y > this.rigidBody.bounds.min.y) {
+    if (element.rigidBody!.bounds.min.y > this.rigidBody!.bounds.min.y) {
       this.game.log("Hit something below");
       this.jumps = 0;
     } else {
@@ -404,7 +412,7 @@ export class HedgehogActor extends Actor {
   private syncAccessories(): void {
     // TODO: Remove old accessories
     Object.values(this.accessorySprites).forEach((sprite) => {
-      this.sprite.removeChild(sprite);
+      this.sprite!.removeChild(sprite);
     });
 
     this.accessorySprites = {};
@@ -423,7 +431,7 @@ export class HedgehogActor extends Actor {
       this.accessorySprites[accessory] = sprite;
       sprite.eventMode = "static";
       sprite.anchor.set(0.5);
-      this.sprite.addChild(sprite);
+      this.sprite!.addChild(sprite);
     });
   }
 
@@ -438,7 +446,7 @@ export class HedgehogActor extends Actor {
       mask: COLLISIONS.NONE,
     };
 
-    gsap.to(this.sprite.scale, {
+    gsap.to(this.sprite!.scale, {
       x: 0,
       y: 0,
       duration: 3,

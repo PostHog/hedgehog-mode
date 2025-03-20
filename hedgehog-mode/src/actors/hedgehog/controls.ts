@@ -71,9 +71,9 @@ export class HedgehogActorControls {
           // TODO: Do this some other way...
           this.actor.ai.pause(5000);
 
-          if (this.actor.rigidBody.velocity.y < 0.1) {
+          if (this.actor.rigidBody!.velocity.y < 0.1) {
             this.actor.setVelocity({
-              x: this.actor.rigidBody.velocity.x,
+              x: this.actor.rigidBody!.velocity.x,
               y: 0,
             });
           }

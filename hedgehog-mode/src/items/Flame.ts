@@ -57,7 +57,7 @@ export class FlameActor extends Actor {
     this.loadSprite("overlays/fire/tile");
     this.isInteractive = false;
 
-    this.sprite.anchor.set(0.5, 0);
+    this.sprite!.anchor.set(0.5, 0);
     this.setScale(0.4);
 
     setTimeout(() => {
@@ -75,9 +75,9 @@ export class FlameActor extends Actor {
   }
 
   update(ticker: UpdateTicker): void {
-    this.sprite.alpha = (1 - this.fadeValue) * 0.75;
+    this.sprite!.alpha = (1 - this.fadeValue) * 0.75;
     const scale = (1 - this.fadeValue) * FLAME_SCALE;
-    this.sprite.scale.set(scale, scale);
+    this.sprite!.scale.set(scale, scale);
 
     super.update(ticker);
   }

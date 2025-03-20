@@ -12,7 +12,7 @@ export type UpdateTicker = {
 
 export type GameElement = {
   readonly sprite?: AnimatedSprite;
-  readonly rigidBody?: Matter.Body;
+  readonly rigidBody?: Matter.Body | null;
   onCollisionStart?: (element: GameElement, pair: Matter.Pair) => void;
   onCollisionEnd?: (element: GameElement, pair: Matter.Pair) => void;
   beforeUnload?: () => void;

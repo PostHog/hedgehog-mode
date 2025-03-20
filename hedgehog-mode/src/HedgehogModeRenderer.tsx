@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { sample } from "lodash";
-import { HedgeHogMode } from "./hedgehog-mode";
+import { HedgeHogMode, HedgehogModeConfig } from "./hedgehog-mode";
 import {
   getRandomAccesoryCombo,
   HedgehogActorColorOptions,
@@ -11,8 +11,10 @@ import { styles } from "./ui/styles";
 
 export function HedgehogModeRenderer({
   onGameReady,
+  config,
 }: {
   onGameReady: (game: HedgeHogMode) => void;
+  config: HedgehogModeConfig;
 }) {
   const [game, setGame] = useState<HedgeHogMode | null>(null);
 
@@ -30,10 +32,7 @@ export function HedgehogModeRenderer({
   };
 
   const setupHedgehogMode = async (container: HTMLDivElement) => {
-    const hedgeHogMode = new HedgeHogMode({
-      assetsUrl: "/assets",
-      platformSelector: ".border",
-    });
+    const hedgeHogMode = new HedgeHogMode(config);
     await hedgeHogMode.render(container);
     setGame(hedgeHogMode);
     onGameReady?.(hedgeHogMode);

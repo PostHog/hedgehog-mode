@@ -48,9 +48,8 @@ export default function Home() {
 
           <Button onClick={() => game?.destroy()}>Stop game</Button>
         </div>
-
-        <HedgehogModeRenderer onGameReady={setGame} />
       </main>
+      <HedgehogModeRenderer onGameReady={setGame} />
     </div>
   );
 }

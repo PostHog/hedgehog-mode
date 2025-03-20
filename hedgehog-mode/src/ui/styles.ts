@@ -3,6 +3,8 @@ export const styles = `
     display: block;
     width: 100%;
     height: 100%;
+    background-color: transparent;
+    pointer-events: none;
   }
   .GameContainer {
     position: fixed;

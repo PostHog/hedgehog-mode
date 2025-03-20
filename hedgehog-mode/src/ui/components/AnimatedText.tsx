@@ -40,7 +40,9 @@ export function AnimatedText({
                 return (
                   <span
                     key={letterIndex}
-                    className={`AnimatedTextLetter Animation_LetterPop`}
+                    className={`AnimatedTextLetter  ${
+                      !disableAnimation ? "Animation_LetterPop" : ""
+                    }`}
                     style={{
                       animationDelay: `${letterIndex * letterDelay}ms`,
                       animationDuration: `400ms`,

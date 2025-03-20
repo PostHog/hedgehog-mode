@@ -9,7 +9,11 @@ import { HedgehogModeUI } from "./ui/GameUI";
 import root from "react-shadow";
 import { styles } from "./ui/styles";
 
-export function HedgehogModeRenderer() {
+export function HedgehogModeRenderer({
+  onGameReady,
+}: {
+  onGameReady: (game: HedgeHogMode) => void;
+}) {
   const [game, setGame] = useState<HedgeHogMode | null>(null);
 
   const spawnHedgehog = async (count: number, hedgehogMode = game) => {
@@ -32,7 +36,7 @@ export function HedgehogModeRenderer() {
     });
     await hedgeHogMode.render(container);
     setGame(hedgeHogMode);
-
+    onGameReady?.(hedgeHogMode);
     hedgeHogMode.spawnHedgehog({
       id: "hedgehog-1",
       controls_enabled: true,
@@ -45,7 +49,7 @@ export function HedgehogModeRenderer() {
   };
 
   return (
-    <root.div className="GameContainer">
+    <root.div>
       <style>{styles}</style>
       <div
         className="GameContainer"

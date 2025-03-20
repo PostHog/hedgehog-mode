@@ -67,6 +67,8 @@ export class Actor implements GameElement {
     this.setupPointerEvents();
   }
 
+  protected onClick(): void {}
+
   private loadRigidBody(reset = false): void {
     // If reset is passed then we recreate the rigid body
     let x = window.innerWidth / 2;
@@ -170,27 +172,51 @@ export class Actor implements GameElement {
       if (!this.isInteractive) {
         return;
       }
-      const ropeConstraint = Constraint.create({
-        pointA: { x: e.clientX, y: e.clientY },
-        bodyB: this.rigidBody!,
-        stiffness: 0.2,
-        damping: 1,
-        length: 2,
-      });
-      Matter.World.addConstraint(this.game.engine.world, ropeConstraint);
 
-      this.isDragging = true;
+      let ropeConstraint: Constraint | null = null;
+      const startPoint: { x: number; y: number } = {
+        x: e.clientX,
+        y: e.clientY,
+      };
 
       const onDragMove = () => {
-        ropeConstraint.pointA.x = e.clientX;
-        ropeConstraint.pointA.y = e.clientY;
+        // We only want to start dragging if the distance moved is greater than 10px
+        if (!ropeConstraint) {
+          const distance = Math.sqrt(
+            (e.clientX - startPoint.x) ** 2 + (e.clientY - startPoint.y) ** 2
+          );
+          if (distance < 10) {
+            return;
+          }
+
+          ropeConstraint = Constraint.create({
+            pointA: { x: e.clientX, y: e.clientY },
+            bodyB: this.rigidBody!,
+            stiffness: 0.2,
+            damping: 1,
+            length: 2,
+          });
+          Matter.World.addConstraint(this.game.engine.world, ropeConstraint);
+
+          this.isDragging = true;
+        }
+        ropeConstraint!.pointA.x = e.clientX;
+        ropeConstraint!.pointA.y = e.clientY;
       };
 
       const onDragEnd = () => {
+        if (!this.isDragging) {
+          this.onClick();
+        }
+
         this.isDragging = false;
-        Matter.World.remove(this.game.engine.world, ropeConstraint);
+        if (ropeConstraint) {
+          Matter.World.remove(this.game.engine.world, ropeConstraint);
+        }
 
         this.game.app.stage.off("pointermove", onDragMove);
+        this.game.app.stage.off("pointerup", onDragEnd);
+        this.game.app.stage.off("pointerupoutside", onDragEnd);
       };
 
       this.game.app.stage.on("pointermove", onDragMove);

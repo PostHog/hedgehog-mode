@@ -144,16 +144,16 @@ export class HedgehogActor extends Actor {
     return !!this.fireTimer;
   }
 
+  protected onClick(): void {
+    if (this.options.onClick) {
+      this.options.onClick();
+    } else {
+      this.interface.onClick();
+    }
+  }
+
   setupPointerEvents(): void {
     super.setupPointerEvents();
-
-    this.sprite!.on("click", (e) => {
-      if (this.options.onClick) {
-        this.options.onClick();
-      } else {
-        this.interface.onClick();
-      }
-    });
 
     this.sprite!.on("pointerover", () => {
       this.ai.run("wave");

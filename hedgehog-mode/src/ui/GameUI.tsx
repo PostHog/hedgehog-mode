@@ -5,11 +5,12 @@ import { HedgeHogMode } from "../hedgehog-mode";
 
 export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
   const [dialogBox, setDialogBox] = useState<GameUIDialogBoxProps | null>(null);
-
+  const [dialogBoxVisible, setDialogBoxVisible] = useState<boolean>(false);
   // To game should control the UI largely so we add an event listener for game modal popups
   useEffect(() => {
     game.setUI({
       showDialogBox: (dialogBox) => {
+        setDialogBoxVisible(true);
         setDialogBox(dialogBox);
       },
     });
@@ -21,10 +22,12 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
         actor={dialogBox?.actor}
         position={{ x: window.innerWidth / 2, y: window.innerHeight / 2 }}
         messages={dialogBox?.messages ?? []}
-        onEnd={() => {
-          setDialogBox(null);
+        visible={dialogBoxVisible}
+        onClose={() => {
+          setDialogBoxVisible(false);
+          dialogBox?.onClose?.();
         }}
-      />
+      ></DialogBox>
     </div>
   );
 }

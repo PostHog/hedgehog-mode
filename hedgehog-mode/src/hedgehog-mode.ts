@@ -10,6 +10,7 @@ import { SyncedPlatform } from "./items/SyncedPlatform";
 import { Actor } from "./actors/Actor";
 import { GlobalKeyboardListeners } from "./misc/GlobalKeyboardListeners";
 import { HedgehogActorOptions } from "./actors/hedgehog/config";
+import { GameStateManager } from "./state";
 
 export type {
   HedgehogActorOptions,
@@ -43,6 +44,7 @@ export class HedgeHogMode implements Game {
   mousePosition?: Matter.Vector;
   lastTime?: number;
   gameUI!: GameUI;
+  stateManager?: GameStateManager;
 
   constructor(private options: HedgehogModeConfig) {
     this.spritesManager = new SpritesManager(options);
@@ -214,6 +216,7 @@ export class HedgeHogMode implements Game {
     new GlobalKeyboardListeners(this);
     gsap.ticker.remove(gsap.updateRoot);
     this.elements.push(new Ground(this));
+    this.stateManager = new GameStateManager(this, this.options);
   }
 
   private onCollisionStart(event: Matter.IEventCollision<Matter.Engine>) {

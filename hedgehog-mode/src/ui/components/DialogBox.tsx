@@ -1,56 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { AnimatedText } from "./AnimatedText";
 import { GameUIDialogBoxProps } from "../../types";
-
-const Chevron = () => {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-      <g
-        id="SVGRepo_tracerCarrier"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      ></g>
-      <g id="SVGRepo_iconCarrier">
-        {" "}
-        <path
-          d="M15 6L9 12L15 18"
-          stroke="#000000"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        ></path>{" "}
-      </g>
-    </svg>
-  );
-};
-
-const ArrowButton = ({
-  onClick,
-  direction,
-  disabled,
-}: {
-  onClick: () => void;
-  direction: "left" | "right";
-  disabled?: boolean;
-}) => {
-  return (
-    <div
-      onClick={onClick}
-      className={`DialogBoxArrowButton ${
-        disabled ? "DialogBoxArrowButton--disabled" : ""
-      }`}
-    >
-      <div
-        className={`DialogBoxArrowIcon ${
-          direction === "right" ? "DialogBoxArrowIcon--right" : ""
-        }`}
-      >
-        <Chevron />
-      </div>
-    </div>
-  );
-};
+import { Messages } from "./Messages";
+import { Button } from "./Button";
 
 const WINDOW_MARGIN = 10;
 
@@ -58,13 +9,14 @@ export function DialogBox({
   messages,
   actor,
   width = 300,
-  onEnd,
-}: GameUIDialogBoxProps & { onClickOutside?: () => void }) {
-  const [messageIndex, setMessageIndex] = useState<number>(0);
+  onClose,
+  visible,
+}: GameUIDialogBoxProps & { visible: boolean; onClickOutside?: () => void }) {
   const ref = useRef<HTMLDivElement>(null);
   const [hovering, setHovering] = useState<boolean>(false);
-  const [animationCompleted, setAnimationCompleted] = useState<boolean>(false);
-  const message = messages[messageIndex];
+  const [showConfiguration, setShowConfiguration] = useState<boolean>(false);
+
+  const derivedWidth = showConfiguration ? 500 : width;
 
   const setPosition = useCallback(
     (actor?: GameUIDialogBoxProps["actor"]) => {
@@ -75,12 +27,12 @@ export function DialogBox({
       const pos = actor?.rigidBody?.position || { y: 999999999, x: 999999999 };
 
       if (ref.current && pos) {
-        let x = pos.x - width / 2;
+        let x = pos.x - derivedWidth / 2;
         let y = window.innerHeight - pos.y + 40; // offset for height of the hedgehog
         const height = ref.current.clientHeight;
 
         x = Math.max(WINDOW_MARGIN, x);
-        x = Math.min(window.innerWidth - width - WINDOW_MARGIN, x);
+        x = Math.min(window.innerWidth - derivedWidth - WINDOW_MARGIN, x);
 
         y = Math.max(WINDOW_MARGIN, y);
         y = Math.min(window.innerHeight - height - WINDOW_MARGIN, y);
@@ -92,9 +44,10 @@ export function DialogBox({
   );
 
   useEffect(() => {
-    setMessageIndex(0);
-    setHovering(false);
-  }, [messages]);
+    if (!visible) {
+      setShowConfiguration(false);
+    }
+  }, [visible]);
 
   useEffect(() => {
     if (actor) {
@@ -114,95 +67,42 @@ export function DialogBox({
     }
   }, [actor, setPosition]);
 
-  const setIndex = useCallback(
-    (index: number) => {
-      const isForward = index > messageIndex;
+  // TODO: Fix this
+  // useEffect(() => {
+  //   const handleClickOutside = (event: MouseEvent) => {
+  //     if (!ref.current) return;
 
-      if (index < 0) {
-        return;
-      }
+  //     const target = event.target as Node;
+  //     if (!ref.current.contains(target)) {
+  //       setIndex(messageIndex + 1);
+  //     }
+  //   };
 
-      if (isForward && !animationCompleted) {
-        setAnimationCompleted(true);
-        return;
-      }
-      setAnimationCompleted(false);
-
-      setMessageIndex(Math.max(0, Math.min(messages.length - 1, index)));
-
-      if (isForward) {
-        messages[messageIndex]?.onComplete?.();
-      }
-
-      if (index === messages.length) {
-        onEnd?.();
-      }
-    },
-    [messageIndex, messages.length, animationCompleted, onEnd]
-  );
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (!ref.current) return;
-
-      const target = event.target as Node;
-      if (!ref.current.contains(target)) {
-        setIndex(messageIndex + 1);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [setIndex, messageIndex]);
-
-  useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
-      if ((event.key === "Enter" || event.key === " ") && message) {
-        setIndex(messageIndex + 1);
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyPress);
-    return () => {
-      document.removeEventListener("keydown", handleKeyPress);
-    };
-  }, [message, messageIndex, setIndex]);
-
-  if (!message) {
-    return null;
-  }
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => {
+  //     document.removeEventListener("mousedown", handleClickOutside);
+  //   };
+  // }, [setIndex, messageIndex]);
 
   return (
     <div
       ref={ref}
-      className="DialogBox"
+      className={`DialogBox ${visible ? "DialogBox--visible" : ""}`}
       style={{
-        width,
+        width: derivedWidth,
       }}
       onMouseOver={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
     >
-      <AnimatedText
-        key={messageIndex}
-        words={message.words}
-        onComplete={() => setAnimationCompleted(true)}
-        disableAnimation={animationCompleted}
-        onClick={() => setIndex(messageIndex + 1)}
-      />
-
       <div className="DialogBoxControls">
-        <ArrowButton
-          onClick={() => setIndex(messageIndex - 1)}
-          direction="left"
-          disabled={messageIndex === 0}
-        />
-        <ArrowButton
-          onClick={() => setIndex(messageIndex + 1)}
-          direction="right"
-        />
+        <Button onClick={() => setShowConfiguration(!showConfiguration)}>
+          Customize me!
+        </Button>
+        <Button onClick={() => onClose?.()}>X</Button>
       </div>
+      {showConfiguration && <p>Yo!</p>}
+
+      {!showConfiguration && <Messages messages={messages} onEnd={onClose} />}
     </div>
   );
 }

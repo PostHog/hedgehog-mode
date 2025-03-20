@@ -21,10 +21,16 @@ export type GameElement = {
   isFlammable?: boolean;
 };
 
+export type HedgehogModeGameState = {
+  player: HedgehogActorOptions;
+  hedgehogs: HedgehogActorOptions[];
+};
+
 export type HedgehogModeConfig = {
   assetsUrl: string;
   // Argument passed to document.querySelectorAll to find items to be used as platforms
   platformSelector?: string;
+  state?: HedgehogModeGameState;
 };
 
 export type Game = {
@@ -60,6 +66,6 @@ export type GameUIDialogBoxProps = {
   }[];
   width?: number;
   position?: { x: number; y: number };
-  onEnd?: () => void;
+  onClose?: () => void;
   actor?: HedgehogActor;
 };

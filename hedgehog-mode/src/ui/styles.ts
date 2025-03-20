@@ -13,46 +13,73 @@ export const styles = `
     font-family: monospace;
     z-index: 2;
   }
+  .Button {
+    background-color: transparent;
+    color: #222;
+    border: none;
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    transition: background-color 300ms;
+    font-family: monospace;
+    opacity: 0.5;
+    cursor: pointer;
+  }
+  .Button--disabled {
+    opacity: 0.25;
+  }
+  .Button:not(.Button--disabled):hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    opacity: 1;
+  }
+
   .DialogBox {
     position: fixed;
     border: 2px solid #222;
     background-color: white;
     border-radius: 0.5rem;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-    padding: 0.5rem;
+    pointer-events: auto;
+    opacity: 0;
+    transition: all 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform: scale(0.8);
+    pointer-events: none;
+  }
+  .DialogBox--visible {
+    opacity: 1;
+    transform: scale(1);
     pointer-events: auto;
   }
   .DialogBoxControls {
     display: flex;
     flex-direction: row;
     justify-content: flex-end;
+    gap: 0.25rem;
+    opacity: 0;
+    transition: all 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    height: 0;
+    border-bottom: 1px solid transparent;
+    padding: 0 0.25rem;
   }
-  .DialogBoxArrowButton {
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 300ms;
-  }
-  .DialogBoxArrowButton--disabled {
-    opacity: 0.25;
-  }
-  .DialogBoxArrowButton:not(.DialogBoxArrowButton--disabled) {
-    opacity: 0.5;
-  }
-  .DialogBoxArrowButton:not(.DialogBoxArrowButton--disabled):hover {
-    opacity: 1;
-  }
-  .DialogBoxArrowIcon {
-    vertical-align: middle;
+  .DialogBox:hover > .DialogBoxControls {
     padding: 0.25rem;
+    opacity: 1;
+    height: 1.5rem;
+    border-bottom-color: rgba(0, 0, 0, 0.2);
+  }
+
+  .Messages {
+    padding: 0.5rem;
+  }
+
+  .ArrowIcon {
+    vertical-align: middle;
     height: 1rem;
     width: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
   }
-  .DialogBoxArrowIcon--right {
+  .ArrowIcon--right {
     transform: rotate(180deg);
   }
 

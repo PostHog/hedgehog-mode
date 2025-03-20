@@ -1,36 +1,26 @@
 export const styles = `
   :host {
     display: block;
-    width: 100%;
-    height: 100%;
     background-color: transparent;
-    pointer-events: none;
   }
   .GameContainer {
     position: fixed;
     inset: 0;
-    z-index: 20;
+    z-index: 1;
   }
   .GameUI {
-    position: fixed;
-    inset: 0;
-    z-index: 20;
+    position: relative;
     font-family: monospace;
-  }
-  .GameUIContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
+    z-index: 2;
   }
   .DialogBox {
-    position: absolute;
+    position: fixed;
     border: 2px solid #222;
     background-color: white;
     border-radius: 0.5rem;
     box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
     padding: 0.5rem;
+    pointer-events: auto;
   }
   .DialogBoxControls {
     display: flex;

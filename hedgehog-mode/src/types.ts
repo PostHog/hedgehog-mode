@@ -50,6 +50,7 @@ export type GameUIAnimatedTextProps = {
   duration?: number;
   disableAnimation?: boolean;
   onComplete?: () => void;
+  onClick?: () => void;
 };
 
 export type GameUIDialogBoxProps = {

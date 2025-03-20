@@ -143,7 +143,10 @@ export function DialogBox({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) {
+      if (!ref.current) return;
+
+      const target = event.target as Node;
+      if (!ref.current.contains(target)) {
         setIndex(messageIndex + 1);
       }
     };
@@ -152,7 +155,7 @@ export function DialogBox({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [setIndex]);
+  }, [setIndex, messageIndex]);
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -178,7 +181,7 @@ export function DialogBox({
       style={{
         width,
       }}
-      onMouseEnter={() => setHovering(true)}
+      onMouseOver={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
     >
       <AnimatedText
@@ -186,6 +189,7 @@ export function DialogBox({
         words={message.words}
         onComplete={() => setAnimationCompleted(true)}
         disableAnimation={animationCompleted}
+        onClick={() => setIndex(messageIndex + 1)}
       />
 
       <div className="DialogBoxControls">

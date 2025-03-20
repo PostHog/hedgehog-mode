@@ -6,6 +6,7 @@ export function AnimatedText({
   duration = 1000,
   disableAnimation = false,
   onComplete,
+  onClick,
 }: GameUIAnimatedTextProps) {
   let letterIndex = 0;
   const lettersCount = words.reduce((acc, word) => {
@@ -22,7 +23,7 @@ export function AnimatedText({
   }, []);
 
   return (
-    <div className="AnimatedText">
+    <div className="AnimatedText" onClick={onClick}>
       {words.map((word) => {
         const subwords =
           typeof word === "string" ? word.split(" ") : word.text.split(" ");

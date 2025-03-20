@@ -1,4 +1,5 @@
-import { HedgehogActor, NO_PLATFORM_COLLISION_FILTER } from "../Hedgehog";
+import { NO_PLATFORM_COLLISION_FILTER } from "../Actor";
+import { HedgehogActor } from "../Hedgehog";
 
 export class HedgehogActorControls {
   constructor(private actor: HedgehogActor) {
@@ -110,7 +111,7 @@ export class HedgehogActorControls {
       if (!this.actor.options.controls_enabled) {
         return;
       }
-      const key = keyMapping[e.key] ?? e.key;
+      const key = keyMapping[e.key as keyof typeof keyMapping] ?? e.key;
 
       if (!heldKeys.has(key)) {
         heldKeys.add(key);
@@ -119,7 +120,7 @@ export class HedgehogActorControls {
     };
 
     const keyUpListener = (e: KeyboardEvent): void => {
-      const key = keyMapping[e.key] ?? e.key;
+      const key = keyMapping[e.key as keyof typeof keyMapping] ?? e.key;
 
       if (heldKeys.has(key)) {
         heldKeys.delete(key);

@@ -2,6 +2,26 @@ import Matter, { Constraint } from "matter-js";
 import { AnimatedSprite } from "pixi.js";
 import { AvailableAnimations } from "../sprites/sprites";
 import { Game, GameElement, UpdateTicker } from "../types";
+import { COLLISIONS } from "../misc/collisions";
+
+const BASE_COLLISION_FILTER = {
+  category: COLLISIONS.ACTOR,
+  mask:
+    COLLISIONS.ACTOR |
+    COLLISIONS.PLATFORM |
+    COLLISIONS.PROJECTILE |
+    COLLISIONS.GROUND,
+};
+
+export const DEFAULT_COLLISION_FILTER = {
+  ...BASE_COLLISION_FILTER,
+  category: COLLISIONS.ACTOR,
+};
+
+export const NO_PLATFORM_COLLISION_FILTER = {
+  ...BASE_COLLISION_FILTER,
+  mask: COLLISIONS.ACTOR | COLLISIONS.PROJECTILE | COLLISIONS.GROUND,
+};
 
 export class Actor implements GameElement {
   public sprite: AnimatedSprite;
@@ -9,7 +29,7 @@ export class Actor implements GameElement {
   public isFlammable = false;
   protected currentAnimation?: AvailableAnimations;
   protected connectedElements: GameElement[] = [];
-  protected collisionFilter: Matter.ICollisionFilter;
+  protected collisionFilter: Matter.ICollisionFilter = DEFAULT_COLLISION_FILTER;
   collisionFilterOverride?: Matter.ICollisionFilter;
 
   rigidBody: Matter.Body;

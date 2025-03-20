@@ -1,4 +1,8 @@
-import { Actor } from "./Actor";
+import {
+  Actor,
+  DEFAULT_COLLISION_FILTER,
+  NO_PLATFORM_COLLISION_FILTER,
+} from "./Actor";
 import { Game, GameElement, UpdateTicker } from "../types";
 import Matter, { Bodies, Composites, Constraint, Pair } from "matter-js";
 import { SyncedPlatform } from "../items/SyncedPlatform";
@@ -52,25 +56,6 @@ export const COLOR_TO_FILTER_MAP: Record<
     filter.grayscale(0.3, true);
   },
   rainbow: (filter) => {},
-};
-
-const BASE_COLLISION_FILTER = {
-  category: COLLISIONS.ACTOR,
-  mask:
-    COLLISIONS.ACTOR |
-    COLLISIONS.PLATFORM |
-    COLLISIONS.PROJECTILE |
-    COLLISIONS.GROUND,
-};
-
-export const DEFAULT_COLLISION_FILTER = {
-  ...BASE_COLLISION_FILTER,
-  category: COLLISIONS.ACTOR,
-};
-
-export const NO_PLATFORM_COLLISION_FILTER = {
-  ...BASE_COLLISION_FILTER,
-  mask: COLLISIONS.ACTOR | COLLISIONS.PROJECTILE | COLLISIONS.GROUND,
 };
 
 export class HedgehogActor extends Actor {

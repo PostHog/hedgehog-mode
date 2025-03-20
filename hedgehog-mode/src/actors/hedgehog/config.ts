@@ -75,8 +75,9 @@ export const HedgehogActorAccessories = {
   },
 };
 
-export type HedgehogActorAccessoryOption =
-  keyof typeof HedgehogActorAccessories;
+type AccessoryKey = keyof typeof HedgehogActorAccessories;
+
+export type HedgehogActorAccessoryOption = AccessoryKey;
 export const HedgehogActorAccessoryOptions = Object.keys(
   HedgehogActorAccessories
 ) as HedgehogActorAccessoryOption[];
@@ -85,17 +86,22 @@ export const getRandomAccesoryCombo = (): HedgehogActorAccessoryOption[] => {
   return [
     sample(
       Object.keys(HedgehogActorAccessories).filter(
-        (accessory) => HedgehogActorAccessories[accessory].group === "headwear"
+        (accessory) =>
+          HedgehogActorAccessories[accessory as AccessoryKey].group ===
+          "headwear"
       ) as HedgehogActorAccessoryOption[]
     ),
     sample(
       Object.keys(HedgehogActorAccessories).filter(
-        (accessory) => HedgehogActorAccessories[accessory].group === "eyewear"
+        (accessory) =>
+          HedgehogActorAccessories[accessory as AccessoryKey].group ===
+          "eyewear"
       ) as HedgehogActorAccessoryOption[]
     ),
     sample([
       ...(Object.keys(HedgehogActorAccessories).filter(
-        (accessory) => HedgehogActorAccessories[accessory].group === "other"
+        (accessory) =>
+          HedgehogActorAccessories[accessory as AccessoryKey].group === "other"
       ) as HedgehogActorAccessoryOption[]),
       // A few undefined to make it less likely to have the other accessories
       undefined,

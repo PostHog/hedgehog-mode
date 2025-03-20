@@ -99,13 +99,13 @@ export class StaticHedgehogRenderer {
     this.app.stage.addChild(container);
     const texture = this.app.renderer.generateTexture(container);
     const canvas = this.app.renderer.extract.canvas(texture);
-    const dataURL = canvas.toDataURL("image/png");
+    const dataURL = canvas.toDataURL?.("image/png");
 
     texture.destroy();
     this.app.stage.removeChild(container);
     container.destroy();
 
-    return dataURL;
+    return dataURL ?? "";
   }
 
   private async performRender(options: HedgehogActorOptions): Promise<string> {

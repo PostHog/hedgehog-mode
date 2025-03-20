@@ -12,7 +12,7 @@ export const AvailableSkins: Set<string> = new Set<string>(
 );
 
 export class SpritesManager {
-  spritesheet: Spritesheet;
+  spritesheet?: Spritesheet;
 
   constructor(private options: HedgehogModeConfig) {}
 
@@ -29,11 +29,11 @@ export class SpritesManager {
   getAnimatedSpriteFrames(
     animation: AvailableAnimations
   ): AnimatedSpriteFrames {
-    return this.spritesheet.animations[animation];
+    return this.spritesheet!.animations[animation as string];
   }
 
   getSpriteFrames(name: AvailableSpriteFrames): Texture {
-    return this.spritesheet.textures[name];
+    return this.spritesheet!.textures[name as string];
   }
 
   toAvailableAnimation(name: string): AvailableAnimations | null {

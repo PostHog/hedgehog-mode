@@ -89,7 +89,7 @@ export class HedgehogActorAI {
     if (action) {
       this.actions[action]?.act();
     } else {
-      sample(this.possibleActions)();
+      sample(this.possibleActions)?.();
     }
     this.pause(1000);
   }

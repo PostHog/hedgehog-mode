@@ -21,6 +21,13 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "../hedgehog-mode/src/ui/components/AnimatedText.tsx",
+    "../hedgehog-mode/src/ui/components/DialogBox.tsx"
+  ],
   "exclude": ["node_modules"]
 }

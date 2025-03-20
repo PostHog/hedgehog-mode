@@ -1,17 +1,15 @@
 {
   "compilerOptions": {
-    "lib": ["ESNext", "dom"],
-    "module": "ESNext",
-    "moduleResolution": "node", // Resolve modules using Node.js style
-    "noImplicitReturns": true,
+    "target": "es5",
+    "lib": ["dom", "esnext"],
+    "jsx": "react-jsx",
+    "module": "esnext",
+    "moduleResolution": "node",
     "esModuleInterop": true,
-    "outDir": "dist",
-    "sourceMap": true,
-    "target": "ESNext",
-    "declaration": true,
-    "types": ["node", "vitest/globals"],
-    "resolveJsonModule": true
+    "skipLibCheck": true,
+    "strict": true,
+    "outDir": "dist"
   },
-  "compileOnSave": true,
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
 }

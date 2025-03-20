@@ -1,5 +1,5 @@
-import { GameUIAnimatedTextProps } from "@posthog/hedgehog-mode";
 import { useEffect } from "react";
+import { GameUIAnimatedTextProps } from "../../types";
 
 export function AnimatedText({
   words,

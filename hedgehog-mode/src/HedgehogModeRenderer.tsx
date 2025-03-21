@@ -8,10 +8,12 @@ export function HedgehogModeRenderer({
   onGameReady,
   config,
   theme,
+  style,
 }: {
   onGameReady: (game: HedgeHogMode) => void;
   config: HedgehogModeConfig;
   theme?: "light" | "dark";
+  style?: React.CSSProperties;
 }) {
   const [game, setGame] = useState<HedgeHogMode | null>(null);
 
@@ -31,7 +33,7 @@ export function HedgehogModeRenderer({
   }
 
   return (
-    <root.div data-theme={theme}>
+    <root.div data-theme={theme} style={style}>
       <style>{styles}</style>
       <div
         className="GameContainer"

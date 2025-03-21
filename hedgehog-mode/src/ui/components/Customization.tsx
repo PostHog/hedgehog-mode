@@ -231,6 +231,7 @@ function HedgehogAccessories({
                 key={acc}
                 active={accessories.includes(acc)}
                 onClick={() => onClick(acc)}
+                title={acc.split("-").join(" ")}
               >
                 <HedgehogImage
                   accessories={[acc]}
@@ -266,6 +267,7 @@ function HedgehogSkins({
                 skin: option as HedgehogActorOptions["skin"],
               })
             }
+            title={option.split("-").join(" ")}
           >
             <HedgehogImage
               skin={option as HedgehogActorOptions["skin"]}
@@ -300,6 +302,7 @@ function HedgehogColor({
                     : (option as HedgehogActorOptions["color"]),
               })
             }
+            title={option.split("-").join(" ")}
           >
             <HedgehogImage
               color={option as HedgehogActorOptions["color"]}

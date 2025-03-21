@@ -3,12 +3,13 @@ export function Button({
   onClick,
   disabled,
   active,
+  ...props
 }: {
   children: React.ReactNode;
   onClick: () => void;
   disabled?: boolean;
   active?: boolean;
-}) {
+} & React.HTMLAttributes<HTMLButtonElement>) {
   return (
     <button
       className={`Button ${disabled ? "Button--disabled" : ""} ${
@@ -16,6 +17,7 @@ export function Button({
       }`}
       onClick={onClick}
       disabled={disabled}
+      {...props}
     >
       {children}
     </button>

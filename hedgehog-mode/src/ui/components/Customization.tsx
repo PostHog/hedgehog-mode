@@ -60,7 +60,9 @@ export function HedgehogCustomization(
           renderer={game.staticHedgehogRenderer}
         />
         <div className="CustomizationContent">
-          <h3 className="CustomizationTitle">hi, i'm Max!</h3>
+          <h3 className="CustomizationTitle">
+            {config.player ? "hi, i'm Max!" : "hi, i'm Max's buddy!"}
+          </h3>
           <p className="CustomizationDescription">
             {config.skin === "spiderhog" ? (
               <>

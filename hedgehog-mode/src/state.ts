@@ -47,12 +47,33 @@ export class GameStateManager {
     this.persistState();
   }
 
+  getState() {
+    return this.state;
+  }
+
+  getNumberOfHedgehogs() {
+    return Object.values(this.state.hedgehogsById).length;
+  }
+
   setHedgehog(config: HedgehogActorOptions) {
     // Find the relevant hedgehog in the state and update it
 
     this.state.hedgehogsById[config.id] = config;
     this.upsertHedgehog(config);
     this.persistState();
+  }
+
+  removeHedgehog(id: string) {
+    const hedgehog = this.state.hedgehogsById[id];
+    if (hedgehog) {
+      if (hedgehog.player) {
+        throw new Error("Cannot remove player hedgehog");
+      }
+      delete this.state.hedgehogsById[id];
+      this.hedgehogsById[id]?.destroy?.();
+      delete this.hedgehogsById[id];
+      this.persistState();
+    }
   }
 
   private persistState() {

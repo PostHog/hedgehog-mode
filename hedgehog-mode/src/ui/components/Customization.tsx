@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
+  getRandomAccesoryCombo,
   HedgehogActorAccessories,
   HedgehogActorAccessoryOption,
   HedgehogActorAccessoryOptions,
@@ -9,6 +10,7 @@ import {
 } from "../..";
 import { HedgehogProfileImage, HedgehogImage } from "../HedgehogStatic";
 import { Button } from "./Button";
+import { sample } from "lodash";
 
 const ACCESSORY_GROUPS = ["headwear", "eyewear", "other"] as const;
 
@@ -19,26 +21,28 @@ type HedgehogOptionsProps = {
 };
 
 function Switch({
-  label,
   checked,
   onChange,
+  children,
   ...props
 }: {
-  label: string;
   checked: boolean;
   onChange: (checked: boolean) => void;
-} & Pick<React.HTMLAttributes<HTMLDivElement>, "title">): JSX.Element {
+} & Pick<
+  React.HTMLAttributes<HTMLDivElement>,
+  "title" | "children"
+>): JSX.Element {
   return (
-    <div className="Switch" {...props}>
+    <span className="Switch" {...props}>
       <label className="SwitchLabel">
         <input
           type="checkbox"
           checked={checked}
           onChange={(e) => onChange(e.target.checked)}
         />
-        <span className="SwitchLabelText">{label}</span>
+        <span className="SwitchLabelText">{children}</span>
       </label>
-    </div>
+    </span>
   );
 }
 
@@ -97,12 +101,48 @@ function HedgehogOptions({
   setConfig,
   game,
 }: HedgehogOptionsProps): JSX.Element {
+  const [hedgehogsCount, setHedgehogsCount] = useState(0);
+
+  useEffect(() => {
+    setHedgehogsCount(game.stateManager?.getNumberOfHedgehogs() ?? 0);
+  }, [game.stateManager]);
+
+  const addFriend = () => {
+    game.stateManager?.setHedgehog({
+      id: "friend-" + Math.random().toString(36).substring(2, 15),
+      player: false,
+      accessories: getRandomAccesoryCombo(),
+      color: sample(HedgehogActorColorOptions),
+    });
+    setHedgehogsCount(game.stateManager?.getNumberOfHedgehogs() ?? 0);
+  };
+
+  const removeFriend = () => {
+    const nonPlayerHedgehog = Object.values(
+      game.stateManager?.getState().hedgehogsById ?? {}
+    ).find((h) => !h.player);
+    if (nonPlayerHedgehog) {
+      game.stateManager?.removeHedgehog(nonPlayerHedgehog.id);
+    }
+    setHedgehogsCount(game.stateManager?.getNumberOfHedgehogs() ?? 0);
+  };
+
+  const removeAllFriends = () => {
+    Object.values(game.stateManager?.getState().hedgehogsById ?? {}).forEach(
+      (h) => {
+        if (!h.player) {
+          game.stateManager?.removeHedgehog(h.id);
+        }
+      }
+    );
+
+    setHedgehogsCount(game.stateManager?.getNumberOfHedgehogs() ?? 0);
+  };
+
   return (
     <>
       <h4 className="CustomizationSectionTitle">options</h4>
-
       <Switch
-        label="Free to roam"
         checked={config.ai_enabled ?? false}
         onChange={(val) =>
           setConfig({
@@ -111,9 +151,10 @@ function HedgehogOptions({
           })
         }
         title="If enabled the Hedgehog will walk around the screen, otherwise they will stay in one place. You can still move them around by dragging them."
-      />
+      >
+        Free to roam
+      </Switch>
       <Switch
-        label="Keyboard controls (WASD / arrow keys)"
         checked={config.controls_enabled ?? false}
         onChange={(val) =>
           setConfig({
@@ -122,18 +163,29 @@ function HedgehogOptions({
           })
         }
         title="If enabled you can use the WASD or arrow key + space to move around and jump."
-      />
-      {/* <Switch
-        label="Party mode"
-        checked={config.party_mode_enabled ?? false}
-        onChange={(val) =>
-          setConfig({
-            ...config,
-            party_mode_enabled: val,
-          })
-        }
-        title="If enabled then all of your organization members will appear in your browser as hedgehogs as well!"
-      /> */}
+      >
+        Keyboard controls (WASD / arrow keys)
+      </Switch>
+      <Switch
+        checked={hedgehogsCount > 1}
+        onChange={() => {
+          if (hedgehogsCount > 1) {
+            removeAllFriends();
+          } else {
+            // The most tragic line of code I've ever written
+            addFriend();
+          }
+        }}
+        title={`If enabled then ${hedgehogsCount - 1} friends will appear in your browser as hedgehogs as well!`}
+      >
+        Friends
+      </Switch>
+      {hedgehogsCount > 1 && (
+        <>
+          <Button onClick={addFriend}>Add</Button> /
+          <Button onClick={removeFriend}>Remove</Button>
+        </>
+      )}
     </>
   );
 }

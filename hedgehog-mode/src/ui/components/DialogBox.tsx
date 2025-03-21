@@ -21,7 +21,7 @@ export function DialogBox({
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [hovering, setHovering] = useState<boolean>(false);
-  const [_showConfiguration, setShowConfiguration] = useState<boolean>(false);
+  const [showConfiguration, setShowConfiguration] = useState<boolean>(false);
   const [actorOptions, _setActorOptions] =
     useState<HedgehogActorOptions | null>(actor?.options || null);
 
@@ -36,8 +36,6 @@ export function DialogBox({
     },
     [game.stateManager]
   );
-
-  const showConfiguration = true;
 
   const derivedWidth = showConfiguration ? 500 : width;
 
@@ -125,7 +123,7 @@ export function DialogBox({
     >
       <div className="DialogBoxControls">
         <Button onClick={() => setShowConfiguration(!showConfiguration)}>
-          Customize me!
+          {showConfiguration ? "Hide customization" : "Customize me!"}
         </Button>
         <Button onClick={() => onClose?.()}>X</Button>
       </div>

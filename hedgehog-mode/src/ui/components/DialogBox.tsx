@@ -96,7 +96,9 @@ export function DialogBox({
   }, [actor, setPosition]);
 
   useOutsideClick(ref, () => {
-    onClose?.();
+    if (visible) {
+      onClose?.();
+    }
   });
 
   return (

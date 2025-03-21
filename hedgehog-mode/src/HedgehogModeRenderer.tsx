@@ -22,8 +22,10 @@ export function HedgehogModeRenderer({
     onGameReady?.(hedgeHogMode);
   };
 
+  const _window = typeof window !== "undefined" ? window : null;
+
   if (!theme) {
-    theme = window.matchMedia("(prefers-color-scheme: dark)").matches
+    theme = _window?.matchMedia("(prefers-color-scheme: dark)").matches
       ? "dark"
       : "light";
   }

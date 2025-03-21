@@ -1,13 +1,14 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { HedgeHogMode, HedgehogModeConfig } from "./hedgehog-mode";
 import { HedgehogModeUI } from "./ui/GameUI";
 import root from "react-shadow";
 import { styles } from "./ui/styles";
+import { useTheme } from "./ui/hooks/useTheme";
 
 export function HedgehogModeRenderer({
   onGameReady,
   config,
-  theme: _theme,
+  theme,
   style,
 }: {
   onGameReady: (game: HedgeHogMode) => void;
@@ -16,7 +17,6 @@ export function HedgehogModeRenderer({
   style?: React.CSSProperties;
 }) {
   const [game, setGame] = useState<HedgeHogMode | null>(null);
-  const [theme, setTheme] = useState<"light" | "dark">("light");
   const setupHedgehogMode = async (container: HTMLDivElement) => {
     const hedgeHogMode = new HedgeHogMode(config);
     await hedgeHogMode.render(container);
@@ -24,21 +24,14 @@ export function HedgehogModeRenderer({
     onGameReady?.(hedgeHogMode);
   };
 
-  useEffect(() => {
-    if (!_theme) {
-      const _window = typeof window !== "undefined" ? window : null;
-      setTheme(
-        _window?.matchMedia("(prefers-color-scheme: dark)").matches
-          ? "dark"
-          : "light"
-      );
-    } else {
-      setTheme(_theme);
-    }
-  }, [theme]);
+  const osTheme = useTheme();
 
   return (
-    <root.div id="hedgehog-mode-root" data-theme={theme} style={style}>
+    <root.div
+      id="hedgehog-mode-root"
+      data-theme={theme ?? osTheme}
+      style={style}
+    >
       <style>{styles}</style>
       <div
         className="GameContainer"

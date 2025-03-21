@@ -233,7 +233,8 @@ function HedgehogAccessories({
                 onClick={() => onClick(acc)}
                 title={acc.split("-").join(" ")}
               >
-                <HedgehogImage
+                <HedgehogProfileImage
+                  size={64}
                   accessories={[acc]}
                   renderer={game.staticHedgehogRenderer}
                 />
@@ -269,7 +270,8 @@ function HedgehogSkins({
             }
             title={option.split("-").join(" ")}
           >
-            <HedgehogImage
+            <HedgehogProfileImage
+              size={64}
               skin={option as HedgehogActorOptions["skin"]}
               renderer={game.staticHedgehogRenderer}
             />
@@ -304,7 +306,8 @@ function HedgehogColor({
             }
             title={option.split("-").join(" ")}
           >
-            <HedgehogImage
+            <HedgehogProfileImage
+              size={64}
               color={option as HedgehogActorOptions["color"]}
               renderer={game.staticHedgehogRenderer}
             />

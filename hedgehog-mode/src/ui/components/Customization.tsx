@@ -60,25 +60,25 @@ export function HedgehogCustomization(
           renderer={game.staticHedgehogRenderer}
         />
         <div className="CustomizationContent">
-          <h3 className="CustomizationTitle">Hi, I'm Max!</h3>
+          <h3 className="CustomizationTitle">hi, i'm Max!</h3>
           <p className="CustomizationDescription">
             {config.skin === "spiderhog" ? (
               <>
-                Well, it's not every day you meet a hedgehog with spider powers.
-                Yep, that's me - SpiderHog. I wasn't always this way. Just your
+                well, it's not every day you meet a hedgehog with spider powers.
+                yep, that's me - spiderhog. i wasn't always this way. just your
                 average, speedy little guy until a radioactive spider bit me.
-                With great power comes great responsibility, so buckle up,
+                with great power comes great responsibility, so buckle up,
                 because this hedgehog's got a whole data warehouse to protect...
                 <br />
-                You can move me around by clicking and dragging or control me
+                you can move me around by clicking and dragging or control me
                 with WASD / arrow keys and I'll use your mouse as a web slinging
                 target.
               </>
             ) : (
               <>
-                Don't mind me. I'm just here to keep you company.
+                don't mind me. i'm just here to keep you company.
                 <br />
-                You can move me around by clicking and dragging or control me
+                you can move me around by clicking and dragging or control me
                 with WASD / arrow keys.
               </>
             )}

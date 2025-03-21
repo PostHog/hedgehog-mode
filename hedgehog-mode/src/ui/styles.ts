@@ -220,7 +220,6 @@ export const styles = `
   }
 
   .CustomizationOptions {
-    margin-top: 1rem;
   }
 
   .CustomizationSection {
@@ -229,7 +228,7 @@ export const styles = `
 
   .CustomizationSectionTitle {
     font-size: 1rem;
-    margin-bottom: 0.5rem;
+    margin: 0.5rem 0;
   }
 
   .CustomizationGrid {

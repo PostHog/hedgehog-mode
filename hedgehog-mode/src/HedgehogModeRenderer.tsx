@@ -33,7 +33,7 @@ export function HedgehogModeRenderer({
   }
 
   return (
-    <root.div data-theme={theme} style={style}>
+    <root.div id="hedgehog-mode-root" data-theme={theme} style={style}>
       <style>{styles}</style>
       <div
         className="GameContainer"

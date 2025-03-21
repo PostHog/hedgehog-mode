@@ -4,6 +4,7 @@ import { Messages } from "./Messages";
 import { Button } from "./Button";
 import { HedgehogCustomization } from "./Customization";
 import { HedgehogActorOptions, HedgeHogMode } from "../../hedgehog-mode";
+import { useOutsideClick } from "../hooks/useOutsideClick";
 
 const WINDOW_MARGIN = 10;
 
@@ -50,7 +51,7 @@ export function DialogBox({
       if (ref.current && pos) {
         let x = pos.x - derivedWidth / 2;
         let y = window.innerHeight - pos.y + 40; // offset for height of the hedgehog
-        const minHeight = 100;
+        const minHeight = 20;
 
         x = Math.max(WINDOW_MARGIN, x);
         x = Math.min(window.innerWidth - derivedWidth - WINDOW_MARGIN, x);
@@ -94,22 +95,9 @@ export function DialogBox({
     }
   }, [actor, setPosition]);
 
-  // TODO: Fix this
-  // useEffect(() => {
-  //   const handleClickOutside = (event: MouseEvent) => {
-  //     if (!ref.current) return;
-
-  //     const target = event.target as Node;
-  //     if (!ref.current.contains(target)) {
-  //       setIndex(messageIndex + 1);
-  //     }
-  //   };
-
-  //   document.addEventListener("mousedown", handleClickOutside);
-  //   return () => {
-  //     document.removeEventListener("mousedown", handleClickOutside);
-  //   };
-  // }, [setIndex, messageIndex]);
+  useOutsideClick(ref, () => {
+    onClose?.();
+  });
 
   return (
     <div

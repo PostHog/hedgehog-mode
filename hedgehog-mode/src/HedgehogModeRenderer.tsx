@@ -7,9 +7,11 @@ import { styles } from "./ui/styles";
 export function HedgehogModeRenderer({
   onGameReady,
   config,
+  theme,
 }: {
   onGameReady: (game: HedgeHogMode) => void;
   config: HedgehogModeConfig;
+  theme?: "light" | "dark";
 }) {
   const [game, setGame] = useState<HedgeHogMode | null>(null);
 
@@ -20,8 +22,14 @@ export function HedgehogModeRenderer({
     onGameReady?.(hedgeHogMode);
   };
 
+  if (!theme) {
+    theme = window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+  }
+
   return (
-    <root.div>
+    <root.div data-theme={theme}>
       <style>{styles}</style>
       <div
         className="GameContainer"

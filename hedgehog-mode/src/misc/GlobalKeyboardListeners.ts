@@ -1,4 +1,4 @@
-import { range, sample } from "lodash";
+import { range, sample, uniqueId } from "lodash";
 import { HedgehogActor } from "../actors/Hedgehog";
 import { Game } from "../types";
 import {
@@ -28,6 +28,7 @@ export class GlobalKeyboardListeners {
 
     const spawnHedgehog = () =>
       this.game.spawnHedgehog({
+        id: uniqueId("hedgehog-"),
         controls_enabled: false,
         accessories: getRandomAccesoryCombo(),
         color: sample(HedgehogActorColorOptions),

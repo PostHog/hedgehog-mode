@@ -12,7 +12,7 @@ import { GlobalKeyboardListeners } from "./misc/GlobalKeyboardListeners";
 import { HedgehogActorOptions } from "./actors/hedgehog/config";
 import { GameStateManager } from "./state";
 import { StaticHedgehogRenderer } from "./static-renderer/StaticHedgehog";
-
+import { uniqueId } from "lodash";
 export type {
   HedgehogActorOptions,
   HedgehogActorColorOption,
@@ -107,7 +107,7 @@ export class HedgeHogMode implements Game {
     const actor = new HedgehogActor(
       this,
       options || {
-        id: "hedgehog-" + Math.random().toString(36).substring(2, 15),
+        id: uniqueId("hedgehog-"),
       }
     );
     this.spawnActor(actor);

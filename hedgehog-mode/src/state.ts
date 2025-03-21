@@ -1,3 +1,4 @@
+import { uniqueId } from "lodash";
 import { HedgehogActor } from "./actors/Hedgehog";
 import type {
   HedgehogActorOptions,
@@ -87,8 +88,7 @@ export class GameStateManager {
   }
 
   private upsertHedgehog(config: HedgehogActorOptions) {
-    config.id =
-      config.id || "hedgehog-" + Math.random().toString(36).substring(2, 15);
+    config.id = config.id || uniqueId("hedgehog-");
 
     const hedgehog = this.hedgehogsById[config.id];
     if (hedgehog) {

@@ -10,7 +10,7 @@ import {
 } from "../..";
 import { HedgehogProfileImage, HedgehogImage } from "../HedgehogStatic";
 import { Button } from "./Button";
-import { sample } from "lodash";
+import { sample, uniqueId } from "lodash";
 
 const ACCESSORY_GROUPS = ["headwear", "eyewear", "other"] as const;
 
@@ -109,7 +109,7 @@ function HedgehogOptions({
 
   const addFriend = () => {
     game.stateManager?.setHedgehog({
-      id: "friend-" + Math.random().toString(36).substring(2, 15),
+      id: uniqueId("friend-"),
       player: false,
       accessories: getRandomAccesoryCombo(),
       color: sample(HedgehogActorColorOptions),

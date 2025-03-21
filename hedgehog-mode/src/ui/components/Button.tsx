@@ -2,14 +2,18 @@ export function Button({
   children,
   onClick,
   disabled,
+  active,
 }: {
   children: React.ReactNode;
   onClick: () => void;
   disabled?: boolean;
+  active?: boolean;
 }) {
   return (
     <button
-      className={`Button ${disabled ? "Button--disabled" : ""}`}
+      className={`Button ${disabled ? "Button--disabled" : ""} ${
+        active ? "Button--active" : ""
+      }`}
       onClick={onClick}
       disabled={disabled}
     >

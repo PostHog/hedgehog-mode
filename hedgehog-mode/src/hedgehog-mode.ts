@@ -11,6 +11,7 @@ import { Actor } from "./actors/Actor";
 import { GlobalKeyboardListeners } from "./misc/GlobalKeyboardListeners";
 import { HedgehogActorOptions } from "./actors/hedgehog/config";
 import { GameStateManager } from "./state";
+import { StaticHedgehogRenderer } from "./static-renderer/StaticHedgehog";
 
 export type {
   HedgehogActorOptions,
@@ -45,9 +46,14 @@ export class HedgeHogMode implements Game {
   lastTime?: number;
   gameUI!: GameUI;
   stateManager?: GameStateManager;
+  staticHedgehogRenderer: StaticHedgehogRenderer;
 
   constructor(private options: HedgehogModeConfig) {
     this.spritesManager = new SpritesManager(options);
+    this.staticHedgehogRenderer = new StaticHedgehogRenderer(
+      options,
+      this.spritesManager
+    );
     this.setupDebugListeners();
   }
 
@@ -98,7 +104,12 @@ export class HedgeHogMode implements Game {
   }
 
   spawnHedgehog(options: HedgehogActorOptions | undefined): HedgehogActor {
-    const actor = new HedgehogActor(this, options || {});
+    const actor = new HedgehogActor(
+      this,
+      options || {
+        id: "hedgehog-" + Math.random().toString(36).substring(2, 15),
+      }
+    );
     this.spawnActor(actor);
     return actor;
   }

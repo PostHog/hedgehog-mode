@@ -22,8 +22,7 @@ export type GameElement = {
 };
 
 export type HedgehogModeGameState = {
-  player: HedgehogActorOptions;
-  hedgehogs: HedgehogActorOptions[];
+  hedgehogsById: Record<string, HedgehogActorOptions>;
 };
 
 export type HedgehogModeConfig = {

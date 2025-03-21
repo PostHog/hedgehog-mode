@@ -19,6 +19,7 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
   return (
     <div className="GameUI">
       <DialogBox
+        game={game}
         actor={dialogBox?.actor}
         position={{ x: window.innerWidth / 2, y: window.innerHeight / 2 }}
         messages={dialogBox?.messages ?? []}

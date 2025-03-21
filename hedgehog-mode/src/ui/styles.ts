@@ -3,6 +3,7 @@ export const styles = `
     --color-text: #222;
     --color-background: white;
     --color-border: #222;
+    --color-border-light: #DDD;
     --color-hover: rgba(0, 0, 0, 0.1);
     --color-shadow: rgba(0, 0, 0, 0.1);
     --transition-timing: cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -13,9 +14,6 @@ export const styles = `
     --spacing-sm: 0.5rem;
     --font-family: monospace;
     --font-size-sm: 0.875rem;
-    --opacity-disabled: 0.25;
-    --opacity-hover: 0.5;
-    --opacity-full: 1;
 
     display: block;
     background-color: transparent;
@@ -25,6 +23,7 @@ export const styles = `
     --color-text: #fff;
     --color-background: #222;
     --color-border: #fff;
+    --color-border-light: #DDD;
     --color-hover: rgba(255, 255, 255, 0.1);
     --color-shadow: rgba(0, 0, 0, 0.3);
   }
@@ -50,18 +49,45 @@ export const styles = `
     border-radius: var(--border-radius-sm);
     transition: background-color 300ms var(--transition-timing);
     font-family: var(--font-family);
-    opacity: var(--opacity-hover);
     cursor: pointer;
   }
 
   .Button--disabled {
-    opacity: var(--opacity-disabled);
+    opacity: 0.25;
+  }
+
+  .Button--active {
+    background-color: var(--color-hover);
   }
 
   .Button:not(.Button--disabled):hover {
     background-color: var(--color-hover);
-    opacity: var(--opacity-full);
+    opacity: 1;
   }
+
+  .Switch {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+
+  .SwitchLabel {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+  }
+
+  .SwitchLabelText {
+    font-size: var(--font-size-sm);
+  }
+
+  .SwitchInput {
+    display: none;
+  }
+  
+  
+  
+  
 
   .DialogBox {
     position: fixed;
@@ -74,12 +100,19 @@ export const styles = `
     transition: all var(--transition-duration) var(--transition-timing);
     transform: scale(0.8);
     pointer-events: none;
+    display: flex;
+    flex-direction: column;
   }
 
   .DialogBox--visible {
-    opacity: var(--opacity-full);
+    opacity: 1;
     transform: scale(1);
     pointer-events: auto;
+  }
+
+  .DialogBoxContent {
+    flex: 1;
+    overflow-y: auto;
   }
 
   .DialogBoxControls {
@@ -96,9 +129,9 @@ export const styles = `
 
   .DialogBox:hover > .DialogBoxControls {
     padding: var(--spacing-xs);
-    opacity: var(--opacity-full);
+    opacity: 1;
     height: 1.5rem;
-    border-bottom-color: var(--color-hover);
+    border-bottom-color: var(--color-border-light);
   }
 
   .Messages {
@@ -151,7 +184,7 @@ export const styles = `
     }
     100% {
       transform: scale(1) rotate(0deg);
-      opacity: var(--opacity-full);
+      opacity: 1;
     }
   }
 
@@ -159,4 +192,66 @@ export const styles = `
     opacity: 0;
     animation: letter-pop 0.5s var(--transition-timing) forwards;
   }
+
+  .Customization {
+    display: flex;
+    flex-direction: column;
+    padding: var(--spacing-sm);
+  }
+
+  .CustomizationContainer {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .CustomizationContent {
+    flex: 1;
+  }
+
+  .CustomizationTitle {
+    font-size: 1.25rem;
+    margin-top: 0;
+    margin-bottom: 0.5rem;
+  }
+
+  .CustomizationDescription {
+    margin-bottom: 1rem;
+  }
+
+  .CustomizationOptions {
+    margin-top: 1rem;
+  }
+
+  .CustomizationSection {
+    margin-bottom: 1rem;
+  }
+
+  .CustomizationSectionTitle {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .CustomizationGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding-top: 1px;
+    padding-bottom: 0.5rem;
+    overflow-y: auto;
+  }
+
+  .CustomizationItem {
+    cursor: pointer;
+    transition: transform 0.2s var(--transition-timing);
+  }
+
+  // .CustomizationItem:hover {
+  //   transform: scale(1.05);
+  // }
+
+  // .CustomizationItem--selected {
+  //   outline: 1px solid var(--color-border-light);
+  //   border-radius: var(--border-radius-sm);
+  // }
 `;

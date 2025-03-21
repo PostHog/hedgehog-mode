@@ -11,9 +11,9 @@ export class StaticHedgehogRenderer {
   private spritesManager: SpritesManager;
   private initPromise: Promise<void> | null = null;
 
-  constructor(options: HedgehogModeConfig) {
+  constructor(options: HedgehogModeConfig, spritesManager?: SpritesManager) {
     this.app = new Application();
-    this.spritesManager = new SpritesManager(options);
+    this.spritesManager = spritesManager ?? new SpritesManager(options);
   }
 
   private async ensureInitialized(): Promise<void> {

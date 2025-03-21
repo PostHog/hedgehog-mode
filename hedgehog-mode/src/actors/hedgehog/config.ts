@@ -113,7 +113,7 @@ export const getRandomAccesoryCombo = (): HedgehogActorAccessoryOption[] => {
 };
 
 export type HedgehogActorOptions = {
-  id?: string;
+  id: string;
   player?: boolean;
   skin?: HedgehogActorSkinOption | null;
   color?: HedgehogActorColorOption | null;

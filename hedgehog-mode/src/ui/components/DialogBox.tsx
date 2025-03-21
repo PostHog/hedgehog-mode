@@ -2,19 +2,42 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { GameUIDialogBoxProps } from "../../types";
 import { Messages } from "./Messages";
 import { Button } from "./Button";
+import { HedgehogCustomization } from "./Customization";
+import { HedgehogActorOptions, HedgeHogMode } from "../../hedgehog-mode";
 
 const WINDOW_MARGIN = 10;
 
 export function DialogBox({
+  game,
   messages,
   actor,
   width = 300,
   onClose,
   visible,
-}: GameUIDialogBoxProps & { visible: boolean; onClickOutside?: () => void }) {
+}: GameUIDialogBoxProps & {
+  visible: boolean;
+  onClickOutside?: () => void;
+  game: HedgeHogMode;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const [hovering, setHovering] = useState<boolean>(false);
-  const [showConfiguration, setShowConfiguration] = useState<boolean>(false);
+  const [_showConfiguration, setShowConfiguration] = useState<boolean>(false);
+  const [actorOptions, _setActorOptions] =
+    useState<HedgehogActorOptions | null>(actor?.options || null);
+
+  useEffect(() => {
+    _setActorOptions(actor?.options || null);
+  }, [actor]);
+
+  const setActorOptions = useCallback(
+    (options: HedgehogActorOptions) => {
+      _setActorOptions(options);
+      game.stateManager?.setHedgehog(options);
+    },
+    [game.stateManager]
+  );
+
+  const showConfiguration = true;
 
   const derivedWidth = showConfiguration ? 500 : width;
 
@@ -29,15 +52,21 @@ export function DialogBox({
       if (ref.current && pos) {
         let x = pos.x - derivedWidth / 2;
         let y = window.innerHeight - pos.y + 40; // offset for height of the hedgehog
-        const height = ref.current.clientHeight;
+        const minHeight = 100;
 
         x = Math.max(WINDOW_MARGIN, x);
         x = Math.min(window.innerWidth - derivedWidth - WINDOW_MARGIN, x);
 
         y = Math.max(WINDOW_MARGIN, y);
-        y = Math.min(window.innerHeight - height - WINDOW_MARGIN, y);
+        y = Math.min(window.innerHeight - WINDOW_MARGIN, y);
+
+        // Height should not be more than the screen
+        const maxHeight = window.innerHeight - y - WINDOW_MARGIN;
+
         ref.current.style.left = `${x}px`;
         ref.current.style.bottom = `${y}px`;
+        ref.current.style.maxHeight = `${maxHeight}px`;
+        ref.current.style.minHeight = `${minHeight}px`;
       }
     },
     [hovering]
@@ -100,9 +129,19 @@ export function DialogBox({
         </Button>
         <Button onClick={() => onClose?.()}>X</Button>
       </div>
-      {showConfiguration && <p>Yo!</p>}
+      <div className="DialogBoxContent">
+        {showConfiguration && actorOptions && (
+          <HedgehogCustomization
+            game={game}
+            config={actorOptions}
+            setConfig={(config) => {
+              setActorOptions(config);
+            }}
+          />
+        )}
 
-      {!showConfiguration && <Messages messages={messages} onEnd={onClose} />}
+        {!showConfiguration && <Messages messages={messages} onEnd={onClose} />}
+      </div>
     </div>
   );
 }

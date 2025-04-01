@@ -276,6 +276,11 @@ export class HedgehogActorInterface {
     [{ words: ["we track everything. even this click"] }],
     [
       {
+        words: ["ai is mid. clippy was the real MVP"],
+      },
+    ],
+    [
+      {
         words: [
           "posthog: because",
           { text: "GA", style: { fontWeight: "bold" } },
@@ -302,32 +307,37 @@ export class HedgehogActorInterface {
   ) {
     setTimeout(() => {
       if (actor.options.player) {
+        // this.game.gameUI?.showDialogBox({
+        //   actor: this.actor,
+        //   messages: [
+        //     {
+        //       words: [
+        //         "hedgehog",
+        //         "mode",
+        //         { text: "is", style: { fontStyle: "italic" } },
+        //         {
+        //           text: "coming soon",
+        //           style: { color: "orange", fontWeight: "bold" },
+        //         },
+        //       ],
+        //     },
+        //     {
+        //       words: ["ben is very excited for this..."],
+        //     },
+        //     {
+        //       words: [
+        //         "...i'm worried he is losing sight of the big picture...",
+        //       ],
+        //     },
+        //     {
+        //       words: ["...it's like a cry for help or something"],
+        //     },
+        //   ],
+        // });
+
         this.game.gameUI?.showDialogBox({
           actor: this.actor,
-          messages: [
-            {
-              words: [
-                "hedgehog",
-                "mode",
-                { text: "is", style: { fontStyle: "italic" } },
-                {
-                  text: "coming soon",
-                  style: { color: "orange", fontWeight: "bold" },
-                },
-              ],
-            },
-            {
-              words: ["ben is very excited for this..."],
-            },
-            {
-              words: [
-                "...i'm worried he is losing sight of the big picture...",
-              ],
-            },
-            {
-              words: ["...it's like a cry for help or something"],
-            },
-          ],
+          messages: [{ words: ["i am the defining feature"] }],
         });
       }
     }, 1000);

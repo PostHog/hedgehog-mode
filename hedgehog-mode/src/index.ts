@@ -11,7 +11,7 @@ export type {
 } from "./actors/hedgehog/config";
 export {
   HedgehogActorColorOptions,
-  getRandomAccesoryCombo,
+  getRandomAccessoryCombo,
   HedgehogActorAccessoryOptions,
   HedgehogActorSkinOptions,
   HedgehogActorAccessories,

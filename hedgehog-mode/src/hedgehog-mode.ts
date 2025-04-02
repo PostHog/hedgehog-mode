@@ -13,6 +13,7 @@ import { HedgehogActorOptions } from "./actors/hedgehog/config";
 import { GameStateManager } from "./state";
 import { StaticHedgehogRenderer } from "./static-renderer/StaticHedgehog";
 import { uniqueId } from "lodash";
+
 export type {
   HedgehogActorOptions,
   HedgehogActorColorOption,
@@ -22,7 +23,7 @@ export type {
 } from "./actors/hedgehog/config";
 export {
   HedgehogActorColorOptions,
-  getRandomAccesoryCombo,
+  getRandomAccessoryCombo,
   HedgehogActorAccessoryOptions,
   HedgehogActorSkinOptions,
   HedgehogActorAccessories,

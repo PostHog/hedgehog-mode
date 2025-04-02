@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
-  getRandomAccesoryCombo,
+  getRandomAccessoryCombo,
   HedgehogActorAccessories,
   HedgehogActorAccessoryOption,
   HedgehogActorAccessoryOptions,
@@ -113,7 +113,7 @@ function HedgehogOptions({
     game.stateManager?.setHedgehog({
       id: uniqueId("friend-"),
       player: false,
-      accessories: getRandomAccesoryCombo(),
+      accessories: getRandomAccessoryCombo(),
       color: sample(HedgehogActorColorOptions),
     });
     setHedgehogsCount(game.stateManager?.getNumberOfHedgehogs() ?? 0);

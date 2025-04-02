@@ -2,7 +2,7 @@
 
 import {
   HedgehogActorOptions,
-  getRandomAccesoryCombo,
+  getRandomAccessoryCombo,
   HedgehogActorColorOptions,
   StaticHedgehogRenderer,
 } from "@posthog/hedgehog-mode";
@@ -23,7 +23,7 @@ export default function StaticRendering() {
   useEffect(() => {
     const HEDGEHOGS: HedgehogActorOptions[] = range(1000).map((i) => ({
       id: `hedgehog-${i}`,
-      accessories: getRandomAccesoryCombo(),
+      accessories: getRandomAccessoryCombo(),
       color: sample(HedgehogActorColorOptions),
       skin: sample(["default", "spiderhog"]),
     }));

@@ -2,7 +2,7 @@ import { range, sample, uniqueId } from "lodash";
 import { HedgehogActor } from "../actors/Hedgehog";
 import { Game } from "../types";
 import {
-  getRandomAccesoryCombo,
+  getRandomAccessoryCombo,
   HedgehogActorColorOptions,
 } from "../actors/hedgehog/config";
 
@@ -30,7 +30,7 @@ export class GlobalKeyboardListeners {
       this.game.spawnHedgehog({
         id: uniqueId("hedgehog-"),
         controls_enabled: false,
-        accessories: getRandomAccesoryCombo(),
+        accessories: getRandomAccessoryCombo(),
         color: sample(HedgehogActorColorOptions),
       });
 

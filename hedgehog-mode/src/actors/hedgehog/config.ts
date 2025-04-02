@@ -82,7 +82,7 @@ export const HedgehogActorAccessoryOptions = Object.keys(
   HedgehogActorAccessories
 ) as HedgehogActorAccessoryOption[];
 
-export const getRandomAccesoryCombo = (): HedgehogActorAccessoryOption[] => {
+export const getRandomAccessoryCombo = (): HedgehogActorAccessoryOption[] => {
   return [
     sample(
       Object.keys(HedgehogActorAccessories).filter(

@@ -1,7 +1,7 @@
 "use client";
 import {
   HedgehogActorColorOptions,
-  getRandomAccesoryCombo,
+  getRandomAccessoryCombo,
   HedgehogModeRenderer,
   HedgeHogMode,
 } from "@posthog/hedgehog-mode";
@@ -17,7 +17,7 @@ export default function Home() {
       game?.spawnHedgehog({
         id: `hedgehog-${i}`,
         controls_enabled: false,
-        accessories: getRandomAccesoryCombo(),
+        accessories: getRandomAccessoryCombo(),
         color: sample(HedgehogActorColorOptions),
       });
 

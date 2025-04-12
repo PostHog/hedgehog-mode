@@ -56,8 +56,9 @@ export class Actor implements GameElement {
     );
 
     this.loadRigidBody();
-
     this.sprite.eventMode = "static";
+    this.sprite.texture.source.scaleMode = "nearest";
+
     this.sprite.play();
     this.sprite.anchor.set(0.5);
     this.sprite.x = this.rigidBody!.position.x;

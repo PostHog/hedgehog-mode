@@ -1,7 +1,7 @@
 import gsap from "gsap";
 
 import Matter, { Render, Runner } from "matter-js";
-import { Application } from "pixi.js";
+import { Application, SCALE_MODES } from "pixi.js";
 import { Game, GameElement, GameUI, HedgehogModeConfig } from "./types";
 import { SpritesManager } from "./sprites/sprites";
 import { HedgehogActor } from "./actors/Hedgehog";
@@ -178,12 +178,13 @@ export class HedgeHogMode implements Game {
       resizeTo: window,
       resolution: window.devicePixelRatio || 1,
       autoDensity: true,
-      antialias: true,
-      roundPixels: true,
+      antialias: false,
+      roundPixels: false,
     });
 
     await this.spritesManager.load();
     ref.appendChild(this.app.canvas);
+
     this.app.stage.eventMode = "static";
     this.app.stage.hitArea = this.app.screen;
 

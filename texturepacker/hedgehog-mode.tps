@@ -34,7 +34,7 @@
         <key>dataFormat</key>
         <string>pixijs4</string>
         <key>textureFileName</key>
-        <filename>../sdk/assets/sprites.png</filename>
+        <filename>../hedgehog-mode/assets/sprites.png</filename>
         <key>flipPVR</key>
         <false/>
         <key>pvrQualityLevel</key>
@@ -124,7 +124,7 @@
             <key>data</key>
             <struct type="DataFile">
                 <key>name</key>
-                <filename>../sdk/assets/sprites.json</filename>
+                <filename>../hedgehog-mode/assets/sprites.json</filename>
             </struct>
         </map>
         <key>multiPackMode</key>
@@ -464,6 +464,25 @@
                 <rect>20,20,40,40</rect>
                 <key>scale9Paddings</key>
                 <rect>20,20,40,40</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">assets/projectiles/missile/tile-0.png</key>
+            <key type="filename">assets/projectiles/missile/tile-1.png</key>
+            <key type="filename">assets/projectiles/missile/tile-2.png</key>
+            <key type="filename">assets/projectiles/missile/tile-3.png</key>
+            <key type="filename">assets/projectiles/missile/tile-4.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0,0</point_f>
+                <key>spriteScale</key>
+                <double>1</double>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>20,6,39,12</rect>
+                <key>scale9Paddings</key>
+                <rect>20,6,39,12</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>

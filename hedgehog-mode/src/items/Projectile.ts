@@ -2,6 +2,8 @@ import { Actor } from "../actors/Actor";
 import { Game, GameElement, UpdateTicker } from "../types";
 import { COLLISIONS } from "../misc/collisions";
 
+let PROJECTILE_ID = 0;
+
 export class Projectile extends Actor {
   angle = 0;
 
@@ -24,15 +26,15 @@ export class Projectile extends Actor {
     private source: Actor
   ) {
     super(game, {
-      id: "projectile" + Math.random(),
+      id: PROJECTILE_ID++,
       friction: 0.7,
       frictionStatic: 0,
       frictionAir: 0.01,
       restitution: 0.1,
-      inertia: Infinity,
-      inverseInertia: Infinity,
-      inverseMass: 0,
-      label: "Projectile" + Math.random(),
+      //   inertia: Infinity,
+      //   inverseInertia: Infinity,
+      //   inverseMass: 0,
+      label: "Projectile",
     });
 
     this.loadSprite("overlays/fire/tile");
@@ -40,17 +42,6 @@ export class Projectile extends Actor {
 
     this.sprite!.anchor.set(0.5, 0);
     this.setScale(0.4);
-
-    // setTimeout(() => {
-    //   gsap.to(this, {
-    //     fadeValue: 1,
-    //     duration: 1,
-    //     ease: "power2.in",
-    //     onComplete: () => {
-    //       this.game.world.removeElement(this);
-    //     },
-    //   });
-    // }, 1000);
   }
 
   fire(options: { target: { x: number; y: number } }): void {
@@ -89,6 +80,8 @@ export class Projectile extends Actor {
 
   onCollisionStart(element: GameElement, pair: Matter.Pair): void {
     pair.isActive = false;
+
+    console.log("projectile collision pair!!", element, pair);
   }
 
   destroy(): void {

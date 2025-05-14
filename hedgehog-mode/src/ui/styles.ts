@@ -34,7 +34,7 @@ export const styles = `
     z-index: 1;
   }
 
-  .GameUI {
+  .EntryUI {
     position: relative;
     font-family: var(--font-family);
     z-index: 2;
@@ -125,6 +125,10 @@ export const styles = `
     height: 0;
     border-bottom: 1px solid transparent;
     padding: 0 var(--spacing-xs);
+  }
+
+  .DialogBoxGameButton {
+    margin-right: auto;
   }
 
   .DialogBox:hover > .DialogBoxControls {
@@ -253,4 +257,52 @@ export const styles = `
   //   outline: 1px solid var(--color-border-light);
   //   border-radius: var(--border-radius-sm);
   // }
+
+  .GameConsole {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .GameConsole-overlay {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .GameConsole-content {
+    position: relative;
+    background-color: var(--color-background);
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    width: 90%;
+    height: 90%;
+    max-width: 1200px;
+    max-height: 800px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 15px -3px var(--color-shadow);
+  }
+
+  .GameConsole-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--spacing-sm);
+    border-bottom: 1px solid var(--color-border-light);
+  }
+
+  .GameConsole-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+  }
+
+  .GameConsole-body {
+    flex: 1;
+    padding: var(--spacing-sm);
+    overflow-y: auto;
+  }
 `;

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { GameUIAnimatedTextProps } from "../../types";
+import { EntryUIAnimatedTextProps } from "../../types";
 
 export function AnimatedText({
   words,
@@ -7,7 +7,7 @@ export function AnimatedText({
   disableAnimation = false,
   onComplete,
   onClick,
-}: GameUIAnimatedTextProps) {
+}: EntryUIAnimatedTextProps) {
   let letterIndex = 0;
   const lettersCount = words.reduce((acc, word) => {
     return acc + (typeof word === "string" ? word.length : word.text.length);

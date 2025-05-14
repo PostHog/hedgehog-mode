@@ -2,7 +2,7 @@ import gsap from "gsap";
 
 import Matter, { Render, Runner } from "matter-js";
 import { Application } from "pixi.js";
-import { Game, GameUI, HedgehogModeConfig } from "./types";
+import { Game, EntryUI, HedgehogModeConfig } from "./types";
 import { SpritesManager } from "./sprites/sprites";
 import { HedgehogActor } from "./actors/Hedgehog";
 import { GlobalKeyboardListeners } from "./misc/GlobalKeyboardListeners";
@@ -39,7 +39,7 @@ export class HedgeHogMode implements Game {
   spritesManager: SpritesManager;
   mousePosition?: Matter.Vector;
   lastTime?: number;
-  gameUI!: GameUI;
+  EntryUI!: EntryUI;
   // stateManager?: GameStateManager;
   staticHedgehogRenderer: StaticHedgehogRenderer;
   world: GameWorld;
@@ -90,8 +90,8 @@ export class HedgeHogMode implements Game {
     });
   }
 
-  setUI(ui: GameUI): void {
-    this.gameUI = ui;
+  setUI(ui: EntryUI): void {
+    this.EntryUI = ui;
   }
 
   setPointerEvents(enabled: boolean): void {

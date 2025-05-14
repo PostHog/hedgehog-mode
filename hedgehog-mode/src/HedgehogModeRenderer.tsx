@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { HedgeHogMode, HedgehogModeConfig } from "./hedgehog-mode";
-import { HedgehogModeUI } from "./ui/GameUI";
+import { HedgehogModeUI } from "./ui/EntryUI";
 import root from "react-shadow";
 import { styles } from "./ui/styles";
 import { useTheme } from "./ui/hooks/useTheme";

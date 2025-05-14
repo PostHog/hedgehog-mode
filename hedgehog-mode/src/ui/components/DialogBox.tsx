@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { GameUIDialogBoxProps } from "../../types";
+import { EntryUIDialogBoxProps } from "../../types";
 import { Messages } from "./Messages";
 import { Button } from "./Button";
 import { HedgehogCustomization } from "./Customization";
 import { HedgehogActorOptions, HedgeHogMode } from "../../hedgehog-mode";
 import { useOutsideClick } from "../hooks/useOutsideClick";
+import { GameConsole } from "./GameConsole";
 
 const WINDOW_MARGIN = 10;
 
@@ -15,7 +16,7 @@ export function DialogBox({
   width = 300,
   onClose,
   visible,
-}: GameUIDialogBoxProps & {
+}: EntryUIDialogBoxProps & {
   visible: boolean;
   onClickOutside?: () => void;
   game: HedgeHogMode;
@@ -23,6 +24,7 @@ export function DialogBox({
   const ref = useRef<HTMLDivElement>(null);
   const [hovering, setHovering] = useState<boolean>(false);
   const [showConfiguration, setShowConfiguration] = useState<boolean>(false);
+  const [showGameConsole, setShowGameConsole] = useState<boolean>(false);
   const [actorOptions, _setActorOptions] =
     useState<HedgehogActorOptions | null>(actor?.options || null);
 
@@ -41,7 +43,7 @@ export function DialogBox({
   const derivedWidth = showConfiguration ? 500 : width;
 
   const setPosition = useCallback(
-    (actor?: GameUIDialogBoxProps["actor"]) => {
+    (actor?: EntryUIDialogBoxProps["actor"]) => {
       if (hovering) {
         return;
       }
@@ -102,34 +104,49 @@ export function DialogBox({
   });
 
   return (
-    <div
-      ref={ref}
-      className={`DialogBox ${visible ? "DialogBox--visible" : ""}`}
-      style={{
-        width: derivedWidth,
-      }}
-      onMouseOver={() => setHovering(true)}
-      onMouseLeave={() => setHovering(false)}
-    >
-      <div className="DialogBoxControls">
-        <Button onClick={() => setShowConfiguration(!showConfiguration)}>
-          {showConfiguration ? "Hide customization" : "Customize me!"}
-        </Button>
-        <Button onClick={() => onClose?.()}>X</Button>
-      </div>
-      <div className="DialogBoxContent">
-        {showConfiguration && actorOptions && (
-          <HedgehogCustomization
-            game={game}
-            config={actorOptions}
-            setConfig={(config) => {
-              setActorOptions(config);
-            }}
-          />
-        )}
+    <>
+      <div
+        ref={ref}
+        className={`DialogBox ${visible ? "DialogBox--visible" : ""}`}
+        style={{
+          width: derivedWidth,
+        }}
+        onMouseOver={() => setHovering(true)}
+        onMouseLeave={() => setHovering(false)}
+      >
+        <div className="DialogBoxControls">
+          <Button
+            onClick={() => setShowGameConsole(true)}
+            className="DialogBoxGameButton"
+          >
+            Enter game
+          </Button>
+          <Button onClick={() => setShowConfiguration(!showConfiguration)}>
+            {showConfiguration ? "Hide customization" : "Customize me!"}
+          </Button>
+          <Button onClick={() => onClose?.()}>X</Button>
+        </div>
+        <div className="DialogBoxContent">
+          {showConfiguration && actorOptions && (
+            <HedgehogCustomization
+              game={game}
+              config={actorOptions}
+              setConfig={(config) => {
+                setActorOptions(config);
+              }}
+            />
+          )}
 
-        {!showConfiguration && <Messages messages={messages} onEnd={onClose} />}
+          {!showConfiguration && (
+            <Messages messages={messages} onEnd={onClose} />
+          )}
+        </div>
       </div>
-    </div>
+      <GameConsole
+        game={game}
+        visible={showGameConsole}
+        onClose={() => setShowGameConsole(false)}
+      />
+    </>
   );
 }

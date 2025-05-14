@@ -3,9 +3,9 @@ import { Actor } from "./actors/Actor";
 import { HedgehogActor } from "./actors/Hedgehog";
 import { HedgehogActorOptions } from "./actors/hedgehog/config";
 import { Game, GameElement } from "./types";
-import { Ground } from "./items/Ground";
 import Matter from "matter-js";
 import { Platform } from "./items/Platform";
+import { MainLevel } from "./levels/main-level";
 
 export class GameWorld {
   elements: GameElement[] = []; // TODO: Type better
@@ -15,30 +15,7 @@ export class GameWorld {
   }
 
   load() {
-    this.elements.push(new Ground(this.game));
-
-    this.spawnHedgehog({
-      id: "player",
-      player: true,
-      controls_enabled: true,
-      ai_enabled: false,
-    });
-
-    this.spawnPlatform(
-      new Platform(this.game, { x: 100, y: 100, width: 100, height: 100 })
-    );
-
-    this.spawnPlatform(
-      new Platform(this.game, { x: 100, y: 600, width: 100, height: 100 })
-    );
-
-    this.spawnPlatform(
-      new Platform(this.game, { x: 400, y: 600, width: 100, height: 100 })
-    );
-
-    this.spawnPlatform(
-      new Platform(this.game, { x: 700, y: 600, width: 100, height: 100 })
-    );
+    new MainLevel(this.game).load();
   }
 
   addElement(element: GameElement) {
@@ -56,6 +33,15 @@ export class GameWorld {
   update(deltaMS: number) {
     this.elements.forEach((el) => {
       el.update({ deltaMS, deltaTime: deltaMS / 1000 });
+    });
+  }
+
+  spawnPlayer(): HedgehogActor {
+    return this.spawnHedgehog({
+      id: "player",
+      player: true,
+      controls_enabled: true,
+      ai_enabled: false,
     });
   }
 

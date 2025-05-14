@@ -64,7 +64,6 @@ export class Actor implements GameElement {
     this.sprite.x = this.rigidBody!.position.x;
     this.sprite.y = this.rigidBody!.position.y;
     this.game.app.stage.addChild(this.sprite);
-
     this.setupPointerEvents();
   }
 

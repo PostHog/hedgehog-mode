@@ -1,6 +1,7 @@
-name: Publish to GitHub Package Registry
+name: Build
 
-on: [push]
+on:
+  pull_request:
 
 jobs:
   build:
@@ -20,15 +21,9 @@ jobs:
         with:
           registry-url: https://npm.pkg.github.com/
           node-version: 18.x
-          scope: '@dalenguyen'
-          
+          scope: "@posthog"
+
       - name: pnpm install, build, and test
         run: |
           pnpm install
           pnpm build
-          pnpm test
-      - name: publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-        run: |
-          pnpm run deploy

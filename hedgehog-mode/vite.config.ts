@@ -13,8 +13,24 @@ export default defineConfig(({ mode }) => {
         fileName: "index",
       },
       sourcemap: true,
+      rollupOptions: {
+        external: ["react", "react-dom"],
+        output: {
+          globals: {
+            react: "React",
+            "react-dom": "ReactDOM",
+          },
+        },
+      },
     },
-    resolve: { alias: { src: resolve("src/") } },
+    resolve: {
+      alias: { src: resolve("src/") },
+      dedupe: ["react", "react-dom"],
+    },
+    optimizeDeps: {
+      include: ["react", "react-dom"],
+      exclude: ["@posthog/hedgehog-mode"],
+    },
     test: {
       globals: true,
       include: ["test/*.test.ts"],

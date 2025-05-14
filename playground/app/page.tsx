@@ -1,80 +1,61 @@
 "use client";
-import { HedgeHogMode } from "@posthog/hedgehog-mode";
-import { useEffect, useState } from "react";
+import {
+  HedgehogActorColorOptions,
+  getRandomAccessoryCombo,
+  HedgehogModeRenderer,
+  HedgeHogMode,
+} from "@posthog/hedgehog-mode";
+import { Logo } from "../components/logo";
+import { sample } from "lodash";
+import { Button } from "../components/Button";
+import { useState } from "react";
 
 export default function Home() {
-  const [ref, setRef] = useState<HTMLDivElement | null>(null);
+  const [game, setGame] = useState<HedgeHogMode | null>(null);
+  const spawnHedgehog = async (count: number) => {
+    for (let i = 0; i < count; i++) {
+      game?.spawnHedgehog({
+        id: `hedgehog-${i}`,
+        controls_enabled: false,
+        accessories: getRandomAccessoryCombo(),
+        color: sample(HedgehogActorColorOptions),
+      });
 
-  const makeRandomBoxes = () => {
-    return Array.from({ length: 10 }, () => ({
-      x: Math.random() * window.innerWidth,
-      y: Math.random() * window.innerHeight,
-      w: 100 + Math.random() * 100,
-      h: 50 + Math.random() * 50,
-    }));
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
   };
 
-  const [randomBoxes, setRandomBoxes] = useState<
-    {
-      x: number;
-      y: number;
-      w: number;
-      h: number;
-    }[]
-  >([]);
-
-  useEffect(() => {
-    if (ref) {
-      const hedgeHogMode = new HedgeHogMode({
-        assetsUrl: "/assets",
-      });
-      hedgeHogMode.render(ref);
-    }
-  }, [ref]);
-
-  useEffect(() => {
-    const t = setTimeout(() => {
-      setRandomBoxes(makeRandomBoxes());
-    }, 5000);
-    return () => clearTimeout(t);
-  }, [randomBoxes]);
-
-  useEffect(() => {
-    setRandomBoxes(makeRandomBoxes());
-  }, []);
-
   return (
-    <div className="">
-      <main className="fixed inset-0 overflow-hidden flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        {randomBoxes.map((box, index) => (
-          <div
-            key={index}
-            className="border rounded p-4 hover:bg-red-600"
-            style={{
-              position: "absolute",
-              left: `${box.x}px`,
-              top: `${box.y}px`,
-              width: `${box.w}px`,
-              height: `${box.h}px`,
-              transition: "all 1000ms ease-in-out",
-            }}
-          >
-            Box {index + 1}
+    <div>
+      <main className="fixed inset-0 flex flex-col overflow-hidden">
+        <div className="relative flex-1 overflow-y-auto">
+          <div className="relative flex flex-col w-full h-full">
+            <Logo />
           </div>
-        ))}
-      </main>
+          <div className="relative flex flex-col w-full h-full">
+            <Logo />
+          </div>
+          <div className="relative flex flex-col w-full h-full">
+            <Logo />
+          </div>
+        </div>
 
-      <div
-        id="game"
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          width: "100%",
-          height: "100%",
+        <div className="absolute bottom-0 z-10 flex flex-row gap-2 p-12">
+          <Button onClick={() => spawnHedgehog(1)}>Spawn hedgehog</Button>
+          <Button onClick={() => spawnHedgehog(100)}>
+            Spawn 100 hedgehogs
+          </Button>
+
+          <Button onClick={() => game?.destroy()}>Stop game</Button>
+        </div>
+      </main>
+      <HedgehogModeRenderer
+        config={{
+          assetsUrl: "/assets",
+          platformSelector: ".border",
         }}
-        ref={(r) => setRef(r)}
-      ></div>
+        onGameReady={setGame}
+      />
     </div>
   );
 }

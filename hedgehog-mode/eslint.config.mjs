@@ -10,4 +10,17 @@ export default [
   },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
+  {
+    rules: {
+      "no-console": "error",
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          ignoreRestSiblings: true,
+          destructuredArrayIgnorePattern: "^_$",
+        },
+      ],
+    },
+  },
 ];

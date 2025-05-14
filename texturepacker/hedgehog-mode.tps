@@ -4,7 +4,7 @@
         <key>fileFormatVersion</key>
         <int>6</int>
         <key>texturePackerVersion</key>
-        <string>7.4.0</string>
+        <string>7.6.3</string>
         <key>autoSDSettings</key>
         <array>
             <struct type="AutoSDSettings">
@@ -173,6 +173,7 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
+            <key type="filename">assets/accessories/bazooka.png</key>
             <key type="filename">assets/accessories/beret.png</key>
             <key type="filename">assets/accessories/cap.png</key>
             <key type="filename">assets/accessories/chef.png</key>
@@ -189,6 +190,7 @@
             <key type="filename">assets/accessories/xmas-antlers.png</key>
             <key type="filename">assets/accessories/xmas-hat.png</key>
             <key type="filename">assets/accessories/xmas-scarf.png</key>
+            <key type="filename">assets/overlays/bazooka/tile1.png</key>
             <key type="filename">assets/overlays/fire/tile000.png</key>
             <key type="filename">assets/overlays/fire/tile001.png</key>
             <key type="filename">assets/overlays/fire/tile002.png</key>
@@ -253,6 +255,27 @@
             <key type="filename">assets/skins/default/flag/tile022.png</key>
             <key type="filename">assets/skins/default/flag/tile023.png</key>
             <key type="filename">assets/skins/default/flag/tile024.png</key>
+            <key type="filename">assets/skins/default/game-jump/tile0.png</key>
+            <key type="filename">assets/skins/default/game-jump/tile1.png</key>
+            <key type="filename">assets/skins/default/game-jump/tile2.png</key>
+            <key type="filename">assets/skins/default/game-jump/tile3.png</key>
+            <key type="filename">assets/skins/default/game-jump/tile4.png</key>
+            <key type="filename">assets/skins/default/game-jump/tile5.png</key>
+            <key type="filename">assets/skins/default/game-jump/tile6.png</key>
+            <key type="filename">assets/skins/default/game-jump/tile7.png</key>
+            <key type="filename">assets/skins/default/game-jump/tile8.png</key>
+            <key type="filename">assets/skins/default/game-jump/tile9.png</key>
+            <key type="filename">assets/skins/default/game-walk/tile0.png</key>
+            <key type="filename">assets/skins/default/game-walk/tile1.png</key>
+            <key type="filename">assets/skins/default/game-walk/tile10.png</key>
+            <key type="filename">assets/skins/default/game-walk/tile2.png</key>
+            <key type="filename">assets/skins/default/game-walk/tile3.png</key>
+            <key type="filename">assets/skins/default/game-walk/tile4.png</key>
+            <key type="filename">assets/skins/default/game-walk/tile5.png</key>
+            <key type="filename">assets/skins/default/game-walk/tile6.png</key>
+            <key type="filename">assets/skins/default/game-walk/tile7.png</key>
+            <key type="filename">assets/skins/default/game-walk/tile8.png</key>
+            <key type="filename">assets/skins/default/game-walk/tile9.png</key>
             <key type="filename">assets/skins/default/inspect/tile000.png</key>
             <key type="filename">assets/skins/default/inspect/tile001.png</key>
             <key type="filename">assets/skins/default/inspect/tile002.png</key>

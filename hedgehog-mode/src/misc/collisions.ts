@@ -4,4 +4,5 @@ export const COLLISIONS = {
   ACTOR: 0x0002, // 2
   PROJECTILE: 0x0004, // 4
   GROUND: 0x0008, // 8
+  WEAPON: 0x0010, // 16
 };

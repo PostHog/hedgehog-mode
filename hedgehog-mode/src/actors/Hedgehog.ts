@@ -217,11 +217,25 @@ export class HedgehogActor extends Actor {
   }
 
   pickupAccessory(accessory: string): void {
-    this.options.accessories = [...(this.options.accessories ?? []), accessory as HedgehogActorAccessoryOption];
+    this.options.accessories = [
+      ...(this.options.accessories ?? []),
+      accessory as HedgehogActorAccessoryOption,
+    ];
     this.syncAccessories();
   }
 
-  receiveDamage(amount: number): void {
+  receiveDamage(amount: number, source: Actor): void {
+    // Move away from the source
+    const xDirection =
+      source.rigidBody!.position.x > this.rigidBody!.position.x ? 1 : -1;
+    const yDirection =
+      source.rigidBody!.position.y > this.rigidBody!.position.y ? 1 : -1;
+
+    this.setVelocity({
+      x: xDirection * 10,
+      y: yDirection * 10,
+    });
+
     this.health -= amount;
 
     if (this.health <= 0) {
@@ -239,6 +253,7 @@ export class HedgehogActor extends Actor {
 
       const interval = setInterval(() => {
         const projectile = new Projectile(this.game, this);
+        this.game.world.addElement(projectile);
         projectile.fire({
           target: {
             x: pointerX,
@@ -415,7 +430,7 @@ export class HedgehogActor extends Actor {
       element.setOnFire(1);
       // If it isn't the player then damage it
       if (!element.options.player) {
-        element.receiveDamage(50);
+        element.receiveDamage(50, this);
       }
     }
 
@@ -429,7 +444,7 @@ export class HedgehogActor extends Actor {
     this.maybeSetElementOnFire(element, pair);
 
     // TODO: Check if it is a weapon and if so then pick it up
-    
+
     if (element.rigidBody!.bounds.min.y > this.rigidBody!.bounds.min.y) {
       this.game.log("Hit something below");
       this.jumps = 0;

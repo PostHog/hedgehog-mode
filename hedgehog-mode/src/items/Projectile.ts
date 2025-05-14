@@ -1,6 +1,7 @@
 import { Actor } from "../actors/Actor";
 import { Game, GameElement, UpdateTicker } from "../types";
 import { COLLISIONS } from "../misc/collisions";
+import { HedgehogActor } from "../actors/Hedgehog";
 
 let PROJECTILE_ID = 0;
 
@@ -18,7 +19,7 @@ export class Projectile extends Actor {
 
   collisionFilter = {
     category: COLLISIONS.PROJECTILE,
-    mask: COLLISIONS.PLATFORM | COLLISIONS.GROUND,
+    mask: COLLISIONS.PLATFORM | COLLISIONS.GROUND | COLLISIONS.ACTOR,
   };
 
   constructor(
@@ -37,7 +38,7 @@ export class Projectile extends Actor {
       label: "Projectile",
     });
 
-    this.loadSprite("overlays/fire/tile");
+    this.loadSprite("projectiles/missile/tile");
     this.isInteractive = false;
 
     this.sprite!.anchor.set(0.5, 0);
@@ -75,13 +76,23 @@ export class Projectile extends Actor {
   }
 
   update(ticker: UpdateTicker): void {
+    // Calculate the angle based on veloctiy
+    const angle = Math.atan2(
+      this.rigidBody!.velocity.y,
+      this.rigidBody!.velocity.x
+    );
+
+    this.forceAngle = angle;
     super.update(ticker);
   }
 
   onCollisionStart(element: GameElement, pair: Matter.Pair): void {
     pair.isActive = false;
 
-    console.log("projectile collision pair!!", element, pair);
+    if (element instanceof HedgehogActor) {
+      this.destroy();
+      element.receiveDamage(10, this);
+    }
   }
 
   destroy(): void {

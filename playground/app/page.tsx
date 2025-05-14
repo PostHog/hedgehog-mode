@@ -32,12 +32,6 @@ export default function Home() {
           <div className="relative flex flex-col w-full h-full">
             <Logo />
           </div>
-          <div className="relative flex flex-col w-full h-full">
-            <Logo />
-          </div>
-          <div className="relative flex flex-col w-full h-full">
-            <Logo />
-          </div>
         </div>
 
         <div className="absolute bottom-0 z-10 flex flex-row gap-2 p-12">

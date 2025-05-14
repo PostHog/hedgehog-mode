@@ -4,7 +4,7 @@
         <key>fileFormatVersion</key>
         <int>6</int>
         <key>texturePackerVersion</key>
-        <string>7.4.0</string>
+        <string>7.6.3</string>
         <key>autoSDSettings</key>
         <array>
             <struct type="AutoSDSettings">
@@ -124,7 +124,7 @@
             <key>data</key>
             <struct type="DataFile">
                 <key>name</key>
-                <filename>../sdk/assets/sprites.json</filename>
+                <filename>../hedgehog-mode/assets/sprites.json</filename>
             </struct>
         </map>
         <key>multiPackMode</key>
@@ -173,6 +173,7 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
+            <key type="filename">assets/accessories/bazooka.png</key>
             <key type="filename">assets/accessories/beret.png</key>
             <key type="filename">assets/accessories/cap.png</key>
             <key type="filename">assets/accessories/chef.png</key>
@@ -253,6 +254,17 @@
             <key type="filename">assets/skins/default/flag/tile022.png</key>
             <key type="filename">assets/skins/default/flag/tile023.png</key>
             <key type="filename">assets/skins/default/flag/tile024.png</key>
+            <key type="filename">assets/skins/default/game-walk/tile0.png</key>
+            <key type="filename">assets/skins/default/game-walk/tile1.png</key>
+            <key type="filename">assets/skins/default/game-walk/tile10.png</key>
+            <key type="filename">assets/skins/default/game-walk/tile2.png</key>
+            <key type="filename">assets/skins/default/game-walk/tile3.png</key>
+            <key type="filename">assets/skins/default/game-walk/tile4.png</key>
+            <key type="filename">assets/skins/default/game-walk/tile5.png</key>
+            <key type="filename">assets/skins/default/game-walk/tile6.png</key>
+            <key type="filename">assets/skins/default/game-walk/tile7.png</key>
+            <key type="filename">assets/skins/default/game-walk/tile8.png</key>
+            <key type="filename">assets/skins/default/game-walk/tile9.png</key>
             <key type="filename">assets/skins/default/inspect/tile000.png</key>
             <key type="filename">assets/skins/default/inspect/tile001.png</key>
             <key type="filename">assets/skins/default/inspect/tile002.png</key>
@@ -467,6 +479,21 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
+            <key type="filename">../../../Downloads/walk.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0,0</point_f>
+                <key>spriteScale</key>
+                <double>1</double>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>160,40,320,80</rect>
+                <key>scale9Paddings</key>
+                <rect>160,40,320,80</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
         </map>
         <key>fileLists</key>
         <map type="SpriteSheetMap">
@@ -475,6 +502,7 @@
                 <key>files</key>
                 <array>
                     <filename>assets</filename>
+                    <filename>../../../Downloads/walk.png</filename>
                 </array>
             </struct>
         </map>

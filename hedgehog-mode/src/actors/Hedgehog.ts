@@ -13,6 +13,7 @@ import { COLLISIONS } from "../misc/collisions";
 import { HedgehogActorAI } from "./hedgehog/ai";
 import { HedgehogActorControls } from "./hedgehog/controls";
 import {
+  HedgehogActorAccessoryOption,
   HedgehogActorColorOption,
   HedgehogActorOptions,
 } from "./hedgehog/config";
@@ -213,6 +214,11 @@ export class HedgehogActor extends Actor {
     });
 
     this.jumps++;
+  }
+
+  pickupAccessory(accessory: string): void {
+    this.options.accessories = [...(this.options.accessories ?? []), accessory as HedgehogActorAccessoryOption];
+    this.syncAccessories();
   }
 
   receiveDamage(amount: number): void {
@@ -422,6 +428,8 @@ export class HedgehogActor extends Actor {
     super.onCollisionStart(element, pair);
     this.maybeSetElementOnFire(element, pair);
 
+    // TODO: Check if it is a weapon and if so then pick it up
+    
     if (element.rigidBody!.bounds.min.y > this.rigidBody!.bounds.min.y) {
       this.game.log("Hit something below");
       this.jumps = 0;

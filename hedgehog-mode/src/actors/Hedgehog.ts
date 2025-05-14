@@ -17,6 +17,7 @@ import {
   HedgehogActorOptions,
 } from "./hedgehog/config";
 import { HedgehogActorInterface } from "./hedgehog/interface";
+import * as Tone from "tone";
 
 export const COLOR_TO_FILTER_MAP: Record<
   HedgehogActorColorOption,
@@ -212,6 +213,7 @@ export class HedgehogActor extends Actor {
     });
 
     this.jumps++;
+    this.game.audioContext && this.game.audioContext.triggerAttackRelease("C4", "32n", Tone.now());
   }
 
   receiveDamage(amount: number): void {
@@ -399,6 +401,7 @@ export class HedgehogActor extends Actor {
     if (element.rigidBody!.bounds.min.y > this.rigidBody!.bounds.min.y) {
       this.game.log("Hit something below");
       this.jumps = 0;
+      this.game.audioContext && this.game.audioContext.triggerAttackRelease("C2", "32n", Tone.now());
     } else {
       this.game.log("Hit something above");
       // We check if it is a platform and if so we ignore it

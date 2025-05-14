@@ -4,6 +4,7 @@ import { AnimatedSprite, Application } from "pixi.js";
 import type { SpritesManager } from "./sprites/sprites";
 import type { HedgehogActor } from "./actors/Hedgehog";
 import { HedgehogActorOptions } from "./actors/hedgehog/config";
+import { GameWorld } from "./world";
 
 export type UpdateTicker = {
   deltaMS: number;
@@ -38,12 +39,12 @@ export type Game = {
   pointerEventsEnabled: boolean;
   spritesManager: SpritesManager;
   elapsed?: number;
-  elements: GameElement[];
-  spawnHedgehog: (options?: HedgehogActorOptions) => HedgehogActor;
-  removeElement: (element: GameElement) => void;
+  // spawnHedgehog: (options?: HedgehogActorOptions) => HedgehogActor;
+  // removeElement: (element: GameElement) => void;
   log: (...args: unknown[]) => void;
   setSpeed: (speed: number) => void;
   gameUI?: GameUI;
+  world: GameWorld;
 };
 
 export type GameUI = {

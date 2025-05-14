@@ -1,18 +1,13 @@
 import gsap from "gsap";
 
 import Matter, { Render, Runner } from "matter-js";
-import { Application, SCALE_MODES } from "pixi.js";
-import { Game, GameElement, GameUI, HedgehogModeConfig } from "./types";
+import { Application } from "pixi.js";
+import { Game, GameUI, HedgehogModeConfig } from "./types";
 import { SpritesManager } from "./sprites/sprites";
 import { HedgehogActor } from "./actors/Hedgehog";
-import { Ground } from "./items/Ground";
-import { SyncedPlatform } from "./items/SyncedPlatform";
-import { Actor } from "./actors/Actor";
 import { GlobalKeyboardListeners } from "./misc/GlobalKeyboardListeners";
-import { HedgehogActorOptions } from "./actors/hedgehog/config";
-import { GameStateManager } from "./state";
 import { StaticHedgehogRenderer } from "./static-renderer/StaticHedgehog";
-import { uniqueId } from "lodash";
+import { GameWorld } from "./world";
 
 export type {
   HedgehogActorOptions,
@@ -38,7 +33,6 @@ export class HedgeHogMode implements Game {
   engine!: Matter.Engine;
   runner!: Matter.Runner;
   debugRender?: Matter.Render;
-  elements: GameElement[] = []; // TODO: Type better
   totalElapsedTime = 0;
   pointerEventsEnabled = false;
   isDebugging = false;
@@ -46,8 +40,9 @@ export class HedgeHogMode implements Game {
   mousePosition?: Matter.Vector;
   lastTime?: number;
   gameUI!: GameUI;
-  stateManager?: GameStateManager;
+  // stateManager?: GameStateManager;
   staticHedgehogRenderer: StaticHedgehogRenderer;
+  world: GameWorld;
 
   constructor(private options: HedgehogModeConfig) {
     this.spritesManager = new SpritesManager(options);
@@ -55,6 +50,7 @@ export class HedgeHogMode implements Game {
       options,
       this.spritesManager
     );
+    this.world = new GameWorld(this);
     this.setupDebugListeners();
   }
 
@@ -104,21 +100,6 @@ export class HedgeHogMode implements Game {
     this.pointerEventsEnabled = enabled;
   }
 
-  spawnHedgehog(options: HedgehogActorOptions | undefined): HedgehogActor {
-    const actor = new HedgehogActor(
-      this,
-      options || {
-        id: uniqueId("hedgehog-"),
-      }
-    );
-    this.spawnActor(actor);
-    return actor;
-  }
-
-  public spawnActor(actor: Actor): void {
-    this.elements.push(actor);
-  }
-
   async render(ref: HTMLDivElement): Promise<void> {
     this.ref = ref;
 
@@ -150,7 +131,8 @@ export class HedgeHogMode implements Game {
 
       // Update all game elements
       let shouldHavePointerEvents = false;
-      for (const el of this.elements) {
+
+      for (const el of this.world.elements) {
         el.update({ deltaMS, deltaTime: deltaMS / 1000 });
 
         if (
@@ -190,8 +172,8 @@ export class HedgeHogMode implements Game {
 
     window.addEventListener("resize", () => this.resize());
 
-    setTimeout(() => this.syncPlatforms(), 1000);
-    this.syncPlatforms();
+    // setTimeout(() => this.syncPlatforms(), 1000);
+    // this.syncPlatforms();
 
     // Add debug renderer
     this.debugRender = Render.create({
@@ -228,8 +210,9 @@ export class HedgeHogMode implements Game {
 
     new GlobalKeyboardListeners(this);
     gsap.ticker.remove(gsap.updateRoot);
-    this.elements.push(new Ground(this));
-    this.stateManager = new GameStateManager(this, this.options);
+
+    this.world.load();
+    // this.stateManager = new GameStateManager(this, this.options);
   }
 
   private onCollisionStart(event: Matter.IEventCollision<Matter.Engine>) {
@@ -265,24 +248,12 @@ export class HedgeHogMode implements Game {
   }
 
   private findElementWithRigidBody(rb: Matter.Body) {
-    return this.elements.find((element) => element.rigidBody === rb);
+    return this.world.elements.find((element) => element.rigidBody === rb);
   }
 
   setSpeed(speed: number) {
     this.engine.timing.timeScale = speed;
     gsap.globalTimeline.timeScale(speed);
-  }
-
-  removeElement(element: GameElement): void {
-    element.beforeUnload?.();
-    if (element.rigidBody) {
-      Matter.Composite.remove(this.engine.world, element.rigidBody);
-    }
-    if (element.sprite) {
-      this.app.stage.removeChild(element.sprite);
-    }
-    this.elements = this.elements.filter((el) => el != element);
-    this.log(`Removed element. Elements left: ${this.elements.length}`);
   }
 
   private resize() {
@@ -299,28 +270,27 @@ export class HedgeHogMode implements Game {
     Matter.Render.setPixelRatio(this.debugRender, window.devicePixelRatio);
   }
 
-  private syncPlatforms() {
-    if (!this.options.platformSelector) {
-      return;
-    }
-    const boxes = Array.from(
-      document.querySelectorAll(this.options.platformSelector)
-    );
-    const existingBoxes = this.elements.filter(
-      (el) => el instanceof SyncedPlatform
-    );
+  // private syncPlatforms() {
+  //   if (!this.options.platformSelector) {
+  //     return;
+  //   }
+  //   const boxes = Array.from(
+  //     document.querySelectorAll(this.options.platformSelector)
+  //   );
+  //   const existingBoxes = this.world.elements.filter(
+  //     (el) => el instanceof SyncedPlatform
+  //   );
 
-    boxes.forEach((box) => {
-      // TODO: Make this much faster...
+  //   boxes.forEach((box) => {
+  //     // TODO: Make this much faster...
+  //     if (existingBoxes.find((el) => el.ref === box)) {
+  //       return;
+  //     }
 
-      if (existingBoxes.find((el) => el.ref === box)) {
-        return;
-      }
-
-      const platform = new SyncedPlatform(this, box as HTMLElement);
-      this.elements.push(platform);
-    });
-  }
+  //     const platform = new SyncedPlatform(this, box as HTMLElement);
+  //     this.world.spawnActor(platform);
+  //   });
+  // }
 
   log(...args: unknown[]): void {
     // LATER: Add debugging option

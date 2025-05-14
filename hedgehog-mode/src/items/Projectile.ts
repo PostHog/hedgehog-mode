@@ -56,7 +56,7 @@ export class Projectile extends Actor {
     const magnitude = Math.sqrt(dx * dx + dy * dy);
 
     // Normalize the direction vector and multiply by desired speed
-    const speed = 50; // Fixed speed value
+    const speed = 40; // Fixed speed value
     const normalizedDx = (dx / magnitude) * speed;
     const normalizedDy = (dy / magnitude) * speed;
 
@@ -89,7 +89,7 @@ export class Projectile extends Actor {
   onCollisionStart(element: GameElement, pair: Matter.Pair): void {
     pair.isActive = false;
 
-    if (element instanceof HedgehogActor) {
+    if (element instanceof HedgehogActor && element !== this.source) {
       this.destroy();
       element.receiveDamage(10, this);
     }

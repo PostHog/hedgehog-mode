@@ -228,12 +228,10 @@ export class HedgehogActor extends Actor {
     // Move away from the source
     const xDirection =
       source.rigidBody!.position.x > this.rigidBody!.position.x ? 1 : -1;
-    const yDirection =
-      source.rigidBody!.position.y > this.rigidBody!.position.y ? 1 : -1;
 
-    this.setVelocity({
+    this.applyForce({
       x: xDirection * 10,
-      y: yDirection * 10,
+      y: 0,
     });
 
     this.health -= amount;
@@ -260,7 +258,7 @@ export class HedgehogActor extends Actor {
             y: pointerY,
           },
         });
-      }, 100);
+      }, 250);
 
       const onPointerMove = (e: PointerEvent) => {
         pointerX = e.clientX;

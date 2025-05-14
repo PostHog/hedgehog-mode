@@ -486,7 +486,7 @@ export class HedgehogActor extends Actor {
       duration: 3,
       ease: "elastic.out",
       onComplete: () => {
-        this.game.removeElement(this);
+        this.game.world.removeElement(this);
       },
     });
   }

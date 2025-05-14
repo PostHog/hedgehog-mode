@@ -190,6 +190,7 @@
             <key type="filename">assets/accessories/xmas-antlers.png</key>
             <key type="filename">assets/accessories/xmas-hat.png</key>
             <key type="filename">assets/accessories/xmas-scarf.png</key>
+            <key type="filename">assets/overlays/bazooka/tile1.png</key>
             <key type="filename">assets/overlays/fire/tile000.png</key>
             <key type="filename">assets/overlays/fire/tile001.png</key>
             <key type="filename">assets/overlays/fire/tile002.png</key>
@@ -254,6 +255,16 @@
             <key type="filename">assets/skins/default/flag/tile022.png</key>
             <key type="filename">assets/skins/default/flag/tile023.png</key>
             <key type="filename">assets/skins/default/flag/tile024.png</key>
+            <key type="filename">assets/skins/default/game-jump/tile0.png</key>
+            <key type="filename">assets/skins/default/game-jump/tile1.png</key>
+            <key type="filename">assets/skins/default/game-jump/tile2.png</key>
+            <key type="filename">assets/skins/default/game-jump/tile3.png</key>
+            <key type="filename">assets/skins/default/game-jump/tile4.png</key>
+            <key type="filename">assets/skins/default/game-jump/tile5.png</key>
+            <key type="filename">assets/skins/default/game-jump/tile6.png</key>
+            <key type="filename">assets/skins/default/game-jump/tile7.png</key>
+            <key type="filename">assets/skins/default/game-jump/tile8.png</key>
+            <key type="filename">assets/skins/default/game-jump/tile9.png</key>
             <key type="filename">assets/skins/default/game-walk/tile0.png</key>
             <key type="filename">assets/skins/default/game-walk/tile1.png</key>
             <key type="filename">assets/skins/default/game-walk/tile10.png</key>
@@ -479,21 +490,6 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
-            <key type="filename">../../../Downloads/walk.png</key>
-            <struct type="IndividualSpriteSettings">
-                <key>pivotPoint</key>
-                <point_f>0,0</point_f>
-                <key>spriteScale</key>
-                <double>1</double>
-                <key>scale9Enabled</key>
-                <false/>
-                <key>scale9Borders</key>
-                <rect>160,40,320,80</rect>
-                <key>scale9Paddings</key>
-                <rect>160,40,320,80</rect>
-                <key>scale9FromFile</key>
-                <false/>
-            </struct>
         </map>
         <key>fileLists</key>
         <map type="SpriteSheetMap">
@@ -502,7 +498,6 @@
                 <key>files</key>
                 <array>
                     <filename>assets</filename>
-                    <filename>../../../Downloads/walk.png</filename>
                 </array>
             </struct>
         </map>

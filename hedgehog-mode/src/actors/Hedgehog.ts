@@ -17,6 +17,7 @@ import {
   HedgehogActorOptions,
 } from "./hedgehog/config";
 import { HedgehogActorInterface } from "./hedgehog/interface";
+import { Projectile } from "../items/Projectile";
 
 export const COLOR_TO_FILTER_MAP: Record<
   HedgehogActorColorOption,
@@ -113,7 +114,7 @@ export class HedgehogActor extends Actor {
     });
 
     this.updateOptions(options);
-    this.setupSpiderHogRope();
+    this.setupPointerListener();
   }
 
   updateSprite(
@@ -222,78 +223,103 @@ export class HedgehogActor extends Actor {
     }
   }
 
-  setupSpiderHogRope(): void {
+  setupPointerListener(): void {
     window.addEventListener("pointerdown", (e) => {
-      if (this.options.skin !== "spiderhog") {
+      if (!this.options.player) {
         return;
       }
+      let pointerX = e.clientX;
+      let pointerY = e.clientY;
 
-      this.collisionFilterOverride = NO_PLATFORM_COLLISION_FILTER;
+      const interval = setInterval(() => {
+        const projectile = new Projectile(this.game, this);
+        projectile.fire({
+          target: {
+            x: pointerX,
+            y: pointerY,
+          },
+        });
+      }, 100);
 
-      const rope = Composites.stack(
-        400,
-        100,
-        1,
-        8,
-        0,
-        5,
-        (x: number, y: number) => {
-          return Bodies.rectangle(x, y, 5, 20, {
-            density: 0.0005,
-            frictionAir: 0.02,
-          });
-        }
-      );
-      Composites.chain(rope, 0.5, 0, -0.5, 0, {
-        stiffness: 0.9,
-        render: { visible: true },
-      });
-
-      const firstLink = rope.bodies[0];
-      const lastLink = rope.bodies[rope.bodies.length - 1];
-
-      const webAnchor = Constraint.create({
-        pointA: { x: e.clientX, y: e.clientY },
-        bodyB: firstLink,
-        length: 0,
-        stiffness: 1,
-        render: { visible: true },
-      });
-
-      const webAttachment = Constraint.create({
-        bodyA: lastLink,
-        bodyB: this.rigidBody!,
-        length: 10,
-        stiffness: 1,
-        render: { visible: true },
-      });
-
-      Matter.World.add(this.game.engine.world, [
-        rope,
-        webAnchor,
-        webAttachment,
-      ]);
-
-      const onDragMove = (e: PointerEvent) => {
-        webAnchor.pointA.x = e.clientX;
-        webAnchor.pointA.y = e.clientY;
+      const onPointerMove = (e: PointerEvent) => {
+        pointerX = e.clientX;
+        pointerY = e.clientY;
       };
 
-      const onDragEnd = (e: PointerEvent) => {
-        this.isDragging = false;
-        Matter.World.remove(this.game.engine.world, [
-          rope,
-          webAnchor,
-          webAttachment,
-        ]);
-
-        window.removeEventListener("pointermove", onDragMove);
-        this.collisionFilterOverride = undefined;
+      const onPointerCancel = () => {
+        clearInterval(interval);
       };
 
-      window.addEventListener("pointermove", onDragMove);
-      window.addEventListener("pointerup", onDragEnd);
-      window.addEventListener("pointercancel", onDragEnd);
+      // if (this.options.skin !== "spiderhog") {
+      //   return;
+      // }
+
+      // this.collisionFilterOverride = NO_PLATFORM_COLLISION_FILTER;
+
+      // const rope = Composites.stack(
+      //   400,
+      //   100,
+      //   1,
+      //   8,
+      //   0,
+      //   5,
+      //   (x: number, y: number) => {
+      //     return Bodies.rectangle(x, y, 5, 20, {
+      //       density: 0.0005,
+      //       frictionAir: 0.02,
+      //     });
+      //   }
+      // );
+      // Composites.chain(rope, 0.5, 0, -0.5, 0, {
+      //   stiffness: 0.9,
+      //   render: { visible: true },
+      // });
+
+      // const firstLink = rope.bodies[0];
+      // const lastLink = rope.bodies[rope.bodies.length - 1];
+
+      // const webAnchor = Constraint.create({
+      //   pointA: { x: e.clientX, y: e.clientY },
+      //   bodyB: firstLink,
+      //   length: 0,
+      //   stiffness: 1,
+      //   render: { visible: true },
+      // });
+
+      // const webAttachment = Constraint.create({
+      //   bodyA: lastLink,
+      //   bodyB: this.rigidBody!,
+      //   length: 10,
+      //   stiffness: 1,
+      //   render: { visible: true },
+      // });
+
+      // Matter.World.add(this.game.engine.world, [
+      //   rope,
+      //   webAnchor,
+      //   webAttachment,
+      // ]);
+
+      // const onDragMove = (e: PointerEvent) => {
+      //   webAnchor.pointA.x = e.clientX;
+      //   webAnchor.pointA.y = e.clientY;
+      // };
+
+      // const onDragEnd = (e: PointerEvent) => {
+      //   this.isDragging = false;
+      //   Matter.World.remove(this.game.engine.world, [
+      //     rope,
+      //     webAnchor,
+      //     webAttachment,
+      //   ]);
+
+      //   window.removeEventListener("pointermove", onDragMove);
+      //   this.collisionFilterOverride = undefined;
+      // };
+
+      window.addEventListener("pointermove", onPointerMove);
+      window.addEventListener("pointerup", onPointerCancel);
+      window.addEventListener("pointercancel", onPointerCancel);
     });
   }
 

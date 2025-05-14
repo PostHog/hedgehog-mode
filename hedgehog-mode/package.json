@@ -46,7 +46,8 @@
     "lodash": "^4.17.21",
     "matter-js": "^0.20.0",
     "pixi.js": "^8.4.0",
-    "react-shadow": "^20.6.0"
+    "react-shadow": "^20.6.0",
+    "tone": "^15.1.22"
   },
   "peerDependencies": {
     "react": "^17.0.0 || ^18.0.0",

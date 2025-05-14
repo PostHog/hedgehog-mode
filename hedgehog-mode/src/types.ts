@@ -5,6 +5,7 @@ import type { SpritesManager } from "./sprites/sprites";
 import type { HedgehogActor } from "./actors/Hedgehog";
 import { HedgehogActorOptions } from "./actors/hedgehog/config";
 import { GameWorld } from "./world";
+import * as Tone from "tone";
 
 export type UpdateTicker = {
   deltaMS: number;
@@ -45,6 +46,7 @@ export type Game = {
   setSpeed: (speed: number) => void;
   EntryUI?: EntryUI;
   world: GameWorld;
+  audioContext: any;
 };
 
 export type EntryUI = {

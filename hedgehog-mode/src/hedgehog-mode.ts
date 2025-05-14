@@ -8,6 +8,7 @@ import { HedgehogActor } from "./actors/Hedgehog";
 import { GlobalKeyboardListeners } from "./misc/GlobalKeyboardListeners";
 import { StaticHedgehogRenderer } from "./static-renderer/StaticHedgehog";
 import { GameWorld } from "./world";
+import * as Tone from "tone";
 
 export type {
   HedgehogActorOptions,
@@ -43,6 +44,7 @@ export class HedgeHogMode implements Game {
   // stateManager?: GameStateManager;
   staticHedgehogRenderer: StaticHedgehogRenderer;
   world: GameWorld;
+  audioContext: any;
 
   constructor(private options: HedgehogModeConfig) {
     this.spritesManager = new SpritesManager(options);
@@ -51,6 +53,15 @@ export class HedgeHogMode implements Game {
       this.spritesManager
     );
     this.world = new GameWorld(this);
+
+    const enableSound = async () => {
+      window.removeEventListener('keydown', enableSound);
+      await Tone.start();
+      this.audioContext = new Tone.PolySynth().toDestination();
+      this.audioContext.triggerAttackRelease("C4", "8n", Tone.now());
+    };
+    window.addEventListener('keydown', enableSound);
+
     this.setupDebugListeners();
   }
 

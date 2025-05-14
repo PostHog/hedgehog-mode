@@ -129,6 +129,9 @@ export class HedgeHogMode implements Game {
       this.totalElapsedTime += deltaMS / 1000;
       gsap.updateRoot(this.totalElapsedTime);
 
+      // Update the world (viewport)
+      this.world.update();
+
       // Update all game elements
       let shouldHavePointerEvents = false;
 

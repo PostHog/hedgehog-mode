@@ -27,7 +27,7 @@ export class GlobalKeyboardListeners {
     const lastKeys: string[] = [];
 
     const spawnHedgehog = () =>
-      this.game.spawnHedgehog({
+      this.game.world.spawnHedgehog({
         id: uniqueId("hedgehog-"),
         controls_enabled: false,
         accessories: getRandomAccessoryCombo(),

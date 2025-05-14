@@ -5,6 +5,7 @@ import { HedgehogActorOptions } from "./actors/hedgehog/config";
 import { Game, GameElement } from "./types";
 import { Ground } from "./items/Ground";
 import Matter from "matter-js";
+import { Platform } from "./items/Platform";
 
 export class GameWorld {
   elements: GameElement[] = []; // TODO: Type better
@@ -20,7 +21,24 @@ export class GameWorld {
       id: "player",
       player: true,
       controls_enabled: true,
+      ai_enabled: false,
     });
+
+    this.spawnPlatform(
+      new Platform(this.game, { x: 100, y: 100, width: 100, height: 100 })
+    );
+
+    this.spawnPlatform(
+      new Platform(this.game, { x: 100, y: 600, width: 100, height: 100 })
+    );
+
+    this.spawnPlatform(
+      new Platform(this.game, { x: 400, y: 600, width: 100, height: 100 })
+    );
+
+    this.spawnPlatform(
+      new Platform(this.game, { x: 700, y: 600, width: 100, height: 100 })
+    );
   }
 
   addElement(element: GameElement) {
@@ -29,6 +47,16 @@ export class GameWorld {
 
   public spawnActor(actor: Actor): void {
     this.elements.push(actor);
+  }
+
+  public spawnPlatform(platform: Platform): void {
+    this.elements.push(platform);
+  }
+
+  update(deltaMS: number) {
+    this.elements.forEach((el) => {
+      el.update({ deltaMS, deltaTime: deltaMS / 1000 });
+    });
   }
 
   spawnHedgehog(options: HedgehogActorOptions | undefined): HedgehogActor {

@@ -35,7 +35,7 @@ export class HedgeHogMode implements Game {
   debugRender?: Matter.Render;
   totalElapsedTime = 0;
   pointerEventsEnabled = false;
-  isDebugging = false;
+  isDebugging = true;
   spritesManager: SpritesManager;
   mousePosition?: Matter.Vector;
   lastTime?: number;
@@ -130,14 +130,12 @@ export class HedgeHogMode implements Game {
       gsap.updateRoot(this.totalElapsedTime);
 
       // Update the world (viewport)
-      this.world.update();
+      this.world.update(deltaMS);
 
       // Update all game elements
       let shouldHavePointerEvents = false;
 
       for (const el of this.world.elements) {
-        el.update({ deltaMS, deltaTime: deltaMS / 1000 });
-
         if (
           !shouldHavePointerEvents &&
           el instanceof HedgehogActor &&

@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { DialogBox } from "./components/DialogBox";
-import { GameUIDialogBoxProps } from "../types";
+import { EntryUIDialogBoxProps } from "../types";
 import { HedgeHogMode } from "../hedgehog-mode";
 
 export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
-  const [dialogBox, setDialogBox] = useState<GameUIDialogBoxProps | null>(null);
+  const [dialogBox, setDialogBox] = useState<EntryUIDialogBoxProps | null>(
+    null
+  );
   const [dialogBoxVisible, setDialogBoxVisible] = useState<boolean>(false);
   // To game should control the UI largely so we add an event listener for game modal popups
   useEffect(() => {
@@ -17,7 +19,7 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
   }, [game]);
 
   return (
-    <div className="GameUI">
+    <div className="EntryUI">
       <DialogBox
         game={game}
         actor={dialogBox?.actor}

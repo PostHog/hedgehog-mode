@@ -43,15 +43,15 @@ export type Game = {
   // removeElement: (element: GameElement) => void;
   log: (...args: unknown[]) => void;
   setSpeed: (speed: number) => void;
-  gameUI?: GameUI;
+  EntryUI?: EntryUI;
   world: GameWorld;
 };
 
-export type GameUI = {
-  showDialogBox: (dialogBox: GameUIDialogBoxProps) => void;
+export type EntryUI = {
+  showDialogBox: (dialogBox: EntryUIDialogBoxProps) => void;
 };
 
-export type GameUIAnimatedTextProps = {
+export type EntryUIAnimatedTextProps = {
   words: (string | { text: string; style?: CSSProperties })[];
   duration?: number;
   disableAnimation?: boolean;
@@ -59,9 +59,9 @@ export type GameUIAnimatedTextProps = {
   onClick?: () => void;
 };
 
-export type GameUIDialogBoxProps = {
+export type EntryUIDialogBoxProps = {
   messages: {
-    words: GameUIAnimatedTextProps["words"];
+    words: EntryUIAnimatedTextProps["words"];
     onComplete?: () => void;
   }[];
   width?: number;

@@ -229,9 +229,9 @@ export class HedgehogActor extends Actor {
     const xDirection =
       source.rigidBody!.position.x > this.rigidBody!.position.x ? 1 : -1;
 
-    this.applyForce({
+    this.setVelocity({
       x: xDirection * 10,
-      y: 0,
+      y: -1,
     });
 
     this.health -= amount;
@@ -249,7 +249,7 @@ export class HedgehogActor extends Actor {
       let pointerX = e.clientX;
       let pointerY = e.clientY;
 
-      const interval = setInterval(() => {
+      const createProjectile = () => {
         const projectile = new Projectile(this.game, this);
         this.game.world.addElement(projectile);
         projectile.fire({
@@ -258,7 +258,10 @@ export class HedgehogActor extends Actor {
             y: pointerY,
           },
         });
-      }, 250);
+      };
+
+      createProjectile();
+      const interval = setInterval(createProjectile, 250);
 
       const onPointerMove = (e: PointerEvent) => {
         pointerX = e.clientX;

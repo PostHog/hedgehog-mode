@@ -41,6 +41,8 @@ export class Projectile extends Actor {
       label: "Projectile",
     });
 
+    this.forceAngle = null;
+
     this.loadSprite("projectiles/missile/tile");
     this.isInteractive = false;
 

@@ -43,7 +43,7 @@ export class Actor implements GameElement {
     bottom: 0,
   };
 
-  forceAngle = 0;
+  forceAngle: number | null = 0;
 
   constructor(
     protected game: Game,
@@ -262,7 +262,9 @@ export class Actor implements GameElement {
     const xCenterDiff = (width - hitBoxWidth) / 2;
 
     // Keep it upright (unless overidden)
-    rigidBody.angle = this.forceAngle;
+    if (typeof this.forceAngle === "number") {
+      rigidBody.angle = this.forceAngle;
+    }
 
     sprite.x = rigidBody.position.x - xOffsetDiff + xCenterDiff;
     sprite.y = rigidBody.position.y - yOffsetDiff + yCenterDiff;

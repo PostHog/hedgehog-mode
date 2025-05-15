@@ -1,19 +1,31 @@
-import {Actor, DEFAULT_COLLISION_FILTER, NO_PLATFORM_COLLISION_FILTER,} from "./Actor";
-import {Game, GameElement, UpdateTicker} from "../types";
-import Matter, {Constraint, Pair, Vector} from "matter-js";
-import {SyncedPlatform} from "../items/SyncedPlatform";
-import {AnimatedSprite, ColorMatrixFilter, Sprite} from "pixi.js";
-import {FlameActor} from "../items/Flame";
+import {
+  Actor,
+  DEFAULT_COLLISION_FILTER,
+  NO_PLATFORM_COLLISION_FILTER,
+} from "./Actor";
+import { Game, GameElement, UpdateTicker } from "../types";
+import Matter, { Constraint, Pair, Vector } from "matter-js";
+import { SyncedPlatform } from "../items/SyncedPlatform";
+import { AnimatedSprite, ColorMatrixFilter, Sprite } from "pixi.js";
+import { FlameActor } from "../items/Flame";
 import gsap from "gsap";
-import {HedgehogActorAI} from "./hedgehog/ai";
-import {HedgehogActorControls} from "./hedgehog/controls";
-import {HedgehogActorAccessoryOption, HedgehogActorColorOption, HedgehogActorOptions,} from "./hedgehog/config";
-import {HedgehogActorInterface} from "./hedgehog/interface";
-import {Projectile} from "../items/Projectile";
-import {AvailableSpriteFrames} from "../sprites/sprites";
-import {Inventory} from "../items/Inventory";
-import {COLLISIONS} from "../misc/collisions";
-import {ActionSound, AudioManager} from "../audio";
+import { HedgehogActorAI } from "./hedgehog/ai";
+import { HedgehogActorControls } from "./hedgehog/controls";
+import {
+  HedgehogActorAccessoryOption,
+  HedgehogActorColorOption,
+  HedgehogActorOptions,
+} from "./hedgehog/config";
+import { HedgehogActorInterface } from "./hedgehog/interface";
+import { Projectile } from "../items/Projectile";
+import * as Tone from "tone";
+import { AvailableSpriteFrames } from "../sprites/sprites";
+import { Inventory } from "../items/Inventory";
+import { COLLISIONS } from "../misc/collisions";
+import { ActionSound, AudioManager } from "../audio";
+
+export const PLAYER_HEALTH = 300;
+export const ENEMY_HEALTH = 100;
 
 export const COLOR_TO_FILTER_MAP: Record<
   HedgehogActorColorOption,
@@ -127,6 +139,8 @@ export class HedgehogActor extends Actor {
       };
       window.addEventListener("mousemove", this.mouseMoveHandler);
     }
+
+    this.health = this.options.player ? PLAYER_HEALTH : ENEMY_HEALTH;
   }
 
   updateSprite(
@@ -553,9 +567,8 @@ export class HedgehogActor extends Actor {
     if (element.rigidBody!.bounds.min.y > this.rigidBody!.bounds.min.y) {
       this.game.log("Hit something below");
       this.jumps = 0;
-      // this.game.audioContext &&
-      //   this.game.audioContext.triggerAttackRelease("C2", "32n", Tone.now());
-      AudioManager.getInstance().play(ActionSound.LAND);
+      this.game.audioContext &&
+        this.game.audioContext.triggerAttackRelease("C2", "32n", Tone.now());
     } else {
       this.game.log("Hit something above");
       // We check if it is a platform and if so we ignore it

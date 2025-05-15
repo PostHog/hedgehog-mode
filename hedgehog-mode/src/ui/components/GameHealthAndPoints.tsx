@@ -1,6 +1,7 @@
 import React from "react";
 import { HedgeHogMode } from "../../hedgehog-mode";
 import { PizzaHealthIndicator } from "./PizzaHealthIndicator";
+import { PLAYER_HEALTH } from "../../actors/Hedgehog";
 
 interface GameHealthAndPointsProps {
   game: HedgeHogMode;
@@ -9,7 +10,7 @@ interface GameHealthAndPointsProps {
 }
 
 const calculateDamage = (health: number) => {
-  const totalDamage = 100 - health;
+  const totalDamage = PLAYER_HEALTH - health;
   const damage = Math.floor(totalDamage / 10) - 1;
   return damage;
 };

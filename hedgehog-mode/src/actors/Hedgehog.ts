@@ -134,12 +134,6 @@ export class HedgehogActor extends Actor {
         this.mouseY = e.clientY;
       };
       window.addEventListener("mousemove", this.mouseMoveHandler);
-
-      // TODO: Remove
-
-      // setTimeout(() => {
-      //   this.destroy();
-      // }, 1000);
     }
   }
 

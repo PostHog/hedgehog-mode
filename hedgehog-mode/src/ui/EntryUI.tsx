@@ -3,6 +3,7 @@ import { DialogBox } from "./components/DialogBox";
 import { EntryUIDialogBoxProps } from "../types";
 import { HedgeHogMode } from "../hedgehog-mode";
 import { GameConsole } from "./components/GameConsole";
+import { GameOverUI } from "./components/GameOverUI";
 
 export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
   /** force a repaint ~10×/sec so the numbers tick up in real-time */
@@ -12,6 +13,7 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
     return () => clearInterval(id);
   }, []);
   const [consoleVisible, setConsoleVisible] = useState(true);
+  const [gameOverVisible, setGameOverVisible] = useState(false);
 
   const [dialogBox, setDialogBox] = useState<EntryUIDialogBoxProps | null>(
     null
@@ -23,6 +25,21 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
       showDialogBox: (dialogBox) => {
         setDialogBoxVisible(true);
         setDialogBox(dialogBox);
+      },
+      clear: () => {
+        setDialogBoxVisible(false);
+        setDialogBox(null);
+        setConsoleVisible(false);
+      },
+      showGameOver: () => {
+        setDialogBoxVisible(false);
+        setConsoleVisible(false);
+        setGameOverVisible(true);
+      },
+      showStartScreen: () => {
+        setDialogBoxVisible(false);
+        setConsoleVisible(true);
+        setGameOverVisible(false);
       },
     });
   }, [game]);
@@ -47,6 +64,12 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
         game={game}
         visible={consoleVisible}
         onClose={() => setConsoleVisible(false)}
+      />
+
+      <GameOverUI
+        game={game}
+        visible={gameOverVisible}
+        onClose={() => setGameOverVisible(false)}
       />
     </div>
   );

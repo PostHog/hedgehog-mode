@@ -54,6 +54,9 @@ export type Game = {
 
 export type EntryUI = {
   showDialogBox: (dialogBox: EntryUIDialogBoxProps) => void;
+  clear: () => void;
+  showGameOver: () => void;
+  showStartScreen: () => void;
 };
 
 export type EntryUIAnimatedTextProps = {

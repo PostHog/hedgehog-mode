@@ -360,6 +360,39 @@ const baseStyles = `
     border: 2px solid var(--color-border);
   }
 
+
+
+  .GameOverUI {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .GameOverUI-image {
+    margin-bottom: 250px;
+    transform: translateY(100px);
+    transition: all 3s ease-out;
+    opacity: 0;
+  }
+
+
+  .GameOverUI--showing {
+    .GameOverUI-image {
+      transform: translateY(0px);
+      opacity: 1;
+    }
+  }
+
+  .GameOverUI--exiting {
+    .GameOverUI-image {
+      transform: translateY(-100px);
+      opacity: 0;
+    }
+  }
+
 `;
 
 const utils = `

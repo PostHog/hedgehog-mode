@@ -239,6 +239,13 @@ export class HedgehogActor extends Actor {
 
     this.health -= amount;
 
+    this.updateSprite("shock", {
+      reset: true,
+      onComplete: () => {
+        this.updateSprite("wave");
+      },
+    });
+
     if (this.health <= 0) {
       this.destroy();
     }
@@ -373,16 +380,18 @@ export class HedgehogActor extends Actor {
       });
     }
 
-    // Set the appropriate animation
-    if (!this.getGround()) {
-      this.updateSprite("fall");
-    } else if (Math.abs(this.rigidBody!.velocity.x) > 0.1) {
-      // If horizontal movement is noticeable then walk
-      this.updateSprite("walk");
-    } else if (["fall", "walk"].includes(this.currentSprite)) {
-      // NOTE:  wave is just used as a placeholder anim. WE should have a dedicated idle animation
-      this.updateSprite("wave");
-      this.sprite!.stop();
+    if (!["shock", "wave"].includes(this.currentSprite)) {
+      // Set the appropriate animation unless certain ones are playing
+      if (!this.getGround()) {
+        this.updateSprite("fall");
+      } else if (Math.abs(this.rigidBody!.velocity.x) > 0.1) {
+        // If horizontal movement is noticeable then walk
+        this.updateSprite("walk");
+      } else if (["fall", "walk"].includes(this.currentSprite)) {
+        // NOTE:  wave is just used as a placeholder anim. WE should have a dedicated idle animation
+        this.updateSprite("wave");
+        this.sprite!.stop();
+      }
     }
 
     // We want to make it look like the hedgehog's accessories are disconnected. If we are falling then we position them slightly above

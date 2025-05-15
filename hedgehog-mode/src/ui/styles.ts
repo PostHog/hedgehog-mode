@@ -322,6 +322,7 @@ const baseStyles = `
   .GameConsole-ControlPanel {
     flex: 1;
     max-width: 250px;
+    padding-top: 1rem;
   }
 
   .GameConsole-ControlPanel-status-pizza {
@@ -374,6 +375,10 @@ const utils = `
 
   .gap-4 {
     gap: 1rem;
+  }
+
+  .gap-8 {
+    gap: 2rem;
   }
 
   .justify-center {

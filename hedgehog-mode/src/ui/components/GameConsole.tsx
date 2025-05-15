@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { HedgeHogMode } from "../../hedgehog-mode";
 import { HedgehogActor } from "../../actors/Hedgehog";
 import { Weapon, Weapons } from "./Weapon";
+import { PizzaHealthIndicator } from "./PizzaHealthIndicator";
 
 interface GameConsoleProps {
   game: HedgeHogMode;
@@ -45,9 +46,9 @@ export function GameConsole({ game, visible, onClose }: GameConsoleProps) {
       <div className="GameConsole-content pixel-corners">
         <div className="GameConsole-body">
           <div className="GameConsole-GameView pixel-corners"></div>
-          <div className="GameConsole-ControlPanel flex flex-col gap-4">
+          <div className="GameConsole-ControlPanel flex flex-col gap-8">
             <div className="GameConsole-ControlPanel-status flex flex-row gap-4 justify-between items-center">
-              <div className="GameConsole-ControlPanel-status-pizza"></div>
+              <PizzaHealthIndicator game={game} damage={1} />
               <div className="GameConsole-ControlPanel-status-points flex flex-row gap-2 items-center">
                 <div className="GameConsole-ControlPanel-status-count">215</div>
                 <div className="GameConsole-ControlPanel-status-pineapple"></div>

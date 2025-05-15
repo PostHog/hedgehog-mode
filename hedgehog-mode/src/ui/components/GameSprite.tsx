@@ -11,6 +11,9 @@ export function GameSprite({
   if (!game) return null;
   const spriteBaseUrl = game.spritesManager.assetUrl("sprites.png");
   const details = game.spritesManager.getSpriteFrames(spriteName);
+  const backgroundSize = game.spritesManager.spritesheet?.data.meta.size;
+  const backgroundWidth = backgroundSize?.w;
+  const backgroundHeight = backgroundSize?.h;
   const width = details.frame.width;
   const height = details.frame.height;
   const x = details.frame.x;
@@ -23,8 +26,8 @@ export function GameSprite({
         width: `${width}px`,
         height: `${height}px`,
         backgroundImage: `url(${spriteBaseUrl})`,
-        backgroundPosition: `-${x}px ${y}px`,
-        backgroundSize: "2000px 2000px",
+        backgroundPosition: `-${x}px -${y}px`,
+        backgroundSize: `${backgroundWidth}px ${backgroundHeight}px`,
         imageRendering: "pixelated",
       }}
     />

@@ -54,12 +54,12 @@ export function GameConsole({ game, visible, onClose }: GameConsoleProps) {
               </div>
             </div>
             <div className="GameConsole-ControlPanel-weapons flex flex-row gap-2 justify-center wrap">
-              <Weapon />
-              <Weapon />
-              <Weapon />
-              <Weapon />
-              <Weapon />
-              <Weapon />
+              <Weapon game={game} />
+              <Weapon game={game} />
+              <Weapon game={game} />
+              <Weapon game={game} />
+              <Weapon game={game} />
+              <Weapon game={game} />
             </div>
             <div className="GameConsole-ControlPanel-controls">
               <div className="GameConsole-ControlPanel-control-option">
@@ -76,7 +76,13 @@ export function GameConsole({ game, visible, onClose }: GameConsoleProps) {
               </div>
             </div>
             <div className="GameConsole-ControlPanel-options"></div>
-            <div className="GameConsole-ControlPanel-logo"></div>
+            <div className="GameConsole-ControlPanel-logo">
+              <img
+                src="/assets/hogwars.png"
+                alt="Hogwars Logo"
+                className="w-full h-auto max-w-full"
+              />
+            </div>
           </div>
         </div>
       </div>

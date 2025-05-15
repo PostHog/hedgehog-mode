@@ -53,6 +53,8 @@ const baseStyles = `
     position: fixed;
     inset: 0;
     z-index: 1;
+    background: url('/assets/background.png');
+    background-size: cover;
   }
 
   .EntryUI {

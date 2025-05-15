@@ -71,10 +71,11 @@ export class FloatingPlatform implements GameElement {
     while (stripeY < h / 2 - 1) {
       const height = Math.min(STRIPE_H, h / 2 - stripeY);
       const baseCol = SOIL_STRATA[idx % SOIL_STRATA.length];
+      const localRadius = stripeY < h / 2 - RADIUS ? 0 : RADIUS;
 
       this.gfx.beginFill(baseCol);
       // keep a margin equal to radius so the rounded corners stay visible
-      this.gfx.drawRect(-w / 2 + RADIUS, stripeY, w - RADIUS * 2, height);
+      this.gfx.drawRect(-w / 2 + localRadius, stripeY, w - localRadius * 2, height);
       this.gfx.endFill();
 
       stripeY += height;

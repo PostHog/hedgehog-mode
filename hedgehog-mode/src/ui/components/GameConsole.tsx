@@ -79,6 +79,7 @@ export function GameConsole({ game, visible, onClose }: GameConsoleProps) {
                   game={game}
                   health={playerHealth}
                   points={kills}
+                  size="large"
                 />
                 <Weapons game={game} />
               </>

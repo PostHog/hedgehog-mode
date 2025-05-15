@@ -7,6 +7,7 @@ interface PizzaHealthIndicatorProps {
   game: HedgeHogMode;
   damage: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
   className?: string;
+  size: "small" | "large";
 }
 
 const getPizzaSpriteName = (damage: number): AvailableSpriteFrames => {
@@ -18,6 +19,7 @@ export function PizzaHealthIndicator({
   game,
   damage,
   className = "",
+  size = "small",
 }: PizzaHealthIndicatorProps) {
   // Ensure health is between 0 and 7
   const clampedDamage = Math.max(0, Math.min(8, damage));
@@ -32,7 +34,7 @@ export function PizzaHealthIndicator({
         spriteName={spriteName}
         translateX={0}
         translateY={0}
-        scale={1.5}
+        scale={size === "large" ? 1.5 : 1}
       />
     </div>
   );

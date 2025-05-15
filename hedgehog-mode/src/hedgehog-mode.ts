@@ -71,6 +71,8 @@ export class HedgeHogMode implements Game {
 
   destroy(): void {
     Runner.stop(this.runner);
+
+    this.world.beforeUnload();
     this.app.destroy({
       removeView: true,
     });

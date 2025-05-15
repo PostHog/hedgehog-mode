@@ -1,4 +1,4 @@
-import { Actor, DEFAULT_COLLISION_FILTER } from "./Actor";
+import { Actor } from "./Actor";
 import { Game, UpdateTicker } from "../types";
 import { COLLISIONS } from "../misc/collisions";
 import gsap from "gsap";

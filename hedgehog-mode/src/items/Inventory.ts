@@ -60,15 +60,18 @@ export class Inventory extends Actor {
     }
 
     // Set initial position (if needed)
-    // this.sprite.x = this.rigidBody?.position.x ?? 0;
-    // this.sprite.y = this.rigidBody?.position.y ?? 0;
     this.sprite.visible = true;
 
     this.setScale(0.8);
+
+    this.setPosition({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+    });
   }
 
   onCollisionStart(element: GameElement, pair: Matter.Pair): void {
     super.onCollisionStart(element, pair);
     // You can add custom collision behavior here
   }
-} 
+}

@@ -1,8 +1,7 @@
 import { getRandomAccessoryCombo } from "../hedgehog-mode";
-import { Platform } from "../items/Platform";
 import { Game } from "../types";
 import { Terrain } from "../items/Terrain";
-import {Ground} from "../items/Ground";
+import { Ground } from "../items/Ground";
 
 export class MainLevel {
   constructor(private game: Game) {}
@@ -27,42 +26,12 @@ export class MainLevel {
     const player = this.game.world.spawnPlayer();
 
     this.game.world.spawnRandomInventory();
-
-    this.game.world.spawnHedgehog({
-      id: "enemy-hedgehog-1",
-      player: false,
-      controls_enabled: false,
-      ai_enabled: true,
-      accessories: getRandomAccessoryCombo(),
-    });
-
-    this.game.world.spawnHedgehog({
-      id: "enemy-hedgehog-2",
-      player: false,
-      controls_enabled: false,
-      ai_enabled: true,
-      accessories: getRandomAccessoryCombo(),
-    });
-
-    this.game.world.spawnHedgehogGhost({
-      x: 100,
-      y: 100,
-    });
+    this.game.world.spawnRandomInventory();
+    this.game.world.spawnRandomInventory();
 
     player.setPosition({
       x: 100,
       y: 100,
     });
-
-    for (let i = 0; i < 10; i++) {
-      this.game.world.addElement(
-        new Platform(this.game, {
-          x: 100 + i * 250,
-          y: window.innerHeight - 300,
-          width: 200,
-          height: 50,
-        })
-      );
-    }
   }
 }

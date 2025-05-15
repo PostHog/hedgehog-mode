@@ -4,7 +4,7 @@
         <key>fileFormatVersion</key>
         <int>6</int>
         <key>texturePackerVersion</key>
-        <string>7.4.0</string>
+        <string>7.6.3</string>
         <key>autoSDSettings</key>
         <array>
             <struct type="AutoSDSettings">
@@ -189,7 +189,8 @@
             <key type="filename">assets/accessories/xmas-antlers.png</key>
             <key type="filename">assets/accessories/xmas-hat.png</key>
             <key type="filename">assets/accessories/xmas-scarf.png</key>
-            <key type="filename">assets/overlays/bazooka/tile1.png</key>
+            <key type="filename">assets/overlays/bazooka/tile001.png</key>
+            <key type="filename">assets/overlays/bazooka/tile002.png</key>
             <key type="filename">assets/overlays/fire/tile000.png</key>
             <key type="filename">assets/overlays/fire/tile001.png</key>
             <key type="filename">assets/overlays/fire/tile002.png</key>

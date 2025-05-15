@@ -14,12 +14,14 @@ import { Inventory } from "./items/Inventory";
 import { Actor } from "./actors/Actor";
 import { Platform } from "./items/Platform";
 import { Accessory } from "./items/Accessory";
+import { FloatingPlatform } from "./items/FloatingPlatform";
 
 export class GameWorld {
   elements: GameElement[] = []; // TODO: Type better
   timers: NodeJS.Timeout[] = [];
   wave: number = 0;
   enemies: HedgehogActor[] = [];
+  kills: number = 0;
 
   constructor(private game: Game) {
     this.game = game;
@@ -36,6 +38,7 @@ export class GameWorld {
 
   load() {
     new MainLevel(this.game).load();
+    this.spawnPlatformsForWave();
 
     this.setTimeout(() => {
       this.startWave();
@@ -56,6 +59,45 @@ export class GameWorld {
     for (let i = 0; i < this.wave; i++) {
       this.spawnEnemy();
     }
+    this.spawnPlatformsForWave();
+  }
+
+  /* ─────────────────────────────────────────────────────────── */
+  /*  Helper: keep ≤ 3 platforms, add 1–2 each wave              */
+  /* ─────────────────────────────────────────────────────────── */
+  private spawnPlatformsForWave(): void {
+    const existing = this.elements.filter(
+      (e) => e instanceof FloatingPlatform
+    ) as FloatingPlatform[];
+
+    const slotsLeft = 3 - existing.length;
+    if (slotsLeft <= 0) return;
+
+    const toSpawn = Math.min(slotsLeft, 1 + Math.floor(Math.random() * 2));
+
+    for (let i = 0; i < toSpawn; i++) {
+      const UPPER_LIMIT = 50; // y-coordinate
+      const LOWER_LIMIT = window.innerHeight - 120; // just above terrain
+
+      const amplitude = Math.max(
+        20, // fail-safe minimum
+        (LOWER_LIMIT - UPPER_LIMIT) / 2
+      );
+      const baseY = UPPER_LIMIT + amplitude; // midpoint
+
+      const x = Math.random() * window.innerWidth; // anywhere onscreen
+
+      this.spawnPlatform(
+        new FloatingPlatform(this.game, {
+          x,
+          y: baseY,
+          width: 140 + Math.random() * 100,
+          height: 32,
+          amplitude: amplitude,
+          period: 12000 + Math.random() * 5000,
+        })
+      );
+    }
   }
 
   addElement(element: GameElement) {
@@ -66,7 +108,7 @@ export class GameWorld {
     this.elements.push(actor);
   }
 
-  public spawnPlatform(platform: Platform): void {
+  public spawnPlatform(platform: Platform | FloatingPlatform): void {
     this.elements.push(platform);
   }
 
@@ -156,6 +198,7 @@ export class GameWorld {
     this.game.log(`Removed enemy. Elements left: ${this.elements.length}`);
 
     this.enemies = this.enemies.filter((e) => e != enemy);
+    this.kills++;
 
     if (this.enemies.length === 0) {
       this.game.log("No enemies left. Starting next wave...");

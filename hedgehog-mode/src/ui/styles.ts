@@ -18,6 +18,8 @@ const baseStyles = `
     --game-color-background: #c8a989;
     --game-color-background-dark: #b89065;
     --game-color-text-dark: #593a17;
+    --game-color-red: #c22324;
+    --game-color-red-light: #ca8272;
     display: block;
     background-color: transparent;
   }
@@ -320,6 +322,7 @@ const baseStyles = `
   .GameConsole-ControlPanel {
     flex: 1;
     max-width: 250px;
+    padding-top: 1rem;
   }
 
   .GameConsole-ControlPanel-status-pizza {
@@ -374,6 +377,10 @@ const utils = `
     gap: 1rem;
   }
 
+  .gap-8 {
+    gap: 2rem;
+  }
+
   .justify-center {
     justify-content: center;
   }
@@ -396,6 +403,9 @@ const utils = `
 
   .max-w-full {
     max-width: 100%;
+  }
+  .bg-red-light {
+    background-color: var(--game-color-red-light);
   }
 `;
 
@@ -691,6 +701,24 @@ const pixelCornersGray2 = `
   }
   .pixel-corners-gray-2::after {
     margin: -4px;
+  }
+  .pixel-corners-red::after,
+  .pixel-corners-red--wrapper::after {
+    background: var(--game-color-red);
+  }
+  .Scoreboard {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    padding: 4px 8px;
+    font-family: monospace;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(0,0,0,0.5);
+    border-radius: 4px;
+    z-index: 10000;
+    user-select: none;
+    pointer-events: none;
   }
 `;
 

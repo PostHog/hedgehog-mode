@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { HedgeHogMode } from "../../hedgehog-mode";
 import { HedgehogActor } from "../../actors/Hedgehog";
-import { Weapon } from "./Weapon";
+import { Weapon, Weapons } from "./Weapon";
 
 interface GameConsoleProps {
   game: HedgeHogMode;
@@ -53,14 +53,7 @@ export function GameConsole({ game, visible, onClose }: GameConsoleProps) {
                 <div className="GameConsole-ControlPanel-status-pineapple"></div>
               </div>
             </div>
-            <div className="GameConsole-ControlPanel-weapons flex flex-row gap-2 justify-center wrap">
-              <Weapon game={game} />
-              <Weapon game={game} />
-              <Weapon game={game} />
-              <Weapon game={game} />
-              <Weapon game={game} />
-              <Weapon game={game} />
-            </div>
+            <Weapons game={game} />
             <div className="GameConsole-ControlPanel-controls">
               <div className="GameConsole-ControlPanel-control-option">
                 <div className="GameConsole-ControlPanel-control-option-icon"></div>

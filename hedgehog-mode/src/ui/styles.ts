@@ -18,6 +18,8 @@ const baseStyles = `
     --game-color-background: #c8a989;
     --game-color-background-dark: #b89065;
     --game-color-text-dark: #593a17;
+    --game-color-red: #c22324;
+    --game-color-red-light: #ca8272;
     display: block;
     background-color: transparent;
   }
@@ -397,6 +399,9 @@ const utils = `
   .max-w-full {
     max-width: 100%;
   }
+  .bg-red-light {
+    background-color: var(--game-color-red-light);
+  }
 `;
 
 const pixelCorners = `
@@ -691,6 +696,10 @@ const pixelCornersGray2 = `
   }
   .pixel-corners-gray-2::after {
     margin: -4px;
+  }
+  .pixel-corners-red::after,
+  .pixel-corners-red--wrapper::after {
+    background: var(--game-color-red);
   }
 `;
 

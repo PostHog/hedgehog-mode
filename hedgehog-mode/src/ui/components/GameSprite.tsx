@@ -4,9 +4,13 @@ import { AvailableSpriteFrames } from "../../sprites/sprites";
 export function GameSprite({
   game,
   spriteName,
+  translateX,
+  translateY,
 }: {
   game?: HedgeHogMode;
   spriteName: AvailableSpriteFrames;
+  translateX: number;
+  translateY: number;
 }) {
   if (!game) return null;
   const spriteBaseUrl = game.spritesManager.assetUrl("sprites.png");
@@ -29,6 +33,7 @@ export function GameSprite({
         backgroundPosition: `-${x}px -${y}px`,
         backgroundSize: `${backgroundWidth}px ${backgroundHeight}px`,
         imageRendering: "pixelated",
+        transform: `translate(${translateX}px, ${translateY}px)`,
       }}
     />
   );

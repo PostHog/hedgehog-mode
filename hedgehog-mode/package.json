@@ -46,6 +46,9 @@
     "lodash": "^4.17.21",
     "matter-js": "^0.20.0",
     "pixi.js": "^8.4.0",
+    "simplex-noise": "^4.0.3",
+    "alea": "^1.0.1",
+    "poly-decomp": "^0.3.0",
     "react-shadow": "^20.6.0",
     "tone": "^15.1.22"
   },

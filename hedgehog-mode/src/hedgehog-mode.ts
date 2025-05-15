@@ -1,6 +1,7 @@
 import gsap from "gsap";
 
 import Matter, { Render, Runner } from "matter-js";
+import decomp from 'poly-decomp';
 import { Application } from "pixi.js";
 import { Game, EntryUI, HedgehogModeConfig } from "./types";
 import { SpritesManager } from "./sprites/sprites";
@@ -10,6 +11,8 @@ import { StaticHedgehogRenderer } from "./static-renderer/StaticHedgehog";
 import { GameWorld } from "./world";
 import * as Tone from "tone";
 import {PolySynth} from "tone";
+
+Matter.Common.setDecomp(decomp)
 
 export type {
   HedgehogActorOptions,

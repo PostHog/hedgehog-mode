@@ -635,10 +635,8 @@ export class HedgehogActor extends Actor {
     });
 
     // Remove attached inventory sprites from hedgehog sprite
-    this.attachedInventorySprites.forEach((sprite) => {
-      this.sprite!.removeChild(sprite);
-    });
-    this.attachedInventorySprites = [];
+    this.attachedInventorySprite && this.sprite!.removeChild(this.attachedInventorySprite);
+    this.attachedInventorySprite = undefined;
 
     this.inventories.forEach((inventory) => {
       const newItem = this.game.world.spawnInventory(inventory.type);

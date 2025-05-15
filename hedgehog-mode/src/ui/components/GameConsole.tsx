@@ -10,6 +10,10 @@ interface GameConsoleProps {
 }
 
 export function GameConsole({ game, visible, onClose }: GameConsoleProps) {
+  const player = game.getPlayer();
+
+  // TODO: Loop to make sure we get updates - we can then use the player info the render the inventoruy
+
   useEffect(() => {
     if (visible) {
       // Hide all hedgehogs when game console is visible

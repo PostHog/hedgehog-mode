@@ -32,7 +32,6 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
           dialogBox?.onClose?.();
         }}
       ></DialogBox>
-      <GameConsole game={game} visible={true} onClose={() => {}} />
     </div>
   );
 }

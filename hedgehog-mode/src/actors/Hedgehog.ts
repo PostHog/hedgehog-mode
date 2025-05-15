@@ -452,7 +452,6 @@ export class HedgehogActor extends Actor {
     // if not player, point to player
     // If the player is holding an inventory then we want to position it in front of the hedgehog
     if (this.attachedInventorySprite) {
-      
       if (this.options.player) {
         // Update sprite to holding versions
         this.updateSprite("game-hold");
@@ -463,15 +462,16 @@ export class HedgehogActor extends Actor {
           this.mouseY - hedgehogGlobal.y,
           this.mouseX - hedgehogGlobal.x
         );
-        
+
         const facingLeft = parentScaleX < 0;
-        
+
         // Flip gun vertically if the angle is on the "opposite" side
-        const shouldFlipY = (facingLeft && angle > -Math.PI / 2 && angle < Math.PI / 2) ||
-                            (!facingLeft && (angle < -Math.PI / 2 || angle > Math.PI / 2));
-        
+        const shouldFlipY =
+          (facingLeft && angle > -Math.PI / 2 && angle < Math.PI / 2) ||
+          (!facingLeft && (angle < -Math.PI / 2 || angle > Math.PI / 2));
+
         this.attachedInventorySprite.scale.y = shouldFlipY ? -1 : 1;
-        
+
         if (facingLeft) {
           // Flip angle across vertical axis
           this.attachedInventorySprite.rotation = Math.PI - angle;
@@ -479,7 +479,9 @@ export class HedgehogActor extends Actor {
           this.attachedInventorySprite.rotation = angle;
         }
       } else {
-        const player = this.game.world.elements.find(e => e instanceof HedgehogActor && e.options.player);
+        const player = this.game.world.elements.find(
+          (e) => e instanceof HedgehogActor && e.options.player
+        );
         if (player) {
           const playerGlobal = player.sprite!.getGlobalPosition();
           const enemyGlobal = this.sprite!.getGlobalPosition();
@@ -489,8 +491,12 @@ export class HedgehogActor extends Actor {
           );
           const parentScaleX = this.sprite!.scale.x;
           const facingLeft = parentScaleX < 0;
-          const shouldFlipY = (facingLeft && angleToPlayer > -Math.PI / 2 && angleToPlayer < Math.PI / 2) ||
-                              (!facingLeft && (angleToPlayer < -Math.PI / 2 || angleToPlayer > Math.PI / 2));
+          const shouldFlipY =
+            (facingLeft &&
+              angleToPlayer > -Math.PI / 2 &&
+              angleToPlayer < Math.PI / 2) ||
+            (!facingLeft &&
+              (angleToPlayer < -Math.PI / 2 || angleToPlayer > Math.PI / 2));
           this.attachedInventorySprite.scale.y = shouldFlipY ? -1 : 1;
           if (facingLeft) {
             this.attachedInventorySprite.rotation = Math.PI - angleToPlayer;
@@ -499,7 +505,6 @@ export class HedgehogActor extends Actor {
           }
         }
       }
-
     }
   }
 
@@ -583,7 +588,8 @@ export class HedgehogActor extends Actor {
     this.sprite!.addChild(attachedSprite);
     attachedSprite.scale.set(inventory.scale);
     // TODO first remove any existing inventory sprites
-    this.attachedInventorySprite && this.sprite!.removeChild(this.attachedInventorySprite);
+    this.attachedInventorySprite &&
+      this.sprite!.removeChild(this.attachedInventorySprite);
     // TODO make this single
     this.attachedInventorySprite = attachedSprite;
   };
@@ -635,7 +641,8 @@ export class HedgehogActor extends Actor {
     });
 
     // Remove attached inventory sprites from hedgehog sprite
-    this.attachedInventorySprite && this.sprite!.removeChild(this.attachedInventorySprite);
+    this.attachedInventorySprite &&
+      this.sprite!.removeChild(this.attachedInventorySprite);
     this.attachedInventorySprite = undefined;
 
     this.inventories.forEach((inventory) => {
@@ -681,7 +688,8 @@ export class HedgehogActor extends Actor {
       this.game.app.stage.removeChild(sprite);
     });
     // Remove attached inventory sprites from hedgehog sprite
-    this.attachedInventorySprite && this.sprite!.removeChild(this.attachedInventorySprite);
+    this.attachedInventorySprite &&
+      this.sprite!.removeChild(this.attachedInventorySprite);
     this.attachedInventorySprite = undefined;
 
     // Remove mousemove event listener if set

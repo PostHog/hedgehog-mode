@@ -10,7 +10,7 @@ export type InventoryItemType = (typeof INVENTORY_ITEMS)[number];
 
 export interface InventoryOptions {
   type: InventoryItemType;
-  scale: number;
+  scale?: number;
   // Add more properties as needed (ammo, damage, etc.)
 }
 

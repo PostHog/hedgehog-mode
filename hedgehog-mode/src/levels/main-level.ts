@@ -37,11 +37,11 @@ export class MainLevel {
     });
 
     for (let i = 0; i < 10; i++) {
-      this.game.world.spawnPlatform(
+      this.game.world.addElement(
         new Platform(this.game, {
-          x: 100 + i * 200,
+          x: 100 + i * 250,
           y: window.innerHeight - 100,
-          width: 100,
+          width: 200,
           height: 50,
         })
       );

@@ -89,10 +89,10 @@ export class Projectile extends Actor {
 
   onCollisionStart(element: GameElement, pair: Matter.Pair): void {
     pair.isActive = false;
+    this.destroy();
 
     if (element instanceof HedgehogActor && element !== this.source) {
-      this.destroy();
-      element.receiveDamage(120, this);
+      element.receiveDamage(20, this);
     }
   }
 

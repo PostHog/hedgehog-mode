@@ -1,10 +1,8 @@
 import { uniqueId } from "lodash";
-import { Actor } from "./actors/Actor";
 import { HedgehogActor } from "./actors/Hedgehog";
 import { HedgehogActorOptions } from "./actors/hedgehog/config";
 import { Game, GameElement } from "./types";
 import Matter from "matter-js";
-import { Platform } from "./items/Platform";
 import { MainLevel } from "./levels/main-level";
 import { HedgehogGhostActor } from "./actors/Ghost";
 
@@ -21,14 +19,6 @@ export class GameWorld {
 
   addElement(element: GameElement) {
     this.elements.push(element);
-  }
-
-  public spawnActor(actor: Actor): void {
-    this.elements.push(actor);
-  }
-
-  public spawnPlatform(platform: Platform): void {
-    this.elements.push(platform);
   }
 
   update(deltaMS: number) {
@@ -53,13 +43,13 @@ export class GameWorld {
         id: uniqueId("hedgehog-"),
       }
     );
-    this.spawnActor(actor);
+    this.addElement(actor);
     return actor;
   }
 
   spawnHedgehogGhost(position: Matter.Vector): HedgehogGhostActor {
     const ghost = new HedgehogGhostActor(this.game, position);
-    this.spawnActor(ghost);
+    this.addElement(ghost);
     return ghost;
   }
 

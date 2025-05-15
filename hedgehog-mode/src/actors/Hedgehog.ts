@@ -549,23 +549,21 @@ export class HedgehogActor extends Actor {
 
     this.game.world.spawnHedgehogGhost(this.rigidBody!.position);
 
-    this.game.world.removeElement(this);
-
     // Remove attached inventory sprites
-    // this.attachedInventorySprites.forEach((sprite) => {
-    //   this.sprite!.removeChild(sprite);
-    // });
-    // this.attachedInventorySprites = [];
+    this.attachedInventorySprites.forEach((sprite) => {
+      this.sprite!.removeChild(sprite);
+    });
+    this.attachedInventorySprites = [];
 
-    // gsap.to(this.sprite!.scale, {
-    //   x: 0,
-    //   y: 0,
-    //   duration: 3,
-    //   ease: "elastic.out",
-    //   onComplete: () => {
-    //     this.game.world.removeElement(this);
-    //   },
-    // });
+    gsap.to(this.sprite!.scale, {
+      x: 0,
+      y: 0,
+      duration: 3,
+      ease: "elastic.out",
+      onComplete: () => {
+        this.game.world.removeElement(this);
+      },
+    });
   }
 
   beforeUnload(): void {

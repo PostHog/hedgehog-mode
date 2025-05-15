@@ -27,11 +27,11 @@ export function GameOptions({
       scale: 0.25,
       action: startAction,
     },
-    {
-      spriteName: "ui/ui-start.png",
-      scale: 0.25,
-      action: outfitsAction,
-    },
+    // {
+    //   spriteName: "ui/ui-start.png",
+    //   scale: 0.25,
+    //   action: outfitsAction,
+    // },
     {
       spriteName: "ui/ui-share-lg.png",
       scale: 0.25,

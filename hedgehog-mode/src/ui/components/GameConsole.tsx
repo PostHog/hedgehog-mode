@@ -53,7 +53,7 @@ export function GameConsole({ game, visible, onClose }: GameConsoleProps) {
 
   return (
     <div className="GameConsole text-game-dark">
-      <div className="GameConsole-overlay" onClick={onClose} />
+      <div className="GameConsole-overlay" />
       <div className="GameConsole-content items-center pixel-corners">
         <div className="GameConsole-body flex flex-col gap-8 items-center">
           <div

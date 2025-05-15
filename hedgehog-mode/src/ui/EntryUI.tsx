@@ -43,10 +43,17 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
         setDialogBoxVisible(false);
         setConsoleVisible(true);
         setGameOverVisible(false);
-        game.setSpeed(0);
       },
     });
   }, [game]);
+
+  useEffect(() => {
+    if (consoleVisible) {
+      game.setSpeed(0);
+    } else {
+      game.setSpeed(1);
+    }
+  }, [consoleVisible]);
 
   const player = game.getPlayer();
   const world = game.world;
@@ -68,7 +75,10 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
           </div>
           <div className="BottomLogo text-beige flex gap-2">
             <GameLogo size="small" />
-            <div className="flex flex-col gap-1 items-center">
+            <div
+              className="flex flex-col gap-1 items-center"
+              onClick={() => setConsoleVisible(true)}
+            >
               <GameSprite game={game} spriteName="ui/ui-alt.png" />
               <p className="text-sm" style={{ margin: 0, padding: 0 }}>
                 pause

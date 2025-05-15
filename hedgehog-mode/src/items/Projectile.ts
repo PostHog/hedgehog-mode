@@ -24,7 +24,10 @@ export class Projectile extends Actor {
 
   constructor(
     game: Game,
-    private source: Actor
+    private source: Actor,
+    private options: {
+      target: { x: number; y: number };
+    }
   ) {
     super(game, {
       id: PROJECTILE_ID++,
@@ -43,9 +46,7 @@ export class Projectile extends Actor {
 
     this.sprite!.anchor.set(0.5, 0);
     this.setScale(0.4);
-  }
 
-  fire(options: { target: { x: number; y: number } }): void {
     const sourcePosition = this.source.rigidBody!.position;
 
     // Calculate direction vector

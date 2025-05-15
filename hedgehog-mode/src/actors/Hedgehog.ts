@@ -215,7 +215,8 @@ export class HedgehogActor extends Actor {
     });
 
     this.jumps++;
-    this.game.audioContext && this.game.audioContext.triggerAttackRelease("C4", "32n", Tone.now());
+    this.game.audioContext &&
+      this.game.audioContext.triggerAttackRelease("C4", "32n", Tone.now());
   }
 
   pickupAccessory(accessory: string): void {
@@ -252,14 +253,13 @@ export class HedgehogActor extends Actor {
       let pointerY = e.clientY;
 
       const createProjectile = () => {
-        const projectile = new Projectile(this.game, this);
-        this.game.world.addElement(projectile);
-        projectile.fire({
+        const projectile = new Projectile(this.game, this, {
           target: {
             x: pointerX,
             y: pointerY,
           },
         });
+        this.game.world.addElement(projectile);
       };
 
       createProjectile();
@@ -451,7 +451,8 @@ export class HedgehogActor extends Actor {
     if (element.rigidBody!.bounds.min.y > this.rigidBody!.bounds.min.y) {
       this.game.log("Hit something below");
       this.jumps = 0;
-      this.game.audioContext && this.game.audioContext.triggerAttackRelease("C2", "32n", Tone.now());
+      this.game.audioContext &&
+        this.game.audioContext.triggerAttackRelease("C2", "32n", Tone.now());
     } else {
       this.game.log("Hit something above");
       // We check if it is a platform and if so we ignore it

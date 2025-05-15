@@ -4,7 +4,7 @@ import {
   NO_PLATFORM_COLLISION_FILTER,
 } from "./Actor";
 import { Game, GameElement, UpdateTicker } from "../types";
-import Matter, { Constraint, Pair } from "matter-js";
+import Matter, { Constraint, Pair, Vector } from "matter-js";
 import { SyncedPlatform } from "../items/SyncedPlatform";
 import { AnimatedSprite, ColorMatrixFilter, Sprite } from "pixi.js";
 import { FlameActor } from "../items/Flame";
@@ -99,7 +99,7 @@ export class HedgehogActor extends Actor {
     super(game);
     this.updateSprite("jump");
     this.isInteractive = options.interactions_enabled ?? true;
-    this.ai = new HedgehogActorAI(this);
+    this.ai = new HedgehogActorAI(game, this);
     this.controls = new HedgehogActorControls(this);
     this.interface = new HedgehogActorInterface(game, this);
     this.setPosition({
@@ -246,6 +246,17 @@ export class HedgehogActor extends Actor {
     this.syncAccessories();
   }
 
+  fireWeapon(target: Vector): void {
+    if (this.inventories.length === 0) {
+      return;
+    }
+
+    const projectile = new Projectile(this.game, this, {
+      target,
+    });
+    this.game.world.addElement(projectile);
+  }
+
   receiveDamage(amount: number, source: Actor): void {
     // Move away from the source
     const xDirection =
@@ -278,18 +289,17 @@ export class HedgehogActor extends Actor {
       let pointerX = e.clientX;
       let pointerY = e.clientY;
 
-      const createProjectile = () => {
-        const projectile = new Projectile(this.game, this, {
-          target: {
-            x: pointerX,
-            y: pointerY,
-          },
-        });
-        this.game.world.addElement(projectile);
-      };
+      this.fireWeapon({
+        x: pointerX,
+        y: pointerY,
+      });
 
-      createProjectile();
-      const interval = setInterval(createProjectile, 250);
+      const interval = setInterval(() => {
+        this.fireWeapon({
+          x: pointerX,
+          y: pointerY,
+        });
+      }, 250);
 
       const onPointerMove = (e: PointerEvent) => {
         pointerX = e.clientX;

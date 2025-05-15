@@ -131,51 +131,45 @@ export class Terrain implements GameElement {
   }
 
   private buildRigidBody() {
-    // 1. World-space vertices *closed* with a baseline so bounds are correct
+    // 1. World-space vertices (same ones you use for PIXI)
     const vertsWorld = [
       ...this.heightmap.map((h, i) => ({
         x: i * this.opts.segmentWidth,
         y: window.innerHeight - h,
       })),
-      { x: this.width, y: window.innerHeight }, // right-hand corner
-      { x: 0,         y: window.innerHeight },  // back to origin
+      { x: this.width, y: window.innerHeight }, // close along the bottom
+      { x: 0,        y: window.innerHeight },
     ];
 
-    // // 2. Find their bounding box and centre
-    const centre = Matter.Vertices.centre(
-      vertsWorld as unknown as Matter.Vertices,
-    );
-
-    // 3. Convert to **local** coordinates for the body
-    const vertsLocal = vertsWorld.map((v) => ({
-      x: v.x - centre.x,
-      y: v.y - centre.y,
-    }));
-
-    // 4. Kill the old body (if any) and add the new one
+    // 2. Throw away any previous body
     if (this.rigidBody) {
       Matter.Composite.remove(this.game.engine.world, this.rigidBody);
     }
+
+    // 3. Build the body *in world-space* (no extra centring)
     this.rigidBody = Matter.Bodies.fromVertices(
-      centre.x,
-      centre.y,
-      [vertsLocal] as unknown as Matter.Vector[][], // one vertex-set
+      0,                     // x (ignored – see translate below)
+      0,                     // y
+      [vertsWorld] as unknown as Matter.Vector[][],
       {
         isStatic: true,
         label: "Terrain",
         collisionFilter: {
           category: COLLISIONS.GROUND,
-          mask: COLLISIONS.PLATFORM |
-                COLLISIONS.ACTOR     |
-                COLLISIONS.PROJECTILE,
+          mask:    COLLISIONS.PLATFORM |
+                   COLLISIONS.ACTOR    |
+                   COLLISIONS.PROJECTILE,
         },
       },
-      /* flagInternal    */ false,  // keep the concave outline
-      /* removeCollinear */ 0.01,   // only drop *perfectly* straight segments
+      false,                 // flagInternal – keep concave outline
+      0.01                   // remove perfectly straight segments only
     );
-    const desiredTop = Math.min(...vertsWorld.map(v => v.y));             // y of real surface
-    const actualTop  = this.rigidBody.bounds.min.y;                       // y after Matter shifts it
-    Matter.Body.translate(this.rigidBody, { x: 0, y: desiredTop - actualTop });
+
+    /* 4. Snap the body so its bottom-left corner is (0, window.innerHeight) */
+    Matter.Body.translate(this.rigidBody, {
+      x: -this.rigidBody.bounds.min.x,                       // ← flush to 0
+      y: window.innerHeight - this.rigidBody.bounds.max.y,   // ↓ flush to bottom
+    });
 
     Matter.Composite.add(this.game.engine.world, this.rigidBody);
   }

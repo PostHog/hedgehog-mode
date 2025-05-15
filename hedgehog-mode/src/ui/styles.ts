@@ -53,8 +53,16 @@ const baseStyles = `
     position: fixed;
     inset: 0;
     z-index: 1;
-    background: url('/assets/background.png');
-    background-size: cover;
+    background:
+      url('/assets/bg-clouds.png') repeat-x 0 0,
+      url('/assets/bg-static.png') center / cover no-repeat;
+    background-size: 80% auto, cover;
+    animation: clouds-scroll 60s linear infinite;  
+  }
+  
+  @keyframes clouds-scroll {
+    from { background-position:   0   0, center; }
+    to   { background-position: 100%  0, center; }
   }
 
   .EntryUI {

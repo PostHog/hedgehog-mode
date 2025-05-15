@@ -3,6 +3,7 @@ import { Graphics } from "pixi.js";
 import { Game, GameElement, UpdateTicker } from "../types";
 import { COLLISIONS } from "../misc/collisions";
 import { Projectile } from "./Projectile";
+import {GRASS_COLORS, SOIL_COLORS} from "../constants/colors";
 
 /**
  * FloatingPlatform – stripy soil with rounded corners (top & bottom).
@@ -51,10 +52,10 @@ export class FloatingPlatform implements GameElement {
     /* ——————————————————— visuals ——————————————————— */
     this.gfx = new Graphics();
 
-    const MID_DIRT   = 0x4d3b2a;
-    const DARK_SOIL  = 0x3b2b1b;
-    const BASE_GRASS = 0x5ba94c;
-    const SOIL_STRATA = [0x6e563e, 0x4f3a28, 0x3b2b1b] as const;
+    const MID_DIRT   = SOIL_COLORS[1];
+    const DARK_SOIL  = SOIL_COLORS[2];
+    const BASE_GRASS = GRASS_COLORS[1];
+    const SOIL_STRATA = SOIL_COLORS;
 
     const GRASS_H   = 10;
     const RADIUS    = 8;   // corner radius for both top & bottom

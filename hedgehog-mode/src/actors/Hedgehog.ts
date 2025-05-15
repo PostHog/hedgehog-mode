@@ -137,9 +137,9 @@ export class HedgehogActor extends Actor {
 
       // TODO: Remove
 
-      // setTimeout(() => {
-      //   this.destroy();
-      // }, 1000);
+      setTimeout(() => {
+        this.destroy();
+      }, 1000);
     }
   }
 

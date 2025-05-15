@@ -16,6 +16,7 @@ export enum ActionSound {
 export const SOUND_MAP: Record<string, string[]> = {
   [ActionSound.JUMP]: ["jump.wav"],
   [ActionSound.FIRE]: ["pew.wav"/*, "pew_fast.wav"*/],
+  [ActionSound.LAND]: ["oof.wav"],
 //   [ActionSound.EXPLOSION]: ["explosion.wav"],
 //   [ActionSound.PICKUP]: ["pickup.wav"],
 //   [ActionSound.DEATH]: ["death.wav"],

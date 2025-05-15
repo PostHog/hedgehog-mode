@@ -10,7 +10,6 @@ import {HedgehogActorControls} from "./hedgehog/controls";
 import {HedgehogActorAccessoryOption, HedgehogActorColorOption, HedgehogActorOptions,} from "./hedgehog/config";
 import {HedgehogActorInterface} from "./hedgehog/interface";
 import {Projectile} from "../items/Projectile";
-import * as Tone from "tone";
 import {AvailableSpriteFrames} from "../sprites/sprites";
 import {Inventory} from "../items/Inventory";
 import {COLLISIONS} from "../misc/collisions";
@@ -554,8 +553,9 @@ export class HedgehogActor extends Actor {
     if (element.rigidBody!.bounds.min.y > this.rigidBody!.bounds.min.y) {
       this.game.log("Hit something below");
       this.jumps = 0;
-      this.game.audioContext &&
-        this.game.audioContext.triggerAttackRelease("C2", "32n", Tone.now());
+      // this.game.audioContext &&
+      //   this.game.audioContext.triggerAttackRelease("C2", "32n", Tone.now());
+      AudioManager.getInstance().play(ActionSound.LAND);
     } else {
       this.game.log("Hit something above");
       // We check if it is a platform and if so we ignore it

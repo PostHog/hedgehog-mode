@@ -12,6 +12,7 @@ import { GameWorld } from "./world";
 import * as Tone from "tone";
 import { PolySynth } from "tone";
 import { Howl } from "howler";
+import {AudioManager} from "./audio";
 
 Matter.Common.setDecomp(decomp);
 
@@ -68,7 +69,6 @@ export class HedgeHogMode implements Game {
       // start Tone.js (already there)
       await Tone.start();
       this.audioContext = new Tone.PolySynth().toDestination();
-      this.audioContext.triggerAttackRelease("C4", "8n", Tone.now());
 
       if (!this.backgroundMusic) {
         this.backgroundMusic = new Howl({

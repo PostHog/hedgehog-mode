@@ -2,6 +2,8 @@ import { Actor } from "../actors/Actor";
 import { Game, GameElement, UpdateTicker } from "../types";
 import { COLLISIONS } from "../misc/collisions";
 import { HedgehogActor } from "../actors/Hedgehog";
+import {Terrain} from "./Terrain";
+import {FlameActor} from "./Flame";
 
 let PROJECTILE_ID = 0;
 
@@ -91,6 +93,16 @@ export class Projectile extends Actor {
 
   onCollisionStart(element: GameElement, pair: Matter.Pair): void {
     pair.isActive = false;
+    // calculate exact impact position (use contact vertex if present,
+    // otherwise centre of our body)
+    const impact = pair?.contacts?.[0]?.vertex ?? this.rigidBody!.position;
+
+    // carve a 40-pixel radius crater when we hit terrain
+    if (element instanceof Terrain) {
+      element.carveCircle(impact.x, impact.y, 40);
+      FlameActor.fireBurst(this.game, impact);
+    }
+
     this.destroy();
 
     if (element instanceof HedgehogActor && element !== this.source) {

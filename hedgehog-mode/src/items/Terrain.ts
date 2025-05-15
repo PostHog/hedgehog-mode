@@ -73,7 +73,7 @@ export class Terrain implements GameElement {
         // new ground is the *lowest* y-value that survives the blast
         const newY = window.innerHeight - (cy + dy);
         if (newY < this.heightmap[i]) {
-          this.heightmap[i] = Math.max(0, newY); // clamp to the bottom
+          this.heightmap[i] = Math.max(1, newY); // clamp to the bottom
           modified = true;
         }
       }

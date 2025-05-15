@@ -360,11 +360,47 @@ const baseStyles = `
     border: 2px solid var(--color-border);
   }
 
+
+
+  .GameOverUI {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .GameOverUI-image {
+    margin-bottom: 250px;
+    transform: translateY(100px);
+    transition: all 3s ease-out;
+    opacity: 0;
+  }
+
+
+  .GameOverUI--showing {
+    .GameOverUI-image {
+      transform: translateY(0px);
+      opacity: 1;
+    }
+  }
+
+  .GameOverUI--exiting {
+    .GameOverUI-image {
+      transform: translateY(-100px);
+      opacity: 0;
+    }
+  }
+
 `;
 
 const utils = `
   .text-black {
     color: #000000;
+  }
+  .text-beige {
+    color: var(--game-color-background);
   }
   .font-bold {
     font-weight: bold;
@@ -751,16 +787,24 @@ const pixelCornersGray2 = `
   .Scoreboard {
     position: fixed;
     top: 8px;
-    left: 8px;
+    right: 8px;
     padding: 4px 8px;
     font-family: monospace;
     font-weight: 600;
-    color: #fff;
-    background: rgba(0,0,0,0.5);
+    background: #593a17c9;
     border-radius: 4px;
     z-index: 10000;
     user-select: none;
     pointer-events: none;
+  }
+  .BottomLogo {
+    position: fixed;
+    bottom: 8px;
+    right: 8px;
+    padding: 4px 8px;
+    font-family: monospace;
+    z-index: 10000;
+    max-width: 300px;
   }
 `;
 

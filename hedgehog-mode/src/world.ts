@@ -65,6 +65,12 @@ export class GameWorld {
     this.game.startBackgroundMusic();
   }
 
+  reset() {
+    this.gameOverContainer?.destroy();
+    this.gameOverContainer = undefined;
+    this.game.EntryUI?.showStartScreen();
+  }
+
   startWave() {
     this.wave++;
     for (let i = 0; i < this.wave; i++) {

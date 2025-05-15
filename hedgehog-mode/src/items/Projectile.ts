@@ -61,7 +61,7 @@ export class Projectile extends Actor {
     const magnitude = Math.sqrt(dx * dx + dy * dy);
 
     // Normalize the direction vector and multiply by desired speed
-    const speed = 40; // Fixed speed value
+    const speed = 30; // Fixed speed value
     const normalizedDx = (dx / magnitude) * speed;
     const normalizedDy = (dy / magnitude) * speed;
 
@@ -77,7 +77,7 @@ export class Projectile extends Actor {
 
     setTimeout(() => {
       this.destroy();
-    }, 2000);
+    }, 5000);
   }
 
   update(ticker: UpdateTicker): void {

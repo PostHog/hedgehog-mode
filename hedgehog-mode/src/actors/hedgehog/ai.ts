@@ -112,13 +112,18 @@ export class HedgehogActorAI {
       (e) => e instanceof Inventory
     );
 
+    const itemsWithDistance = inventoryItems.map((item) => {
+      return {
+        item,
+        distance: Math.abs(item.rigidBody!.position.x - actorX),
+      };
+    });
+
     const nearestInventoryItem =
-      inventoryItems.length > 0
-        ? inventoryItems.reduce((prev, current) => {
-            return prev.rigidBody!.position.x < current.rigidBody!.position.x
-              ? prev
-              : current;
-          }, inventoryItems[0])
+      itemsWithDistance.length > 0
+        ? itemsWithDistance.reduce((prev, current) => {
+            return prev.distance < current.distance ? prev : current;
+          }, itemsWithDistance[0])
         : null;
 
     if (!nearestInventoryItem) {
@@ -133,7 +138,9 @@ export class HedgehogActorAI {
     } else if (this.actor.inventories.length === 0 && nearestInventoryItem) {
       // If we don't have a weapon, move towards the nearest weapon
       const direction =
-        nearestInventoryItem.rigidBody!.position.x < actorX ? "left" : "right";
+        nearestInventoryItem.item.rigidBody!.position.x < actorX
+          ? "left"
+          : "right";
       this.actor.setDirection(direction);
       this.actor.walkSpeed = direction === "left" ? -WALK_SPEED : WALK_SPEED;
     } else {

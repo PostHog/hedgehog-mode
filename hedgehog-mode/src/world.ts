@@ -1,6 +1,10 @@
-import { uniqueId } from "lodash";
+import { sample, uniqueId } from "lodash";
 import { HedgehogActor } from "./actors/Hedgehog";
-import { HedgehogActorOptions } from "./actors/hedgehog/config";
+import {
+  getRandomAccessoryCombo,
+  HedgehogActorColorOptions,
+  HedgehogActorOptions,
+} from "./actors/hedgehog/config";
 import { Game, GameElement } from "./types";
 import Matter from "matter-js";
 import { MainLevel } from "./levels/main-level";
@@ -90,6 +94,8 @@ export class GameWorld {
       player: false,
       controls_enabled: false,
       ai_enabled: true,
+      accessories: getRandomAccessoryCombo(),
+      color: sample(HedgehogActorColorOptions),
     });
 
     this.enemies.push(enemy);

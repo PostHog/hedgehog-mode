@@ -20,6 +20,8 @@ import {
 import { HedgehogActorInterface } from "./hedgehog/interface";
 import { Projectile } from "../items/Projectile";
 import * as Tone from "tone";
+import { AvailableSpriteFrames } from "../sprites/sprites";
+// import { Weapon } from "../items/Weapon";
 
 export const COLOR_TO_FILTER_MAP: Record<
   HedgehogActorColorOption,
@@ -455,8 +457,14 @@ export class HedgehogActor extends Actor {
     super.onCollisionStart(element, pair);
     this.maybeSetElementOnFire(element, pair);
 
-    // TODO: Check if it is a weapon and if so then pick it up
+    // Check if it is a weapon and if so then pick it up
+    // if (element instanceof Weapon) {
+    //   // Remove the weapon from the world
+    //   this.game.world.removeElement(element);
 
+    //   // TODO: Add the weapon to the player's inventory
+    // }
+    
     if (element.rigidBody!.bounds.min.y > this.rigidBody!.bounds.min.y) {
       this.game.log("Hit something below");
       this.jumps = 0;
@@ -482,7 +490,7 @@ export class HedgehogActor extends Actor {
 
     this.options.accessories?.forEach((accessory) => {
       const frame = this.game.spritesManager.getSpriteFrames(
-        `accessories/${accessory}.png`
+        `accessories/${accessory}.png` as AvailableSpriteFrames
       );
 
       if (!frame) {

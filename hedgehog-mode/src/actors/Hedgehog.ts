@@ -21,6 +21,7 @@ import { Projectile } from "../items/Projectile";
 import * as Tone from "tone";
 import { AvailableSpriteFrames } from "../sprites/sprites";
 import { Inventory } from "../items/Inventory";
+import { COLLISIONS } from "../misc/collisions";
 
 export const COLOR_TO_FILTER_MAP: Record<
   HedgehogActorColorOption,
@@ -133,6 +134,13 @@ export class HedgehogActor extends Actor {
         this.mouseY = e.clientY;
       };
       window.addEventListener("mousemove", this.mouseMoveHandler);
+    }
+
+    // TESTING CODE
+    if (!this.options.player) {
+      setTimeout(() => {
+        this.destroy();
+      }, 1000);
     }
   }
 
@@ -517,8 +525,7 @@ export class HedgehogActor extends Actor {
       this.pickupInventory(element);
     }
 
-    const isGroundContact =
-          pair.collision.normal.y < -0.5;   // normal points up into the hog
+    const isGroundContact = pair.collision.normal.y < -0.5; // normal points up into the hog
     if (isGroundContact) this.jumps = 0;
 
     if (element.rigidBody!.bounds.min.y > this.rigidBody!.bounds.min.y) {
@@ -594,13 +601,18 @@ export class HedgehogActor extends Actor {
     //   y: -5,
     // });
 
-    // this.collisionFilter = {
-    //   category: COLLISIONS.NONE,
-    //   mask: COLLISIONS.NONE,
-    // };
-
     this.game.world.spawnHedgehogGhost(this.rigidBody!.position);
-    this.game.world.removeElement(this);
+
+    if (!this.options.player) {
+      // Start the death animation
+      this.collisionFilterOverride = {
+        category: COLLISIONS.ACTOR,
+        mask: COLLISIONS.GROUND | COLLISIONS.PLATFORM,
+      };
+
+      this.ai.enable(false);
+      this.walkSpeed = 0;
+    }
   }
 
   beforeUnload(): void {

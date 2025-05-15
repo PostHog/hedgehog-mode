@@ -3,6 +3,8 @@ import type { HedgehogActor } from "../Hedgehog";
 import { Inventory } from "../../items/Inventory";
 import { Game } from "../../types";
 
+const WALK_SPEED = 2;
+
 export class HedgehogActorAI {
   private actionInterval?: NodeJS.Timeout;
   private enabled = false;
@@ -119,8 +121,6 @@ export class HedgehogActorAI {
           }, inventoryItems[0])
         : null;
 
-    console.log("nearestInventoryItem", nearestInventoryItem);
-
     if (!nearestInventoryItem) {
       // If there are no weapons, run away from the player and jump sometimes
       const direction = actorX < playerX ? "left" : "right";
@@ -135,10 +135,10 @@ export class HedgehogActorAI {
       const direction =
         nearestInventoryItem.rigidBody!.position.x < actorX ? "left" : "right";
       this.actor.setDirection(direction);
-      this.actor.walkSpeed = direction === "left" ? -1 : 1;
+      this.actor.walkSpeed = direction === "left" ? -WALK_SPEED : WALK_SPEED;
     } else {
       // If we have a weapon, move towards the player and shoot them
-      const direction = actorX < playerX ? "left" : "right";
+      const direction = actorX > playerX ? "left" : "right";
       const distance = Math.abs(playerX - actorX);
 
       if (distance < 200) {
@@ -147,7 +147,7 @@ export class HedgehogActorAI {
         this.actor.walkSpeed = 0;
       } else {
         this.actor.setDirection(direction);
-        this.actor.walkSpeed = direction === "left" ? -1 : 1;
+        this.actor.walkSpeed = direction === "left" ? -WALK_SPEED : WALK_SPEED;
       }
     }
     // If we don't have a weapon, move towards the nearest weapon

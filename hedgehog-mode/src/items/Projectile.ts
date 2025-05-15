@@ -2,8 +2,8 @@ import { Actor } from "../actors/Actor";
 import { Game, GameElement, UpdateTicker } from "../types";
 import { COLLISIONS } from "../misc/collisions";
 import { HedgehogActor } from "../actors/Hedgehog";
-import {Terrain} from "./Terrain";
-import {FlameActor} from "./Flame";
+import { Terrain } from "./Terrain";
+import { FlameActor } from "./Flame";
 
 let PROJECTILE_ID = 0;
 

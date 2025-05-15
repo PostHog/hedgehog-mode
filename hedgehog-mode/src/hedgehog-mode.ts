@@ -11,7 +11,7 @@ import { StaticHedgehogRenderer } from "./static-renderer/StaticHedgehog";
 import { GameWorld } from "./world";
 import * as Tone from "tone";
 import { PolySynth } from "tone";
-import { Howl } from 'howler';
+import { Howl } from "howler";
 
 Matter.Common.setDecomp(decomp);
 
@@ -51,8 +51,8 @@ export class HedgeHogMode implements Game {
   world: GameWorld;
   audioContext?: PolySynth;
   backgroundMusic?: Howl;
-  private audioUnlocked = false;          // ①  tracks Tone / Howler unlock
-  private gameStarted   = false;          // ②  set once the title screen closes
+  private audioUnlocked = false; // ①  tracks Tone / Howler unlock
+  private gameStarted = false; // ②  set once the title screen closes
 
   constructor(private options: HedgehogModeConfig) {
     this.spritesManager = new SpritesManager(options);
@@ -74,7 +74,7 @@ export class HedgeHogMode implements Game {
         this.backgroundMusic = new Howl({
           src: ["/assets/music/timeattack.mp3"],
           loop: true,
-          volume: 0.5,          // tweak to taste
+          volume: 0.5, // tweak to taste
         });
       }
       this.audioUnlocked = true;
@@ -99,10 +99,10 @@ export class HedgeHogMode implements Game {
   playDeathMusic(): void {
     window.setTimeout(() => {
       new Howl({ src: ["/assets/sounds/die.wav"], volume: 1 }).play();
-    }, 2500)
+    }, 2500);
     window.setTimeout(() => {
       new Howl({ src: ["/assets/sounds/gameover.mp3"], volume: 1 }).play();
-    }, 5500)
+    }, 5500);
   }
 
   destroy(): void {
@@ -272,8 +272,6 @@ export class HedgeHogMode implements Game {
 
     new GlobalKeyboardListeners(this);
     gsap.ticker.remove(gsap.updateRoot);
-
-    this.world.load();
     // this.stateManager = new GameStateManager(this, this.options);
   }
 

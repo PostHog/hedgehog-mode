@@ -97,9 +97,11 @@ export function GameConsole({ game, visible, onClose }: GameConsoleProps) {
                 game={game}
                 startAction={() => {
                   world.load();
+                  onClose();
                 }}
                 resumeAction={() => {
-                  world.resume();
+                  game.setSpeed(1);
+                  onClose();
                 }}
                 outfitsAction={() => {}}
                 shareAction={() => {}}

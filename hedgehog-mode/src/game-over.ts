@@ -39,7 +39,7 @@ export class GameOver implements GameElement {
 
     this.spawnHedgehog(this.actorPosition);
 
-    this.game.EntryUI?.clear();
+    this.game.EntryUI?.showGameOver();
 
     setTimeout(() => {
       this.deathSequence();
@@ -67,9 +67,7 @@ export class GameOver implements GameElement {
     this.hedgehogSprite!.animationSpeed = 0.1;
     this.hedgehogSprite!.loop = false;
     this.hedgehogSprite?.play();
-    this.hedgehogSprite!.onComplete = () => {
-      this.game.EntryUI?.showGameOver();
-    };
+    this.hedgehogSprite!.onComplete = () => {};
   }
 
   update(ticker: UpdateTicker) {

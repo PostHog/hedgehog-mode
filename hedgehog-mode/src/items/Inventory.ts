@@ -3,7 +3,7 @@ import { Game, GameElement } from "../types";
 import { COLLISIONS } from "../misc/collisions";
 import Matter from "matter-js";
 import { AnimatedSprite } from "pixi.js";
-import { AvailableSpriteFrames } from "../sprites/sprites";
+import { AvailableAnimations, AvailableSpriteFrames } from "../sprites/sprites";
 
 export const INVENTORY_ITEMS = ["gun", "bazooka", "grenade"] as const;
 export type InventoryItemType = (typeof INVENTORY_ITEMS)[number];
@@ -50,9 +50,8 @@ export class Inventory extends Actor {
     this.scale = options.scale || 1;
 
     // Dynamically load the correct sprite/animation based on type
-    const spriteKey = `inventory/${this.type}-tile` as AvailableSpriteFrames;
-    // @ts-ignore
-    let frames = game.spritesManager.getAnimatedSpriteFrames(spriteKey);
+    const spriteKey = `inventory/${this.type}-tile` as AvailableAnimations;
+    const frames = game.spritesManager.getAnimatedSpriteFrames(spriteKey);
 
     this.sprite = new AnimatedSprite(frames);
     this.sprite.animationSpeed = 0.1;

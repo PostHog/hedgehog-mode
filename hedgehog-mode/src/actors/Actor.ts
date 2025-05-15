@@ -1,10 +1,5 @@
 import Matter, { Constraint } from "matter-js";
-import {
-  AnimatedSprite,
-  AnimatedSpriteFrames,
-  FrameObject,
-  Texture,
-} from "pixi.js";
+import { AnimatedSprite, AnimatedSpriteFrames } from "pixi.js";
 import { AvailableAnimations } from "../sprites/sprites";
 import { Game, GameElement, UpdateTicker } from "../types";
 import { COLLISIONS } from "../misc/collisions";

@@ -20,10 +20,10 @@ export function GameSprite({
   const backgroundSize = game.spritesManager.spritesheet?.data.meta.size;
   const backgroundWidth = backgroundSize?.w;
   const backgroundHeight = backgroundSize?.h;
-  const width = details.frame.width;
-  const height = details.frame.height;
-  const x = details.frame.x;
-  const y = details.frame.y;
+  const width = details?.frame.width;
+  const height = details?.frame.height;
+  const x = details?.frame.x;
+  const y = details?.frame.y;
 
   return (
     <div

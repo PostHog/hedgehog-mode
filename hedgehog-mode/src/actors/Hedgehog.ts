@@ -22,6 +22,7 @@ import * as Tone from "tone";
 import { AvailableSpriteFrames } from "../sprites/sprites";
 import { Inventory } from "../items/Inventory";
 import { COLLISIONS } from "../misc/collisions";
+import { AudioManager, ActionSound } from "../audio";
 
 export const COLOR_TO_FILTER_MAP: Record<
   HedgehogActorColorOption,
@@ -241,8 +242,10 @@ export class HedgehogActor extends Actor {
     });
 
     this.jumps++;
-    this.game.audioContext &&
-      this.game.audioContext.triggerAttackRelease("C4", "32n", Tone.now());
+    // this.game.audioContext &&
+    //   this.game.audioContext.triggerAttackRelease("C4", "32n", Tone.now());
+
+    AudioManager.getInstance().play(ActionSound.JUMP);
   }
 
   pickupAccessory(accessory: string): void {

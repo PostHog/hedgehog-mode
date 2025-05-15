@@ -517,6 +517,10 @@ export class HedgehogActor extends Actor {
       this.pickupInventory(element);
     }
 
+    const isGroundContact =
+          pair.collision.normal.y < -0.5;   // normal points up into the hog
+    if (isGroundContact) this.jumps = 0;
+
     if (element.rigidBody!.bounds.min.y > this.rigidBody!.bounds.min.y) {
       this.game.log("Hit something below");
       this.jumps = 0;

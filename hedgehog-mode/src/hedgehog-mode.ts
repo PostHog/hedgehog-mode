@@ -1,7 +1,7 @@
 import gsap from "gsap";
 
 import Matter, { Render, Runner } from "matter-js";
-import decomp from 'poly-decomp';
+import decomp from "poly-decomp";
 import { Application } from "pixi.js";
 import { Game, EntryUI, HedgehogModeConfig } from "./types";
 import { SpritesManager } from "./sprites/sprites";
@@ -10,9 +10,9 @@ import { GlobalKeyboardListeners } from "./misc/GlobalKeyboardListeners";
 import { StaticHedgehogRenderer } from "./static-renderer/StaticHedgehog";
 import { GameWorld } from "./world";
 import * as Tone from "tone";
-import {PolySynth} from "tone";
+import { PolySynth } from "tone";
 
-Matter.Common.setDecomp(decomp)
+Matter.Common.setDecomp(decomp);
 
 export type {
   HedgehogActorOptions,
@@ -59,18 +59,20 @@ export class HedgeHogMode implements Game {
     this.world = new GameWorld(this);
 
     const enableSound = async () => {
-      window.removeEventListener('keydown', enableSound);
+      window.removeEventListener("keydown", enableSound);
       await Tone.start();
       this.audioContext = new Tone.PolySynth().toDestination();
       this.audioContext.triggerAttackRelease("C4", "8n", Tone.now());
     };
-    window.addEventListener('keydown', enableSound);
+    window.addEventListener("keydown", enableSound);
 
     this.setupDebugListeners();
   }
 
   destroy(): void {
     Runner.stop(this.runner);
+
+    this.world.beforeUnload();
     this.app.destroy({
       removeView: true,
     });
@@ -113,6 +115,12 @@ export class HedgeHogMode implements Game {
     this.log("Setting pointer events", enabled);
     this.ref?.style.setProperty("pointer-events", enabled ? "auto" : "none");
     this.pointerEventsEnabled = enabled;
+  }
+
+  getPlayer(): HedgehogActor | undefined {
+    return this.world.elements.find(
+      (el) => el instanceof HedgehogActor && el.options.player
+    ) as HedgehogActor | undefined;
   }
 
   async render(ref: HTMLDivElement): Promise<void> {

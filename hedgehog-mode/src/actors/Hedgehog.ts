@@ -140,7 +140,9 @@ export class HedgehogActor extends Actor {
     sprite: string,
     options: { reset?: boolean; onComplete?: () => void } = {}
   ): void {
-    const possibleAnimation = `skins/${this.options.skin ?? "default"}/${sprite}/tile`;
+    const holdingInventory = this.inventories.length > 0;
+    const spritePath = holdingInventory ? `${sprite}-armless` : sprite;
+    const possibleAnimation = `skins/${this.options.skin ?? "default"}/${spritePath}/tile`;
 
     // Set the sprite but selecting the skin as well
     const spriteName =
@@ -405,8 +407,7 @@ export class HedgehogActor extends Actor {
         // If horizontal movement is noticeable then walk
         this.updateSprite("walk");
       } else if (["fall", "walk"].includes(this.currentSprite)) {
-        // NOTE:  wave is just used as a placeholder anim. WE should have a dedicated idle animation
-        this.updateSprite("wave");
+        this.updateSprite("idle");
         this.sprite!.stop();
       }
     }
@@ -436,7 +437,11 @@ export class HedgehogActor extends Actor {
 
     this.updateColor(ticker);
 
+    // If the player is holding an inventory then we want to position it in front of the hedgehog
     if (this.options.player && this.attachedInventorySprites.length > 0) {
+      // Update sprite to holding versions
+      this.updateSprite("game-hold");
+
       const hedgehogGlobal = this.sprite!.getGlobalPosition();
       const parentScaleX = this.sprite!.scale.x;
       this.attachedInventorySprites.forEach((sprite) => {
@@ -527,13 +532,12 @@ export class HedgehogActor extends Actor {
     if (!inventory.sprite) return;
     // Clone the inventory sprite for attachment
     const attachedSprite = new Sprite(inventory.sprite.texture);
-    attachedSprite.anchor.set(0.5);
+    attachedSprite.anchor.set(0.5, 0.7);
     attachedSprite.scale.set(0.7); // Slightly smaller for visual fit
-    attachedSprite.x = 18; // Position in front of hedgehog (tweak as needed)
-    attachedSprite.y = 0;
+    attachedSprite.x = 7; // Position in front of hedgehog (tweak as needed)
+    attachedSprite.y = 6;
     attachedSprite.zIndex = 10;
     attachedSprite.eventMode = "static";
-    attachedSprite.name = "inventory";
     this.sprite!.addChild(attachedSprite);
     this.attachedInventorySprites.push(attachedSprite);
   };

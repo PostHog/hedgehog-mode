@@ -4,7 +4,7 @@
         <key>fileFormatVersion</key>
         <int>6</int>
         <key>texturePackerVersion</key>
-        <string>7.6.3</string>
+        <string>7.4.0</string>
         <key>autoSDSettings</key>
         <array>
             <struct type="AutoSDSettings">
@@ -189,8 +189,18 @@
             <key type="filename">assets/accessories/xmas-antlers.png</key>
             <key type="filename">assets/accessories/xmas-hat.png</key>
             <key type="filename">assets/accessories/xmas-scarf.png</key>
-            <key type="filename">assets/overlays/bazooka/tile001.png</key>
-            <key type="filename">assets/overlays/bazooka/tile002.png</key>
+            <key type="filename">assets/inventory/bazooka-held-tile001.png</key>
+            <key type="filename">assets/inventory/bazooka-held-tile002.png</key>
+            <key type="filename">assets/inventory/bazooka-tile001.png</key>
+            <key type="filename">assets/inventory/bazooka-tile002.png</key>
+            <key type="filename">assets/inventory/grenade-held-tile001.png</key>
+            <key type="filename">assets/inventory/grenade-held-tile002.png</key>
+            <key type="filename">assets/inventory/grenade-tile001.png</key>
+            <key type="filename">assets/inventory/grenade-tile002.png</key>
+            <key type="filename">assets/inventory/gun-held-tile001.png</key>
+            <key type="filename">assets/inventory/gun-held-tile002.png</key>
+            <key type="filename">assets/inventory/gun-tile001.png</key>
+            <key type="filename">assets/inventory/gun-tile002.png</key>
             <key type="filename">assets/overlays/fire/tile000.png</key>
             <key type="filename">assets/overlays/fire/tile001.png</key>
             <key type="filename">assets/overlays/fire/tile002.png</key>
@@ -221,6 +231,15 @@
             <key type="filename">assets/skins/default/action/tile013.png</key>
             <key type="filename">assets/skins/default/action/tile014.png</key>
             <key type="filename">assets/skins/default/action/tile015.png</key>
+            <key type="filename">assets/skins/default/fall-armless/fall-armless-0.png</key>
+            <key type="filename">assets/skins/default/fall-armless/fall-armless-1.png</key>
+            <key type="filename">assets/skins/default/fall-armless/fall-armless-2.png</key>
+            <key type="filename">assets/skins/default/fall-armless/fall-armless-3.png</key>
+            <key type="filename">assets/skins/default/fall-armless/fall-armless-4.png</key>
+            <key type="filename">assets/skins/default/fall-armless/fall-armless-5.png</key>
+            <key type="filename">assets/skins/default/fall-armless/fall-armless-6.png</key>
+            <key type="filename">assets/skins/default/fall-armless/fall-armless-7.png</key>
+            <key type="filename">assets/skins/default/fall-armless/fall-armless-8.png</key>
             <key type="filename">assets/skins/default/fall/tile000.png</key>
             <key type="filename">assets/skins/default/fall/tile001.png</key>
             <key type="filename">assets/skins/default/fall/tile002.png</key>
@@ -255,27 +274,6 @@
             <key type="filename">assets/skins/default/flag/tile022.png</key>
             <key type="filename">assets/skins/default/flag/tile023.png</key>
             <key type="filename">assets/skins/default/flag/tile024.png</key>
-            <key type="filename">assets/skins/default/game-jump/tile0.png</key>
-            <key type="filename">assets/skins/default/game-jump/tile1.png</key>
-            <key type="filename">assets/skins/default/game-jump/tile2.png</key>
-            <key type="filename">assets/skins/default/game-jump/tile3.png</key>
-            <key type="filename">assets/skins/default/game-jump/tile4.png</key>
-            <key type="filename">assets/skins/default/game-jump/tile5.png</key>
-            <key type="filename">assets/skins/default/game-jump/tile6.png</key>
-            <key type="filename">assets/skins/default/game-jump/tile7.png</key>
-            <key type="filename">assets/skins/default/game-jump/tile8.png</key>
-            <key type="filename">assets/skins/default/game-jump/tile9.png</key>
-            <key type="filename">assets/skins/default/game-walk/tile0.png</key>
-            <key type="filename">assets/skins/default/game-walk/tile1.png</key>
-            <key type="filename">assets/skins/default/game-walk/tile10.png</key>
-            <key type="filename">assets/skins/default/game-walk/tile2.png</key>
-            <key type="filename">assets/skins/default/game-walk/tile3.png</key>
-            <key type="filename">assets/skins/default/game-walk/tile4.png</key>
-            <key type="filename">assets/skins/default/game-walk/tile5.png</key>
-            <key type="filename">assets/skins/default/game-walk/tile6.png</key>
-            <key type="filename">assets/skins/default/game-walk/tile7.png</key>
-            <key type="filename">assets/skins/default/game-walk/tile8.png</key>
-            <key type="filename">assets/skins/default/game-walk/tile9.png</key>
             <key type="filename">assets/skins/default/inspect/tile000.png</key>
             <key type="filename">assets/skins/default/inspect/tile001.png</key>
             <key type="filename">assets/skins/default/inspect/tile002.png</key>
@@ -312,6 +310,16 @@
             <key type="filename">assets/skins/default/inspect/tile033.png</key>
             <key type="filename">assets/skins/default/inspect/tile034.png</key>
             <key type="filename">assets/skins/default/inspect/tile035.png</key>
+            <key type="filename">assets/skins/default/jump-armless/tile0.png</key>
+            <key type="filename">assets/skins/default/jump-armless/tile1.png</key>
+            <key type="filename">assets/skins/default/jump-armless/tile2.png</key>
+            <key type="filename">assets/skins/default/jump-armless/tile3.png</key>
+            <key type="filename">assets/skins/default/jump-armless/tile4.png</key>
+            <key type="filename">assets/skins/default/jump-armless/tile5.png</key>
+            <key type="filename">assets/skins/default/jump-armless/tile6.png</key>
+            <key type="filename">assets/skins/default/jump-armless/tile7.png</key>
+            <key type="filename">assets/skins/default/jump-armless/tile8.png</key>
+            <key type="filename">assets/skins/default/jump-armless/tile9.png</key>
             <key type="filename">assets/skins/default/jump/tile000.png</key>
             <key type="filename">assets/skins/default/jump/tile001.png</key>
             <key type="filename">assets/skins/default/jump/tile002.png</key>
@@ -350,6 +358,21 @@
             <key type="filename">assets/skins/default/phone/tile025.png</key>
             <key type="filename">assets/skins/default/phone/tile026.png</key>
             <key type="filename">assets/skins/default/phone/tile027.png</key>
+            <key type="filename">assets/skins/default/shock-armless/shock-armless-0.png</key>
+            <key type="filename">assets/skins/default/shock-armless/shock-armless-1.png</key>
+            <key type="filename">assets/skins/default/shock-armless/shock-armless-10.png</key>
+            <key type="filename">assets/skins/default/shock-armless/shock-armless-11.png</key>
+            <key type="filename">assets/skins/default/shock-armless/shock-armless-12.png</key>
+            <key type="filename">assets/skins/default/shock-armless/shock-armless-13.png</key>
+            <key type="filename">assets/skins/default/shock-armless/shock-armless-14.png</key>
+            <key type="filename">assets/skins/default/shock-armless/shock-armless-2.png</key>
+            <key type="filename">assets/skins/default/shock-armless/shock-armless-3.png</key>
+            <key type="filename">assets/skins/default/shock-armless/shock-armless-4.png</key>
+            <key type="filename">assets/skins/default/shock-armless/shock-armless-5.png</key>
+            <key type="filename">assets/skins/default/shock-armless/shock-armless-6.png</key>
+            <key type="filename">assets/skins/default/shock-armless/shock-armless-7.png</key>
+            <key type="filename">assets/skins/default/shock-armless/shock-armless-8.png</key>
+            <key type="filename">assets/skins/default/shock-armless/shock-armless-9.png</key>
             <key type="filename">assets/skins/default/shock/tile-0.png</key>
             <key type="filename">assets/skins/default/shock/tile-1.png</key>
             <key type="filename">assets/skins/default/shock/tile-10.png</key>
@@ -398,6 +421,17 @@
             <key type="filename">assets/skins/default/sign/tile030.png</key>
             <key type="filename">assets/skins/default/sign/tile031.png</key>
             <key type="filename">assets/skins/default/sign/tile032.png</key>
+            <key type="filename">assets/skins/default/walk-armless/walk-armless-0.png</key>
+            <key type="filename">assets/skins/default/walk-armless/walk-armless-1.png</key>
+            <key type="filename">assets/skins/default/walk-armless/walk-armless-10.png</key>
+            <key type="filename">assets/skins/default/walk-armless/walk-armless-2.png</key>
+            <key type="filename">assets/skins/default/walk-armless/walk-armless-3.png</key>
+            <key type="filename">assets/skins/default/walk-armless/walk-armless-4.png</key>
+            <key type="filename">assets/skins/default/walk-armless/walk-armless-5.png</key>
+            <key type="filename">assets/skins/default/walk-armless/walk-armless-6.png</key>
+            <key type="filename">assets/skins/default/walk-armless/walk-armless-7.png</key>
+            <key type="filename">assets/skins/default/walk-armless/walk-armless-8.png</key>
+            <key type="filename">assets/skins/default/walk-armless/walk-armless-9.png</key>
             <key type="filename">assets/skins/default/walk/tile000.png</key>
             <key type="filename">assets/skins/default/walk/tile001.png</key>
             <key type="filename">assets/skins/default/walk/tile002.png</key>
@@ -503,6 +537,14 @@
             <key type="filename">assets/skins/spiderhog/wave/tile023.png</key>
             <key type="filename">assets/skins/spiderhog/wave/tile024.png</key>
             <key type="filename">assets/skins/spiderhog/wave/tile025.png</key>
+            <key type="filename">assets/ui/pizza/pizza-0.png</key>
+            <key type="filename">assets/ui/pizza/pizza-1.png</key>
+            <key type="filename">assets/ui/pizza/pizza-2.png</key>
+            <key type="filename">assets/ui/pizza/pizza-3.png</key>
+            <key type="filename">assets/ui/pizza/pizza-4.png</key>
+            <key type="filename">assets/ui/pizza/pizza-5.png</key>
+            <key type="filename">assets/ui/pizza/pizza-6.png</key>
+            <key type="filename">assets/ui/pizza/pizza-7.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0,0</point_f>
@@ -533,6 +575,33 @@
                 <rect>20,6,39,12</rect>
                 <key>scale9Paddings</key>
                 <rect>20,6,39,12</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">assets/ui/ui-a.png</key>
+            <key type="filename">assets/ui/ui-d.png</key>
+            <key type="filename">assets/ui/ui-down.png</key>
+            <key type="filename">assets/ui/ui-left.png</key>
+            <key type="filename">assets/ui/ui-mute.png</key>
+            <key type="filename">assets/ui/ui-pause.png</key>
+            <key type="filename">assets/ui/ui-play.png</key>
+            <key type="filename">assets/ui/ui-right.png</key>
+            <key type="filename">assets/ui/ui-s.png</key>
+            <key type="filename">assets/ui/ui-share.png</key>
+            <key type="filename">assets/ui/ui-sound.png</key>
+            <key type="filename">assets/ui/ui-up.png</key>
+            <key type="filename">assets/ui/ui-w.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0,0</point_f>
+                <key>spriteScale</key>
+                <double>1</double>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>5,5,10,10</rect>
+                <key>scale9Paddings</key>
+                <rect>5,5,10,10</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>

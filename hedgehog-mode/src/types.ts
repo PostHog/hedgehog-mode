@@ -5,7 +5,7 @@ import type { SpritesManager } from "./sprites/sprites";
 import type { HedgehogActor } from "./actors/Hedgehog";
 import { HedgehogActorOptions } from "./actors/hedgehog/config";
 import { GameWorld } from "./world";
-import {PolySynth} from "tone";
+import { PolySynth } from "tone";
 import { Inventory } from "./items/Inventory";
 
 export type UpdateTicker = {
@@ -46,6 +46,7 @@ export type Game = {
   // removeElement: (element: GameElement) => void;
   log: (...args: unknown[]) => void;
   setSpeed: (speed: number) => void;
+  getPlayer: () => HedgehogActor | undefined;
   EntryUI?: EntryUI;
   world: GameWorld;
   audioContext?: PolySynth;

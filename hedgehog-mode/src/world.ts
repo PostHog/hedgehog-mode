@@ -8,6 +8,7 @@ import { HedgehogGhostActor } from "./actors/Ghost";
 import { Inventory } from "./items/Inventory";
 import { Actor } from "./actors/Actor";
 import { Platform } from "./items/Platform";
+import { AnimatedSprite } from "pixi.js";
 
 export class GameWorld {
   elements: GameElement[] = []; // TODO: Type better
@@ -43,7 +44,9 @@ export class GameWorld {
   }
 
   spawnRandomInventory(): Inventory {
-    const inventory = new Inventory(this.game);
+    const inventory = new Inventory(this.game, {
+      type: "bazooka",
+    });
     this.spawnInventory(inventory);
     return inventory;
   }

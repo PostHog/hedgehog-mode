@@ -77,6 +77,11 @@ export class HedgehogActor extends Actor {
   interface: HedgehogActorInterface;
   attachedInventorySprites: Sprite[] = [];
 
+  // Track mouse position for player
+  mouseX: number = 0;
+  mouseY: number = 0;
+  private mouseMoveHandler?: (e: MouseEvent) => void;
+
   hitBoxModifier = {
     left: 0.24,
     right: 0.24,
@@ -89,7 +94,7 @@ export class HedgehogActor extends Actor {
   constructor(
     game: Game,
     public options: HedgehogActorOptions,
-    public inventory: Inventory[] = []
+    public inventories: Inventory[] = []
   ) {
     super(game);
     this.updateSprite("jump");
@@ -120,6 +125,15 @@ export class HedgehogActor extends Actor {
 
     this.updateOptions(options);
     this.setupPointerListener();
+
+    // Setup mouse tracking for player
+    if (this.options.player) {
+      this.mouseMoveHandler = (e: MouseEvent) => {
+        this.mouseX = e.clientX;
+        this.mouseY = e.clientY;
+      };
+      window.addEventListener("mousemove", this.mouseMoveHandler);
+    }
   }
 
   updateSprite(
@@ -421,6 +435,27 @@ export class HedgehogActor extends Actor {
     }
 
     this.updateColor(ticker);
+
+    if (this.options.player && this.attachedInventorySprites.length > 0) {
+      const hedgehogGlobal = this.sprite!.getGlobalPosition();
+      const parentScaleX = this.sprite!.scale.x;
+      this.attachedInventorySprites.forEach((sprite) => {
+        const angle = Math.atan2(
+          this.mouseY - hedgehogGlobal.y,
+          this.mouseX - hedgehogGlobal.x
+        );
+
+        // If your sprite points up by default, use this:
+        sprite.scale.set(0.7, 0.7);
+        if (parentScaleX < 0) {
+          sprite.scale.x = -0.7;
+          sprite.rotation = angle + Math.PI - Math.PI / 2;
+        } else {
+          sprite.scale.x = 0.7;
+          sprite.rotation = angle - Math.PI / 2;
+        }
+      });
+    }
   }
 
   private updateColor(ticker: UpdateTicker) {
@@ -483,7 +518,7 @@ export class HedgehogActor extends Actor {
   }
 
   private pickupInventory(inventory: Inventory): void {
-    this.inventory.push(inventory);
+    this.inventories.push(inventory);
     this.syncInventory();
     this.attachInventorySprite(inventory);
   }
@@ -504,8 +539,8 @@ export class HedgehogActor extends Actor {
   };
 
   private syncInventory(): void {
-    this.inventory.forEach((weapon) => {
-      this.game.world.removeElement(weapon);
+    this.inventories.forEach((inventory) => {
+      this.game.world.removeElement(inventory);
     });
   }
 
@@ -560,5 +595,11 @@ export class HedgehogActor extends Actor {
       this.sprite!.removeChild(sprite);
     });
     this.attachedInventorySprites = [];
+
+    // Remove mousemove event listener if set
+    if (this.mouseMoveHandler) {
+      window.removeEventListener("mousemove", this.mouseMoveHandler);
+      this.mouseMoveHandler = undefined;
+    }
   }
 }

@@ -1,27 +1,20 @@
-import {
-  Actor,
-  DEFAULT_COLLISION_FILTER,
-  NO_PLATFORM_COLLISION_FILTER,
-} from "./Actor";
-import { Game, GameElement, UpdateTicker } from "../types";
-import Matter, { Constraint, Pair, Vector } from "matter-js";
-import { SyncedPlatform } from "../items/SyncedPlatform";
-import { AnimatedSprite, ColorMatrixFilter, Sprite } from "pixi.js";
-import { FlameActor } from "../items/Flame";
+import {Actor, DEFAULT_COLLISION_FILTER, NO_PLATFORM_COLLISION_FILTER,} from "./Actor";
+import {Game, GameElement, UpdateTicker} from "../types";
+import Matter, {Constraint, Pair, Vector} from "matter-js";
+import {SyncedPlatform} from "../items/SyncedPlatform";
+import {AnimatedSprite, ColorMatrixFilter, Sprite} from "pixi.js";
+import {FlameActor} from "../items/Flame";
 import gsap from "gsap";
-import { HedgehogActorAI } from "./hedgehog/ai";
-import { HedgehogActorControls } from "./hedgehog/controls";
-import {
-  HedgehogActorAccessoryOption,
-  HedgehogActorColorOption,
-  HedgehogActorOptions,
-} from "./hedgehog/config";
-import { HedgehogActorInterface } from "./hedgehog/interface";
-import { Projectile } from "../items/Projectile";
+import {HedgehogActorAI} from "./hedgehog/ai";
+import {HedgehogActorControls} from "./hedgehog/controls";
+import {HedgehogActorAccessoryOption, HedgehogActorColorOption, HedgehogActorOptions,} from "./hedgehog/config";
+import {HedgehogActorInterface} from "./hedgehog/interface";
+import {Projectile} from "../items/Projectile";
 import * as Tone from "tone";
-import { AvailableSpriteFrames } from "../sprites/sprites";
-import { Inventory } from "../items/Inventory";
-import { COLLISIONS } from "../misc/collisions";
+import {AvailableSpriteFrames} from "../sprites/sprites";
+import {Inventory} from "../items/Inventory";
+import {COLLISIONS} from "../misc/collisions";
+import {ActionSound, AudioManager} from "../audio";
 
 export const COLOR_TO_FILTER_MAP: Record<
   HedgehogActorColorOption,
@@ -241,8 +234,9 @@ export class HedgehogActor extends Actor {
     });
 
     this.jumps++;
-    this.game.audioContext &&
-      this.game.audioContext.triggerAttackRelease("C4", "32n", Tone.now());
+    // this.game.audioContext &&
+    //   this.game.audioContext.triggerAttackRelease("C4", "32n", Tone.now());
+    AudioManager.getInstance().play(ActionSound.JUMP);
   }
 
   pickupAccessory(accessory: string): void {
@@ -262,6 +256,7 @@ export class HedgehogActor extends Actor {
       target,
     });
     this.game.world.addElement(projectile);
+    AudioManager.getInstance().play(ActionSound.FIRE);
   }
 
   receiveDamage(amount: number, source: Actor): void {
@@ -423,6 +418,7 @@ export class HedgehogActor extends Actor {
       } else if (Math.abs(this.rigidBody!.velocity.x) > 0.1) {
         // If horizontal movement is noticeable then walk
         this.updateSprite("walk");
+        AudioManager.getInstance().play(ActionSound.WALK);
       } else if (["fall", "walk"].includes(this.currentSprite)) {
         this.updateSprite("idle");
         this.sprite!.stop();

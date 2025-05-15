@@ -15,12 +15,12 @@ export enum ActionSound {
 
 export const SOUND_MAP: Record<string, string[]> = {
   [ActionSound.JUMP]: ["jump.wav"],
-//   [ActionSound.FIRE]: ["fire.wav"],
+  [ActionSound.FIRE]: ["pew.wav"/*, "pew_fast.wav"*/],
 //   [ActionSound.EXPLOSION]: ["explosion.wav"],
 //   [ActionSound.PICKUP]: ["pickup.wav"],
 //   [ActionSound.DEATH]: ["death.wav"],
 //   [ActionSound.HURT]: ["hurt.wav"],
-//   [ActionSound.WALK]: ["walk.wav"],
+  [ActionSound.WALK]: ["walk.wav"/*, "walk_walk_walk_walk.wav"*/],
 //   [ActionSound.LAND]: ["land.wav"],
 //   [ActionSound.PLAYER_SPAWN]: ["player_spawn.wav"],
 //   [ActionSound.SPAWN]: ["spawn.wav"],
@@ -50,13 +50,15 @@ export class AudioManager {
         sounds = SOUND_MAP[sound].map((file) => {
             console.log(`loading sound ${file}`);
             return new Howl({
-                src: [`/assets/audio/${file}`],
+                src: [`/assets/sounds/${file}`],
             });
         });
         this.sounds[sound] = sounds;
     }
     if (sounds) {
-        sounds[Math.floor(Math.random() * sounds.length)].play();
+        const toBePlayed:Howl = sounds[Math.floor(Math.random() * sounds.length)];
+        if (!toBePlayed.playing())
+            toBePlayed.play();
     }
   }
 }

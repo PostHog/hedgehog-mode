@@ -10,7 +10,11 @@ import { Game, GameElement } from "./types";
 import Matter from "matter-js";
 import { MainLevel } from "./levels/main-level";
 import { HedgehogGhostActor } from "./actors/Ghost";
-import { Inventory } from "./items/Inventory";
+import {
+  Inventory,
+  INVENTORY_ITEMS,
+  InventoryItemType,
+} from "./items/Inventory";
 import { Actor } from "./actors/Actor";
 import { Platform } from "./items/Platform";
 import { Accessory } from "./items/Accessory";
@@ -119,8 +123,13 @@ export class GameWorld {
   }
 
   spawnRandomInventory(): Inventory {
+    const type = sample(INVENTORY_ITEMS);
+    return this.spawnInventory(type);
+  }
+
+  spawnInventory(type: InventoryItemType): Inventory {
     const inventory = new Inventory(this.game, {
-      type: "bazooka",
+      type,
     });
     this.elements.push(inventory);
     return inventory;

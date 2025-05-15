@@ -602,6 +602,18 @@ export class HedgehogActor extends Actor {
       this.game.world.spawnAccessory(accessory, this.rigidBody!.position);
     });
 
+    // Remove attached inventory sprites from hedgehog sprite
+    this.attachedInventorySprites.forEach((sprite) => {
+      this.sprite!.removeChild(sprite);
+    });
+    this.attachedInventorySprites = [];
+
+    this.inventories.forEach((inventory) => {
+      const newItem = this.game.world.spawnInventory(inventory.type);
+      newItem.setPosition(this.rigidBody!.position);
+    });
+    this.inventories = [];
+
     if (!this.options.player) {
       // Start the death animation
       this.collisionFilterOverride = {

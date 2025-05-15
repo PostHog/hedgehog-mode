@@ -5,7 +5,8 @@ import Matter from "matter-js";
 import { AnimatedSprite } from "pixi.js";
 import { AvailableSpriteFrames } from "../sprites/sprites";
 
-type InventoryItemType = "gun" | "bazooka" | "grenade";
+export const INVENTORY_ITEMS = ["gun", "bazooka", "grenade"] as const;
+export type InventoryItemType = (typeof INVENTORY_ITEMS)[number];
 
 export interface InventoryOptions {
   type: InventoryItemType;

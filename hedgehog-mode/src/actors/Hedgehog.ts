@@ -4,12 +4,11 @@ import {
   NO_PLATFORM_COLLISION_FILTER,
 } from "./Actor";
 import { Game, GameElement, UpdateTicker } from "../types";
-import Matter, { Bodies, Composites, Constraint, Pair } from "matter-js";
+import Matter, { Constraint, Pair } from "matter-js";
 import { SyncedPlatform } from "../items/SyncedPlatform";
 import { AnimatedSprite, ColorMatrixFilter, Sprite } from "pixi.js";
 import { FlameActor } from "../items/Flame";
 import gsap from "gsap";
-import { COLLISIONS } from "../misc/collisions";
 import { HedgehogActorAI } from "./hedgehog/ai";
 import { HedgehogActorControls } from "./hedgehog/controls";
 import {
@@ -441,16 +440,19 @@ export class HedgehogActor extends Actor {
       const hedgehogGlobal = this.sprite!.getGlobalPosition();
       const parentScaleX = this.sprite!.scale.x;
       this.attachedInventorySprites.forEach((sprite) => {
-        const angle = Math.atan2(this.mouseY - hedgehogGlobal.y, this.mouseX - hedgehogGlobal.x);
+        const angle = Math.atan2(
+          this.mouseY - hedgehogGlobal.y,
+          this.mouseX - hedgehogGlobal.x
+        );
 
         // If your sprite points up by default, use this:
         sprite.scale.set(0.7, 0.7);
         if (parentScaleX < 0) {
           sprite.scale.x = -0.7;
-          sprite.rotation = angle + Math.PI - Math.PI/2;
+          sprite.rotation = angle + Math.PI - Math.PI / 2;
         } else {
           sprite.scale.x = 0.7;
-          sprite.rotation = angle - Math.PI/2;
+          sprite.rotation = angle - Math.PI / 2;
         }
       });
     }
@@ -499,7 +501,7 @@ export class HedgehogActor extends Actor {
       // TODO: Add to the player's inventory
       this.pickupInventory(element);
     }
-    
+
     if (element.rigidBody!.bounds.min.y > this.rigidBody!.bounds.min.y) {
       this.game.log("Hit something below");
       this.jumps = 0;
@@ -580,28 +582,7 @@ export class HedgehogActor extends Actor {
     // };
 
     this.game.world.spawnHedgehogGhost(this.rigidBody!.position);
-
-    // Remove attached inventory sprites
-    this.attachedInventorySprites.forEach((sprite) => {
-      this.sprite!.removeChild(sprite);
-    });
-    this.attachedInventorySprites = [];
-
-    gsap.to(this.sprite!.scale, {
-      x: 0,
-      y: 0,
-      duration: 3,
-      ease: "elastic.out",
-      onComplete: () => {
-        this.game.world.removeElement(this);
-      },
-    });
-
-    // Remove mousemove event listener if set
-    if (this.mouseMoveHandler) {
-      window.removeEventListener("mousemove", this.mouseMoveHandler);
-      this.mouseMoveHandler = undefined;
-    }
+    this.game.world.removeElement(this);
   }
 
   beforeUnload(): void {

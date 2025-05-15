@@ -51,6 +51,8 @@ export class HedgeHogMode implements Game {
   world: GameWorld;
   audioContext?: PolySynth;
   backgroundMusic?: Howl;
+  private audioUnlocked = false;          // ①  tracks Tone / Howler unlock
+  private gameStarted   = false;          // ②  set once the title screen closes
 
   constructor(private options: HedgehogModeConfig) {
     this.spritesManager = new SpritesManager(options);
@@ -75,11 +77,30 @@ export class HedgeHogMode implements Game {
           volume: 0.5,          // tweak to taste
         });
       }
+      this.audioUnlocked = true;
+      if (this.gameStarted) this.backgroundMusic.play();
+
       this.backgroundMusic.play();
     };
     window.addEventListener("keydown", enableSound);
 
     this.setupDebugListeners();
+  }
+
+  startBackgroundMusic(): void {
+    this.gameStarted = true;
+    if (this.audioUnlocked) this.backgroundMusic?.play();
+  }
+
+  stopBackgroundMusic(): void {
+    this.backgroundMusic?.stop();
+  }
+
+  playDeathMusic(): void {
+    new Howl({ src: ["/assets/sounds/death.mp3"], volume: 1 }).play();
+    window.setTimeout(() => {
+      new Howl({ src: ["/assets/sounds/gameover.mp3"], volume: 1 }).play();
+    }, 5000)
   }
 
   destroy(): void {

@@ -69,6 +69,9 @@ importers:
       gsap:
         specifier: ^3.12.7
         version: 3.12.7
+      howler:
+        specifier: ^2.2.4
+        version: 2.2.4
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -1685,6 +1688,9 @@ packages:
   he@1.2.0:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
     hasBin: true
+
+  howler@2.2.4:
+    resolution: {integrity: sha512-iARIBPgcQrwtEr+tALF+rapJ8qSc+Set2GJQl7xT1MQzWaVkFebdJhR3alVlSiUf5U7nAANKuj3aWpwerocD5w==}
 
   humps@2.0.1:
     resolution: {integrity: sha512-E0eIbrFWUhwfXJmsbdjRQFQPrl5pTEoKlz163j1mTqqUnU9PgR4AgB8AIITzuB3vLBdxZXyZ9TDIrwB2OASz4g==}
@@ -4722,6 +4728,8 @@ snapshots:
       function-bind: 1.1.2
 
   he@1.2.0: {}
+
+  howler@2.2.4: {}
 
   humps@2.0.1: {}
 

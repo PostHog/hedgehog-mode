@@ -5,6 +5,13 @@ import { HedgeHogMode } from "../hedgehog-mode";
 import { GameConsole } from "./components/GameConsole";
 
 export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
+  /** force a repaint ~10×/sec so the numbers tick up in real-time */
+  const [, tick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => tick(Date.now()), 500);
+    return () => clearInterval(id);
+  }, []);
+
   const [dialogBox, setDialogBox] = useState<EntryUIDialogBoxProps | null>(
     null
   );
@@ -21,6 +28,9 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
 
   return (
     <div className="EntryUI">
+      <div className="Scoreboard">
+        wave: {game.world.wave}, kills: {game.world.kills}
+      </div>
       <DialogBox
         game={game}
         actor={dialogBox?.actor}

@@ -4,6 +4,7 @@ import { COLLISIONS } from "../misc/collisions";
 import { HedgehogActor } from "../actors/Hedgehog";
 import {Terrain} from "./Terrain";
 import {FlameActor} from "./Flame";
+import {FloatingPlatform} from "./FloatingPlatform";
 
 let PROJECTILE_ID = 0;
 
@@ -100,6 +101,10 @@ export class Projectile extends Actor {
     // carve a 40-pixel radius crater when we hit terrain
     if (element instanceof Terrain) {
       element.carveCircle(impact.x, impact.y, 40);
+      FlameActor.fireBurst(this.game, impact);
+    } else if (element instanceof FloatingPlatform) {
+      /* one hit = gone */
+      this.game.world.removeElement(element);
       FlameActor.fireBurst(this.game, impact);
     }
 

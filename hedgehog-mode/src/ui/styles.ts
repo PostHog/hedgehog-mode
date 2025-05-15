@@ -692,6 +692,20 @@ const pixelCornersGray2 = `
   .pixel-corners-gray-2::after {
     margin: -4px;
   }
+  .Scoreboard {
+    position: fixed;
+    top: 8px;
+    left: 8px;
+    padding: 4px 8px;
+    font-family: monospace;
+    font-weight: 600;
+    color: #fff;
+    background: rgba(0,0,0,0.5);
+    border-radius: 4px;
+    z-index: 10000;
+    user-select: none;
+    pointer-events: none;
+  }
 `;
 
 export const styles = [baseStyles, utils, pixelCorners, pixelCornersGray2].join(

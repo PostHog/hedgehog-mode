@@ -1,4 +1,4 @@
-export const styles = `
+const baseStyles = `
   :host {
     --color-text: #222;
     --color-background: white;
@@ -14,7 +14,10 @@ export const styles = `
     --spacing-sm: 0.5rem;
     --font-family: monospace;
     --font-size-sm: 0.875rem;
-
+    --game-color-border-dark: #b17816;
+    --game-color-background: #c8a989;
+    --game-color-background-dark: #b19475;
+    --game-color-text-dark: #593a17;
     display: block;
     background-color: transparent;
   }
@@ -100,10 +103,6 @@ export const styles = `
   .SwitchInput {
     display: none;
   }
-  
-  
-  
-  
 
   .DialogBox {
     position: fixed;
@@ -290,7 +289,7 @@ export const styles = `
 
   .GameConsole-content {
     position: relative;
-    background-color: #FFFFFF;
+    background-color: var(--game-color-background);
     border: 2px solid var(--color-border);
     border-radius: var(--border-radius-md);
     width: 90%;
@@ -314,13 +313,13 @@ export const styles = `
   .GameConsole-GameView {
     flex: 1;
     flex-grow: 1;
-    background-color: #000000;
+    background-color: var(--game-color-border-dark);
     margin-right: 16px;
   }
 
   .GameConsole-ControlPanel {
     flex: 1;
-    max-width: 200px;
+    max-width: 250px;
   }
 
   .GameConsole-ControlPanel-status-pizza {
@@ -340,6 +339,55 @@ export const styles = `
     height: 40px;
   }
 
+  .GameConsole-ControlPanel-weapons-weapon {
+    background-color: var(--game-color-background-dark);
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    border: 2px solid var(--color-border);
+  }
+
+`;
+
+const utils = `
+  .text-black {
+    color: #000000;
+  }
+  .text-game-dark {
+    color: var(--game-color-text-dark);
+  }
+  .flex {
+    display: flex;
+  }
+  .flex-col {
+    flex-direction: column;
+  }
+  .wrap {
+    flex-wrap: wrap;
+  }
+
+  .gap-2 {
+    gap: 0.5rem;
+  }
+
+  .gap-4 {
+    gap: 1rem;
+  }
+
+  .justify-center {
+    justify-content: center;
+  }
+
+  .justify-between {
+    justify-content: space-between;
+  }
+
+  .items-center {
+    align-items: center;
+  }
+`;
+
+const pixelCorners = `
   .pixel-corners,
 .pixel-corners--wrapper {
   clip-path: polygon(0px calc(100% - 30px),
@@ -494,37 +542,146 @@ export const styles = `
   bottom: 0;
   left: 0;
   right: 0;
-  background: #000000;
+  background: var(--game-color-border-dark);
   display: block;
   pointer-events: none;
 }
 .pixel-corners::after {
   margin: -6px;
-}
-.text-black {
-  color: #000000;
-}
-.flex {
-  display: flex;
-}
-.flex-col {
-  flex-direction: column;
-}
+}`;
 
-.gap-2 {
-  gap: 0.5rem;
-}
-
-.gap-4 {
-  gap: 1rem;
-}
-
-.justify-between {
-  justify-content: space-between;
-}
-
-.items-center {
-  align-items: center;
-}
-
+const pixelCornersGray2 = `
+  .pixel-corners-gray-2,
+  .pixel-corners-gray-2--wrapper {
+    clip-path: polygon(0px calc(100% - 8px),
+      2px calc(100% - 8px),
+      2px calc(100% - 4px),
+      4px calc(100% - 4px),
+      4px calc(100% - 2px),
+      8px calc(100% - 2px),
+      8px 100%,
+      calc(100% - 8px) 100%,
+      calc(100% - 8px) calc(100% - 2px),
+      calc(100% - 4px) calc(100% - 2px),
+      calc(100% - 4px) calc(100% - 4px),
+      calc(100% - 2px) calc(100% - 4px),
+      calc(100% - 2px) calc(100% - 8px),
+      100% calc(100% - 8px),
+      100% 8px,
+      calc(100% - 2px) 8px,
+      calc(100% - 2px) 4px,
+      calc(100% - 4px) 4px,
+      calc(100% - 4px) 2px,
+      calc(100% - 8px) 2px,
+      calc(100% - 8px) 0px,
+      8px 0px,
+      8px 2px,
+      4px 2px,
+      4px 4px,
+      2px 4px,
+      2px 8px,
+      0px 8px);
+    position: relative;
+  }
+  .pixel-corners-gray-2 {
+    border: 4px solid transparent;
+  }
+  .pixel-corners-gray-2--wrapper {
+    width: fit-content;
+    height: fit-content;
+  }
+  .pixel-corners-gray-2--wrapper .pixel-corners-gray-2 {
+    display: block;
+    clip-path: polygon(4px 10px,
+      6px 10px,
+      6px 6px,
+      10px 6px,
+      10px 4px,
+      calc(100% - 10px) 4px,
+      calc(100% - 10px) 6px,
+      calc(100% - 6px) 6px,
+      calc(100% - 6px) 10px,
+      calc(100% - 4px) 10px,
+      calc(100% - 4px) calc(100% - 10px),
+      calc(100% - 6px) calc(100% - 10px),
+      calc(100% - 6px) calc(100% - 6px),
+      calc(100% - 10px) calc(100% - 6px),
+      calc(100% - 10px) calc(100% - 4px),
+      10px calc(100% - 4px),
+      10px calc(100% - 6px),
+      6px calc(100% - 6px),
+      6px calc(100% - 10px),
+      4px calc(100% - 10px));
+  }
+  .pixel-corners-gray-2::after,
+  .pixel-corners-gray-2--wrapper::after {
+    content: "";
+    position: absolute;
+    clip-path: polygon(0px calc(100% - 8px),
+      2px calc(100% - 8px),
+      2px calc(100% - 4px),
+      4px calc(100% - 4px),
+      4px calc(100% - 2px),
+      8px calc(100% - 2px),
+      8px 100%,
+      calc(100% - 8px) 100%,
+      calc(100% - 8px) calc(100% - 2px),
+      calc(100% - 4px) calc(100% - 2px),
+      calc(100% - 4px) calc(100% - 4px),
+      calc(100% - 2px) calc(100% - 4px),
+      calc(100% - 2px) calc(100% - 8px),
+      100% calc(100% - 8px),
+      100% 8px,
+      calc(100% - 2px) 8px,
+      calc(100% - 2px) 4px,
+      calc(100% - 4px) 4px,
+      calc(100% - 4px) 2px,
+      calc(100% - 8px) 2px,
+      calc(100% - 8px) 0px,
+      8px 0px,
+      8px 2px,
+      4px 2px,
+      4px 4px,
+      2px 4px,
+      2px 8px,
+      0px 8px,
+      0px 50%,
+      4px 50%,
+      4px 10px,
+      6px 10px,
+      6px 6px,
+      10px 6px,
+      10px 4px,
+      calc(100% - 10px) 4px,
+      calc(100% - 10px) 6px,
+      calc(100% - 6px) 6px,
+      calc(100% - 6px) 10px,
+      calc(100% - 4px) 10px,
+      calc(100% - 4px) calc(100% - 10px),
+      calc(100% - 6px) calc(100% - 10px),
+      calc(100% - 6px) calc(100% - 6px),
+      calc(100% - 10px) calc(100% - 6px),
+      calc(100% - 10px) calc(100% - 4px),
+      10px calc(100% - 4px),
+      10px calc(100% - 6px),
+      6px calc(100% - 6px),
+      6px calc(100% - 10px),
+      4px calc(100% - 10px),
+      4px 50%,
+      0px 50%);
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--game-color-border-dark);
+    display: block;
+    pointer-events: none;
+  }
+  .pixel-corners-gray-2::after {
+    margin: -4px;
+  }
 `;
+
+export const styles = [baseStyles, utils, pixelCorners, pixelCornersGray2].join(
+  "\n"
+);

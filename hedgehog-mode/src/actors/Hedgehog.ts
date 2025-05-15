@@ -76,6 +76,7 @@ export class HedgehogActor extends Actor {
   controls: HedgehogActorControls;
   private filter = new ColorMatrixFilter();
   interface: HedgehogActorInterface;
+  attachedInventorySprites: Sprite[] = [];
 
   hitBoxModifier = {
     left: 0.24,
@@ -485,7 +486,23 @@ export class HedgehogActor extends Actor {
   private pickupInventory(inventory: Inventory): void {
     this.inventory.push(inventory);
     this.syncInventory();
+    this.attachInventorySprite(inventory);
   }
+
+  private attachInventorySprite = (inventory: Inventory): void => {
+    if (!inventory.sprite) return;
+    // Clone the inventory sprite for attachment
+    const attachedSprite = new Sprite(inventory.sprite.texture);
+    attachedSprite.anchor.set(0.5);
+    attachedSprite.scale.set(0.7); // Slightly smaller for visual fit
+    attachedSprite.x = 18; // Position in front of hedgehog (tweak as needed)
+    attachedSprite.y = 0;
+    attachedSprite.zIndex = 10;
+    attachedSprite.eventMode = "static";
+    attachedSprite.name = "inventory";
+    this.sprite!.addChild(attachedSprite);
+    this.attachedInventorySprites.push(attachedSprite);
+  };
 
   private syncInventory(): void {
     this.inventory.forEach((weapon) => {
@@ -533,6 +550,22 @@ export class HedgehogActor extends Actor {
     this.game.world.spawnHedgehogGhost(this.rigidBody!.position);
 
     this.game.world.removeElement(this);
+
+    // Remove attached inventory sprites
+    // this.attachedInventorySprites.forEach((sprite) => {
+    //   this.sprite!.removeChild(sprite);
+    // });
+    // this.attachedInventorySprites = [];
+
+    // gsap.to(this.sprite!.scale, {
+    //   x: 0,
+    //   y: 0,
+    //   duration: 3,
+    //   ease: "elastic.out",
+    //   onComplete: () => {
+    //     this.game.world.removeElement(this);
+    //   },
+    // });
   }
 
   beforeUnload(): void {
@@ -540,5 +573,10 @@ export class HedgehogActor extends Actor {
     Object.values(this.accessorySprites).forEach((sprite) => {
       this.game.app.stage.removeChild(sprite);
     });
+    // Remove attached inventory sprites from hedgehog sprite
+    this.attachedInventorySprites.forEach((sprite) => {
+      this.sprite!.removeChild(sprite);
+    });
+    this.attachedInventorySprites = [];
   }
 }

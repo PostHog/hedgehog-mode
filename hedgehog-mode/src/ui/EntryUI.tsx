@@ -11,6 +11,7 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
     const id = setInterval(() => tick(Date.now()), 500);
     return () => clearInterval(id);
   }, []);
+  const [consoleVisible, setConsoleVisible] = useState(true);
 
   const [dialogBox, setDialogBox] = useState<EntryUIDialogBoxProps | null>(
     null
@@ -42,6 +43,11 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
           dialogBox?.onClose?.();
         }}
       ></DialogBox>
+      <GameConsole
+        game={game}
+        visible={consoleVisible}
+        onClose={() => setConsoleVisible(false)}
+      />
     </div>
   );
 }

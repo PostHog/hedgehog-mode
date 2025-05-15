@@ -134,6 +134,12 @@ export class HedgehogActor extends Actor {
         this.mouseY = e.clientY;
       };
       window.addEventListener("mousemove", this.mouseMoveHandler);
+
+      // TODO: Remove
+
+      setTimeout(() => {
+        this.destroy();
+      }, 1000);
     }
   }
 
@@ -627,11 +633,6 @@ export class HedgehogActor extends Actor {
   }
 
   destroy(): void {
-    // this.setVelocity({
-    //   x: 0,
-    //   y: -5,
-    // });
-
     const accessories = this.options.accessories;
     this.options.accessories = [];
     this.syncAccessories();
@@ -679,7 +680,10 @@ export class HedgehogActor extends Actor {
           });
         },
       });
+      return;
     }
+
+    this.game.world.gameOver(this.rigidBody!.position);
   }
 
   beforeUnload(): void {

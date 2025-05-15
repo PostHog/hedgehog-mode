@@ -19,6 +19,8 @@ import { Actor } from "./actors/Actor";
 import { Platform } from "./items/Platform";
 import { Accessory } from "./items/Accessory";
 import { FloatingPlatform } from "./items/FloatingPlatform";
+import { GameOver } from "./game-over";
+import { Container } from "pixi.js";
 
 export class GameWorld {
   elements: GameElement[] = []; // TODO: Type better
@@ -26,9 +28,12 @@ export class GameWorld {
   wave: number = 0;
   enemies: HedgehogActor[] = [];
   kills: number = 0;
+  container: Container;
 
   constructor(private game: Game) {
     this.game = game;
+    this.container = new Container();
+    this.container.zIndex = 100;
   }
 
   setTimeout(fn: () => void, delay: number) {
@@ -41,6 +46,7 @@ export class GameWorld {
   }
 
   load() {
+    this.game.app.stage.addChild(this.container);
     new MainLevel(this.game).load();
     this.spawnPlatformsForWave();
 
@@ -193,7 +199,7 @@ export class GameWorld {
       Matter.Composite.remove(this.game.engine.world, element.rigidBody);
     }
     if (element.sprite) {
-      this.game.app.stage.removeChild(element.sprite);
+      this.container.removeChild(element.sprite);
     }
     this.elements = this.elements.filter((el) => el != element);
     this.game.log(`Removed element. Elements left: ${this.elements.length}`);
@@ -225,6 +231,18 @@ export class GameWorld {
         this.startWave();
       }, 5000);
     }
+  }
+
+  gameOver(position: Matter.Vector): void {
+    this.game.EntryUI?.showDialogBox({
+      actor: this.game.getPlayer(),
+      messages: [{ words: ["game over"] }],
+    });
+
+    this.game.setSpeed(0.2);
+
+    const gameOver = new GameOver(this.game);
+    this.addElement(gameOver);
   }
 
   beforeUnload(): void {

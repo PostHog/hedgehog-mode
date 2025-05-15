@@ -3,7 +3,7 @@ import { Graphics } from "pixi.js";
 import { Game, GameElement, UpdateTicker } from "../types";
 import { COLLISIONS } from "../misc/collisions";
 import { Projectile } from "./Projectile";
-import {GRASS_COLORS, SOIL_COLORS} from "../constants/colors";
+import { GRASS_COLORS, SOIL_COLORS } from "../constants/colors";
 
 /**
  * FloatingPlatform – stripy soil with rounded corners (top & bottom).
@@ -52,14 +52,14 @@ export class FloatingPlatform implements GameElement {
     /* ——————————————————— visuals ——————————————————— */
     this.gfx = new Graphics();
 
-    const MID_DIRT   = SOIL_COLORS[1];
-    const DARK_SOIL  = SOIL_COLORS[2];
+    const MID_DIRT = SOIL_COLORS[1];
+    const DARK_SOIL = SOIL_COLORS[2];
     const BASE_GRASS = GRASS_COLORS[1];
     const SOIL_STRATA = SOIL_COLORS;
 
-    const GRASS_H   = 10;
-    const RADIUS    = 8;   // corner radius for both top & bottom
-    const STRIPE_H  = 6;
+    const GRASS_H = 10;
+    const RADIUS = 8; // corner radius for both top & bottom
+    const STRIPE_H = 6;
 
     /* 1️⃣ rounded silhouette */
     this.gfx.beginFill(MID_DIRT);
@@ -76,7 +76,12 @@ export class FloatingPlatform implements GameElement {
 
       this.gfx.beginFill(baseCol);
       // keep a margin equal to radius so the rounded corners stay visible
-      this.gfx.drawRect(-w / 2 + localRadius, stripeY, w - localRadius * 2, height);
+      this.gfx.drawRect(
+        -w / 2 + localRadius,
+        stripeY,
+        w - localRadius * 2,
+        height
+      );
       this.gfx.endFill();
 
       stripeY += height;
@@ -90,35 +95,39 @@ export class FloatingPlatform implements GameElement {
 
     /* 4️⃣ spiky underside */
     const STEP = 8;
-    const leftInset  = -w / 2 + RADIUS + STEP;
-    const rightInset =  w / 2 - RADIUS - STEP;
+    const leftInset = -w / 2 + RADIUS + STEP;
+    const rightInset = w / 2 - RADIUS - STEP;
 
     for (let xi = leftInset; xi < rightInset; xi += STEP) {
       const depth = 4 + Math.random() * 8;
       this.gfx.beginFill(DARK_SOIL);
       this.gfx.drawPolygon([
-        xi,             h / 2,
-        xi + STEP,      h / 2,
-        xi + STEP / 2,  h / 2 + depth,
+        xi,
+        h / 2,
+        xi + STEP,
+        h / 2,
+        xi + STEP / 2,
+        h / 2 + depth,
       ]);
       this.gfx.endFill();
     }
 
     this.gfx.alpha = 0.95;
-    this.game.app.stage.addChildAt(this.gfx, 0);
+    this.game.world.container.addChildAt(this.gfx, 0);
 
     /* ——————————————————— motion ——————————————————— */
     this.baselineY = y;
     this.amplitude = opts.amplitude ?? 60;
-    this.period    = opts.period    ?? 4000;
+    this.period = opts.period ?? 4000;
 
     this.update({ deltaMS: 0, deltaTime: 0 });
   }
 
   update(_: UpdateTicker): void {
     const elapsed = performance.now() % this.period;
-    const offset  = Math.sin((elapsed / this.period) * Math.PI * 2) * this.amplitude;
-    const newY    = this.baselineY + offset;
+    const offset =
+      Math.sin((elapsed / this.period) * Math.PI * 2) * this.amplitude;
+    const newY = this.baselineY + offset;
 
     Matter.Body.setPosition(this.rigidBody, {
       x: this.rigidBody.position.x,
@@ -135,7 +144,7 @@ export class FloatingPlatform implements GameElement {
 
   beforeUnload(): void {
     Matter.Composite.remove(this.game.engine.world, this.rigidBody);
-    this.game.app.stage.removeChild(this.gfx);
+    this.game.world.container.removeChild(this.gfx);
     this.gfx.destroy();
   }
 }

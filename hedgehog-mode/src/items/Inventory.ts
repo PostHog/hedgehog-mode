@@ -58,8 +58,8 @@ export class Inventory extends Actor {
     this.sprite.play();
 
     // Ensure the sprite is added to the stage if Actor doesn't do it
-    if (!game.app.stage.children.includes(this.sprite)) {
-      game.app.stage.addChild(this.sprite);
+    if (!game.world.container.children.includes(this.sprite)) {
+      game.world.container.addChild(this.sprite);
     }
 
     // Set initial position (if needed)

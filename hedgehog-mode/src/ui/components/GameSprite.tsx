@@ -10,8 +10,8 @@ export function GameSprite({
 }: {
   game?: HedgeHogMode;
   spriteName: AvailableSpriteFrames;
-  translateX: number;
-  translateY: number;
+  translateX?: number;
+  translateY?: number;
   scale?: number;
 }) {
   if (!game) return null;
@@ -35,7 +35,7 @@ export function GameSprite({
         backgroundPosition: `-${x}px -${y}px`,
         backgroundSize: `${backgroundWidth}px ${backgroundHeight}px`,
         imageRendering: "pixelated",
-        transform: `translate(${translateX}px, ${translateY}px)`,
+        transform: `translate(${translateX ?? 0}px, ${translateY ?? 0}px)`,
         scale: scale,
       }}
     />

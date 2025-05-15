@@ -358,6 +358,9 @@ const utils = `
   .text-black {
     color: #000000;
   }
+  .font-bold {
+    font-weight: bold;
+  }
   .text-game-dark {
     color: var(--game-color-text-dark);
   }
@@ -369,6 +372,10 @@ const utils = `
   }
   .wrap {
     flex-wrap: wrap;
+  }
+
+  .gap-1 {
+    gap: 0.25rem;
   }
 
   .gap-2 {

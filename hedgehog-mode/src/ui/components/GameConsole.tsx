@@ -3,6 +3,7 @@ import { HedgeHogMode } from "../../hedgehog-mode";
 import { HedgehogActor } from "../../actors/Hedgehog";
 import { Weapon, Weapons } from "./Weapon";
 import { PizzaHealthIndicator } from "./PizzaHealthIndicator";
+import { GameControls } from "./GameControls";
 
 interface GameConsoleProps {
   game: HedgeHogMode;
@@ -55,20 +56,7 @@ export function GameConsole({ game, visible, onClose }: GameConsoleProps) {
               </div>
             </div>
             <Weapons game={game} />
-            <div className="GameConsole-ControlPanel-controls">
-              <div className="GameConsole-ControlPanel-control-option">
-                <div className="GameConsole-ControlPanel-control-option-icon"></div>
-                <div className="GameConsole-ControlPanel-control-option-label">
-                  Move left
-                </div>
-              </div>
-              <div className="GameConsole-ControlPanel-control-option">
-                <div className="GameConsole-ControlPanel-control-option-icon"></div>
-                <div className="GameConsole-ControlPanel-control-option-label">
-                  Move right
-                </div>
-              </div>
-            </div>
+            <GameControls game={game} />
             <div className="GameConsole-ControlPanel-options"></div>
             <div className="GameConsole-ControlPanel-logo">
               <img

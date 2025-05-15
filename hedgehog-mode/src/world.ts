@@ -62,6 +62,13 @@ export class GameWorld {
     };
 
     inventoryLoop();
+    this.game.startBackgroundMusic();
+  }
+
+  reset() {
+    this.gameOverContainer?.destroy();
+    this.gameOverContainer = undefined;
+    this.game.EntryUI?.showStartScreen();
   }
 
   startWave() {
@@ -241,6 +248,8 @@ export class GameWorld {
   }
 
   gameOver(position: Matter.Vector): void {
+    this.game.stopBackgroundMusic();
+    this.game.playDeathMusic();
     this.gameOverContainer = new GameOver(this.game, position, () =>
       this.destroy()
     );

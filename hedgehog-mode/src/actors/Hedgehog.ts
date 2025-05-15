@@ -448,32 +448,58 @@ export class HedgehogActor extends Actor {
 
     this.updateColor(ticker);
 
+    // if player, point to mouse,
+    // if not player, point to player
     // If the player is holding an inventory then we want to position it in front of the hedgehog
-    if (this.options.player && this.attachedInventorySprite) {
-      // Update sprite to holding versions
-      this.updateSprite("game-hold");
+    if (this.attachedInventorySprite) {
+      
+      if (this.options.player) {
+        // Update sprite to holding versions
+        this.updateSprite("game-hold");
 
-      const hedgehogGlobal = this.sprite!.getGlobalPosition();
-      const parentScaleX = this.sprite!.scale.x;
-      const angle = Math.atan2(
-        this.mouseY - hedgehogGlobal.y,
-        this.mouseX - hedgehogGlobal.x
-      );
-      
-      const facingLeft = parentScaleX < 0;
-      
-      // Flip gun vertically if the angle is on the "opposite" side
-      const shouldFlipY = (facingLeft && angle > -Math.PI / 2 && angle < Math.PI / 2) ||
-                          (!facingLeft && (angle < -Math.PI / 2 || angle > Math.PI / 2));
-      
-      this.attachedInventorySprite.scale.y = shouldFlipY ? -1 : 1;
-      
-      if (facingLeft) {
-        // Flip angle across vertical axis
-        this.attachedInventorySprite.rotation = Math.PI - angle;
+        const hedgehogGlobal = this.sprite!.getGlobalPosition();
+        const parentScaleX = this.sprite!.scale.x;
+        const angle = Math.atan2(
+          this.mouseY - hedgehogGlobal.y,
+          this.mouseX - hedgehogGlobal.x
+        );
+        
+        const facingLeft = parentScaleX < 0;
+        
+        // Flip gun vertically if the angle is on the "opposite" side
+        const shouldFlipY = (facingLeft && angle > -Math.PI / 2 && angle < Math.PI / 2) ||
+                            (!facingLeft && (angle < -Math.PI / 2 || angle > Math.PI / 2));
+        
+        this.attachedInventorySprite.scale.y = shouldFlipY ? -1 : 1;
+        
+        if (facingLeft) {
+          // Flip angle across vertical axis
+          this.attachedInventorySprite.rotation = Math.PI - angle;
+        } else {
+          this.attachedInventorySprite.rotation = angle;
+        }
       } else {
-        this.attachedInventorySprite.rotation = angle;
+        const player = this.game.world.elements.find(e => e instanceof HedgehogActor && e.options.player);
+        if (player) {
+          const playerGlobal = player.sprite!.getGlobalPosition();
+          const enemyGlobal = this.sprite!.getGlobalPosition();
+          const angleToPlayer = Math.atan2(
+            playerGlobal.y - enemyGlobal.y,
+            playerGlobal.x - enemyGlobal.x
+          );
+          const parentScaleX = this.sprite!.scale.x;
+          const facingLeft = parentScaleX < 0;
+          const shouldFlipY = (facingLeft && angleToPlayer > -Math.PI / 2 && angleToPlayer < Math.PI / 2) ||
+                              (!facingLeft && (angleToPlayer < -Math.PI / 2 || angleToPlayer > Math.PI / 2));
+          this.attachedInventorySprite.scale.y = shouldFlipY ? -1 : 1;
+          if (facingLeft) {
+            this.attachedInventorySprite.rotation = Math.PI - angleToPlayer;
+          } else {
+            this.attachedInventorySprite.rotation = angleToPlayer;
+          }
+        }
       }
+
     }
   }
 

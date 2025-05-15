@@ -29,7 +29,7 @@ export class GameWorld {
   enemies: HedgehogActor[] = [];
   kills: number = 0;
   container: Container;
-
+  gameOverContainer?: GameOver;
   constructor(private game: Game) {
     this.game = game;
     this.container = new Container();
@@ -123,9 +123,12 @@ export class GameWorld {
   }
 
   update(deltaMS: number) {
+    const ticker = { deltaMS, deltaTime: deltaMS / 1000 };
     this.elements.forEach((el) => {
-      el.update({ deltaMS, deltaTime: deltaMS / 1000 });
+      el.update(ticker);
     });
+
+    this.gameOverContainer?.update(ticker);
   }
 
   spawnRandomInventory(): Inventory {
@@ -234,15 +237,21 @@ export class GameWorld {
   }
 
   gameOver(position: Matter.Vector): void {
-    this.game.EntryUI?.showDialogBox({
-      actor: this.game.getPlayer(),
-      messages: [{ words: ["game over"] }],
+    this.gameOverContainer = new GameOver(this.game, position, () =>
+      this.destroy()
+    );
+  }
+
+  destroy() {
+    this.elements.forEach((el) => {
+      this.removeElement(el);
     });
 
-    this.game.setSpeed(0.2);
+    this.timers.forEach((timer) => {
+      clearTimeout(timer);
+    });
 
-    const gameOver = new GameOver(this.game);
-    this.addElement(gameOver);
+    this.timers = [];
   }
 
   beforeUnload(): void {

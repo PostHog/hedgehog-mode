@@ -22,7 +22,6 @@ import * as Tone from "tone";
 import { AvailableSpriteFrames } from "../sprites/sprites";
 import { Inventory } from "../items/Inventory";
 import { COLLISIONS } from "../misc/collisions";
-import { AudioManager, ActionSound } from "../audio";
 
 export const COLOR_TO_FILTER_MAP: Record<
   HedgehogActorColorOption,
@@ -138,9 +137,9 @@ export class HedgehogActor extends Actor {
 
       // TODO: Remove
 
-      setTimeout(() => {
-        this.destroy();
-      }, 1000);
+      // setTimeout(() => {
+      //   this.destroy();
+      // }, 1000);
     }
   }
 
@@ -242,10 +241,8 @@ export class HedgehogActor extends Actor {
     });
 
     this.jumps++;
-    // this.game.audioContext &&
-    //   this.game.audioContext.triggerAttackRelease("C4", "32n", Tone.now());
-
-    AudioManager.getInstance().play(ActionSound.JUMP);
+    this.game.audioContext &&
+      this.game.audioContext.triggerAttackRelease("C4", "32n", Tone.now());
   }
 
   pickupAccessory(accessory: string): void {
@@ -687,12 +684,13 @@ export class HedgehogActor extends Actor {
     }
 
     this.game.world.gameOver(this.rigidBody!.position);
+    this.game.world.removeElement(this);
   }
 
   beforeUnload(): void {
     this.ai.enable(false);
     Object.values(this.accessorySprites).forEach((sprite) => {
-      this.game.app.stage.removeChild(sprite);
+      this.game.world.container.removeChild(sprite);
     });
     // Remove attached inventory sprites from hedgehog sprite
     this.attachedInventorySprite &&

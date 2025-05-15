@@ -54,6 +54,7 @@ export class Inventory extends Actor {
     const frames = game.spritesManager.getAnimatedSpriteFrames(spriteKey);
 
     this.sprite = new AnimatedSprite(frames);
+    this.sprite.anchor.set(0.5, 0.6);
     this.sprite.animationSpeed = 0.1;
     this.sprite.play();
 

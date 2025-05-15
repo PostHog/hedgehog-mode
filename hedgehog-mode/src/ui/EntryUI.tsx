@@ -43,6 +43,7 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
         setDialogBoxVisible(false);
         setConsoleVisible(true);
         setGameOverVisible(false);
+        game.setSpeed(0);
       },
     });
   }, [game]);

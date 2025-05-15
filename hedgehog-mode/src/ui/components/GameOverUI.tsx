@@ -25,7 +25,7 @@ export function GameOverUI({ game, visible, onClose }: GameOverUIProps) {
             game.world.reset();
           }, 1000);
         }, 5000);
-      }, 50);
+      }, 5000);
     }
   }, [visible]);
 

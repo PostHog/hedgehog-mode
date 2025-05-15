@@ -93,7 +93,19 @@ export function GameConsole({ game, visible, onClose }: GameConsoleProps) {
               <GameControls game={game} />
             </div>
             <div>
-              <GameOptions game={game} />
+              <GameOptions
+                game={game}
+                startAction={() => {
+                  world.load();
+                  onClose();
+                }}
+                resumeAction={() => {
+                  game.setSpeed(1);
+                  onClose();
+                }}
+                outfitsAction={() => {}}
+                shareAction={() => {}}
+              />
             </div>
           </div>
         </div>

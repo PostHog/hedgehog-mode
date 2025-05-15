@@ -11,7 +11,7 @@ import { StaticHedgehogRenderer } from "./static-renderer/StaticHedgehog";
 import { GameWorld } from "./world";
 import * as Tone from "tone";
 import { PolySynth } from "tone";
-import { Howl } from 'howler';
+import { Howl } from "howler";
 
 Matter.Common.setDecomp(decomp);
 
@@ -51,8 +51,8 @@ export class HedgeHogMode implements Game {
   world: GameWorld;
   audioContext?: PolySynth;
   backgroundMusic?: Howl;
-  private audioUnlocked = false;          // ①  tracks Tone / Howler unlock
-  private gameStarted   = false;          // ②  set once the title screen closes
+  private audioUnlocked = false; // ①  tracks Tone / Howler unlock
+  private gameStarted = false; // ②  set once the title screen closes
 
   constructor(private options: HedgehogModeConfig) {
     this.spritesManager = new SpritesManager(options);
@@ -273,8 +273,6 @@ export class HedgeHogMode implements Game {
 
     new GlobalKeyboardListeners(this);
     gsap.ticker.remove(gsap.updateRoot);
-
-    this.world.load();
     // this.stateManager = new GameStateManager(this, this.options);
   }
 

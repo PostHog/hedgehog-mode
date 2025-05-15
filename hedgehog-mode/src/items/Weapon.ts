@@ -31,7 +31,7 @@ export class Weapon extends Actor {
       label: "Weapon",
     });
 
-    this.loadSprite("weapons/bazooka/tile");
+    this.loadSprite("overlays/bazooka/tile");
     this.setScale(0.8);
   }
 

@@ -76,7 +76,7 @@ export class HedgehogActor extends Actor {
   controls: HedgehogActorControls;
   private filter = new ColorMatrixFilter();
   interface: HedgehogActorInterface;
-  attachedInventorySprites: Sprite[] = [];
+  attachedInventorySprite?: Sprite;
 
   // Track mouse position for player
   mouseX: number = 0;
@@ -449,28 +449,25 @@ export class HedgehogActor extends Actor {
     this.updateColor(ticker);
 
     // If the player is holding an inventory then we want to position it in front of the hedgehog
-    if (this.options.player && this.attachedInventorySprites.length > 0) {
+    if (this.options.player && this.attachedInventorySprite) {
       // Update sprite to holding versions
       this.updateSprite("game-hold");
 
       const hedgehogGlobal = this.sprite!.getGlobalPosition();
       const parentScaleX = this.sprite!.scale.x;
-      this.attachedInventorySprites.forEach((sprite) => {
         const angle = Math.atan2(
           this.mouseY - hedgehogGlobal.y,
           this.mouseX - hedgehogGlobal.x
         );
 
         // If your sprite points up by default, use this:
-        sprite.scale.set(0.7, 0.7);
         if (parentScaleX < 0) {
-          sprite.scale.x = -0.7;
-          sprite.rotation = angle + Math.PI - Math.PI / 2;
+          this.attachedInventorySprite.scale.x = Math.abs(this.attachedInventorySprite.scale.x);
+          this.attachedInventorySprite.rotation = angle + Math.PI - Math.PI / 2;
         } else {
-          sprite.scale.x = 0.7;
-          sprite.rotation = angle - Math.PI / 2;
+          this.attachedInventorySprite.scale.x = this.attachedInventorySprite.scale.x;
+          this.attachedInventorySprite.rotation = angle - Math.PI / 2;
         }
-      });
     }
   }
 
@@ -547,13 +544,16 @@ export class HedgehogActor extends Actor {
     // Clone the inventory sprite for attachment
     const attachedSprite = new Sprite(inventory.sprite.texture);
     attachedSprite.anchor.set(0.5, 0.7);
-    attachedSprite.scale.set(0.7); // Slightly smaller for visual fit
     attachedSprite.x = 7; // Position in front of hedgehog (tweak as needed)
     attachedSprite.y = 6;
     attachedSprite.zIndex = 10;
     attachedSprite.eventMode = "static";
     this.sprite!.addChild(attachedSprite);
-    this.attachedInventorySprites.push(attachedSprite);
+    attachedSprite.scale.set(inventory.scale);
+    // TODO first remove any existing inventory sprites
+    this.attachedInventorySprite && this.sprite!.removeChild(this.attachedInventorySprite);
+    // TODO make this single
+    this.attachedInventorySprite = attachedSprite;
   };
 
   private syncInventory(): void {
@@ -651,10 +651,8 @@ export class HedgehogActor extends Actor {
       this.game.app.stage.removeChild(sprite);
     });
     // Remove attached inventory sprites from hedgehog sprite
-    this.attachedInventorySprites.forEach((sprite) => {
-      this.sprite!.removeChild(sprite);
-    });
-    this.attachedInventorySprites = [];
+    this.attachedInventorySprite && this.sprite!.removeChild(this.attachedInventorySprite);
+    this.attachedInventorySprite = undefined;
 
     // Remove mousemove event listener if set
     if (this.mouseMoveHandler) {

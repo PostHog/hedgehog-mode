@@ -10,6 +10,7 @@ export type InventoryItemType = (typeof INVENTORY_ITEMS)[number];
 
 export interface InventoryOptions {
   type: InventoryItemType;
+  scale: number;
   // Add more properties as needed (ammo, damage, etc.)
 }
 
@@ -29,6 +30,7 @@ export class Inventory extends Actor {
     mask: COLLISIONS.ACTOR | COLLISIONS.PLATFORM | COLLISIONS.GROUND,
   };
 
+  scale = 1;
   type: InventoryItemType;
   sprite: AnimatedSprite;
 
@@ -45,6 +47,7 @@ export class Inventory extends Actor {
     });
 
     this.type = options.type;
+    this.scale = options.scale || 1;
 
     // Dynamically load the correct sprite/animation based on type
     const spriteKey = `inventory/${this.type}-tile` as AvailableSpriteFrames;
@@ -63,7 +66,7 @@ export class Inventory extends Actor {
     // Set initial position (if needed)
     this.sprite.visible = true;
 
-    this.setScale(0.8);
+    this.setScale(this.scale);
 
     this.setPosition({
       x: Math.random() * window.innerWidth,

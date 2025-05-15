@@ -86,6 +86,9 @@ export class Actor implements GameElement {
       return;
     }
 
+    const width = this.sprite!.width;
+    const height = this.sprite!.height;
+
     const playerOptions: Matter.IBodyDefinition = {
       density: 0.001,
       friction: 0.2,
@@ -99,19 +102,18 @@ export class Actor implements GameElement {
       ...this.rigidBodyOptions,
     };
 
-    const width = this.sprite!.width;
-    const height = this.sprite!.height;
+    // Round the bottom-left & bottom-right corners so we glide over bumps
+    const BODY_W = width  - width  * (this.hitBoxModifier.left + this.hitBoxModifier.right);
+    const BODY_H = height - height * (this.hitBoxModifier.top  + this.hitBoxModifier.bottom);
 
     this.rigidBody = Matter.Bodies.rectangle(
-      x,
-      y,
-      width -
-        width * this.hitBoxModifier.left -
-        width * this.hitBoxModifier.right,
-      height -
-        height * this.hitBoxModifier.top -
-        height * this.hitBoxModifier.bottom,
-      playerOptions
+      x, y,
+      BODY_W,
+      BODY_H,
+      {
+        ...playerOptions,
+        chamfer : { radius: [BODY_W * 0.25, BODY_W * 0.25, BODY_W * 0.25, BODY_W * 0.25] },
+      }
     );
 
     Matter.Composite.add(this.game.engine.world, this.rigidBody);

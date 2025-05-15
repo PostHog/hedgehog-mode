@@ -16,7 +16,7 @@ const baseStyles = `
     --font-size-sm: 0.875rem;
     --game-color-border-dark: #b17816;
     --game-color-background: #c8a989;
-    --game-color-background-dark: #b19475;
+    --game-color-background-dark: #b89065;
     --game-color-text-dark: #593a17;
     display: block;
     background-color: transparent;
@@ -384,6 +384,18 @@ const utils = `
 
   .items-center {
     align-items: center;
+  }
+
+  .w-full {
+    width: 100%;
+  }
+
+  .h-auto {
+    height: auto;
+  }
+
+  .max-w-full {
+    max-width: 100%;
   }
 `;
 

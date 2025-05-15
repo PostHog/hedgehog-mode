@@ -272,7 +272,10 @@ export class HedgeHogMode implements Game {
   }
 
   private findElementWithRigidBody(rb: Matter.Body) {
-    return this.world.elements.find((element) => element.rigidBody === rb);
+    const root = rb.parent || rb;
+    return this.world.elements.find(el =>
+      el.rigidBody && (el.rigidBody.parent || el.rigidBody) === root
+    );
   }
 
   setSpeed(speed: number) {

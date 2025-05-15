@@ -4,12 +4,11 @@ import {
   NO_PLATFORM_COLLISION_FILTER,
 } from "./Actor";
 import { Game, GameElement, UpdateTicker } from "../types";
-import Matter, { Bodies, Composites, Constraint, Pair } from "matter-js";
+import Matter, { Constraint, Pair } from "matter-js";
 import { SyncedPlatform } from "../items/SyncedPlatform";
 import { AnimatedSprite, ColorMatrixFilter, Sprite } from "pixi.js";
 import { FlameActor } from "../items/Flame";
 import gsap from "gsap";
-import { COLLISIONS } from "../misc/collisions";
 import { HedgehogActorAI } from "./hedgehog/ai";
 import { HedgehogActorControls } from "./hedgehog/controls";
 import {
@@ -467,7 +466,7 @@ export class HedgehogActor extends Actor {
       // TODO: Add to the player's inventory
       this.pickupInventory(element);
     }
-    
+
     if (element.rigidBody!.bounds.min.y > this.rigidBody!.bounds.min.y) {
       this.game.log("Hit something below");
       this.jumps = 0;
@@ -548,22 +547,7 @@ export class HedgehogActor extends Actor {
     // };
 
     this.game.world.spawnHedgehogGhost(this.rigidBody!.position);
-
-    // Remove attached inventory sprites
-    this.attachedInventorySprites.forEach((sprite) => {
-      this.sprite!.removeChild(sprite);
-    });
-    this.attachedInventorySprites = [];
-
-    gsap.to(this.sprite!.scale, {
-      x: 0,
-      y: 0,
-      duration: 3,
-      ease: "elastic.out",
-      onComplete: () => {
-        this.game.world.removeElement(this);
-      },
-    });
+    this.game.world.removeElement(this);
   }
 
   beforeUnload(): void {

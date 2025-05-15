@@ -455,19 +455,25 @@ export class HedgehogActor extends Actor {
 
       const hedgehogGlobal = this.sprite!.getGlobalPosition();
       const parentScaleX = this.sprite!.scale.x;
-        const angle = Math.atan2(
-          this.mouseY - hedgehogGlobal.y,
-          this.mouseX - hedgehogGlobal.x
-        );
-
-        // If your sprite points up by default, use this:
-        if (parentScaleX < 0) {
-          this.attachedInventorySprite.scale.x = Math.abs(this.attachedInventorySprite.scale.x);
-          this.attachedInventorySprite.rotation = angle + Math.PI - Math.PI / 2;
-        } else {
-          this.attachedInventorySprite.scale.x = this.attachedInventorySprite.scale.x;
-          this.attachedInventorySprite.rotation = angle - Math.PI / 2;
-        }
+      const angle = Math.atan2(
+        this.mouseY - hedgehogGlobal.y,
+        this.mouseX - hedgehogGlobal.x
+      );
+      
+      const facingLeft = parentScaleX < 0;
+      
+      // Flip gun vertically if the angle is on the "opposite" side
+      const shouldFlipY = (facingLeft && angle > -Math.PI / 2 && angle < Math.PI / 2) ||
+                          (!facingLeft && (angle < -Math.PI / 2 || angle > Math.PI / 2));
+      
+      this.attachedInventorySprite.scale.y = shouldFlipY ? -1 : 1;
+      
+      if (facingLeft) {
+        // Flip angle across vertical axis
+        this.attachedInventorySprite.rotation = Math.PI - angle;
+      } else {
+        this.attachedInventorySprite.rotation = angle;
+      }
     }
   }
 

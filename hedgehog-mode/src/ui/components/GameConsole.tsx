@@ -4,6 +4,7 @@ import { HedgehogActor } from "../../actors/Hedgehog";
 import { Weapon, Weapons } from "./Weapon";
 import { PizzaHealthIndicator } from "./PizzaHealthIndicator";
 import { GameControls } from "./GameControls";
+import { GameLogo } from "./GameLogo";
 
 interface GameConsoleProps {
   game: HedgeHogMode;
@@ -58,13 +59,7 @@ export function GameConsole({ game, visible, onClose }: GameConsoleProps) {
             <Weapons game={game} />
             <GameControls game={game} />
             <div className="GameConsole-ControlPanel-options"></div>
-            <div className="GameConsole-ControlPanel-logo">
-              <img
-                src="/assets/hogwars.png"
-                alt="Hogwars Logo"
-                className="w-full h-auto max-w-full"
-              />
-            </div>
+            <GameLogo />
           </div>
         </div>
       </div>

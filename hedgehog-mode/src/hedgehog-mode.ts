@@ -74,13 +74,14 @@ export class HedgeHogMode implements Game {
         this.backgroundMusic = new Howl({
           src: ["/assets/music/timeattack.mp3"],
           loop: true,
-          volume: 0.5, // tweak to taste
+          volume: 0.3,          // tweak to taste
+          sprite: { main: [10_000, 999_999, true] }
         });
       }
       this.audioUnlocked = true;
-      if (this.gameStarted) this.backgroundMusic.play();
+      if (this.gameStarted) this.backgroundMusic.play('main');
 
-      this.backgroundMusic.play();
+      this.backgroundMusic.play('main');
     };
     window.addEventListener("keydown", enableSound);
 
@@ -89,7 +90,7 @@ export class HedgeHogMode implements Game {
 
   startBackgroundMusic(): void {
     this.gameStarted = true;
-    if (this.audioUnlocked) this.backgroundMusic?.play();
+    if (this.audioUnlocked) this.backgroundMusic?.play('main');
   }
 
   stopBackgroundMusic(): void {
@@ -98,11 +99,11 @@ export class HedgeHogMode implements Game {
 
   playDeathMusic(): void {
     window.setTimeout(() => {
-      new Howl({ src: ["/assets/sounds/die.wav"], volume: 1 }).play();
-    }, 2500);
+      new Howl({ src: ["/assets/sounds/die.wav"], volume: 1.2 }).play();
+    }, 2500)
     window.setTimeout(() => {
-      new Howl({ src: ["/assets/sounds/gameover.mp3"], volume: 1 }).play();
-    }, 5500);
+      new Howl({ src: ["/assets/sounds/gameover.mp3"], volume: 1.2 }).play();
+    }, 5500)
   }
 
   destroy(): void {

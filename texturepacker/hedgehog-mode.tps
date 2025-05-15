@@ -4,7 +4,7 @@
         <key>fileFormatVersion</key>
         <int>6</int>
         <key>texturePackerVersion</key>
-        <string>7.6.3</string>
+        <string>7.4.0</string>
         <key>autoSDSettings</key>
         <array>
             <struct type="AutoSDSettings">
@@ -189,8 +189,18 @@
             <key type="filename">assets/accessories/xmas-antlers.png</key>
             <key type="filename">assets/accessories/xmas-hat.png</key>
             <key type="filename">assets/accessories/xmas-scarf.png</key>
-            <key type="filename">assets/overlays/bazooka/tile001.png</key>
-            <key type="filename">assets/overlays/bazooka/tile002.png</key>
+            <key type="filename">assets/inventory/bazooka-held-tile001.png</key>
+            <key type="filename">assets/inventory/bazooka-held-tile002.png</key>
+            <key type="filename">assets/inventory/bazooka-tile001.png</key>
+            <key type="filename">assets/inventory/bazooka-tile002.png</key>
+            <key type="filename">assets/inventory/grenade-held-tile001.png</key>
+            <key type="filename">assets/inventory/grenade-held-tile002.png</key>
+            <key type="filename">assets/inventory/grenade-tile001.png</key>
+            <key type="filename">assets/inventory/grenade-tile002.png</key>
+            <key type="filename">assets/inventory/gun-held-tile001.png</key>
+            <key type="filename">assets/inventory/gun-held-tile002.png</key>
+            <key type="filename">assets/inventory/gun-tile001.png</key>
+            <key type="filename">assets/inventory/gun-tile002.png</key>
             <key type="filename">assets/overlays/fire/tile000.png</key>
             <key type="filename">assets/overlays/fire/tile001.png</key>
             <key type="filename">assets/overlays/fire/tile002.png</key>
@@ -503,6 +513,14 @@
             <key type="filename">assets/skins/spiderhog/wave/tile023.png</key>
             <key type="filename">assets/skins/spiderhog/wave/tile024.png</key>
             <key type="filename">assets/skins/spiderhog/wave/tile025.png</key>
+            <key type="filename">assets/ui/pizza/pizza-0.png</key>
+            <key type="filename">assets/ui/pizza/pizza-1.png</key>
+            <key type="filename">assets/ui/pizza/pizza-2.png</key>
+            <key type="filename">assets/ui/pizza/pizza-3.png</key>
+            <key type="filename">assets/ui/pizza/pizza-4.png</key>
+            <key type="filename">assets/ui/pizza/pizza-5.png</key>
+            <key type="filename">assets/ui/pizza/pizza-6.png</key>
+            <key type="filename">assets/ui/pizza/pizza-7.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0,0</point_f>
@@ -533,6 +551,25 @@
                 <rect>20,6,39,12</rect>
                 <key>scale9Paddings</key>
                 <rect>20,6,39,12</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">assets/ui/ui-mute.png</key>
+            <key type="filename">assets/ui/ui-pause.png</key>
+            <key type="filename">assets/ui/ui-play.png</key>
+            <key type="filename">assets/ui/ui-share.png</key>
+            <key type="filename">assets/ui/ui-sound.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0,0</point_f>
+                <key>spriteScale</key>
+                <double>1</double>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>5,5,10,10</rect>
+                <key>scale9Paddings</key>
+                <rect>5,5,10,10</rect>
                 <key>scale9FromFile</key>
                 <false/>
             </struct>

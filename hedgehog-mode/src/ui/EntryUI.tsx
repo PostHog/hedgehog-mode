@@ -55,7 +55,7 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
 
   return (
     <div className="EntryUI">
-      {!consoleVisible && (
+      {!consoleVisible && !gameOverVisible && (
         <>
           <div className="Scoreboard text-beige">
             <GameHealthAndPoints

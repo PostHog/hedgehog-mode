@@ -33,8 +33,8 @@ export class GameWorld {
       player: true,
       controls_enabled: true,
       ai_enabled: false,
-    });
-  }
+    });  
+  }  
 
   spawnHedgehog(options: HedgehogActorOptions | undefined): HedgehogActor {
     const actor = new HedgehogActor(

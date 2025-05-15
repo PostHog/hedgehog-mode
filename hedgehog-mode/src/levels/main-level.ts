@@ -10,6 +10,8 @@ export class MainLevel {
     this.game.world.elements.push(new Ground(this.game));
     const player = this.game.world.spawnPlayer();
 
+    this.game.world.spawnRandomWeapon();
+
     this.game.world.spawnHedgehog({
       id: "enemy-hedgehog-1",
       player: false,

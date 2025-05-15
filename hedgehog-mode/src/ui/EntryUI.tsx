@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { DialogBox } from "./components/DialogBox";
 import { EntryUIDialogBoxProps } from "../types";
 import { HedgeHogMode } from "../hedgehog-mode";
+import { GameConsole } from "./components/GameConsole";
 
 export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
   const [dialogBox, setDialogBox] = useState<EntryUIDialogBoxProps | null>(
@@ -31,6 +32,7 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
           dialogBox?.onClose?.();
         }}
       ></DialogBox>
+      <GameConsole game={game} visible={true} onClose={() => {}} />
     </div>
   );
 }

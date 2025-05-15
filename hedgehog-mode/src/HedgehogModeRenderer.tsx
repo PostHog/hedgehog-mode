@@ -32,6 +32,12 @@ export function HedgehogModeRenderer({
       data-theme={theme ?? osTheme}
       style={style}
     >
+      <style>
+        {`
+        @import
+        url('https://fonts.googleapis.com/css2?family=Doto:wght@500&display=swap');
+        `}
+      </style>
       <style>{styles}</style>
       <div
         className="GameContainer"

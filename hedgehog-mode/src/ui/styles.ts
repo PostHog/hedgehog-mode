@@ -28,6 +28,22 @@ export const styles = `
     --color-shadow: rgba(0, 0, 0, 0.3);
   }
 
+  .font-doto {
+    font-family: "Doto", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-variation-settings:
+      "ROND" 0;
+  }
+
+  .font-doto-500 {
+    font-weight: 500;
+  }
+
+  .font-doto-600 {
+    font-weight: 600;
+  }
+
   .GameContainer {
     position: fixed;
     inset: 0;
@@ -270,12 +286,11 @@ export const styles = `
   .GameConsole-overlay {
     position: absolute;
     inset: 0;
-    background-color: rgba(0, 0, 0, 0.5);
   }
 
   .GameConsole-content {
     position: relative;
-    background-color: var(--color-background);
+    background-color: #FFFFFF;
     border: 2px solid var(--color-border);
     border-radius: var(--border-radius-md);
     width: 90%;
@@ -285,24 +300,210 @@ export const styles = `
     display: flex;
     flex-direction: column;
     box-shadow: 0 10px 15px -3px var(--color-shadow);
-  }
-
-  .GameConsole-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: var(--spacing-sm);
-    border-bottom: 1px solid var(--color-border-light);
-  }
-
-  .GameConsole-header h1 {
-    margin: 0;
-    font-size: 1.5rem;
+    padding: 0;
+    overflow: visible;
+    padding: 16px;
   }
 
   .GameConsole-body {
     flex: 1;
-    padding: var(--spacing-sm);
+    display: flex;
     overflow-y: auto;
   }
+
+  .GameConsole-GameView {
+    flex: 1;
+    flex-grow: 1;
+    background-color: #000000;
+  }
+
+  .GameConsole-ControlPanel {
+    flex: 1;
+    max-width: 300px;
+  }
+
+  .GameConsole-ControlPanel-status-pizza {
+    background-color: red;
+    width: 100px;
+    height: 100px;
+    border-radius: 100%;
+  }
+
+  .GameConsole-ControlPanel-status-points {
+    font-size: 2rem;
+  }
+
+
+
+  .pixel-corners,
+.pixel-corners--wrapper {
+  clip-path: polygon(0px calc(100% - 30px),
+    6px calc(100% - 30px),
+    6px calc(100% - 18px),
+    12px calc(100% - 18px),
+    12px calc(100% - 12px),
+    18px calc(100% - 12px),
+    18px calc(100% - 6px),
+    30px calc(100% - 6px),
+    30px 100%,
+    calc(100% - 30px) 100%,
+    calc(100% - 30px) calc(100% - 6px),
+    calc(100% - 18px) calc(100% - 6px),
+    calc(100% - 18px) calc(100% - 12px),
+    calc(100% - 12px) calc(100% - 12px),
+    calc(100% - 12px) calc(100% - 18px),
+    calc(100% - 6px) calc(100% - 18px),
+    calc(100% - 6px) calc(100% - 30px),
+    100% calc(100% - 30px),
+    100% 30px,
+    calc(100% - 6px) 30px,
+    calc(100% - 6px) 18px,
+    calc(100% - 12px) 18px,
+    calc(100% - 12px) 12px,
+    calc(100% - 18px) 12px,
+    calc(100% - 18px) 6px,
+    calc(100% - 30px) 6px,
+    calc(100% - 30px) 0px,
+    30px 0px,
+    30px 6px,
+    18px 6px,
+    18px 12px,
+    12px 12px,
+    12px 18px,
+    6px 18px,
+    6px 30px,
+    0px 30px);
+  position: relative;
+}
+.pixel-corners {
+  border: 6px solid transparent;
+}
+.pixel-corners--wrapper {
+  width: fit-content;
+  height: fit-content;
+}
+.pixel-corners--wrapper .pixel-corners {
+  display: block;
+  clip-path: polygon(6px 30px,
+    12px 30px,
+    12px 18px,
+    18px 18px,
+    18px 12px,
+    30px 12px,
+    30px 6px,
+    calc(100% - 30px) 6px,
+    calc(100% - 30px) 12px,
+    calc(100% - 18px) 12px,
+    calc(100% - 18px) 18px,
+    calc(100% - 12px) 18px,
+    calc(100% - 12px) 30px,
+    calc(100% - 6px) 30px,
+    calc(100% - 6px) calc(100% - 30px),
+    calc(100% - 12px) calc(100% - 30px),
+    calc(100% - 12px) calc(100% - 18px),
+    calc(100% - 18px) calc(100% - 18px),
+    calc(100% - 18px) calc(100% - 12px),
+    calc(100% - 30px) calc(100% - 12px),
+    calc(100% - 30px) calc(100% - 6px),
+    30px calc(100% - 6px),
+    30px calc(100% - 12px),
+    18px calc(100% - 12px),
+    18px calc(100% - 18px),
+    12px calc(100% - 18px),
+    12px calc(100% - 30px),
+    6px calc(100% - 30px));
+}
+.pixel-corners::after,
+.pixel-corners--wrapper::after {
+  content: "";
+  position: absolute;
+  clip-path: polygon(0px calc(100% - 30px),
+    6px calc(100% - 30px),
+    6px calc(100% - 18px),
+    12px calc(100% - 18px),
+    12px calc(100% - 12px),
+    18px calc(100% - 12px),
+    18px calc(100% - 6px),
+    30px calc(100% - 6px),
+    30px 100%,
+    calc(100% - 30px) 100%,
+    calc(100% - 30px) calc(100% - 6px),
+    calc(100% - 18px) calc(100% - 6px),
+    calc(100% - 18px) calc(100% - 12px),
+    calc(100% - 12px) calc(100% - 12px),
+    calc(100% - 12px) calc(100% - 18px),
+    calc(100% - 6px) calc(100% - 18px),
+    calc(100% - 6px) calc(100% - 30px),
+    100% calc(100% - 30px),
+    100% 30px,
+    calc(100% - 6px) 30px,
+    calc(100% - 6px) 18px,
+    calc(100% - 12px) 18px,
+    calc(100% - 12px) 12px,
+    calc(100% - 18px) 12px,
+    calc(100% - 18px) 6px,
+    calc(100% - 30px) 6px,
+    calc(100% - 30px) 0px,
+    30px 0px,
+    30px 6px,
+    18px 6px,
+    18px 12px,
+    12px 12px,
+    12px 18px,
+    6px 18px,
+    6px 30px,
+    0px 30px,
+    0px 50%,
+    6px 50%,
+    6px 30px,
+    12px 30px,
+    12px 18px,
+    18px 18px,
+    18px 12px,
+    30px 12px,
+    30px 6px,
+    calc(100% - 30px) 6px,
+    calc(100% - 30px) 12px,
+    calc(100% - 18px) 12px,
+    calc(100% - 18px) 18px,
+    calc(100% - 12px) 18px,
+    calc(100% - 12px) 30px,
+    calc(100% - 6px) 30px,
+    calc(100% - 6px) calc(100% - 30px),
+    calc(100% - 12px) calc(100% - 30px),
+    calc(100% - 12px) calc(100% - 18px),
+    calc(100% - 18px) calc(100% - 18px),
+    calc(100% - 18px) calc(100% - 12px),
+    calc(100% - 30px) calc(100% - 12px),
+    calc(100% - 30px) calc(100% - 6px),
+    30px calc(100% - 6px),
+    30px calc(100% - 12px),
+    18px calc(100% - 12px),
+    18px calc(100% - 18px),
+    12px calc(100% - 18px),
+    12px calc(100% - 30px),
+    6px calc(100% - 30px),
+    6px 50%,
+    0px 50%);
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #000000;
+  display: block;
+  pointer-events: none;
+}
+.pixel-corners::after {
+  margin: -6px;
+}
+.text-black {
+  color: #000000;
+}
+.flex {
+  display: flex;
+}
+.flex-col {
+  flex-direction: column;
+}
+
 `;

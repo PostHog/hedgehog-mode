@@ -37,15 +37,24 @@ export function GameConsole({ game, visible, onClose }: GameConsoleProps) {
   return (
     <div className="GameConsole">
       <div className="GameConsole-overlay" onClick={onClose} />
-      <div className="GameConsole-content">
-        <div className="GameConsole-header">
-          <h1>Game Console</h1>
-          <button className="Button" onClick={onClose}>
-            X
-          </button>
-        </div>
+      <div className="GameConsole-content pixel-corners">
         <div className="GameConsole-body">
-          {/* Add game console content here */}
+          <div className="GameConsole-GameView pixel-corners"></div>
+          <div className="GameConsole-ControlPanel flex flex-col">
+            <div className="GameConsole-ControlPanel-status flex flex-row">
+              <div className="GameConsole-ControlPanel-status-pizza"></div>
+              <div className="GameConsole-ControlPanel-status-points">
+                <div className="GameConsole-ControlPanel-status-count font-doto font-doto-600 text-black">
+                  215
+                </div>
+                <div className="GameConsole-ControlPanel-status-pineapple"></div>
+              </div>
+            </div>
+            <div className="GameConsole-ControlPanel-weapons"></div>
+            <div className="GameConsole-ControlPanel-controls"></div>
+            <div className="GameConsole-ControlPanel-options"></div>
+            <div className="GameConsole-ControlPanel-logo"></div>
+          </div>
         </div>
       </div>
     </div>

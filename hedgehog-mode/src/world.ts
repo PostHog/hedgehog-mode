@@ -218,6 +218,10 @@ export class GameWorld {
     this.enemies = this.enemies.filter((e) => e != enemy);
     this.kills++;
 
+    if (this.gameOverContainer) {
+      return;
+    }
+
     if (this.enemies.length === 0) {
       this.game.log("No enemies left. Starting next wave...");
 

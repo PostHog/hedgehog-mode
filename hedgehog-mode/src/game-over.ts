@@ -1,6 +1,8 @@
 import { Game, GameElement, UpdateTicker } from "./types";
 import { AnimatedSprite, Container, Graphics } from "pixi.js";
 
+const ENTRY_TIME = 2000;
+
 export class GameOver implements GameElement {
   private overlay: Graphics;
   private container: Container;
@@ -40,7 +42,7 @@ export class GameOver implements GameElement {
     setTimeout(() => {
       this.deathSequence();
       onLoad?.();
-    }, 3000);
+    }, ENTRY_TIME);
   }
 
   spawnHedgehog(position: Matter.Vector) {
@@ -60,30 +62,28 @@ export class GameOver implements GameElement {
 
   deathSequence() {
     this.game.setSpeed(1);
+    this.hedgehogSprite!.animationSpeed = 0.1;
+    this.hedgehogSprite!.loop = false;
+    this.hedgehogSprite?.play();
   }
 
   update(ticker: UpdateTicker) {
-    this.progress += ticker.deltaMS / 3000;
+    this.progress += ticker.deltaMS / ENTRY_TIME;
 
-    if (this.progress < 1) {
+    if (this.progress > 0 && this.progress < 1) {
       const destinationX = window.innerWidth / 2;
       const destinationY = window.innerHeight / 2;
 
-      this.hedgehogSprite!.x =
-        destinationX - (destinationX - this.startX) * (1 - this.progress);
-      this.hedgehogSprite!.y =
-        destinationY - (destinationY - this.startY) * (1 - this.progress);
-      this.overlay!.alpha = this.startAlpha + this.progress * 1;
+      const actorProgress =
+        this.progress > 0.2 ? Math.max(0, (this.progress - 0.2) / 0.8) : 0;
 
-      console.log({
-        alpha: this.overlay!.alpha,
-        progress: this.progress,
-        startAlpha: this.startAlpha,
-        startX: this.startX,
-        startY: this.startY,
-        destinationX: destinationX,
-        destinationY: destinationY,
-      });
+      this.hedgehogSprite!.x =
+        destinationX - (destinationX - this.startX) * (1 - actorProgress);
+      this.hedgehogSprite!.y =
+        destinationY - (destinationY - this.startY) * (1 - actorProgress);
+
+      this.hedgehogSprite!.scale.set(1 + actorProgress * 1);
+      this.overlay!.alpha = this.startAlpha + this.progress * 1;
     }
   }
 }

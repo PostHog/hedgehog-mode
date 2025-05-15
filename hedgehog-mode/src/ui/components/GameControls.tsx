@@ -7,7 +7,7 @@ export type GameControlOptionDetails = {
   sprites: AvailableSpriteFrames[];
   label: string;
   multiType?: "or" | "and";
-  type: "movement" | "modifier";
+  type: "movement" | "modifier" | "action";
 };
 
 export type GameControlOption = GameControlOptionDetails & {
@@ -48,22 +48,46 @@ export function GameControls({ game }: { game: HedgeHogMode }) {
       type: "movement",
     },
     {
-      sprites: ["ui/ui-right.png", "ui/ui-d.png"],
+      sprites: ["ui/ui-right.png", "ui/ui-a.png"],
       label: "Move right",
       multiType: "or",
       type: "movement",
     },
     {
-      sprites: ["ui/ui-up.png", "ui/ui-d.png"],
+      sprites: ["ui/ui-up.png", "ui/ui-w.png"],
       label: "Jump",
       multiType: "or",
       type: "movement",
     },
     {
-      sprites: ["ui/ui-down.png", "ui/ui-d.png"],
+      sprites: ["ui/ui-down.png", "ui/ui-s.png"],
       label: "Fall",
       multiType: "or",
       type: "movement",
+    },
+    {
+      sprites: ["ui/ui-shift.png"],
+      label: "Fast",
+      multiType: "or",
+      type: "modifier",
+    },
+    {
+      sprites: ["ui/ui-alt.png"],
+      label: "Moonwalk",
+      multiType: "or",
+      type: "modifier",
+    },
+    {
+      sprites: ["ui/ui-play.png"],
+      label: "Shoot",
+      multiType: "or",
+      type: "action",
+    },
+    {
+      sprites: ["ui/ui-play.png"],
+      label: "Pause",
+      multiType: "or",
+      type: "action",
     },
   ];
 
@@ -78,6 +102,12 @@ export function GameControls({ game }: { game: HedgeHogMode }) {
       <p className="font-bold">Modifiers</p>
       {gameControls
         .filter((control) => control.type == "modifier")
+        .map((control) => (
+          <GameControlOption key={control.label} {...control} game={game} />
+        ))}
+      <p className="font-bold">Actions</p>
+      {gameControls
+        .filter((control) => control.type == "action")
         .map((control) => (
           <GameControlOption key={control.label} {...control} game={game} />
         ))}

@@ -369,6 +369,31 @@ const utils = `
   .font-bold {
     font-weight: bold;
   }
+  .italic {
+    font-style: italic;
+  }
+  .text-center {
+    text-align: center;
+  }
+  .text-base {
+    font-size: 1rem;
+  }
+  .text-sm {
+    font-size: 0.875rem;
+  }
+  .text-lg {
+    font-size: 1.5rem;
+  }
+  .text-xl {
+    font-size: 2rem;
+  }
+  .text-2xl {
+    font-size: 2.5rem;
+  }
+  .text-3xl {
+    font-size: 3rem;
+  }
+  
   .text-game-dark {
     color: var(--game-color-text-dark);
   }

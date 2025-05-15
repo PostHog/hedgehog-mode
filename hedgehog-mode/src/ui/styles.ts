@@ -315,17 +315,18 @@ export const styles = `
     flex: 1;
     flex-grow: 1;
     background-color: #000000;
+    margin-right: 16px;
   }
 
   .GameConsole-ControlPanel {
     flex: 1;
-    max-width: 300px;
+    max-width: 200px;
   }
 
   .GameConsole-ControlPanel-status-pizza {
     background-color: red;
-    width: 100px;
-    height: 100px;
+    width: 40px;
+    height: 40px;
     border-radius: 100%;
   }
 
@@ -333,7 +334,11 @@ export const styles = `
     font-size: 2rem;
   }
 
-
+  .GameConsole-ControlPanel-status-pineapple {
+    background-color: yellow;
+    width: 20px;
+    height: 40px;
+  }
 
   .pixel-corners,
 .pixel-corners--wrapper {
@@ -504,6 +509,22 @@ export const styles = `
 }
 .flex-col {
   flex-direction: column;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.gap-4 {
+  gap: 1rem;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.items-center {
+  align-items: center;
 }
 
 `;

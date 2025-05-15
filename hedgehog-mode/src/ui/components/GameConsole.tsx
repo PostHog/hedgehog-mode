@@ -40,17 +40,21 @@ export function GameConsole({ game, visible, onClose }: GameConsoleProps) {
       <div className="GameConsole-content pixel-corners">
         <div className="GameConsole-body">
           <div className="GameConsole-GameView pixel-corners"></div>
-          <div className="GameConsole-ControlPanel flex flex-col">
-            <div className="GameConsole-ControlPanel-status flex flex-row">
+          <div className="GameConsole-ControlPanel flex flex-col gap-4">
+            <div className="GameConsole-ControlPanel-status flex flex-row gap-4 justify-between items-center">
               <div className="GameConsole-ControlPanel-status-pizza"></div>
-              <div className="GameConsole-ControlPanel-status-points">
+              <div className="GameConsole-ControlPanel-status-points flex flex-row gap-2 items-center">
                 <div className="GameConsole-ControlPanel-status-count font-doto font-doto-600 text-black">
                   215
                 </div>
                 <div className="GameConsole-ControlPanel-status-pineapple"></div>
               </div>
             </div>
-            <div className="GameConsole-ControlPanel-weapons"></div>
+            <div className="GameConsole-ControlPanel-weapons">
+              <div className="GameConsole-ControlPanel-weapons-weapon">
+                <div className="GameConsole-ControlPanel-weapons-weapon-icon"></div>
+              </div>
+            </div>
             <div className="GameConsole-ControlPanel-controls"></div>
             <div className="GameConsole-ControlPanel-options"></div>
             <div className="GameConsole-ControlPanel-logo"></div>

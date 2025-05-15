@@ -11,6 +11,7 @@ import { StaticHedgehogRenderer } from "./static-renderer/StaticHedgehog";
 import { GameWorld } from "./world";
 import * as Tone from "tone";
 import { PolySynth } from "tone";
+import {Howl, Howler} from 'howler';
 
 Matter.Common.setDecomp(decomp);
 

@@ -1,10 +1,11 @@
 import { useEffect } from "react";
 import { HedgeHogMode } from "../../hedgehog-mode";
 import { HedgehogActor } from "../../actors/Hedgehog";
-import { Weapon, Weapons } from "./Weapon";
-import { PizzaHealthIndicator } from "./PizzaHealthIndicator";
+import { Weapons } from "./Weapon";
 import { GameControls } from "./GameControls";
 import { GameLogo } from "./GameLogo";
+import { GameOptions } from "./GameOptions";
+import { GameHealthAndPoints } from "./GameHealthAndPoints";
 
 interface GameConsoleProps {
   game: HedgeHogMode;
@@ -14,6 +15,10 @@ interface GameConsoleProps {
 
 export function GameConsole({ game, visible, onClose }: GameConsoleProps) {
   const player = game.getPlayer();
+  const world = game.world;
+
+  const playerHealth = player?.health;
+  const kills = world?.kills;
 
   // TODO: Loop to make sure we get updates - we can then use the player info the render the inventoruy
 
@@ -49,16 +54,14 @@ export function GameConsole({ game, visible, onClose }: GameConsoleProps) {
         <div className="GameConsole-body">
           <div className="GameConsole-GameView pixel-corners"></div>
           <div className="GameConsole-ControlPanel flex flex-col gap-8">
-            <div className="GameConsole-ControlPanel-status flex flex-row gap-4 justify-between items-center">
-              <PizzaHealthIndicator game={game} damage={1} />
-              <div className="GameConsole-ControlPanel-status-points flex flex-row gap-2 items-center">
-                <div className="GameConsole-ControlPanel-status-count">215</div>
-                <div className="GameConsole-ControlPanel-status-pineapple"></div>
-              </div>
-            </div>
+            <GameHealthAndPoints
+              game={game}
+              health={playerHealth}
+              points={kills}
+            />
             <Weapons game={game} />
             <GameControls game={game} />
-            <div className="GameConsole-ControlPanel-options"></div>
+            <GameOptions game={game} />
             <GameLogo />
           </div>
         </div>

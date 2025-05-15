@@ -2,6 +2,7 @@ import { sample, uniqueId } from "lodash";
 import { HedgehogActor } from "./actors/Hedgehog";
 import {
   getRandomAccessoryCombo,
+  HedgehogActorAccessoryOption,
   HedgehogActorColorOptions,
   HedgehogActorOptions,
 } from "./actors/hedgehog/config";
@@ -12,6 +13,7 @@ import { HedgehogGhostActor } from "./actors/Ghost";
 import { Inventory } from "./items/Inventory";
 import { Actor } from "./actors/Actor";
 import { Platform } from "./items/Platform";
+import { Accessory } from "./items/Accessory";
 
 export class GameWorld {
   elements: GameElement[] = []; // TODO: Type better
@@ -40,8 +42,10 @@ export class GameWorld {
     }, 1000);
 
     const inventoryLoop = () => {
-      this.spawnRandomInventory();
-      this.setTimeout(inventoryLoop, 10000);
+      this.setTimeout(() => {
+        this.spawnRandomInventory();
+        inventoryLoop();
+      }, 10000);
     };
 
     inventoryLoop();
@@ -118,6 +122,18 @@ export class GameWorld {
     const ghost = new HedgehogGhostActor(this.game, position);
     this.addElement(ghost);
     return ghost;
+  }
+
+  spawnAccessory(
+    accessory: HedgehogActorAccessoryOption,
+    position: Matter.Vector
+  ): Accessory {
+    const el = new Accessory(this.game, {
+      accessory,
+      position,
+    });
+    this.addElement(el);
+    return el;
   }
 
   removeElement(element: GameElement): void {

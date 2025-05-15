@@ -40,7 +40,7 @@ export class HedgeHogMode implements Game {
   debugRender?: Matter.Render;
   totalElapsedTime = 0;
   pointerEventsEnabled = false;
-  isDebugging = true;
+  isDebugging = false;
   spritesManager: SpritesManager;
   mousePosition?: Matter.Vector;
   lastTime?: number;
@@ -273,8 +273,8 @@ export class HedgeHogMode implements Game {
 
   private findElementWithRigidBody(rb: Matter.Body) {
     const root = rb.parent || rb;
-    return this.world.elements.find(el =>
-      el.rigidBody && (el.rigidBody.parent || el.rigidBody) === root
+    return this.world.elements.find(
+      (el) => el.rigidBody && (el.rigidBody.parent || el.rigidBody) === root
     );
   }
 

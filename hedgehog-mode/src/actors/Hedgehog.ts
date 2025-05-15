@@ -135,18 +135,11 @@ export class HedgehogActor extends Actor {
       };
       window.addEventListener("mousemove", this.mouseMoveHandler);
     }
-
-    // TESTING CODE
-    if (!this.options.player) {
-      setTimeout(() => {
-        this.destroy();
-      }, 1000);
-    }
   }
 
   updateSprite(
     sprite: string,
-    options: { reset?: boolean; onComplete?: () => void } = {}
+    options: { reset?: boolean; onComplete?: () => void; force?: boolean } = {}
   ): void {
     const holdingInventory = this.inventories.length > 0;
     const spritePath = holdingInventory ? `${sprite}-armless` : sprite;
@@ -601,7 +594,13 @@ export class HedgehogActor extends Actor {
     //   y: -5,
     // });
 
-    this.game.world.spawnHedgehogGhost(this.rigidBody!.position);
+    const accessories = this.options.accessories;
+    this.options.accessories = [];
+    this.syncAccessories();
+
+    accessories?.forEach((accessory) => {
+      this.game.world.spawnAccessory(accessory, this.rigidBody!.position);
+    });
 
     if (!this.options.player) {
       // Start the death animation
@@ -612,6 +611,25 @@ export class HedgehogActor extends Actor {
 
       this.ai.enable(false);
       this.walkSpeed = 0;
+
+      this.updateSprite("death", {
+        force: true,
+        onComplete: () => {
+          setTimeout(() => {
+            this.game.world.spawnHedgehogGhost(this.rigidBody!.position);
+          }, 500);
+
+          // Trigger the fade out
+          gsap.to(this.sprite!, {
+            alpha: 0,
+            duration: 5,
+            ease: "power2.inOut",
+            onComplete: () => {
+              this.game.world.removeElement(this);
+            },
+          });
+        },
+      });
     }
   }
 

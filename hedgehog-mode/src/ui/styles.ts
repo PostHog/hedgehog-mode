@@ -805,6 +805,8 @@ const pixelCornersGray2 = `
     font-family: monospace;
     z-index: 10000;
     max-width: 300px;
+    user-select: none;
+    pointer-events: none;
   }
 `;
 

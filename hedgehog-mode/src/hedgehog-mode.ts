@@ -97,10 +97,12 @@ export class HedgeHogMode implements Game {
   }
 
   playDeathMusic(): void {
-    new Howl({ src: ["/assets/sounds/death.mp3"], volume: 1 }).play();
+    window.setTimeout(() => {
+      new Howl({ src: ["/assets/sounds/die.wav"], volume: 1 }).play();
+    }, 2500)
     window.setTimeout(() => {
       new Howl({ src: ["/assets/sounds/gameover.mp3"], volume: 1 }).play();
-    }, 5000)
+    }, 5500)
   }
 
   destroy(): void {

@@ -554,11 +554,19 @@
                 <key>scale9FromFile</key>
                 <false/>
             </struct>
+            <key type="filename">assets/ui/ui-a.png</key>
+            <key type="filename">assets/ui/ui-d.png</key>
+            <key type="filename">assets/ui/ui-down.png</key>
+            <key type="filename">assets/ui/ui-left.png</key>
             <key type="filename">assets/ui/ui-mute.png</key>
             <key type="filename">assets/ui/ui-pause.png</key>
             <key type="filename">assets/ui/ui-play.png</key>
+            <key type="filename">assets/ui/ui-right.png</key>
+            <key type="filename">assets/ui/ui-s.png</key>
             <key type="filename">assets/ui/ui-share.png</key>
             <key type="filename">assets/ui/ui-sound.png</key>
+            <key type="filename">assets/ui/ui-up.png</key>
+            <key type="filename">assets/ui/ui-w.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0,0</point_f>

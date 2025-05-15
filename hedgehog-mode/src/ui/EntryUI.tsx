@@ -4,6 +4,9 @@ import { EntryUIDialogBoxProps } from "../types";
 import { HedgeHogMode } from "../hedgehog-mode";
 import { GameConsole } from "./components/GameConsole";
 import { GameOverUI } from "./components/GameOverUI";
+import { GameHealthAndPoints } from "./components/GameHealthAndPoints";
+import { GameLogo } from "./components/GameLogo";
+import { GameSprite } from "./components/GameSprite";
 
 export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
   /** force a repaint ~10×/sec so the numbers tick up in real-time */
@@ -44,11 +47,35 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
     });
   }, [game]);
 
+  const player = game.getPlayer();
+  const world = game.world;
+
+  const playerHealth = player?.health;
+  const kills = world?.kills;
+
   return (
     <div className="EntryUI">
-      <div className="Scoreboard">
-        wave: {game.world.wave}, kills: {game.world.kills}
-      </div>
+      {!consoleVisible && (
+        <>
+          <div className="Scoreboard text-beige">
+            <GameHealthAndPoints
+              game={game}
+              health={playerHealth}
+              points={kills}
+              size="small"
+            />
+          </div>
+          <div className="BottomLogo text-beige flex gap-2">
+            <GameLogo size="small" />
+            <div className="flex flex-col gap-1 items-center">
+              <GameSprite game={game} spriteName="ui/ui-alt.png" />
+              <p className="text-sm" style={{ margin: 0, padding: 0 }}>
+                pause
+              </p>
+            </div>
+          </div>
+        </>
+      )}
       <DialogBox
         game={game}
         actor={dialogBox?.actor}

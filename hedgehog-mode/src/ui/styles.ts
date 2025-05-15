@@ -399,6 +399,9 @@ const utils = `
   .text-black {
     color: #000000;
   }
+  .text-beige {
+    color: var(--game-color-background);
+  }
   .font-bold {
     font-weight: bold;
   }
@@ -784,16 +787,24 @@ const pixelCornersGray2 = `
   .Scoreboard {
     position: fixed;
     top: 8px;
-    left: 8px;
+    right: 8px;
     padding: 4px 8px;
     font-family: monospace;
     font-weight: 600;
-    color: #fff;
-    background: rgba(0,0,0,0.5);
+    background: #593a17c9;
     border-radius: 4px;
     z-index: 10000;
     user-select: none;
     pointer-events: none;
+  }
+  .BottomLogo {
+    position: fixed;
+    bottom: 8px;
+    right: 8px;
+    padding: 4px 8px;
+    font-family: monospace;
+    z-index: 10000;
+    max-width: 300px;
   }
 `;
 

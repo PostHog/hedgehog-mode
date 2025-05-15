@@ -11,7 +11,7 @@ import { StaticHedgehogRenderer } from "./static-renderer/StaticHedgehog";
 import { GameWorld } from "./world";
 import * as Tone from "tone";
 import { PolySynth } from "tone";
-import {Howl, Howler} from 'howler';
+import { Howl } from 'howler';
 
 Matter.Common.setDecomp(decomp);
 
@@ -50,6 +50,7 @@ export class HedgeHogMode implements Game {
   staticHedgehogRenderer: StaticHedgehogRenderer;
   world: GameWorld;
   audioContext?: PolySynth;
+  backgroundMusic?: Howl;
 
   constructor(private options: HedgehogModeConfig) {
     this.spritesManager = new SpritesManager(options);
@@ -61,9 +62,20 @@ export class HedgeHogMode implements Game {
 
     const enableSound = async () => {
       window.removeEventListener("keydown", enableSound);
+
+      // start Tone.js (already there)
       await Tone.start();
       this.audioContext = new Tone.PolySynth().toDestination();
       this.audioContext.triggerAttackRelease("C4", "8n", Tone.now());
+
+      if (!this.backgroundMusic) {
+        this.backgroundMusic = new Howl({
+          src: ["/assets/music/timeattack.mp3"],
+          loop: true,
+          volume: 0.5,          // tweak to taste
+        });
+      }
+      this.backgroundMusic.play();
     };
     window.addEventListener("keydown", enableSound);
 
@@ -72,6 +84,8 @@ export class HedgeHogMode implements Game {
 
   destroy(): void {
     Runner.stop(this.runner);
+    this.backgroundMusic?.stop();
+    this.backgroundMusic?.unload();
 
     this.world.beforeUnload();
     this.app.destroy({

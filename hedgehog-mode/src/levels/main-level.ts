@@ -1,4 +1,3 @@
-import { getRandomAccessoryCombo } from "../hedgehog-mode";
 import { Game } from "../types";
 import { Terrain } from "../items/Terrain";
 import { Ground } from "../items/Ground";

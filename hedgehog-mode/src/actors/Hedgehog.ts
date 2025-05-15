@@ -21,6 +21,7 @@ import { Projectile } from "../items/Projectile";
 import * as Tone from "tone";
 import { AvailableSpriteFrames } from "../sprites/sprites";
 import { Inventory } from "../items/Inventory";
+import { COLLISIONS } from "../misc/collisions";
 
 export const COLOR_TO_FILTER_MAP: Record<
   HedgehogActorColorOption,
@@ -75,7 +76,7 @@ export class HedgehogActor extends Actor {
   controls: HedgehogActorControls;
   private filter = new ColorMatrixFilter();
   interface: HedgehogActorInterface;
-  attachedInventorySprites: Sprite[] = [];
+  attachedInventorySprite?: Sprite;
 
   // Track mouse position for player
   mouseX: number = 0;
@@ -138,7 +139,7 @@ export class HedgehogActor extends Actor {
 
   updateSprite(
     sprite: string,
-    options: { reset?: boolean; onComplete?: () => void } = {}
+    options: { reset?: boolean; onComplete?: () => void; force?: boolean } = {}
   ): void {
     const holdingInventory = this.inventories.length > 0;
     const spritePath = holdingInventory ? `${sprite}-armless` : sprite;
@@ -447,29 +448,58 @@ export class HedgehogActor extends Actor {
 
     this.updateColor(ticker);
 
+    // if player, point to mouse,
+    // if not player, point to player
     // If the player is holding an inventory then we want to position it in front of the hedgehog
-    if (this.options.player && this.attachedInventorySprites.length > 0) {
-      // Update sprite to holding versions
-      this.updateSprite("game-hold");
+    if (this.attachedInventorySprite) {
+      
+      if (this.options.player) {
+        // Update sprite to holding versions
+        this.updateSprite("game-hold");
 
-      const hedgehogGlobal = this.sprite!.getGlobalPosition();
-      const parentScaleX = this.sprite!.scale.x;
-      this.attachedInventorySprites.forEach((sprite) => {
+        const hedgehogGlobal = this.sprite!.getGlobalPosition();
+        const parentScaleX = this.sprite!.scale.x;
         const angle = Math.atan2(
           this.mouseY - hedgehogGlobal.y,
           this.mouseX - hedgehogGlobal.x
         );
-
-        // If your sprite points up by default, use this:
-        sprite.scale.set(0.7, 0.7);
-        if (parentScaleX < 0) {
-          sprite.scale.x = -0.7;
-          sprite.rotation = angle + Math.PI - Math.PI / 2;
+        
+        const facingLeft = parentScaleX < 0;
+        
+        // Flip gun vertically if the angle is on the "opposite" side
+        const shouldFlipY = (facingLeft && angle > -Math.PI / 2 && angle < Math.PI / 2) ||
+                            (!facingLeft && (angle < -Math.PI / 2 || angle > Math.PI / 2));
+        
+        this.attachedInventorySprite.scale.y = shouldFlipY ? -1 : 1;
+        
+        if (facingLeft) {
+          // Flip angle across vertical axis
+          this.attachedInventorySprite.rotation = Math.PI - angle;
         } else {
-          sprite.scale.x = 0.7;
-          sprite.rotation = angle - Math.PI / 2;
+          this.attachedInventorySprite.rotation = angle;
         }
-      });
+      } else {
+        const player = this.game.world.elements.find(e => e instanceof HedgehogActor && e.options.player);
+        if (player) {
+          const playerGlobal = player.sprite!.getGlobalPosition();
+          const enemyGlobal = this.sprite!.getGlobalPosition();
+          const angleToPlayer = Math.atan2(
+            playerGlobal.y - enemyGlobal.y,
+            playerGlobal.x - enemyGlobal.x
+          );
+          const parentScaleX = this.sprite!.scale.x;
+          const facingLeft = parentScaleX < 0;
+          const shouldFlipY = (facingLeft && angleToPlayer > -Math.PI / 2 && angleToPlayer < Math.PI / 2) ||
+                              (!facingLeft && (angleToPlayer < -Math.PI / 2 || angleToPlayer > Math.PI / 2));
+          this.attachedInventorySprite.scale.y = shouldFlipY ? -1 : 1;
+          if (facingLeft) {
+            this.attachedInventorySprite.rotation = Math.PI - angleToPlayer;
+          } else {
+            this.attachedInventorySprite.rotation = angleToPlayer;
+          }
+        }
+      }
+
     }
   }
 
@@ -517,8 +547,7 @@ export class HedgehogActor extends Actor {
       this.pickupInventory(element);
     }
 
-    const isGroundContact =
-          pair.collision.normal.y < -0.5;   // normal points up into the hog
+    const isGroundContact = pair.collision.normal.y < -0.5; // normal points up into the hog
     if (isGroundContact) this.jumps = 0;
 
     if (element.rigidBody!.bounds.min.y > this.rigidBody!.bounds.min.y) {
@@ -547,13 +576,16 @@ export class HedgehogActor extends Actor {
     // Clone the inventory sprite for attachment
     const attachedSprite = new Sprite(inventory.sprite.texture);
     attachedSprite.anchor.set(0.5, 0.7);
-    attachedSprite.scale.set(0.7); // Slightly smaller for visual fit
     attachedSprite.x = 7; // Position in front of hedgehog (tweak as needed)
     attachedSprite.y = 6;
     attachedSprite.zIndex = 10;
     attachedSprite.eventMode = "static";
     this.sprite!.addChild(attachedSprite);
-    this.attachedInventorySprites.push(attachedSprite);
+    attachedSprite.scale.set(inventory.scale);
+    // TODO first remove any existing inventory sprites
+    this.attachedInventorySprite && this.sprite!.removeChild(this.attachedInventorySprite);
+    // TODO make this single
+    this.attachedInventorySprite = attachedSprite;
   };
 
   private syncInventory(): void {
@@ -594,13 +626,53 @@ export class HedgehogActor extends Actor {
     //   y: -5,
     // });
 
-    // this.collisionFilter = {
-    //   category: COLLISIONS.NONE,
-    //   mask: COLLISIONS.NONE,
-    // };
+    const accessories = this.options.accessories;
+    this.options.accessories = [];
+    this.syncAccessories();
 
-    this.game.world.spawnHedgehogGhost(this.rigidBody!.position);
-    this.game.world.removeElement(this);
+    accessories?.forEach((accessory) => {
+      this.game.world.spawnAccessory(accessory, this.rigidBody!.position);
+    });
+
+    // Remove attached inventory sprites from hedgehog sprite
+    this.attachedInventorySprite && this.sprite!.removeChild(this.attachedInventorySprite);
+    this.attachedInventorySprite = undefined;
+
+    this.inventories.forEach((inventory) => {
+      const newItem = this.game.world.spawnInventory(inventory.type);
+      newItem.setPosition(this.rigidBody!.position);
+    });
+    this.inventories = [];
+
+    if (!this.options.player) {
+      // Start the death animation
+      this.collisionFilterOverride = {
+        category: COLLISIONS.ACTOR,
+        mask: COLLISIONS.GROUND | COLLISIONS.PLATFORM,
+      };
+
+      this.ai.enable(false);
+      this.walkSpeed = 0;
+
+      this.updateSprite("death", {
+        force: true,
+        onComplete: () => {
+          setTimeout(() => {
+            this.game.world.spawnHedgehogGhost(this.rigidBody!.position);
+          }, 500);
+
+          // Trigger the fade out
+          gsap.to(this.sprite!, {
+            alpha: 0,
+            duration: 5,
+            ease: "power2.inOut",
+            onComplete: () => {
+              this.game.world.removeElement(this);
+            },
+          });
+        },
+      });
+    }
   }
 
   beforeUnload(): void {
@@ -609,10 +681,8 @@ export class HedgehogActor extends Actor {
       this.game.app.stage.removeChild(sprite);
     });
     // Remove attached inventory sprites from hedgehog sprite
-    this.attachedInventorySprites.forEach((sprite) => {
-      this.sprite!.removeChild(sprite);
-    });
-    this.attachedInventorySprites = [];
+    this.attachedInventorySprite && this.sprite!.removeChild(this.attachedInventorySprite);
+    this.attachedInventorySprite = undefined;
 
     // Remove mousemove event listener if set
     if (this.mouseMoveHandler) {

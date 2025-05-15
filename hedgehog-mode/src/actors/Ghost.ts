@@ -6,7 +6,7 @@ import gsap from "gsap";
 export class HedgehogGhostActor extends Actor {
   x = 0;
   y = 0;
-  alpha = 0.7;
+  alpha = 0;
 
   hitBoxModifier = {
     left: 0.24,
@@ -38,20 +38,21 @@ export class HedgehogGhostActor extends Actor {
     this.x = position.x;
     this.y = position.y;
 
-    this.sprite!.alpha = 0.5;
-
-    // this.sprite!.scale = {
-    //   x: 0,
-    //   y: 0,
-    // };
-
     gsap.to(this, {
       y: this.y - 200,
-      alpha: 0,
-      duration: 5,
+      alpha: 0.5,
+      duration: 2,
       ease: "none",
       onComplete: () => {
-        this.game.world.removeElement(this);
+        gsap.to(this, {
+          y: this.y - 200,
+          alpha: 0,
+          duration: 5,
+          ease: "none",
+          onComplete: () => {
+            this.game.world.removeElement(this);
+          },
+        });
       },
     });
   }

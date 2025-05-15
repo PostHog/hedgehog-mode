@@ -2,6 +2,7 @@ import { sample, uniqueId } from "lodash";
 import { HedgehogActor } from "./actors/Hedgehog";
 import {
   getRandomAccessoryCombo,
+  HedgehogActorAccessoryOption,
   HedgehogActorColorOptions,
   HedgehogActorOptions,
 } from "./actors/hedgehog/config";
@@ -9,17 +10,22 @@ import { Game, GameElement } from "./types";
 import Matter from "matter-js";
 import { MainLevel } from "./levels/main-level";
 import { HedgehogGhostActor } from "./actors/Ghost";
-import { Inventory } from "./items/Inventory";
+import {
+  Inventory,
+  INVENTORY_ITEMS,
+  InventoryItemType,
+} from "./items/Inventory";
 import { Actor } from "./actors/Actor";
 import { Platform } from "./items/Platform";
-import {FloatingPlatform} from "./items/FloatingPlatform";
+import { Accessory } from "./items/Accessory";
+import { FloatingPlatform } from "./items/FloatingPlatform";
 
 export class GameWorld {
   elements: GameElement[] = []; // TODO: Type better
   timers: NodeJS.Timeout[] = [];
   wave: number = 0;
   enemies: HedgehogActor[] = [];
-  kills: number = 0
+  kills: number = 0;
 
   constructor(private game: Game) {
     this.game = game;
@@ -43,8 +49,10 @@ export class GameWorld {
     }, 1000);
 
     const inventoryLoop = () => {
-      this.spawnRandomInventory();
-      this.setTimeout(inventoryLoop, 10000);
+      this.setTimeout(() => {
+        this.spawnRandomInventory();
+        inventoryLoop();
+      }, 10000);
     };
 
     inventoryLoop();
@@ -69,31 +77,28 @@ export class GameWorld {
     const slotsLeft = 3 - existing.length;
     if (slotsLeft <= 0) return;
 
-    const toSpawn = Math.min(
-      slotsLeft,
-      1 + Math.floor(Math.random() * 2)
-    );
+    const toSpawn = Math.min(slotsLeft, 1 + Math.floor(Math.random() * 2));
 
     for (let i = 0; i < toSpawn; i++) {
-      const UPPER_LIMIT = 50;                          // y-coordinate
-      const LOWER_LIMIT = window.innerHeight - 120;    // just above terrain
+      const UPPER_LIMIT = 50; // y-coordinate
+      const LOWER_LIMIT = window.innerHeight - 120; // just above terrain
 
       const amplitude = Math.max(
-        20,                                           // fail-safe minimum
+        20, // fail-safe minimum
         (LOWER_LIMIT - UPPER_LIMIT) / 2
       );
-      const baseY = UPPER_LIMIT + amplitude;          // midpoint
+      const baseY = UPPER_LIMIT + amplitude; // midpoint
 
-      const x = Math.random() * window.innerWidth;    // anywhere onscreen
+      const x = Math.random() * window.innerWidth; // anywhere onscreen
 
       this.spawnPlatform(
         new FloatingPlatform(this.game, {
           x,
-          y         : baseY,
-          width     : 140 + Math.random() * 100,
-          height    : 32,
-          amplitude : amplitude,
-          period    : 12000 + Math.random() * 5000,
+          y: baseY,
+          width: 140 + Math.random() * 100,
+          height: 32,
+          amplitude: amplitude,
+          period: 12000 + Math.random() * 5000,
         })
       );
     }
@@ -118,8 +123,13 @@ export class GameWorld {
   }
 
   spawnRandomInventory(): Inventory {
+    const type = sample(INVENTORY_ITEMS);
+    return this.spawnInventory(type);
+  }
+
+  spawnInventory(type: InventoryItemType): Inventory {
     const inventory = new Inventory(this.game, {
-      type: "bazooka",
+      type,
     });
     this.elements.push(inventory);
     return inventory;
@@ -163,6 +173,18 @@ export class GameWorld {
     const ghost = new HedgehogGhostActor(this.game, position);
     this.addElement(ghost);
     return ghost;
+  }
+
+  spawnAccessory(
+    accessory: HedgehogActorAccessoryOption,
+    position: Matter.Vector
+  ): Accessory {
+    const el = new Accessory(this.game, {
+      accessory,
+      position,
+    });
+    this.addElement(el);
+    return el;
   }
 
   removeElement(element: GameElement): void {

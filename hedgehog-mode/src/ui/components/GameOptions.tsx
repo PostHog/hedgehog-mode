@@ -22,9 +22,8 @@ export function GameOptions({
     action: () => void;
   }[] = [
     {
-      spriteName: "ui/ui-start.png",
-      clickedSpriteName: "ui/ui-start-pressed.png",
-      scale: 0.25,
+      spriteName: "ui/ui-start-lg.png",
+      scale: 2,
       action: startAction,
     },
     // {
@@ -32,18 +31,24 @@ export function GameOptions({
     //   scale: 0.25,
     //   action: outfitsAction,
     // },
-    {
-      spriteName: "ui/ui-share-lg.png",
-      scale: 0.25,
-      action: shareAction,
-    },
+    // {
+    //   spriteName: "ui/share-up.png",
+    //   scale: 1,
+    //   action: shareAction,
+    // },
   ];
   return (
-    <div className="GameConsole-ControlPanel-options">
+    <div
+      className="GameConsole-ControlPanel-options"
+      style={{ marginLeft: "3rem" }}
+    >
       {options.map((option) => (
         <div
           className="GameConsole-ControlPanel-option"
           onClick={option.action}
+          style={{
+            minWidth: "80px",
+          }}
         >
           <GameSprite
             game={game}

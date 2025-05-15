@@ -28,7 +28,7 @@ export function GameHealthAndPoints({
       <PizzaHealthIndicator game={game} damage={calculateDamage(health)} />
       <div className="GameConsole-ControlPanel-status-points flex flex-row gap-2 items-center">
         <div className="GameConsole-ControlPanel-status-count">{points}</div>
-        <div className="GameConsole-ControlPanel-status-pineapple"></div>
+        {/* <div className="GameConsole-ControlPanel-status-pineapple"></div> */}
       </div>
     </div>
   );

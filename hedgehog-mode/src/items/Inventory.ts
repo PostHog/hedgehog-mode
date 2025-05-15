@@ -3,7 +3,7 @@ import { Game, GameElement } from "../types";
 import { COLLISIONS } from "../misc/collisions";
 import Matter from "matter-js";
 
-export class Weapon extends Actor {
+export class Inventory extends Actor {
   public isInteractive = true;
   public isFlammable = false;
 
@@ -28,7 +28,7 @@ export class Weapon extends Actor {
       restitution: 0.5,
       inertia: Infinity,
       inverseInertia: Infinity,
-      label: "Weapon",
+      label: "Inventory",
     });
 
     this.loadSprite("overlays/bazooka/tile");

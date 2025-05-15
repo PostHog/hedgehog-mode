@@ -5,6 +5,9 @@ import { Game, GameElement } from "./types";
 import Matter from "matter-js";
 import { MainLevel } from "./levels/main-level";
 import { HedgehogGhostActor } from "./actors/Ghost";
+import { Inventory } from "./items/Inventory";
+import { Actor } from "./actors/Actor";
+import { Platform } from "./items/Platform";
 
 export class GameWorld {
   elements: GameElement[] = []; // TODO: Type better
@@ -21,10 +24,28 @@ export class GameWorld {
     this.elements.push(element);
   }
 
+  public spawnActor(actor: Actor): void {
+    this.elements.push(actor);
+  }
+
+  public spawnInventory(inventory: Inventory): void {
+    this.elements.push(inventory);
+  }
+
+  public spawnPlatform(platform: Platform): void {
+    this.elements.push(platform);
+  }
+
   update(deltaMS: number) {
     this.elements.forEach((el) => {
       el.update({ deltaMS, deltaTime: deltaMS / 1000 });
     });
+  }
+
+  spawnRandomInventory(): Inventory {
+    const inventory = new Inventory(this.game);
+    this.spawnInventory(inventory);
+    return inventory;
   }
 
   spawnPlayer(): HedgehogActor {

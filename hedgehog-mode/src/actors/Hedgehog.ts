@@ -21,7 +21,7 @@ import { HedgehogActorInterface } from "./hedgehog/interface";
 import { Projectile } from "../items/Projectile";
 import * as Tone from "tone";
 import { AvailableSpriteFrames } from "../sprites/sprites";
-// import { Weapon } from "../items/Weapon";
+import { Inventory } from "../items/Inventory";
 
 export const COLOR_TO_FILTER_MAP: Record<
   HedgehogActorColorOption,
@@ -88,7 +88,8 @@ export class HedgehogActor extends Actor {
 
   constructor(
     game: Game,
-    public options: HedgehogActorOptions
+    public options: HedgehogActorOptions,
+    public inventory: Inventory[] = []
   ) {
     super(game);
     this.updateSprite("jump");
@@ -458,12 +459,13 @@ export class HedgehogActor extends Actor {
     this.maybeSetElementOnFire(element, pair);
 
     // Check if it is a weapon and if so then pick it up
-    // if (element instanceof Weapon) {
-    //   // Remove the weapon from the world
-    //   this.game.world.removeElement(element);
+    if (element instanceof Inventory) {
+      // Remove the weapon from the world
+      this.game.world.removeElement(element);
 
-    //   // TODO: Add the weapon to the player's inventory
-    // }
+      // TODO: Add to the player's inventory
+      this.pickupInventory(element);
+    }
     
     if (element.rigidBody!.bounds.min.y > this.rigidBody!.bounds.min.y) {
       this.game.log("Hit something below");
@@ -478,6 +480,17 @@ export class HedgehogActor extends Actor {
         pair.isActive = false;
       }
     }
+  }
+
+  private pickupInventory(inventory: Inventory): void {
+    this.inventory.push(inventory);
+    this.syncInventory();
+  }
+
+  private syncInventory(): void {
+    this.inventory.forEach((weapon) => {
+      this.game.world.removeElement(weapon);
+    });
   }
 
   private syncAccessories(): void {

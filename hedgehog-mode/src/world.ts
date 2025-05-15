@@ -43,6 +43,7 @@ export class GameWorld {
     }, 1000);
 
     const inventoryLoop = () => {
+      this.spawnRandomInventory();
       this.setTimeout(inventoryLoop, 10000);
     };
 

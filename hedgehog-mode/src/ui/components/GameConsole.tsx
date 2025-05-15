@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { HedgeHogMode } from "../../hedgehog-mode";
 import { HedgehogActor } from "../../actors/Hedgehog";
 import { Weapons } from "./Weapon";
@@ -13,12 +13,16 @@ interface GameConsoleProps {
   onClose: () => void;
 }
 
+type GameState = "new" | "playing" | "paused" | "game-over";
+
 export function GameConsole({ game, visible, onClose }: GameConsoleProps) {
   const player = game.getPlayer();
   const world = game.world;
 
   const playerHealth = player?.health;
   const kills = world?.kills;
+
+  const [gameState, setGameState] = useState<GameState>("new");
 
   // TODO: Loop to make sure we get updates - we can then use the player info the render the inventoruy
 
@@ -50,19 +54,46 @@ export function GameConsole({ game, visible, onClose }: GameConsoleProps) {
   return (
     <div className="GameConsole text-game-dark">
       <div className="GameConsole-overlay" onClick={onClose} />
-      <div className="GameConsole-content pixel-corners">
-        <div className="GameConsole-body">
-          <div className="GameConsole-GameView pixel-corners"></div>
-          <div className="GameConsole-ControlPanel flex flex-col gap-8">
-            <GameHealthAndPoints
-              game={game}
-              health={playerHealth}
-              points={kills}
-            />
-            <Weapons game={game} />
-            <GameControls game={game} />
-            <GameOptions game={game} />
-            <GameLogo />
+      <div className="GameConsole-content items-center pixel-corners">
+        <div className="GameConsole-body flex flex-col gap-8 items-center">
+          <div
+            className="flex flex-col gap-8 items-center"
+            style={{ maxWidth: "800px", marginTop: "1rem" }}
+          >
+            <GameLogo size="large" />
+            {gameState == "new" ? (
+              <p
+                className="text-center text-base"
+                style={{ maxWidth: "700px" }}
+              >
+                Welcome to Hogwars, the game where killing hedgehogs is{" "}
+                <span className="font-bold">
+                  legal <span className="italic">and</span> fun
+                </span>
+                . Find weapons and kill your enemies. Lose pizza slices when you
+                get hit. Run out of pizza and it's game over.
+              </p>
+            ) : (
+              <>
+                <GameHealthAndPoints
+                  game={game}
+                  health={playerHealth}
+                  points={kills}
+                />
+                <Weapons game={game} />
+              </>
+            )}
+          </div>
+          <div
+            className="flex gap-8 items-center"
+            style={{ maxWidth: "800px" }}
+          >
+            <div className="GameConsole-ControlPanel flex flex-col gap-8">
+              <GameControls game={game} />
+            </div>
+            <div>
+              <GameOptions game={game} />
+            </div>
           </div>
         </div>
       </div>

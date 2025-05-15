@@ -121,13 +121,80 @@ export class Terrain implements GameElement {
   public buildGraphics() {
     const g = this.graphics;
     g.clear();
-    g.beginFill(0x4d3b2a); // brown; swap with textured sprite if you like
-    g.moveTo(0, window.innerHeight);
+
+    /* ---------------------------------------------------------------
+       1.  Main dirt body (same outline as before)
+    ----------------------------------------------------------------*/
+    const BASE_DIRT = 0x4d3b2a;      // mid-brown
+    g.beginFill(BASE_DIRT);
+    g.moveTo(0, window.innerHeight);            // bottom-left
     this.heightmap.forEach((h, i) => {
-      g.lineTo(i * this.opts.segmentWidth, window.innerHeight - h);
+      g.lineTo(i * this.opts.segmentWidth,    // top contour
+                 window.innerHeight - h);
     });
-    g.lineTo(this.width, window.innerHeight);
+    g.lineTo(this.width, window.innerHeight);   // bottom-right
     g.endFill();
+
+    /* ---------------------------------------------------------------
+       2.  Ten-pixel-high grass/soil band along the top
+    ----------------------------------------------------------------*/
+    const GRASS_H = 10;
+    const BASE_GRASS = 0x5ba94c;     // pleasant green
+
+    for (let i = 0; i < this.heightmap.length; i++) {
+      const x      = i * this.opts.segmentWidth;
+      const topY   = window.innerHeight - this.heightmap[i];
+
+      // ± a tiny random tint so the edge looks organic
+      const tint   = (Math.random() - 0.5) * 0x002200;
+      const colour = Math.max(0,
+                     Math.min(0xffffff, BASE_GRASS + tint)) >>> 0;
+
+      g.beginFill(colour);
+      g.drawRect(x, topY - GRASS_H, this.opts.segmentWidth, GRASS_H);
+      g.endFill();
+    }
+
+    /* ---------------------------------------------------------------
+       3.  Layered soil veins for visual variation
+    ----------------------------------------------------------------*/
+    const LAYER_COUNT_RANGE  = [6, 8] as const;           // min / max strata
+    const LAYER_THICK_RANGE  = [12, 28] as const;         // px each layer
+    const NOISE_FREQ         = 0.12;                      // lower → smoother
+    const COLOURS = [
+        0x6e563e,   // light brown / ochre
+        0x4f3a28,   // mid brown
+        0x3b2b1b,   // dark brown
+    ];
+
+    const colCount = this.heightmap.length;
+    const noise = this.noise2D ?? (() => 0);              // reuse noise if available
+
+    for (let i = 0; i < colCount; i++) {
+      const x     = i * this.opts.segmentWidth;
+      const topY  = window.innerHeight - this.heightmap[i];
+
+      /* decide how many strata this column gets */
+      const strata = Math.floor(
+          Math.random() * (LAYER_COUNT_RANGE[1] - LAYER_COUNT_RANGE[0] + 1)
+        ) + LAYER_COUNT_RANGE[0];
+
+      let yCursor  = topY + GRASS_H;                    // start just under grass
+
+      for (let s = 0; s < strata; s++) {
+        /* thickness with slight random plus noise wobble */
+        const baseH   = LAYER_THICK_RANGE[0] +
+                       Math.random() * (LAYER_THICK_RANGE[1] - LAYER_THICK_RANGE[0]);
+        const jitter  = noise(i * NOISE_FREQ, s) * 6; // ±6 px waviness
+        const height  = Math.max(4, baseH + jitter);
+
+        g.beginFill(COLOURS[s % COLOURS.length]);
+        g.drawRect(x, yCursor, this.opts.segmentWidth, height);
+        g.endFill();
+
+        yCursor += height;                            // next layer starts lower
+      }
+    }
   }
 
   private buildRigidBody() {

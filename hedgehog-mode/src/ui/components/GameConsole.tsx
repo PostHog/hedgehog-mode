@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { HedgeHogMode } from "../../hedgehog-mode";
 import { HedgehogActor } from "../../actors/Hedgehog";
+import { GameSprite } from "./GameSprite";
 
 interface GameConsoleProps {
   game: HedgeHogMode;
@@ -52,7 +53,9 @@ export function GameConsole({ game, visible, onClose }: GameConsoleProps) {
             </div>
             <div className="GameConsole-ControlPanel-weapons">
               <div className="GameConsole-ControlPanel-weapons-weapon">
-                <div className="GameConsole-ControlPanel-weapons-weapon-icon"></div>
+                <div className="GameConsole-ControlPanel-weapons-weapon-icon">
+                  <GameSprite game={game} spriteName="accessories/beret.png" />
+                </div>
               </div>
             </div>
             <div className="GameConsole-ControlPanel-controls"></div>

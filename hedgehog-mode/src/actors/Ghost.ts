@@ -1,0 +1,77 @@
+import { Actor, DEFAULT_COLLISION_FILTER } from "./Actor";
+import { Game, UpdateTicker } from "../types";
+import { COLLISIONS } from "../misc/collisions";
+import gsap from "gsap";
+
+export class HedgehogGhostActor extends Actor {
+  x = 0;
+  y = 0;
+  alpha = 0.7;
+
+  hitBoxModifier = {
+    left: 0.24,
+    right: 0.24,
+    top: 0.35,
+    bottom: 0.075,
+  };
+
+  collisionFilter = {
+    category: COLLISIONS.PLATFORM,
+    mask: COLLISIONS.PLATFORM,
+  };
+
+  constructor(game: Game, position: Matter.Vector) {
+    super(game, {
+      // It wont interact with gravity
+      friction: 0,
+      frictionStatic: 0,
+      frictionAir: 0,
+      restitution: 0,
+      inertia: Infinity,
+      inverseInertia: Infinity,
+      isStatic: true,
+    });
+    this.isInteractive = false;
+
+    this.loadSprite("skins/ghost/ghost");
+
+    this.x = position.x;
+    this.y = position.y;
+
+    this.sprite!.alpha = 0.5;
+
+    // this.sprite!.scale = {
+    //   x: 0,
+    //   y: 0,
+    // };
+
+    gsap.to(this, {
+      y: this.y - 200,
+      alpha: 0,
+      duration: 5,
+      ease: "none",
+      onComplete: () => {
+        this.game.world.removeElement(this);
+      },
+    });
+  }
+
+  setPosition(position: Matter.Vector): void {
+    this.x = position.x;
+    this.y = position.y;
+
+    super.setPosition(position);
+  }
+
+  update(ticker: UpdateTicker): void {
+    super.update(ticker);
+
+    this.setScale(0.9);
+    this.sprite!.alpha = this.alpha;
+
+    this.setPosition({
+      x: this.x,
+      y: this.y,
+    });
+  }
+}

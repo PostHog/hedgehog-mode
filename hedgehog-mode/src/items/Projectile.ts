@@ -91,7 +91,7 @@ export class Projectile extends Actor {
 
     if (element instanceof HedgehogActor && element !== this.source) {
       this.destroy();
-      element.receiveDamage(10, this);
+      element.receiveDamage(120, this);
     }
   }
 

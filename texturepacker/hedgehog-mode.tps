@@ -4,7 +4,7 @@
         <key>fileFormatVersion</key>
         <int>6</int>
         <key>texturePackerVersion</key>
-        <string>7.6.3</string>
+        <string>7.4.0</string>
         <key>autoSDSettings</key>
         <array>
             <struct type="AutoSDSettings">
@@ -173,7 +173,6 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
-            <key type="filename">assets/accessories/bazooka.png</key>
             <key type="filename">assets/accessories/beret.png</key>
             <key type="filename">assets/accessories/cap.png</key>
             <key type="filename">assets/accessories/chef.png</key>
@@ -420,6 +419,18 @@
             <key type="filename">assets/skins/default/wave/tile023.png</key>
             <key type="filename">assets/skins/default/wave/tile024.png</key>
             <key type="filename">assets/skins/default/wave/tile025.png</key>
+            <key type="filename">assets/skins/ghost/ghost-0.png</key>
+            <key type="filename">assets/skins/ghost/ghost-1.png</key>
+            <key type="filename">assets/skins/ghost/ghost-10.png</key>
+            <key type="filename">assets/skins/ghost/ghost-11.png</key>
+            <key type="filename">assets/skins/ghost/ghost-2.png</key>
+            <key type="filename">assets/skins/ghost/ghost-3.png</key>
+            <key type="filename">assets/skins/ghost/ghost-4.png</key>
+            <key type="filename">assets/skins/ghost/ghost-5.png</key>
+            <key type="filename">assets/skins/ghost/ghost-6.png</key>
+            <key type="filename">assets/skins/ghost/ghost-7.png</key>
+            <key type="filename">assets/skins/ghost/ghost-8.png</key>
+            <key type="filename">assets/skins/ghost/ghost-9.png</key>
             <key type="filename">assets/skins/spiderhog/fall/tile000.png</key>
             <key type="filename">assets/skins/spiderhog/fall/tile001.png</key>
             <key type="filename">assets/skins/spiderhog/fall/tile002.png</key>

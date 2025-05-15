@@ -6,6 +6,7 @@ import { Game, GameElement } from "./types";
 import Matter from "matter-js";
 import { Platform } from "./items/Platform";
 import { MainLevel } from "./levels/main-level";
+import { HedgehogGhostActor } from "./actors/Ghost";
 
 export class GameWorld {
   elements: GameElement[] = []; // TODO: Type better
@@ -54,6 +55,12 @@ export class GameWorld {
     );
     this.spawnActor(actor);
     return actor;
+  }
+
+  spawnHedgehogGhost(position: Matter.Vector): HedgehogGhostActor {
+    const ghost = new HedgehogGhostActor(this.game, position);
+    this.spawnActor(ghost);
+    return ghost;
   }
 
   removeElement(element: GameElement): void {

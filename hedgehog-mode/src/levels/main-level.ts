@@ -26,6 +26,11 @@ export class MainLevel {
       accessories: getRandomAccessoryCombo(),
     });
 
+    this.game.world.spawnHedgehogGhost({
+      x: 100,
+      y: 100,
+    });
+
     player.setPosition({
       x: 100,
       y: 100,

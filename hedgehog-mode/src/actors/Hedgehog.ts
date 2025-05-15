@@ -486,25 +486,19 @@ export class HedgehogActor extends Actor {
   }
 
   destroy(): void {
-    this.setVelocity({
-      x: 0,
-      y: -5,
-    });
+    // this.setVelocity({
+    //   x: 0,
+    //   y: -5,
+    // });
 
-    this.collisionFilter = {
-      category: COLLISIONS.NONE,
-      mask: COLLISIONS.NONE,
-    };
+    // this.collisionFilter = {
+    //   category: COLLISIONS.NONE,
+    //   mask: COLLISIONS.NONE,
+    // };
 
-    gsap.to(this.sprite!.scale, {
-      x: 0,
-      y: 0,
-      duration: 3,
-      ease: "elastic.out",
-      onComplete: () => {
-        this.game.world.removeElement(this);
-      },
-    });
+    this.game.world.spawnHedgehogGhost(this.rigidBody!.position);
+
+    this.game.world.removeElement(this);
   }
 
   beforeUnload(): void {

@@ -51,37 +51,32 @@ export class Terrain implements GameElement {
 
   /* ------------------------------------------------------------------ */
   /*  Public API                                                         */
-
-  /* ------------------------------------------------------------------ */
-
-  /** Remove a circular chunk of terrain (e.g. when a grenade explodes) */
   carveCircle(cx: number, cy: number, r: number): void {
-    // 1. Find column indices affected by the crater
-    const minX = Math.max(0, Math.floor((cx - r) / this.opts.segmentWidth));
-    const maxX = Math.min(
-      this.heightmap.length - 1,
-      Math.ceil((cx + r) / this.opts.segmentWidth),
-    );
+    const segW  = this.opts.segmentWidth;
+    const minI  = Math.max(0, Math.floor((cx - r) / segW));
+    const maxI  = Math.min(this.heightmap.length - 1,
+                           Math.ceil((cx + r) / segW));
 
     let modified = false;
-    for (let i = minX; i <= maxX; i++) {
-      const x = i * this.opts.segmentWidth;
-      const worldY = window.innerHeight - this.heightmap[i];
-      const dist = Math.hypot(cx - x, cy - worldY);
-      if (dist < r) {
-        const dy = Math.sqrt(r * r - (cx - x) ** 2);
-        // new ground is the *lowest* y-value that survives the blast
-        const newY = window.innerHeight - (cy + dy);
-        if (newY < this.heightmap[i]) {
-          this.heightmap[i] = Math.max(1, newY); // clamp to the bottom
-          modified = true;
-        }
+
+    for (let i = minI; i <= maxI; i++) {
+      const x  = i * segW;
+      const dx = x - cx;
+
+      if (Math.abs(dx) >= r) continue;           // ① outside horizontal reach
+
+      const dy           = Math.sqrt(r * r - dx * dx);  // ② vertical reach
+      const worldY       = cy + dy;                     // lower intersection
+      const newHeight    = Math.max(1,                 // ④ keep 1 px film
+                         window.innerHeight - worldY); // ③ bottom-based units
+
+      if (newHeight < this.heightmap[i]) {
+        this.heightmap[i] = newHeight;
+        modified = true;
       }
     }
 
-    if (modified) {
-      this.rebuild();
-    }
+    if (modified) this.rebuild();
   }
 
   update(): void {

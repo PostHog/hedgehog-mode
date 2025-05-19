@@ -4,6 +4,9 @@ import { AnimatedSprite, Application } from "pixi.js";
 import type { SpritesManager } from "./sprites/sprites";
 import type { HedgehogActor } from "./actors/Hedgehog";
 import { HedgehogActorOptions } from "./actors/hedgehog/config";
+import { GameWorld } from "./world";
+import { PolySynth } from "tone";
+import { Inventory } from "./items/Inventory";
 
 export type UpdateTicker = {
   deltaMS: number;
@@ -19,6 +22,7 @@ export type GameElement = {
   update: (ticker: UpdateTicker) => void;
   isInteractive: boolean;
   isFlammable?: boolean;
+  inventory?: Inventory;
 };
 
 export type HedgehogModeGameState = {
@@ -38,19 +42,24 @@ export type Game = {
   pointerEventsEnabled: boolean;
   spritesManager: SpritesManager;
   elapsed?: number;
-  elements: GameElement[];
-  spawnHedgehog: (options?: HedgehogActorOptions) => HedgehogActor;
-  removeElement: (element: GameElement) => void;
+  // spawnHedgehog: (options?: HedgehogActorOptions) => HedgehogActor;
+  // removeElement: (element: GameElement) => void;
   log: (...args: unknown[]) => void;
   setSpeed: (speed: number) => void;
-  gameUI?: GameUI;
+  getPlayer: () => HedgehogActor | undefined;
+  EntryUI?: EntryUI;
+  world: GameWorld;
+  audioContext?: PolySynth;
 };
 
-export type GameUI = {
-  showDialogBox: (dialogBox: GameUIDialogBoxProps) => void;
+export type EntryUI = {
+  showDialogBox: (dialogBox: EntryUIDialogBoxProps) => void;
+  clear: () => void;
+  showGameOver: () => void;
+  showStartScreen: () => void;
 };
 
-export type GameUIAnimatedTextProps = {
+export type EntryUIAnimatedTextProps = {
   words: (string | { text: string; style?: CSSProperties })[];
   duration?: number;
   disableAnimation?: boolean;
@@ -58,9 +67,9 @@ export type GameUIAnimatedTextProps = {
   onClick?: () => void;
 };
 
-export type GameUIDialogBoxProps = {
+export type EntryUIDialogBoxProps = {
   messages: {
-    words: GameUIAnimatedTextProps["words"];
+    words: EntryUIAnimatedTextProps["words"];
     onComplete?: () => void;
   }[];
   width?: number;

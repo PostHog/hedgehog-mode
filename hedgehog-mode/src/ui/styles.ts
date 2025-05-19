@@ -1,4 +1,4 @@
-export const styles = `
+const baseStyles = `
   :host {
     --color-text: #222;
     --color-background: white;
@@ -14,7 +14,12 @@ export const styles = `
     --spacing-sm: 0.5rem;
     --font-family: monospace;
     --font-size-sm: 0.875rem;
-
+    --game-color-border-dark: #b17816;
+    --game-color-background: #c8a989;
+    --game-color-background-dark: #b89065;
+    --game-color-text-dark: #593a17;
+    --game-color-red: #c22324;
+    --game-color-red-light: #ca8272;
     display: block;
     background-color: transparent;
   }
@@ -28,13 +33,39 @@ export const styles = `
     --color-shadow: rgba(0, 0, 0, 0.3);
   }
 
+  .font-doto {
+    font-family: "Doto", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
+    font-variation-settings:
+      "ROND" 0;
+  }
+
+  .font-doto-500 {
+    font-weight: 500;
+  }
+
+  .font-doto-600 {
+    font-weight: 600;
+  }
+
   .GameContainer {
     position: fixed;
     inset: 0;
     z-index: 1;
+    background:
+      url('/assets/bg-clouds.png') repeat-x 0 0,
+      url('/assets/bg-static.png') center / cover no-repeat;
+    background-size: 80% auto, cover;
+    animation: clouds-scroll 60s linear infinite;  
+  }
+  
+  @keyframes clouds-scroll {
+    from { background-position:   0   0, center; }
+    to   { background-position: 100%  0, center; }
   }
 
-  .GameUI {
+  .EntryUI {
     position: relative;
     font-family: var(--font-family);
     z-index: 2;
@@ -84,10 +115,6 @@ export const styles = `
   .SwitchInput {
     display: none;
   }
-  
-  
-  
-  
 
   .DialogBox {
     position: fixed;
@@ -125,6 +152,10 @@ export const styles = `
     height: 0;
     border-bottom: 1px solid transparent;
     padding: 0 var(--spacing-xs);
+  }
+
+  .DialogBoxGameButton {
+    margin-right: auto;
   }
 
   .DialogBox:hover > .DialogBoxControls {
@@ -253,4 +284,532 @@ export const styles = `
   //   outline: 1px solid var(--color-border-light);
   //   border-radius: var(--border-radius-sm);
   // }
+
+  .GameConsole {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .GameConsole-overlay {
+    position: absolute;
+    inset: 0;
+  }
+
+  .GameConsole-content {
+    position: relative;
+    background-color: var(--game-color-background);
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    width: 90%;
+    height: 90%;
+    max-width: 1200px;
+    max-height: 800px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 15px -3px var(--color-shadow);
+    padding: 0;
+    overflow: visible;
+    padding: 16px;
+  }
+
+  .GameConsole-body {
+    flex: 1;
+    display: flex;
+    overflow-y: auto;
+  }
+
+  .GameConsole-GameView {
+    flex: 1;
+    flex-grow: 1;
+    background-color: var(--game-color-border-dark);
+    margin-right: 16px;
+  }
+
+  .GameConsole-ControlPanel {
+    flex: 1;
+    max-width: 250px;
+    padding-top: 1rem;
+  }
+
+  .GameConsole-ControlPanel-status-pizza {
+    background-color: red;
+    width: 40px;
+    height: 40px;
+    border-radius: 100%;
+  }
+
+  .GameConsole-ControlPanel-status-points {
+    font-size: 2rem;
+  }
+
+  .GameConsole-ControlPanel-status-pineapple {
+    background-color: yellow;
+    width: 20px;
+    height: 40px;
+  }
+
+  .GameConsole-ControlPanel-weapons-weapon {
+    background-color: var(--game-color-background-dark);
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    border: 2px solid var(--color-border);
+  }
+
+
+
+  .GameOverUI {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .GameOverUI-image {
+    margin-bottom: 250px;
+    transform: translateY(100px);
+    transition: all 3s ease-out;
+    opacity: 0;
+  }
+
+
+  .GameOverUI--showing {
+    .GameOverUI-image {
+      transform: translateY(0px);
+      opacity: 1;
+    }
+  }
+
+  .GameOverUI--exiting {
+    .GameOverUI-image {
+      transform: translateY(-100px);
+      opacity: 0;
+    }
+  }
+
 `;
+
+const utils = `
+  .text-black {
+    color: #000000;
+  }
+  .text-beige {
+    color: var(--game-color-background);
+  }
+  .font-bold {
+    font-weight: bold;
+  }
+  .italic {
+    font-style: italic;
+  }
+  .text-center {
+    text-align: center;
+  }
+  .text-base {
+    font-size: 1rem;
+  }
+  .text-sm {
+    font-size: 0.875rem;
+  }
+  .text-lg {
+    font-size: 1.5rem;
+  }
+  .text-xl {
+    font-size: 2rem;
+  }
+  .text-2xl {
+    font-size: 2.5rem;
+  }
+  .text-3xl {
+    font-size: 3rem;
+  }
+  
+  .text-game-dark {
+    color: var(--game-color-text-dark);
+  }
+  .flex {
+    display: flex;
+  }
+  .flex-col {
+    flex-direction: column;
+  }
+  .wrap {
+    flex-wrap: wrap;
+  }
+
+  .gap-1 {
+    gap: 0.25rem;
+  }
+
+  .gap-2 {
+    gap: 0.5rem;
+  }
+
+  .gap-4 {
+    gap: 1rem;
+  }
+
+  .gap-8 {
+    gap: 2rem;
+  }
+
+  .justify-center {
+    justify-content: center;
+  }
+
+  .justify-between {
+    justify-content: space-between;
+  }
+
+  .items-center {
+    align-items: center;
+  }
+
+  .w-full {
+    width: 100%;
+  }
+
+  .h-auto {
+    height: auto;
+  }
+
+  .max-w-full {
+    max-width: 100%;
+  }
+  .bg-red-light {
+    background-color: var(--game-color-red-light);
+  }
+`;
+
+const pixelCorners = `
+  .pixel-corners,
+.pixel-corners--wrapper {
+  clip-path: polygon(0px calc(100% - 30px),
+    6px calc(100% - 30px),
+    6px calc(100% - 18px),
+    12px calc(100% - 18px),
+    12px calc(100% - 12px),
+    18px calc(100% - 12px),
+    18px calc(100% - 6px),
+    30px calc(100% - 6px),
+    30px 100%,
+    calc(100% - 30px) 100%,
+    calc(100% - 30px) calc(100% - 6px),
+    calc(100% - 18px) calc(100% - 6px),
+    calc(100% - 18px) calc(100% - 12px),
+    calc(100% - 12px) calc(100% - 12px),
+    calc(100% - 12px) calc(100% - 18px),
+    calc(100% - 6px) calc(100% - 18px),
+    calc(100% - 6px) calc(100% - 30px),
+    100% calc(100% - 30px),
+    100% 30px,
+    calc(100% - 6px) 30px,
+    calc(100% - 6px) 18px,
+    calc(100% - 12px) 18px,
+    calc(100% - 12px) 12px,
+    calc(100% - 18px) 12px,
+    calc(100% - 18px) 6px,
+    calc(100% - 30px) 6px,
+    calc(100% - 30px) 0px,
+    30px 0px,
+    30px 6px,
+    18px 6px,
+    18px 12px,
+    12px 12px,
+    12px 18px,
+    6px 18px,
+    6px 30px,
+    0px 30px);
+  position: relative;
+}
+.pixel-corners {
+  border: 6px solid transparent;
+}
+.pixel-corners--wrapper {
+  width: fit-content;
+  height: fit-content;
+}
+.pixel-corners--wrapper .pixel-corners {
+  display: block;
+  clip-path: polygon(6px 30px,
+    12px 30px,
+    12px 18px,
+    18px 18px,
+    18px 12px,
+    30px 12px,
+    30px 6px,
+    calc(100% - 30px) 6px,
+    calc(100% - 30px) 12px,
+    calc(100% - 18px) 12px,
+    calc(100% - 18px) 18px,
+    calc(100% - 12px) 18px,
+    calc(100% - 12px) 30px,
+    calc(100% - 6px) 30px,
+    calc(100% - 6px) calc(100% - 30px),
+    calc(100% - 12px) calc(100% - 30px),
+    calc(100% - 12px) calc(100% - 18px),
+    calc(100% - 18px) calc(100% - 18px),
+    calc(100% - 18px) calc(100% - 12px),
+    calc(100% - 30px) calc(100% - 12px),
+    calc(100% - 30px) calc(100% - 6px),
+    30px calc(100% - 6px),
+    30px calc(100% - 12px),
+    18px calc(100% - 12px),
+    18px calc(100% - 18px),
+    12px calc(100% - 18px),
+    12px calc(100% - 30px),
+    6px calc(100% - 30px));
+}
+.pixel-corners::after,
+.pixel-corners--wrapper::after {
+  content: "";
+  position: absolute;
+  clip-path: polygon(0px calc(100% - 30px),
+    6px calc(100% - 30px),
+    6px calc(100% - 18px),
+    12px calc(100% - 18px),
+    12px calc(100% - 12px),
+    18px calc(100% - 12px),
+    18px calc(100% - 6px),
+    30px calc(100% - 6px),
+    30px 100%,
+    calc(100% - 30px) 100%,
+    calc(100% - 30px) calc(100% - 6px),
+    calc(100% - 18px) calc(100% - 6px),
+    calc(100% - 18px) calc(100% - 12px),
+    calc(100% - 12px) calc(100% - 12px),
+    calc(100% - 12px) calc(100% - 18px),
+    calc(100% - 6px) calc(100% - 18px),
+    calc(100% - 6px) calc(100% - 30px),
+    100% calc(100% - 30px),
+    100% 30px,
+    calc(100% - 6px) 30px,
+    calc(100% - 6px) 18px,
+    calc(100% - 12px) 18px,
+    calc(100% - 12px) 12px,
+    calc(100% - 18px) 12px,
+    calc(100% - 18px) 6px,
+    calc(100% - 30px) 6px,
+    calc(100% - 30px) 0px,
+    30px 0px,
+    30px 6px,
+    18px 6px,
+    18px 12px,
+    12px 12px,
+    12px 18px,
+    6px 18px,
+    6px 30px,
+    0px 30px,
+    0px 50%,
+    6px 50%,
+    6px 30px,
+    12px 30px,
+    12px 18px,
+    18px 18px,
+    18px 12px,
+    30px 12px,
+    30px 6px,
+    calc(100% - 30px) 6px,
+    calc(100% - 30px) 12px,
+    calc(100% - 18px) 12px,
+    calc(100% - 18px) 18px,
+    calc(100% - 12px) 18px,
+    calc(100% - 12px) 30px,
+    calc(100% - 6px) 30px,
+    calc(100% - 6px) calc(100% - 30px),
+    calc(100% - 12px) calc(100% - 30px),
+    calc(100% - 12px) calc(100% - 18px),
+    calc(100% - 18px) calc(100% - 18px),
+    calc(100% - 18px) calc(100% - 12px),
+    calc(100% - 30px) calc(100% - 12px),
+    calc(100% - 30px) calc(100% - 6px),
+    30px calc(100% - 6px),
+    30px calc(100% - 12px),
+    18px calc(100% - 12px),
+    18px calc(100% - 18px),
+    12px calc(100% - 18px),
+    12px calc(100% - 30px),
+    6px calc(100% - 30px),
+    6px 50%,
+    0px 50%);
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--game-color-border-dark);
+  display: block;
+  pointer-events: none;
+}
+.pixel-corners::after {
+  margin: -6px;
+}`;
+
+const pixelCornersGray2 = `
+  .pixel-corners-gray-2,
+  .pixel-corners-gray-2--wrapper {
+    clip-path: polygon(0px calc(100% - 8px),
+      2px calc(100% - 8px),
+      2px calc(100% - 4px),
+      4px calc(100% - 4px),
+      4px calc(100% - 2px),
+      8px calc(100% - 2px),
+      8px 100%,
+      calc(100% - 8px) 100%,
+      calc(100% - 8px) calc(100% - 2px),
+      calc(100% - 4px) calc(100% - 2px),
+      calc(100% - 4px) calc(100% - 4px),
+      calc(100% - 2px) calc(100% - 4px),
+      calc(100% - 2px) calc(100% - 8px),
+      100% calc(100% - 8px),
+      100% 8px,
+      calc(100% - 2px) 8px,
+      calc(100% - 2px) 4px,
+      calc(100% - 4px) 4px,
+      calc(100% - 4px) 2px,
+      calc(100% - 8px) 2px,
+      calc(100% - 8px) 0px,
+      8px 0px,
+      8px 2px,
+      4px 2px,
+      4px 4px,
+      2px 4px,
+      2px 8px,
+      0px 8px);
+    position: relative;
+  }
+  .pixel-corners-gray-2 {
+    border: 4px solid transparent;
+  }
+  .pixel-corners-gray-2--wrapper {
+    width: fit-content;
+    height: fit-content;
+  }
+  .pixel-corners-gray-2--wrapper .pixel-corners-gray-2 {
+    display: block;
+    clip-path: polygon(4px 10px,
+      6px 10px,
+      6px 6px,
+      10px 6px,
+      10px 4px,
+      calc(100% - 10px) 4px,
+      calc(100% - 10px) 6px,
+      calc(100% - 6px) 6px,
+      calc(100% - 6px) 10px,
+      calc(100% - 4px) 10px,
+      calc(100% - 4px) calc(100% - 10px),
+      calc(100% - 6px) calc(100% - 10px),
+      calc(100% - 6px) calc(100% - 6px),
+      calc(100% - 10px) calc(100% - 6px),
+      calc(100% - 10px) calc(100% - 4px),
+      10px calc(100% - 4px),
+      10px calc(100% - 6px),
+      6px calc(100% - 6px),
+      6px calc(100% - 10px),
+      4px calc(100% - 10px));
+  }
+  .pixel-corners-gray-2::after,
+  .pixel-corners-gray-2--wrapper::after {
+    content: "";
+    position: absolute;
+    clip-path: polygon(0px calc(100% - 8px),
+      2px calc(100% - 8px),
+      2px calc(100% - 4px),
+      4px calc(100% - 4px),
+      4px calc(100% - 2px),
+      8px calc(100% - 2px),
+      8px 100%,
+      calc(100% - 8px) 100%,
+      calc(100% - 8px) calc(100% - 2px),
+      calc(100% - 4px) calc(100% - 2px),
+      calc(100% - 4px) calc(100% - 4px),
+      calc(100% - 2px) calc(100% - 4px),
+      calc(100% - 2px) calc(100% - 8px),
+      100% calc(100% - 8px),
+      100% 8px,
+      calc(100% - 2px) 8px,
+      calc(100% - 2px) 4px,
+      calc(100% - 4px) 4px,
+      calc(100% - 4px) 2px,
+      calc(100% - 8px) 2px,
+      calc(100% - 8px) 0px,
+      8px 0px,
+      8px 2px,
+      4px 2px,
+      4px 4px,
+      2px 4px,
+      2px 8px,
+      0px 8px,
+      0px 50%,
+      4px 50%,
+      4px 10px,
+      6px 10px,
+      6px 6px,
+      10px 6px,
+      10px 4px,
+      calc(100% - 10px) 4px,
+      calc(100% - 10px) 6px,
+      calc(100% - 6px) 6px,
+      calc(100% - 6px) 10px,
+      calc(100% - 4px) 10px,
+      calc(100% - 4px) calc(100% - 10px),
+      calc(100% - 6px) calc(100% - 10px),
+      calc(100% - 6px) calc(100% - 6px),
+      calc(100% - 10px) calc(100% - 6px),
+      calc(100% - 10px) calc(100% - 4px),
+      10px calc(100% - 4px),
+      10px calc(100% - 6px),
+      6px calc(100% - 6px),
+      6px calc(100% - 10px),
+      4px calc(100% - 10px),
+      4px 50%,
+      0px 50%);
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--game-color-border-dark);
+    display: block;
+    pointer-events: none;
+  }
+  .pixel-corners-gray-2::after {
+    margin: -4px;
+  }
+  .pixel-corners-red::after,
+  .pixel-corners-red--wrapper::after {
+    background: var(--game-color-red);
+  }
+  .Scoreboard {
+    position: fixed;
+    top: 8px;
+    right: 8px;
+    padding: 4px 8px;
+    font-family: monospace;
+    font-weight: 600;
+    background: #593a17c9;
+    border-radius: 4px;
+    z-index: 10000;
+    user-select: none;
+    pointer-events: none;
+  }
+  .BottomLogo {
+    position: fixed;
+    bottom: 8px;
+    right: 8px;
+    padding: 4px 8px;
+    font-family: monospace;
+    z-index: 10000;
+    max-width: 300px;
+    user-select: none;
+    pointer-events: none;
+  }
+`;
+
+export const styles = [baseStyles, utils, pixelCorners, pixelCornersGray2].join(
+  "\n"
+);

@@ -4,9 +4,9 @@ import { COLLISIONS } from "../misc/collisions";
 
 const GROUND_HEIGHT = 100;
 
-const getGroundPosition = (): Matter.Vector => {
+const getGroundPosition = (worldWidth: number): Matter.Vector => {
   return {
-    x: window.innerWidth * 0.5,
+    x: worldWidth * 0.5,
     y: window.innerHeight + GROUND_HEIGHT * 0.5,
   };
 };
@@ -16,13 +16,15 @@ export class Ground implements GameElement {
   isInteractive = false;
   isFlammable = true;
 
-  constructor(game: Game) {
+  constructor(
+    private game: Game,
+    private worldWidth: number = window.innerWidth * 3
+  ) {
     // Ground should be set to the bottom of the screen
-
     this.rigidBody = Matter.Bodies.rectangle(
-      getGroundPosition().x,
-      getGroundPosition().y,
-      window.innerWidth * 3, // Larger than the screen to avoid clipping
+      getGroundPosition(this.worldWidth).x,
+      getGroundPosition(this.worldWidth).y,
+      this.worldWidth,
       GROUND_HEIGHT,
       {
         isStatic: true,
@@ -41,6 +43,6 @@ export class Ground implements GameElement {
   }
 
   update(): void {
-    Matter.Body.setPosition(this.rigidBody, getGroundPosition());
+    Matter.Body.setPosition(this.rigidBody, getGroundPosition(this.worldWidth));
   }
 }

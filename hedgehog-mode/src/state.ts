@@ -94,7 +94,7 @@ export class GameStateManager {
     if (hedgehog) {
       hedgehog.updateOptions(config);
     } else {
-      this.hedgehogsById[config.id] = this.game.spawnHedgehog(config);
+      this.hedgehogsById[config.id] = this.game.world.spawnHedgehog(config);
     }
   }
 }

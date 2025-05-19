@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { HedgeHogMode, HedgehogModeConfig } from "./hedgehog-mode";
-import { HedgehogModeUI } from "./ui/GameUI";
+import { HedgehogModeUI } from "./ui/EntryUI";
 import root from "react-shadow";
 import { styles } from "./ui/styles";
 import { useTheme } from "./ui/hooks/useTheme";
@@ -32,6 +32,12 @@ export function HedgehogModeRenderer({
       data-theme={theme ?? osTheme}
       style={style}
     >
+      <style>
+        {`
+        @import
+        url('https://fonts.googleapis.com/css2?family=Doto:wght@500&display=swap');
+        `}
+      </style>
       <style>{styles}</style>
       <div
         className="GameContainer"

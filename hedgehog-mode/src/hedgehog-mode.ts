@@ -1,18 +1,20 @@
 import gsap from "gsap";
 
 import Matter, { Render, Runner } from "matter-js";
-import { Application, SCALE_MODES } from "pixi.js";
-import { Game, GameElement, GameUI, HedgehogModeConfig } from "./types";
+import decomp from "poly-decomp";
+import { Application } from "pixi.js";
+import { Game, EntryUI, HedgehogModeConfig } from "./types";
 import { SpritesManager } from "./sprites/sprites";
 import { HedgehogActor } from "./actors/Hedgehog";
-import { Ground } from "./items/Ground";
-import { SyncedPlatform } from "./items/SyncedPlatform";
-import { Actor } from "./actors/Actor";
 import { GlobalKeyboardListeners } from "./misc/GlobalKeyboardListeners";
-import { HedgehogActorOptions } from "./actors/hedgehog/config";
-import { GameStateManager } from "./state";
 import { StaticHedgehogRenderer } from "./static-renderer/StaticHedgehog";
-import { uniqueId } from "lodash";
+import { GameWorld } from "./world";
+import * as Tone from "tone";
+import { PolySynth } from "tone";
+import { Howl } from "howler";
+import {AudioManager} from "./audio";
+
+Matter.Common.setDecomp(decomp);
 
 export type {
   HedgehogActorOptions,
@@ -38,16 +40,20 @@ export class HedgeHogMode implements Game {
   engine!: Matter.Engine;
   runner!: Matter.Runner;
   debugRender?: Matter.Render;
-  elements: GameElement[] = []; // TODO: Type better
   totalElapsedTime = 0;
   pointerEventsEnabled = false;
   isDebugging = false;
   spritesManager: SpritesManager;
   mousePosition?: Matter.Vector;
   lastTime?: number;
-  gameUI!: GameUI;
-  stateManager?: GameStateManager;
+  EntryUI!: EntryUI;
+  // stateManager?: GameStateManager;
   staticHedgehogRenderer: StaticHedgehogRenderer;
+  world: GameWorld;
+  audioContext?: PolySynth;
+  backgroundMusic?: Howl;
+  private audioUnlocked = false; // ①  tracks Tone / Howler unlock
+  private gameStarted = false; // ②  set once the title screen closes
 
   constructor(private options: HedgehogModeConfig) {
     this.spritesManager = new SpritesManager(options);
@@ -55,11 +61,57 @@ export class HedgeHogMode implements Game {
       options,
       this.spritesManager
     );
+    this.world = new GameWorld(this);
+
+    const enableSound = async () => {
+      window.removeEventListener("keydown", enableSound);
+
+      // start Tone.js (already there)
+      await Tone.start();
+      this.audioContext = new Tone.PolySynth().toDestination();
+
+      if (!this.backgroundMusic) {
+        this.backgroundMusic = new Howl({
+          src: ["/assets/music/timeattack.mp3"],
+          loop: true,
+          volume: 0.3,          // tweak to taste
+          sprite: { main: [10_000, 999_999, true] }
+        });
+      }
+      this.audioUnlocked = true;
+      if (this.gameStarted) this.backgroundMusic.play('main');
+
+      this.backgroundMusic.play('main');
+    };
+    window.addEventListener("keydown", enableSound);
+
     this.setupDebugListeners();
+  }
+
+  startBackgroundMusic(): void {
+    this.gameStarted = true;
+    if (this.audioUnlocked) this.backgroundMusic?.play('main');
+  }
+
+  stopBackgroundMusic(): void {
+    this.backgroundMusic?.stop();
+  }
+
+  playDeathMusic(): void {
+    window.setTimeout(() => {
+      new Howl({ src: ["/assets/sounds/die.wav"], volume: 1.2 }).play();
+    }, 2500)
+    window.setTimeout(() => {
+      new Howl({ src: ["/assets/sounds/gameover.mp3"], volume: 1.2 }).play();
+    }, 5500)
   }
 
   destroy(): void {
     Runner.stop(this.runner);
+    this.backgroundMusic?.stop();
+    this.backgroundMusic?.unload();
+
+    this.world.beforeUnload();
     this.app.destroy({
       removeView: true,
     });
@@ -94,8 +146,8 @@ export class HedgeHogMode implements Game {
     });
   }
 
-  setUI(ui: GameUI): void {
-    this.gameUI = ui;
+  setUI(ui: EntryUI): void {
+    this.EntryUI = ui;
   }
 
   setPointerEvents(enabled: boolean): void {
@@ -104,19 +156,10 @@ export class HedgeHogMode implements Game {
     this.pointerEventsEnabled = enabled;
   }
 
-  spawnHedgehog(options: HedgehogActorOptions | undefined): HedgehogActor {
-    const actor = new HedgehogActor(
-      this,
-      options || {
-        id: uniqueId("hedgehog-"),
-      }
-    );
-    this.spawnActor(actor);
-    return actor;
-  }
-
-  public spawnActor(actor: Actor): void {
-    this.elements.push(actor);
+  getPlayer(): HedgehogActor | undefined {
+    return this.world.elements.find(
+      (el) => el instanceof HedgehogActor && el.options.player
+    ) as HedgehogActor | undefined;
   }
 
   async render(ref: HTMLDivElement): Promise<void> {
@@ -148,11 +191,13 @@ export class HedgeHogMode implements Game {
       this.totalElapsedTime += deltaMS / 1000;
       gsap.updateRoot(this.totalElapsedTime);
 
+      // Update the world (viewport)
+      this.world.update(deltaMS);
+
       // Update all game elements
       let shouldHavePointerEvents = false;
-      for (const el of this.elements) {
-        el.update({ deltaMS, deltaTime: deltaMS / 1000 });
 
+      for (const el of this.world.elements) {
         if (
           !shouldHavePointerEvents &&
           el instanceof HedgehogActor &&
@@ -190,8 +235,8 @@ export class HedgeHogMode implements Game {
 
     window.addEventListener("resize", () => this.resize());
 
-    setTimeout(() => this.syncPlatforms(), 1000);
-    this.syncPlatforms();
+    // setTimeout(() => this.syncPlatforms(), 1000);
+    // this.syncPlatforms();
 
     // Add debug renderer
     this.debugRender = Render.create({
@@ -228,8 +273,7 @@ export class HedgeHogMode implements Game {
 
     new GlobalKeyboardListeners(this);
     gsap.ticker.remove(gsap.updateRoot);
-    this.elements.push(new Ground(this));
-    this.stateManager = new GameStateManager(this, this.options);
+    // this.stateManager = new GameStateManager(this, this.options);
   }
 
   private onCollisionStart(event: Matter.IEventCollision<Matter.Engine>) {
@@ -265,24 +309,15 @@ export class HedgeHogMode implements Game {
   }
 
   private findElementWithRigidBody(rb: Matter.Body) {
-    return this.elements.find((element) => element.rigidBody === rb);
+    const root = rb.parent || rb;
+    return this.world.elements.find(
+      (el) => el.rigidBody && (el.rigidBody.parent || el.rigidBody) === root
+    );
   }
 
   setSpeed(speed: number) {
     this.engine.timing.timeScale = speed;
     gsap.globalTimeline.timeScale(speed);
-  }
-
-  removeElement(element: GameElement): void {
-    element.beforeUnload?.();
-    if (element.rigidBody) {
-      Matter.Composite.remove(this.engine.world, element.rigidBody);
-    }
-    if (element.sprite) {
-      this.app.stage.removeChild(element.sprite);
-    }
-    this.elements = this.elements.filter((el) => el != element);
-    this.log(`Removed element. Elements left: ${this.elements.length}`);
   }
 
   private resize() {
@@ -299,28 +334,27 @@ export class HedgeHogMode implements Game {
     Matter.Render.setPixelRatio(this.debugRender, window.devicePixelRatio);
   }
 
-  private syncPlatforms() {
-    if (!this.options.platformSelector) {
-      return;
-    }
-    const boxes = Array.from(
-      document.querySelectorAll(this.options.platformSelector)
-    );
-    const existingBoxes = this.elements.filter(
-      (el) => el instanceof SyncedPlatform
-    );
+  // private syncPlatforms() {
+  //   if (!this.options.platformSelector) {
+  //     return;
+  //   }
+  //   const boxes = Array.from(
+  //     document.querySelectorAll(this.options.platformSelector)
+  //   );
+  //   const existingBoxes = this.world.elements.filter(
+  //     (el) => el instanceof SyncedPlatform
+  //   );
 
-    boxes.forEach((box) => {
-      // TODO: Make this much faster...
+  //   boxes.forEach((box) => {
+  //     // TODO: Make this much faster...
+  //     if (existingBoxes.find((el) => el.ref === box)) {
+  //       return;
+  //     }
 
-      if (existingBoxes.find((el) => el.ref === box)) {
-        return;
-      }
-
-      const platform = new SyncedPlatform(this, box as HTMLElement);
-      this.elements.push(platform);
-    });
-  }
+  //     const platform = new SyncedPlatform(this, box as HTMLElement);
+  //     this.world.spawnActor(platform);
+  //   });
+  // }
 
   log(...args: unknown[]): void {
     // LATER: Add debugging option

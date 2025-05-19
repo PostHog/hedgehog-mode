@@ -25,7 +25,7 @@ export class FlameActor extends Actor {
         x: (Math.random() - 0.5) * 10,
         y: -10,
       });
-      game.elements.push(flame);
+      game.world.elements.push(flame);
     });
   }
 
@@ -66,7 +66,7 @@ export class FlameActor extends Actor {
         duration: 1,
         ease: "power2.in",
         onComplete: () => {
-          this.game.removeElement(this);
+          this.game.world.removeElement(this);
         },
       });
     }, 1000);

@@ -61,7 +61,7 @@ export class StaticHedgehogRenderer {
     // Add accessories
     options.accessories?.forEach((accessory) => {
       const accessoryFrame = this.spritesManager.getSpriteFrames(
-        `accessories/${accessory}.png`
+        `accessories/${accessory}.png` as AvailableSpriteFrames
       );
 
       if (!accessoryFrame) {

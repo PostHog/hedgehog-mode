@@ -1,5 +1,5 @@
 import Matter, { Constraint } from "matter-js";
-import { AnimatedSprite } from "pixi.js";
+import { AnimatedSprite, AnimatedSpriteFrames } from "pixi.js";
 import { AvailableAnimations } from "../sprites/sprites";
 import { Game, GameElement, UpdateTicker } from "../types";
 import { COLLISIONS } from "../misc/collisions";
@@ -10,7 +10,8 @@ const BASE_COLLISION_FILTER = {
     COLLISIONS.ACTOR |
     COLLISIONS.PLATFORM |
     COLLISIONS.PROJECTILE |
-    COLLISIONS.GROUND,
+    COLLISIONS.GROUND |
+    COLLISIONS.WEAPON,
 };
 
 export const DEFAULT_COLLISION_FILTER = {
@@ -28,6 +29,7 @@ export class Actor implements GameElement {
   public isDragging = false;
   public isFlammable = false;
   protected currentAnimation?: AvailableAnimations;
+  protected forcedAnimation?: AvailableAnimations;
   protected connectedElements: GameElement[] = [];
   protected collisionFilter: Matter.ICollisionFilter = DEFAULT_COLLISION_FILTER;
   collisionFilterOverride?: Matter.ICollisionFilter;
@@ -42,7 +44,7 @@ export class Actor implements GameElement {
     bottom: 0,
   };
 
-  forceAngle = 0;
+  forceAngle: number | null = 0;
 
   constructor(
     protected game: Game,
@@ -51,9 +53,14 @@ export class Actor implements GameElement {
 
   protected loadSprite(animation: AvailableAnimations): void {
     this.currentAnimation = animation;
-    this.sprite = new AnimatedSprite(
+
+    this.loadSpriteFrames(
       this.game.spritesManager.getAnimatedSpriteFrames(animation)
     );
+  }
+
+  protected loadSpriteFrames(frames: AnimatedSpriteFrames): void {
+    this.sprite = new AnimatedSprite(frames);
 
     this.loadRigidBody();
     this.sprite.eventMode = "static";
@@ -63,8 +70,7 @@ export class Actor implements GameElement {
     this.sprite.anchor.set(0.5);
     this.sprite.x = this.rigidBody!.position.x;
     this.sprite.y = this.rigidBody!.position.y;
-    this.game.app.stage.addChild(this.sprite);
-
+    this.game.world.container.addChild(this.sprite);
     this.setupPointerEvents();
   }
 
@@ -86,6 +92,9 @@ export class Actor implements GameElement {
       return;
     }
 
+    const width = this.sprite!.width;
+    const height = this.sprite!.height;
+
     const playerOptions: Matter.IBodyDefinition = {
       density: 0.001,
       friction: 0.2,
@@ -99,20 +108,18 @@ export class Actor implements GameElement {
       ...this.rigidBodyOptions,
     };
 
-    const width = this.sprite!.width;
-    const height = this.sprite!.height;
+    // Round the bottom-left & bottom-right corners so we glide over bumps
+    const BODY_W =
+      width - width * (this.hitBoxModifier.left + this.hitBoxModifier.right);
+    const BODY_H =
+      height - height * (this.hitBoxModifier.top + this.hitBoxModifier.bottom);
 
-    this.rigidBody = Matter.Bodies.rectangle(
-      x,
-      y,
-      width -
-        width * this.hitBoxModifier.left -
-        width * this.hitBoxModifier.right,
-      height -
-        height * this.hitBoxModifier.top -
-        height * this.hitBoxModifier.bottom,
-      playerOptions
-    );
+    this.rigidBody = Matter.Bodies.rectangle(x, y, BODY_W, BODY_H, {
+      ...playerOptions,
+      chamfer: {
+        radius: [BODY_W * 0.25, BODY_W * 0.25, BODY_W * 0.25, BODY_W * 0.25],
+      },
+    });
 
     Matter.Composite.add(this.game.engine.world, this.rigidBody);
   }
@@ -126,8 +133,16 @@ export class Actor implements GameElement {
 
   protected updateSprite(
     animation: AvailableAnimations,
-    options: { reset?: boolean; onComplete?: () => void } = {}
+    options: { reset?: boolean; onComplete?: () => void; force?: boolean } = {}
   ): void {
+    if (this.forcedAnimation && !options.force) {
+      return;
+    }
+
+    if (options.force) {
+      this.forcedAnimation = animation;
+    }
+
     if (!this.currentAnimation) {
       return this.loadSprite(animation);
     }
@@ -262,7 +277,9 @@ export class Actor implements GameElement {
     const xCenterDiff = (width - hitBoxWidth) / 2;
 
     // Keep it upright (unless overidden)
-    rigidBody.angle = this.forceAngle;
+    if (typeof this.forceAngle === "number") {
+      rigidBody.angle = this.forceAngle;
+    }
 
     sprite.x = rigidBody.position.x - xOffsetDiff + xCenterDiff;
     sprite.y = rigidBody.position.y - yOffsetDiff + yCenterDiff;

@@ -1,12 +1,12 @@
 import { useEffect, useState, useCallback } from "react";
 import { AnimatedText } from "./AnimatedText";
-import { GameUIDialogBoxProps } from "../../types";
+import { EntryUIDialogBoxProps } from "../../types";
 import { ArrowButton } from "./Button";
 
 export function Messages({
   messages,
   onEnd,
-}: Pick<GameUIDialogBoxProps, "messages"> & { onEnd?: () => void }) {
+}: Pick<EntryUIDialogBoxProps, "messages"> & { onEnd?: () => void }) {
   const [messageIndex, setMessageIndex] = useState<number>(0);
   const [animationCompleted, setAnimationCompleted] = useState<boolean>(false);
   const message = messages[messageIndex];

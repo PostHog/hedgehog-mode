@@ -48,7 +48,6 @@ export const HedgehogActorAccessories = {
   graduation: {
     group: "headwear",
   },
-
   parrot: {
     group: "other",
   },
@@ -73,6 +72,9 @@ export const HedgehogActorAccessories = {
   "xmas-scarf": {
     group: "other",
   },
+  "bazooka": {
+    group: "weapons"
+  }
 };
 
 type AccessoryKey = keyof typeof HedgehogActorAccessories;

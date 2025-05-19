@@ -42,11 +42,16 @@
     "node": ">=18"
   },
   "dependencies": {
+    "alea": "^1.0.1",
     "gsap": "^3.12.7",
+    "howler": "^2.2.4",
     "lodash": "^4.17.21",
     "matter-js": "^0.20.0",
     "pixi.js": "^8.4.0",
-    "react-shadow": "^20.6.0"
+    "poly-decomp": "^0.3.0",
+    "react-shadow": "^20.6.0",
+    "simplex-noise": "^4.0.3",
+    "tone": "^15.1.22"
   },
   "peerDependencies": {
     "react": "^17.0.0 || ^18.0.0",

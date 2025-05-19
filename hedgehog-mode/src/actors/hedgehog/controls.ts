@@ -12,13 +12,17 @@ export class HedgehogActorControls {
     const keyMapping = {
       ArrowLeft: "left",
       a: "left",
+      A: "left",
       ArrowRight: "right",
       d: "right",
+      D: "right",
       ArrowUp: "up",
       w: "up",
+      W: "up",
       " ": "up",
       ArrowDown: "down",
       s: "down",
+      S: "down",
       Shift: "shift",
       Alt: "alt",
     };

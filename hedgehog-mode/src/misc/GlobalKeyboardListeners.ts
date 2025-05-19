@@ -12,13 +12,13 @@ export class GlobalKeyboardListeners {
   }
 
   private getPlayableHedgehog(): HedgehogActor {
-    return this.game.elements.find(
+    return this.game.world.elements.find(
       (element) => element instanceof HedgehogActor && element.options.player
     ) as HedgehogActor;
   }
 
   private getAllHedgehogs(): HedgehogActor[] {
-    return this.game.elements.filter(
+    return this.game.world.elements.filter(
       (element) => element instanceof HedgehogActor
     ) as HedgehogActor[];
   }
@@ -27,7 +27,7 @@ export class GlobalKeyboardListeners {
     const lastKeys: string[] = [];
 
     const spawnHedgehog = () =>
-      this.game.spawnHedgehog({
+      this.game.world.spawnHedgehog({
         id: uniqueId("hedgehog-"),
         controls_enabled: false,
         accessories: getRandomAccessoryCombo(),

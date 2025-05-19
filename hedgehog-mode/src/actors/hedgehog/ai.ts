@@ -1,12 +1,19 @@
 import { sample } from "lodash";
 import type { HedgehogActor } from "../Hedgehog";
+import { Inventory } from "../../items/Inventory";
+import { Game } from "../../types";
+
+const WALK_SPEED = 2;
 
 export class HedgehogActorAI {
   private actionInterval?: NodeJS.Timeout;
   private enabled = false;
   private possibleActions: (() => void)[] = [];
 
-  constructor(private actor: HedgehogActor) {
+  constructor(
+    private game: Game,
+    private actor: HedgehogActor
+  ) {
     Object.values(this.actions).forEach((action) => {
       for (let i = 0; i < action.frequency; i++) {
         this.possibleActions.push(action.act);
@@ -83,14 +90,76 @@ export class HedgehogActorAI {
 
     this.actor.walkSpeed = 0;
 
-    clearTimeout(this.actionInterval);
-    this.actionInterval = undefined;
-
-    if (action) {
-      this.actions[action]?.act();
-    } else {
-      sample(this.possibleActions)?.();
+    const player = this.game.getPlayer();
+    if (!player) {
+      return;
     }
+
+    const playerX = player.rigidBody!.position.x;
+    const actorX = this.actor.rigidBody!.position.x;
+
+    // clearTimeout(this.actionInterval);
+    // this.actionInterval = undefined;
+
+    // if (action) {
+    //   this.actions[action]?.act();
+    // } else {
+    //   sample(this.possibleActions)?.();
+    // }
+    // this.pause(1000);
+
+    const inventoryItems = this.game.world.elements.filter(
+      (e) => e instanceof Inventory
+    );
+
+    const itemsWithDistance = inventoryItems.map((item) => {
+      return {
+        item,
+        distance: Math.abs(item.rigidBody!.position.x - actorX),
+      };
+    });
+
+    const nearestInventoryItem =
+      itemsWithDistance.length > 0
+        ? itemsWithDistance.reduce((prev, current) => {
+            return prev.distance < current.distance ? prev : current;
+          }, itemsWithDistance[0])
+        : null;
+
+    if (!nearestInventoryItem) {
+      // If there are no weapons, run away from the player and jump sometimes
+      const direction = actorX < playerX ? "left" : "right";
+      this.actor.setDirection(direction);
+      this.actor.walkSpeed = direction === "left" ? -1 : 1;
+
+      if (Math.random() < 0.5) {
+        this.actor.jump();
+      }
+    } else if (this.actor.inventories.length === 0 && nearestInventoryItem) {
+      // If we don't have a weapon, move towards the nearest weapon
+      const direction =
+        nearestInventoryItem.item.rigidBody!.position.x < actorX
+          ? "left"
+          : "right";
+      this.actor.setDirection(direction);
+      this.actor.walkSpeed = direction === "left" ? -WALK_SPEED : WALK_SPEED;
+    } else {
+      // If we have a weapon, move towards the player and shoot them
+      const direction = actorX > playerX ? "left" : "right";
+      const distance = Math.abs(playerX - actorX);
+
+      if (distance < 200) {
+        this.actor.fireWeapon(player.rigidBody!.position);
+        this.actor.setDirection(direction);
+        this.actor.walkSpeed = 0;
+      } else {
+        this.actor.setDirection(direction);
+        this.actor.walkSpeed = direction === "left" ? -WALK_SPEED : WALK_SPEED;
+      }
+    }
+    // If we don't have a weapon, move towards the nearest weapon
+    // If we do have a weapon
+
     this.pause(1000);
   }
 }

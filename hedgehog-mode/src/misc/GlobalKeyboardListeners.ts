@@ -89,6 +89,14 @@ export class GlobalKeyboardListeners {
         },
       },
       {
+        keys: ["r", "o", "b", "o", "h", "o", "g"],
+        action: () => {
+          this.getPlayableHedgehog().updateOptions({
+            skin: "robohog",
+          });
+        },
+      },
+      {
         keys: ["c", "h", "e", "a", "t", "c", "o", "d", "e", "s"],
         action: () => {
           this.getPlayableHedgehog().interface.triggerCheatSheet();

@@ -25,7 +25,7 @@ export default function StaticRendering() {
       id: `hedgehog-${i}`,
       accessories: getRandomAccessoryCombo(),
       color: sample(HedgehogActorColorOptions),
-      skin: sample(["default", "spiderhog"]),
+      skin: sample(["default", "spiderhog", "robohog"]),
     }));
 
     const render = async () => {

@@ -34,7 +34,7 @@
         <key>dataFormat</key>
         <string>pixijs4</string>
         <key>textureFileName</key>
-        <filename>../sdk/assets/sprites.png</filename>
+        <filename>../hedgehog-mode/assets/sprites.png</filename>
         <key>flipPVR</key>
         <false/>
         <key>pvrQualityLevel</key>
@@ -124,7 +124,7 @@
             <key>data</key>
             <struct type="DataFile">
                 <key>name</key>
-                <filename>../sdk/assets/sprites.json</filename>
+                <filename>../hedgehog-mode/assets/sprites.json</filename>
             </struct>
         </map>
         <key>multiPackMode</key>
@@ -397,6 +397,59 @@
             <key type="filename">assets/skins/default/wave/tile023.png</key>
             <key type="filename">assets/skins/default/wave/tile024.png</key>
             <key type="filename">assets/skins/default/wave/tile025.png</key>
+            <key type="filename">assets/skins/robohog/fall/tile-0.png</key>
+            <key type="filename">assets/skins/robohog/fall/tile-1.png</key>
+            <key type="filename">assets/skins/robohog/fall/tile-2.png</key>
+            <key type="filename">assets/skins/robohog/fall/tile-3.png</key>
+            <key type="filename">assets/skins/robohog/fall/tile-4.png</key>
+            <key type="filename">assets/skins/robohog/fall/tile-5.png</key>
+            <key type="filename">assets/skins/robohog/fall/tile-6.png</key>
+            <key type="filename">assets/skins/robohog/fall/tile-7.png</key>
+            <key type="filename">assets/skins/robohog/fall/tile-8.png</key>
+            <key type="filename">assets/skins/robohog/jump/tile-0.png</key>
+            <key type="filename">assets/skins/robohog/jump/tile-1.png</key>
+            <key type="filename">assets/skins/robohog/jump/tile-2.png</key>
+            <key type="filename">assets/skins/robohog/jump/tile-3.png</key>
+            <key type="filename">assets/skins/robohog/jump/tile-4.png</key>
+            <key type="filename">assets/skins/robohog/jump/tile-5.png</key>
+            <key type="filename">assets/skins/robohog/jump/tile-6.png</key>
+            <key type="filename">assets/skins/robohog/jump/tile-7.png</key>
+            <key type="filename">assets/skins/robohog/jump/tile-8.png</key>
+            <key type="filename">assets/skins/robohog/jump/tile-9.png</key>
+            <key type="filename">assets/skins/robohog/walk/tile-0.png</key>
+            <key type="filename">assets/skins/robohog/walk/tile-1.png</key>
+            <key type="filename">assets/skins/robohog/walk/tile-10.png</key>
+            <key type="filename">assets/skins/robohog/walk/tile-2.png</key>
+            <key type="filename">assets/skins/robohog/walk/tile-3.png</key>
+            <key type="filename">assets/skins/robohog/walk/tile-4.png</key>
+            <key type="filename">assets/skins/robohog/walk/tile-5.png</key>
+            <key type="filename">assets/skins/robohog/walk/tile-6.png</key>
+            <key type="filename">assets/skins/robohog/walk/tile-7.png</key>
+            <key type="filename">assets/skins/robohog/walk/tile-8.png</key>
+            <key type="filename">assets/skins/robohog/walk/tile-9.png</key>
+            <key type="filename">assets/skins/robohog/wave/tile-0.png</key>
+            <key type="filename">assets/skins/robohog/wave/tile-1.png</key>
+            <key type="filename">assets/skins/robohog/wave/tile-10.png</key>
+            <key type="filename">assets/skins/robohog/wave/tile-11.png</key>
+            <key type="filename">assets/skins/robohog/wave/tile-12.png</key>
+            <key type="filename">assets/skins/robohog/wave/tile-13.png</key>
+            <key type="filename">assets/skins/robohog/wave/tile-14.png</key>
+            <key type="filename">assets/skins/robohog/wave/tile-15.png</key>
+            <key type="filename">assets/skins/robohog/wave/tile-16.png</key>
+            <key type="filename">assets/skins/robohog/wave/tile-17.png</key>
+            <key type="filename">assets/skins/robohog/wave/tile-18.png</key>
+            <key type="filename">assets/skins/robohog/wave/tile-19.png</key>
+            <key type="filename">assets/skins/robohog/wave/tile-2.png</key>
+            <key type="filename">assets/skins/robohog/wave/tile-20.png</key>
+            <key type="filename">assets/skins/robohog/wave/tile-21.png</key>
+            <key type="filename">assets/skins/robohog/wave/tile-22.png</key>
+            <key type="filename">assets/skins/robohog/wave/tile-3.png</key>
+            <key type="filename">assets/skins/robohog/wave/tile-4.png</key>
+            <key type="filename">assets/skins/robohog/wave/tile-5.png</key>
+            <key type="filename">assets/skins/robohog/wave/tile-6.png</key>
+            <key type="filename">assets/skins/robohog/wave/tile-7.png</key>
+            <key type="filename">assets/skins/robohog/wave/tile-8.png</key>
+            <key type="filename">assets/skins/robohog/wave/tile-9.png</key>
             <key type="filename">assets/skins/spiderhog/fall/tile000.png</key>
             <key type="filename">assets/skins/spiderhog/fall/tile001.png</key>
             <key type="filename">assets/skins/spiderhog/fall/tile002.png</key>

@@ -1,6 +1,11 @@
 import { sample } from "lodash";
 
-export const HedgehogActorSkinOptions = ["default", "spiderhog"] as const;
+export const HedgehogActorSkinOptions = [
+  "default",
+  "spiderhog",
+  "robohog",
+] as const;
+
 export type HedgehogActorSkinOption = (typeof HedgehogActorSkinOptions)[number];
 
 export const HedgehogActorColorOptions = [

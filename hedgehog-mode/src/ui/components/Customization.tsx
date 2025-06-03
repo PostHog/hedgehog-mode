@@ -254,7 +254,7 @@ function HedgehogSkins({
   setConfig,
   game,
 }: HedgehogOptionsProps): JSX.Element | null {
-  const skins = ["default", "spiderhog"];
+  const skins = ["default", "spiderhog", "robohog"];
 
   return (
     <div className="CustomizationSection">

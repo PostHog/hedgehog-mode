@@ -1792,7 +1792,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/fall/tile-0.png":
+"skins/robohog/fall/tile000.png":
 {
 	"frame": {"x":640,"y":720,"w":80,"h":80},
 	"rotated": false,
@@ -1800,7 +1800,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/fall/tile-1.png":
+"skins/robohog/fall/tile001.png":
 {
 	"frame": {"x":720,"y":720,"w":80,"h":80},
 	"rotated": false,
@@ -1808,7 +1808,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/fall/tile-2.png":
+"skins/robohog/fall/tile002.png":
 {
 	"frame": {"x":800,"y":720,"w":80,"h":80},
 	"rotated": false,
@@ -1816,7 +1816,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/fall/tile-3.png":
+"skins/robohog/fall/tile003.png":
 {
 	"frame": {"x":880,"y":720,"w":80,"h":80},
 	"rotated": false,
@@ -1824,7 +1824,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/fall/tile-4.png":
+"skins/robohog/fall/tile004.png":
 {
 	"frame": {"x":960,"y":720,"w":80,"h":80},
 	"rotated": false,
@@ -1832,7 +1832,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/fall/tile-5.png":
+"skins/robohog/fall/tile005.png":
 {
 	"frame": {"x":1040,"y":720,"w":80,"h":80},
 	"rotated": false,
@@ -1840,7 +1840,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/fall/tile-6.png":
+"skins/robohog/fall/tile006.png":
 {
 	"frame": {"x":1120,"y":720,"w":80,"h":80},
 	"rotated": false,
@@ -1848,7 +1848,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/fall/tile-7.png":
+"skins/robohog/fall/tile007.png":
 {
 	"frame": {"x":1200,"y":720,"w":80,"h":80},
 	"rotated": false,
@@ -1856,7 +1856,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/fall/tile-8.png":
+"skins/robohog/fall/tile008.png":
 {
 	"frame": {"x":1280,"y":720,"w":80,"h":80},
 	"rotated": false,
@@ -1864,7 +1864,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/jump/tile-0.png":
+"skins/robohog/jump/tile000.png":
 {
 	"frame": {"x":1360,"y":720,"w":80,"h":80},
 	"rotated": false,
@@ -1872,7 +1872,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/jump/tile-1.png":
+"skins/robohog/jump/tile001.png":
 {
 	"frame": {"x":1440,"y":720,"w":80,"h":80},
 	"rotated": false,
@@ -1880,7 +1880,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/jump/tile-2.png":
+"skins/robohog/jump/tile002.png":
 {
 	"frame": {"x":1520,"y":720,"w":80,"h":80},
 	"rotated": false,
@@ -1888,7 +1888,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/jump/tile-3.png":
+"skins/robohog/jump/tile003.png":
 {
 	"frame": {"x":1600,"y":720,"w":80,"h":80},
 	"rotated": false,
@@ -1896,7 +1896,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/jump/tile-4.png":
+"skins/robohog/jump/tile004.png":
 {
 	"frame": {"x":1680,"y":720,"w":80,"h":80},
 	"rotated": false,
@@ -1904,7 +1904,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/jump/tile-5.png":
+"skins/robohog/jump/tile005.png":
 {
 	"frame": {"x":1760,"y":720,"w":80,"h":80},
 	"rotated": false,
@@ -1912,7 +1912,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/jump/tile-6.png":
+"skins/robohog/jump/tile006.png":
 {
 	"frame": {"x":1840,"y":720,"w":80,"h":80},
 	"rotated": false,
@@ -1920,7 +1920,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/jump/tile-7.png":
+"skins/robohog/jump/tile007.png":
 {
 	"frame": {"x":0,"y":800,"w":80,"h":80},
 	"rotated": false,
@@ -1928,7 +1928,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/jump/tile-8.png":
+"skins/robohog/jump/tile008.png":
 {
 	"frame": {"x":80,"y":800,"w":80,"h":80},
 	"rotated": false,
@@ -1936,7 +1936,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/jump/tile-9.png":
+"skins/robohog/jump/tile009.png":
 {
 	"frame": {"x":160,"y":800,"w":80,"h":80},
 	"rotated": false,
@@ -1944,7 +1944,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/walk/tile-0.png":
+"skins/robohog/walk/tile000.png":
 {
 	"frame": {"x":240,"y":800,"w":80,"h":80},
 	"rotated": false,
@@ -1952,7 +1952,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/walk/tile-1.png":
+"skins/robohog/walk/tile001.png":
 {
 	"frame": {"x":320,"y":800,"w":80,"h":80},
 	"rotated": false,
@@ -1960,7 +1960,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/walk/tile-2.png":
+"skins/robohog/walk/tile002.png":
 {
 	"frame": {"x":400,"y":800,"w":80,"h":80},
 	"rotated": false,
@@ -1968,7 +1968,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/walk/tile-3.png":
+"skins/robohog/walk/tile003.png":
 {
 	"frame": {"x":480,"y":800,"w":80,"h":80},
 	"rotated": false,
@@ -1976,7 +1976,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/walk/tile-4.png":
+"skins/robohog/walk/tile004.png":
 {
 	"frame": {"x":560,"y":800,"w":80,"h":80},
 	"rotated": false,
@@ -1984,7 +1984,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/walk/tile-5.png":
+"skins/robohog/walk/tile005.png":
 {
 	"frame": {"x":640,"y":800,"w":80,"h":80},
 	"rotated": false,
@@ -1992,7 +1992,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/walk/tile-6.png":
+"skins/robohog/walk/tile006.png":
 {
 	"frame": {"x":720,"y":800,"w":80,"h":80},
 	"rotated": false,
@@ -2000,7 +2000,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/walk/tile-7.png":
+"skins/robohog/walk/tile007.png":
 {
 	"frame": {"x":800,"y":800,"w":80,"h":80},
 	"rotated": false,
@@ -2008,7 +2008,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/walk/tile-8.png":
+"skins/robohog/walk/tile008.png":
 {
 	"frame": {"x":880,"y":800,"w":80,"h":80},
 	"rotated": false,
@@ -2016,7 +2016,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/walk/tile-9.png":
+"skins/robohog/walk/tile009.png":
 {
 	"frame": {"x":960,"y":800,"w":80,"h":80},
 	"rotated": false,
@@ -2024,7 +2024,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/walk/tile-10.png":
+"skins/robohog/walk/tile010.png":
 {
 	"frame": {"x":1040,"y":800,"w":80,"h":80},
 	"rotated": false,
@@ -2032,7 +2032,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/wave/tile-0.png":
+"skins/robohog/wave/tile000.png":
 {
 	"frame": {"x":1120,"y":800,"w":80,"h":80},
 	"rotated": false,
@@ -2040,7 +2040,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/wave/tile-1.png":
+"skins/robohog/wave/tile001.png":
 {
 	"frame": {"x":1200,"y":800,"w":80,"h":80},
 	"rotated": false,
@@ -2048,7 +2048,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/wave/tile-2.png":
+"skins/robohog/wave/tile002.png":
 {
 	"frame": {"x":1280,"y":800,"w":80,"h":80},
 	"rotated": false,
@@ -2056,7 +2056,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/wave/tile-3.png":
+"skins/robohog/wave/tile003.png":
 {
 	"frame": {"x":1360,"y":800,"w":80,"h":80},
 	"rotated": false,
@@ -2064,7 +2064,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/wave/tile-4.png":
+"skins/robohog/wave/tile004.png":
 {
 	"frame": {"x":1440,"y":800,"w":80,"h":80},
 	"rotated": false,
@@ -2072,7 +2072,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/wave/tile-5.png":
+"skins/robohog/wave/tile005.png":
 {
 	"frame": {"x":1520,"y":800,"w":80,"h":80},
 	"rotated": false,
@@ -2080,7 +2080,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/wave/tile-6.png":
+"skins/robohog/wave/tile006.png":
 {
 	"frame": {"x":1600,"y":800,"w":80,"h":80},
 	"rotated": false,
@@ -2088,7 +2088,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/wave/tile-7.png":
+"skins/robohog/wave/tile007.png":
 {
 	"frame": {"x":1680,"y":800,"w":80,"h":80},
 	"rotated": false,
@@ -2096,7 +2096,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/wave/tile-8.png":
+"skins/robohog/wave/tile008.png":
 {
 	"frame": {"x":1760,"y":800,"w":80,"h":80},
 	"rotated": false,
@@ -2104,7 +2104,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/wave/tile-9.png":
+"skins/robohog/wave/tile009.png":
 {
 	"frame": {"x":1840,"y":800,"w":80,"h":80},
 	"rotated": false,
@@ -2112,7 +2112,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/wave/tile-10.png":
+"skins/robohog/wave/tile010.png":
 {
 	"frame": {"x":0,"y":880,"w":80,"h":80},
 	"rotated": false,
@@ -2120,7 +2120,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/wave/tile-11.png":
+"skins/robohog/wave/tile011.png":
 {
 	"frame": {"x":80,"y":880,"w":80,"h":80},
 	"rotated": false,
@@ -2128,7 +2128,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/wave/tile-12.png":
+"skins/robohog/wave/tile012.png":
 {
 	"frame": {"x":160,"y":880,"w":80,"h":80},
 	"rotated": false,
@@ -2136,7 +2136,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/wave/tile-13.png":
+"skins/robohog/wave/tile013.png":
 {
 	"frame": {"x":240,"y":880,"w":80,"h":80},
 	"rotated": false,
@@ -2144,7 +2144,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/wave/tile-14.png":
+"skins/robohog/wave/tile014.png":
 {
 	"frame": {"x":320,"y":880,"w":80,"h":80},
 	"rotated": false,
@@ -2152,7 +2152,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/wave/tile-15.png":
+"skins/robohog/wave/tile015.png":
 {
 	"frame": {"x":400,"y":880,"w":80,"h":80},
 	"rotated": false,
@@ -2160,7 +2160,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/wave/tile-16.png":
+"skins/robohog/wave/tile016.png":
 {
 	"frame": {"x":480,"y":880,"w":80,"h":80},
 	"rotated": false,
@@ -2168,7 +2168,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/wave/tile-17.png":
+"skins/robohog/wave/tile017.png":
 {
 	"frame": {"x":560,"y":880,"w":80,"h":80},
 	"rotated": false,
@@ -2176,7 +2176,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/wave/tile-18.png":
+"skins/robohog/wave/tile018.png":
 {
 	"frame": {"x":640,"y":880,"w":80,"h":80},
 	"rotated": false,
@@ -2184,7 +2184,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/wave/tile-19.png":
+"skins/robohog/wave/tile019.png":
 {
 	"frame": {"x":720,"y":880,"w":80,"h":80},
 	"rotated": false,
@@ -2192,7 +2192,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/wave/tile-20.png":
+"skins/robohog/wave/tile020.png":
 {
 	"frame": {"x":800,"y":880,"w":80,"h":80},
 	"rotated": false,
@@ -2200,7 +2200,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/wave/tile-21.png":
+"skins/robohog/wave/tile021.png":
 {
 	"frame": {"x":880,"y":880,"w":80,"h":80},
 	"rotated": false,
@@ -2208,7 +2208,7 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
-"skins/robohog/wave/tile-22.png":
+"skins/robohog/wave/tile022.png":
 {
 	"frame": {"x":960,"y":880,"w":80,"h":80},
 	"rotated": false,
@@ -2675,10 +2675,10 @@
 	"skins/default/sign/tile": ["skins/default/sign/tile000.png","skins/default/sign/tile001.png","skins/default/sign/tile002.png","skins/default/sign/tile003.png","skins/default/sign/tile004.png","skins/default/sign/tile005.png","skins/default/sign/tile006.png","skins/default/sign/tile007.png","skins/default/sign/tile008.png","skins/default/sign/tile009.png","skins/default/sign/tile010.png","skins/default/sign/tile011.png","skins/default/sign/tile012.png","skins/default/sign/tile013.png","skins/default/sign/tile014.png","skins/default/sign/tile015.png","skins/default/sign/tile016.png","skins/default/sign/tile017.png","skins/default/sign/tile018.png","skins/default/sign/tile019.png","skins/default/sign/tile020.png","skins/default/sign/tile021.png","skins/default/sign/tile022.png","skins/default/sign/tile023.png","skins/default/sign/tile024.png","skins/default/sign/tile025.png","skins/default/sign/tile026.png","skins/default/sign/tile027.png","skins/default/sign/tile028.png","skins/default/sign/tile029.png","skins/default/sign/tile030.png","skins/default/sign/tile031.png","skins/default/sign/tile032.png"],
 	"skins/default/walk/tile": ["skins/default/walk/tile000.png","skins/default/walk/tile001.png","skins/default/walk/tile002.png","skins/default/walk/tile003.png","skins/default/walk/tile004.png","skins/default/walk/tile005.png","skins/default/walk/tile006.png","skins/default/walk/tile007.png","skins/default/walk/tile008.png","skins/default/walk/tile009.png","skins/default/walk/tile010.png"],
 	"skins/default/wave/tile": ["skins/default/wave/tile000.png","skins/default/wave/tile001.png","skins/default/wave/tile002.png","skins/default/wave/tile003.png","skins/default/wave/tile004.png","skins/default/wave/tile005.png","skins/default/wave/tile006.png","skins/default/wave/tile007.png","skins/default/wave/tile008.png","skins/default/wave/tile009.png","skins/default/wave/tile010.png","skins/default/wave/tile011.png","skins/default/wave/tile012.png","skins/default/wave/tile013.png","skins/default/wave/tile014.png","skins/default/wave/tile015.png","skins/default/wave/tile016.png","skins/default/wave/tile017.png","skins/default/wave/tile018.png","skins/default/wave/tile019.png","skins/default/wave/tile020.png","skins/default/wave/tile021.png","skins/default/wave/tile022.png","skins/default/wave/tile023.png","skins/default/wave/tile024.png","skins/default/wave/tile025.png"],
-	"skins/robohog/fall/tile": ["skins/robohog/fall/tile-0.png","skins/robohog/fall/tile-1.png","skins/robohog/fall/tile-2.png","skins/robohog/fall/tile-3.png","skins/robohog/fall/tile-4.png","skins/robohog/fall/tile-5.png","skins/robohog/fall/tile-6.png","skins/robohog/fall/tile-7.png","skins/robohog/fall/tile-8.png"],
-	"skins/robohog/jump/tile": ["skins/robohog/jump/tile-0.png","skins/robohog/jump/tile-1.png","skins/robohog/jump/tile-2.png","skins/robohog/jump/tile-3.png","skins/robohog/jump/tile-4.png","skins/robohog/jump/tile-5.png","skins/robohog/jump/tile-6.png","skins/robohog/jump/tile-7.png","skins/robohog/jump/tile-8.png","skins/robohog/jump/tile-9.png"],
-	"skins/robohog/walk/tile": ["skins/robohog/walk/tile-0.png","skins/robohog/walk/tile-1.png","skins/robohog/walk/tile-2.png","skins/robohog/walk/tile-3.png","skins/robohog/walk/tile-4.png","skins/robohog/walk/tile-5.png","skins/robohog/walk/tile-6.png","skins/robohog/walk/tile-7.png","skins/robohog/walk/tile-8.png","skins/robohog/walk/tile-9.png","skins/robohog/walk/tile-10.png"],
-	"skins/robohog/wave/tile": ["skins/robohog/wave/tile-0.png","skins/robohog/wave/tile-1.png","skins/robohog/wave/tile-2.png","skins/robohog/wave/tile-3.png","skins/robohog/wave/tile-4.png","skins/robohog/wave/tile-5.png","skins/robohog/wave/tile-6.png","skins/robohog/wave/tile-7.png","skins/robohog/wave/tile-8.png","skins/robohog/wave/tile-9.png","skins/robohog/wave/tile-10.png","skins/robohog/wave/tile-11.png","skins/robohog/wave/tile-12.png","skins/robohog/wave/tile-13.png","skins/robohog/wave/tile-14.png","skins/robohog/wave/tile-15.png","skins/robohog/wave/tile-16.png","skins/robohog/wave/tile-17.png","skins/robohog/wave/tile-18.png","skins/robohog/wave/tile-19.png","skins/robohog/wave/tile-20.png","skins/robohog/wave/tile-21.png","skins/robohog/wave/tile-22.png"],
+	"skins/robohog/fall/tile": ["skins/robohog/fall/tile000.png","skins/robohog/fall/tile001.png","skins/robohog/fall/tile002.png","skins/robohog/fall/tile003.png","skins/robohog/fall/tile004.png","skins/robohog/fall/tile005.png","skins/robohog/fall/tile006.png","skins/robohog/fall/tile007.png","skins/robohog/fall/tile008.png"],
+	"skins/robohog/jump/tile": ["skins/robohog/jump/tile000.png","skins/robohog/jump/tile001.png","skins/robohog/jump/tile002.png","skins/robohog/jump/tile003.png","skins/robohog/jump/tile004.png","skins/robohog/jump/tile005.png","skins/robohog/jump/tile006.png","skins/robohog/jump/tile007.png","skins/robohog/jump/tile008.png","skins/robohog/jump/tile009.png"],
+	"skins/robohog/walk/tile": ["skins/robohog/walk/tile000.png","skins/robohog/walk/tile001.png","skins/robohog/walk/tile002.png","skins/robohog/walk/tile003.png","skins/robohog/walk/tile004.png","skins/robohog/walk/tile005.png","skins/robohog/walk/tile006.png","skins/robohog/walk/tile007.png","skins/robohog/walk/tile008.png","skins/robohog/walk/tile009.png","skins/robohog/walk/tile010.png"],
+	"skins/robohog/wave/tile": ["skins/robohog/wave/tile000.png","skins/robohog/wave/tile001.png","skins/robohog/wave/tile002.png","skins/robohog/wave/tile003.png","skins/robohog/wave/tile004.png","skins/robohog/wave/tile005.png","skins/robohog/wave/tile006.png","skins/robohog/wave/tile007.png","skins/robohog/wave/tile008.png","skins/robohog/wave/tile009.png","skins/robohog/wave/tile010.png","skins/robohog/wave/tile011.png","skins/robohog/wave/tile012.png","skins/robohog/wave/tile013.png","skins/robohog/wave/tile014.png","skins/robohog/wave/tile015.png","skins/robohog/wave/tile016.png","skins/robohog/wave/tile017.png","skins/robohog/wave/tile018.png","skins/robohog/wave/tile019.png","skins/robohog/wave/tile020.png","skins/robohog/wave/tile021.png","skins/robohog/wave/tile022.png"],
 	"skins/spiderhog/fall/tile": ["skins/spiderhog/fall/tile000.png","skins/spiderhog/fall/tile001.png","skins/spiderhog/fall/tile002.png","skins/spiderhog/fall/tile003.png","skins/spiderhog/fall/tile004.png","skins/spiderhog/fall/tile005.png","skins/spiderhog/fall/tile006.png","skins/spiderhog/fall/tile007.png","skins/spiderhog/fall/tile008.png"],
 	"skins/spiderhog/jump/tile": ["skins/spiderhog/jump/tile000.png","skins/spiderhog/jump/tile001.png","skins/spiderhog/jump/tile002.png","skins/spiderhog/jump/tile003.png","skins/spiderhog/jump/tile004.png","skins/spiderhog/jump/tile005.png","skins/spiderhog/jump/tile006.png","skins/spiderhog/jump/tile007.png","skins/spiderhog/jump/tile008.png","skins/spiderhog/jump/tile009.png"],
 	"skins/spiderhog/walk/tile": ["skins/spiderhog/walk/tile000.png","skins/spiderhog/walk/tile001.png","skins/spiderhog/walk/tile002.png","skins/spiderhog/walk/tile003.png","skins/spiderhog/walk/tile004.png","skins/spiderhog/walk/tile005.png","skins/spiderhog/walk/tile006.png","skins/spiderhog/walk/tile007.png","skins/spiderhog/walk/tile008.png","skins/spiderhog/walk/tile009.png","skins/spiderhog/walk/tile010.png"],
@@ -2691,6 +2691,6 @@
 	"format": "RGBA8888",
 	"size": {"w":1920,"h":1120},
 	"scale": "1",
-	"smartupdate": "$TexturePacker:SmartUpdate:36b9ceabff4dfec2149fd7c7c4118a4c:ed6149abc7db61ec6263b00753fe2bfe:1eabdf11f75e3a4fe3147baf7b5be24b$"
+	"smartupdate": "$TexturePacker:SmartUpdate:68147f204c4422832f51eb3d1eb58988:ab8d55fd1957992a60239d44ce95edd5:1eabdf11f75e3a4fe3147baf7b5be24b$"
 }
 }

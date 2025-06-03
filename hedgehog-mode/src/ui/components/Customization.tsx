@@ -76,6 +76,14 @@ export function HedgehogCustomization(
                 with WASD / arrow keys and I'll use your mouse as a web slinging
                 target.
               </>
+            ) : config.skin === "robohog" ? (
+              <>
+                RoboHog reporting for duty. dead or alive, you're coding with
+                me!
+                <br />
+                my AI is superior but if you must, you can move me around by
+                clicking and dragging or control me with WASD / arrow keys.
+              </>
             ) : (
               <>
                 don't mind me. i'm just here to keep you company.

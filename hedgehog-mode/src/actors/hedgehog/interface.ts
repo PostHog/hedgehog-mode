@@ -344,24 +344,6 @@ export class HedgehogActorInterface {
 
   onClick(): void {
     // Temp to fix
-
-    return;
-    const selectedMessages = sample(this.messages);
-
-    if (selectedMessages) {
-      const messages = Array.isArray(selectedMessages)
-        ? selectedMessages
-        : selectedMessages.messages;
-
-      if (!Array.isArray(selectedMessages)) {
-        selectedMessages.onStart?.();
-      }
-
-      this.game.EntryUI?.showDialogBox({
-        actor: this.actor,
-        messages,
-      });
-    }
   }
 
   triggerCheatSheet(): void {

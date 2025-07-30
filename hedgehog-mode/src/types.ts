@@ -50,6 +50,9 @@ export type Game = {
   EntryUI?: EntryUI;
   world: GameWorld;
   audioContext?: PolySynth;
+  playDeathMusic: () => void;
+  startBackgroundMusic: () => void;
+  stopBackgroundMusic: () => void;
 };
 
 export type EntryUI = {

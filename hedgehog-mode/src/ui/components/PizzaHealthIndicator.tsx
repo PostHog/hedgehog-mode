@@ -5,7 +5,7 @@ import { AvailableSpriteFrames } from "../../sprites/sprites";
 
 interface PizzaHealthIndicatorProps {
   game: HedgeHogMode;
-  damage: 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+  damage: number;
   className?: string;
   size: "small" | "large";
 }

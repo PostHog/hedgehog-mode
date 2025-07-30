@@ -68,9 +68,8 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
           <div className="Scoreboard text-beige">
             <GameHealthAndPoints
               game={game}
-              health={playerHealth}
+              health={playerHealth ?? 0}
               points={kills}
-              size="small"
             />
           </div>
           <div className="BottomLogo text-beige flex gap-2">

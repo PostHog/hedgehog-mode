@@ -100,6 +100,9 @@ importers:
       '@eslint/js':
         specifier: ^9.7.0
         version: 9.10.0
+      '@types/howler':
+        specifier: ^2.2.12
+        version: 2.2.12
       '@types/lodash':
         specifier: ^4.17.15
         version: 4.17.15
@@ -681,6 +684,9 @@ packages:
 
   '@types/estree@1.0.5':
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
+
+  '@types/howler@2.2.12':
+    resolution: {integrity: sha512-hy769UICzOSdK0Kn1FBk4gN+lswcj1EKRkmiDtMkUGvFfYJzgaDXmVXkSShS2m89ERAatGIPnTUlp2HhfkVo5g==}
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
@@ -3228,6 +3234,8 @@ snapshots:
   '@types/earcut@2.1.4': {}
 
   '@types/estree@1.0.5': {}
+
+  '@types/howler@2.2.12': {}
 
   '@types/json-schema@7.0.15': {}
 

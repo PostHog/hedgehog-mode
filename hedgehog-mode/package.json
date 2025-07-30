@@ -21,6 +21,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.7.0",
+    "@types/howler": "^2.2.12",
     "@types/lodash": "^4.17.15",
     "@types/matter-js": "^0.19.8",
     "@types/node": "^20.14.11",

@@ -12,7 +12,7 @@ import { GameWorld } from "./world";
 import * as Tone from "tone";
 import { PolySynth } from "tone";
 import { Howl } from "howler";
-import {AudioManager} from "./audio";
+import { AudioManager } from "./audio";
 
 Matter.Common.setDecomp(decomp);
 
@@ -47,7 +47,6 @@ export class HedgeHogMode implements Game {
   mousePosition?: Matter.Vector;
   lastTime?: number;
   EntryUI!: EntryUI;
-  // stateManager?: GameStateManager;
   staticHedgehogRenderer: StaticHedgehogRenderer;
   world: GameWorld;
   audioContext?: PolySynth;
@@ -74,14 +73,14 @@ export class HedgeHogMode implements Game {
         this.backgroundMusic = new Howl({
           src: ["/assets/music/timeattack.mp3"],
           loop: true,
-          volume: 0.3,          // tweak to taste
-          sprite: { main: [10_000, 999_999, true] }
+          volume: 0.3, // tweak to taste
+          sprite: { main: [10_000, 999_999, true] },
         });
       }
       this.audioUnlocked = true;
-      if (this.gameStarted) this.backgroundMusic.play('main');
+      if (this.gameStarted) this.backgroundMusic.play("main");
 
-      this.backgroundMusic.play('main');
+      this.backgroundMusic.play("main");
     };
     window.addEventListener("keydown", enableSound);
 
@@ -90,7 +89,7 @@ export class HedgeHogMode implements Game {
 
   startBackgroundMusic(): void {
     this.gameStarted = true;
-    if (this.audioUnlocked) this.backgroundMusic?.play('main');
+    if (this.audioUnlocked) this.backgroundMusic?.play("main");
   }
 
   stopBackgroundMusic(): void {
@@ -100,10 +99,10 @@ export class HedgeHogMode implements Game {
   playDeathMusic(): void {
     window.setTimeout(() => {
       new Howl({ src: ["/assets/sounds/die.wav"], volume: 1.2 }).play();
-    }, 2500)
+    }, 2500);
     window.setTimeout(() => {
       new Howl({ src: ["/assets/sounds/gameover.mp3"], volume: 1.2 }).play();
-    }, 5500)
+    }, 5500);
   }
 
   destroy(): void {
@@ -273,7 +272,6 @@ export class HedgeHogMode implements Game {
 
     new GlobalKeyboardListeners(this);
     gsap.ticker.remove(gsap.updateRoot);
-    // this.stateManager = new GameStateManager(this, this.options);
   }
 
   private onCollisionStart(event: Matter.IEventCollision<Matter.Engine>) {

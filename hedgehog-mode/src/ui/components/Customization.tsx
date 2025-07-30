@@ -105,42 +105,6 @@ function HedgehogOptions({
 }: HedgehogOptionsProps): JSX.Element {
   const [hedgehogsCount, setHedgehogsCount] = useState(0);
 
-  useEffect(() => {
-    setHedgehogsCount(game.stateManager?.getNumberOfHedgehogs() ?? 0);
-  }, [game.stateManager]);
-
-  const addFriend = () => {
-    game.stateManager?.setHedgehog({
-      id: uniqueId("friend-"),
-      player: false,
-      accessories: getRandomAccessoryCombo(),
-      color: sample(HedgehogActorColorOptions),
-    });
-    setHedgehogsCount(game.stateManager?.getNumberOfHedgehogs() ?? 0);
-  };
-
-  const removeFriend = () => {
-    const nonPlayerHedgehog = Object.values(
-      game.stateManager?.getState().hedgehogsById ?? {}
-    ).find((h) => !h.player);
-    if (nonPlayerHedgehog) {
-      game.stateManager?.removeHedgehog(nonPlayerHedgehog.id);
-    }
-    setHedgehogsCount(game.stateManager?.getNumberOfHedgehogs() ?? 0);
-  };
-
-  const removeAllFriends = () => {
-    Object.values(game.stateManager?.getState().hedgehogsById ?? {}).forEach(
-      (h) => {
-        if (!h.player) {
-          game.stateManager?.removeHedgehog(h.id);
-        }
-      }
-    );
-
-    setHedgehogsCount(game.stateManager?.getNumberOfHedgehogs() ?? 0);
-  };
-
   return (
     <>
       <h4 className="CustomizationSectionTitle">options</h4>
@@ -168,26 +132,6 @@ function HedgehogOptions({
       >
         Keyboard controls (WASD / arrow keys)
       </Switch>
-      <Switch
-        checked={hedgehogsCount > 1}
-        onChange={() => {
-          if (hedgehogsCount > 1) {
-            removeAllFriends();
-          } else {
-            // The most tragic line of code I've ever written
-            addFriend();
-          }
-        }}
-        title={`If enabled then ${hedgehogsCount - 1} friends will appear in your browser as hedgehogs as well!`}
-      >
-        Friends
-      </Switch>
-      {hedgehogsCount > 1 && (
-        <>
-          <Button onClick={addFriend}>Add</Button> /
-          <Button onClick={removeFriend}>Remove</Button>
-        </>
-      )}
     </>
   );
 }

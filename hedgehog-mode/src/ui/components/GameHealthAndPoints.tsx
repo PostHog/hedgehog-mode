@@ -25,7 +25,11 @@ export function GameHealthAndPoints({
       className="GameConsole-ControlPanel-status flex flex-row gap-4 justify-between items-center"
       style={{ maxWidth: "250px", margin: "0 auto" }}
     >
-      <PizzaHealthIndicator game={game} damage={calculateDamage(health)} />
+      <PizzaHealthIndicator
+        game={game}
+        damage={calculateDamage(health)}
+        size="small"
+      />
       <div className="GameConsole-ControlPanel-status-points flex flex-row gap-2 items-center">
         <div className="GameConsole-ControlPanel-status-count">{points}</div>
         {/* <div className="GameConsole-ControlPanel-status-pineapple"></div> */}

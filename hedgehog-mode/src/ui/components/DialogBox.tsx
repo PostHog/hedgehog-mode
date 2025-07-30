@@ -32,13 +32,9 @@ export function DialogBox({
     _setActorOptions(actor?.options || null);
   }, [actor]);
 
-  const setActorOptions = useCallback(
-    (options: HedgehogActorOptions) => {
-      _setActorOptions(options);
-      game.stateManager?.setHedgehog(options);
-    },
-    [game.stateManager]
-  );
+  const setActorOptions = useCallback((options: HedgehogActorOptions) => {
+    _setActorOptions(options);
+  }, []);
 
   const derivedWidth = showConfiguration ? 500 : width;
 

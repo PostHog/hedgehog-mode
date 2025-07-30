@@ -1,6 +1,7 @@
 import gsap from "gsap";
 
 import Matter, { Render, Runner } from "matter-js";
+// @ts-expect-error - no types
 import decomp from "poly-decomp";
 import { Application } from "pixi.js";
 import { Game, EntryUI, HedgehogModeConfig } from "./types";
@@ -12,7 +13,6 @@ import { GameWorld } from "./world";
 import * as Tone from "tone";
 import { PolySynth } from "tone";
 import { Howl } from "howler";
-import { AudioManager } from "./audio";
 
 Matter.Common.setDecomp(decomp);
 

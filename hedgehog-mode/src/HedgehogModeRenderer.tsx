@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { HedgeHogMode, HedgehogModeConfig } from "./hedgehog-mode";
 import { HedgehogModeUI } from "./ui/GameUI";
 import root from "react-shadow";
@@ -17,14 +17,19 @@ export function HedgehogModeRenderer({
   style?: React.CSSProperties;
 }) {
   const [game, setGame] = useState<HedgeHogMode | null>(null);
+
   const setupHedgehogMode = async (container: HTMLDivElement) => {
     const hedgeHogMode = new HedgeHogMode(config);
-    await hedgeHogMode.render(container);
     setGame(hedgeHogMode);
+    await hedgeHogMode.render(container);
     onGameReady?.(hedgeHogMode);
   };
 
   const osTheme = useTheme();
+
+  useEffect(() => {
+    return () => game?.destroy();
+  }, [game]);
 
   return (
     <root.div

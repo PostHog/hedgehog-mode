@@ -335,10 +335,14 @@ export class HedgehogActorInterface {
         //   ],
         // });
 
-        this.game.gameUI?.showDialogBox({
-          actor: this.actor,
-          messages: [{ words: ["i am the defining feature"] }],
-        });
+        const messages = sample(this.messages);
+
+        if (Array.isArray(messages)) {
+          this.game.gameUI?.showDialogBox({
+            actor: this.actor,
+            messages,
+          });
+        }
       }
     }, 1000);
   }

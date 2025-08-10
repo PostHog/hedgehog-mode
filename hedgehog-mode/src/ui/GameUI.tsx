@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  GameUI,
   GameUIProps,
   HedgehogActorOptions,
   HedgeHogMode,
@@ -14,15 +15,27 @@ const WINDOW_MARGIN = 10;
 export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
   const [ui, setUI] = useState<GameUIProps | null>(null);
   const [visible, setVisible] = useState<boolean>(false);
+
+  const uiRef = useRef<GameUI>({
+    show: (ui) => {
+      setVisible(true);
+      setUI(ui);
+    },
+    hide: () => {
+      setVisible(false);
+    },
+    visible,
+  });
+
   // To game should control the UI largely so we add an event listener for game modal popups
   useEffect(() => {
-    game.setUI({
-      show: (ui) => {
-        setVisible(true);
-        setUI(ui);
-      },
-    });
+    // This is the object that can be used programatically to show the UI and reference other state
+    game.setUI(uiRef.current);
   }, [game]);
+
+  useEffect(() => {
+    uiRef.current.visible = visible;
+  }, [uiRef.current, visible]);
 
   const onClose = useCallback(() => {
     setVisible(false);

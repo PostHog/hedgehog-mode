@@ -52,6 +52,8 @@ export type Game = {
 
 export type GameUI = {
   show: (dialogBox: GameUIProps) => void;
+  hide: () => void;
+  visible: boolean;
 };
 
 export type GameUIAnimatedTextProps = {

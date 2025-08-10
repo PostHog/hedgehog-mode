@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - feat/renderer
+      - fix/renderer
 
 jobs:
   release:

@@ -48,6 +48,14 @@ export class GameStateManager {
     this.persistState();
   }
 
+  getHedgehogActor(id: string): HedgehogActor | undefined {
+    return this.hedgehogsById[id];
+  }
+
+  getPlayerHedgehogActor(): HedgehogActor | undefined {
+    return this.hedgehogsById["player"];
+  }
+
   getState() {
     return this.state;
   }

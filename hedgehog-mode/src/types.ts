@@ -4,6 +4,7 @@ import { AnimatedSprite, Application } from "pixi.js";
 import type { SpritesManager } from "./sprites/sprites";
 import type { HedgehogActor } from "./actors/Hedgehog";
 import { HedgehogActorOptions } from "./actors/hedgehog/config";
+import type { GameStateManager } from "./state";
 
 export type { HedgehogActor, HedgehogActorOptions };
 
@@ -46,6 +47,7 @@ export type Game = {
   log: (...args: unknown[]) => void;
   setSpeed: (speed: number) => void;
   gameUI?: GameUI;
+  stateManager?: GameStateManager;
 };
 
 export type GameUI = {

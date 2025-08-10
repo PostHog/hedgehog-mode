@@ -1,7 +1,7 @@
 import gsap from "gsap";
 
 import Matter, { Render, Runner } from "matter-js";
-import { Application, SCALE_MODES } from "pixi.js";
+import { Application } from "pixi.js";
 import { Game, GameElement, GameUI, HedgehogModeConfig } from "./types";
 import { SpritesManager } from "./sprites/sprites";
 import { HedgehogActor } from "./actors/Hedgehog";

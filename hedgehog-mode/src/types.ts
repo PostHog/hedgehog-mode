@@ -51,7 +51,7 @@ export type Game = {
 };
 
 export type GameUI = {
-  showDialogBox: (dialogBox: GameUIDialogBoxProps) => void;
+  show: (dialogBox: GameUIProps) => void;
 };
 
 export type GameUIAnimatedTextProps = {
@@ -62,7 +62,8 @@ export type GameUIAnimatedTextProps = {
   onClick?: () => void;
 };
 
-export type GameUIDialogBoxProps = {
+export type GameUIProps = {
+  screen: "configuration" | "dialog";
   messages: {
     words: GameUIAnimatedTextProps["words"];
     onComplete?: () => void;

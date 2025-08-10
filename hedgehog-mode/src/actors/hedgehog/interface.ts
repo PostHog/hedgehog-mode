@@ -1,8 +1,8 @@
 import { sample } from "lodash";
 import type { HedgehogActor } from "../Hedgehog";
-import { Game, GameUIDialogBoxProps } from "../../types";
+import { Game, GameUIProps } from "../../types";
 
-const cheatSheetMessages: GameUIDialogBoxProps["messages"] = [
+const cheatSheetMessages: GameUIProps["messages"] = [
   {
     words: [
       {
@@ -81,10 +81,10 @@ const cheatSheetMessages: GameUIDialogBoxProps["messages"] = [
 
 export class HedgehogActorInterface {
   private messages: (
-    | GameUIDialogBoxProps["messages"]
+    | GameUIProps["messages"]
     | {
         onStart?: () => void;
-        messages: GameUIDialogBoxProps["messages"];
+        messages: GameUIProps["messages"];
       }
   )[] = [
     [
@@ -307,7 +307,7 @@ export class HedgehogActorInterface {
   ) {
     setTimeout(() => {
       if (actor.options.player) {
-        // this.game.gameUI?.showDialogBox({
+        // this.game.gameUI?.show({
         //   actor: this.actor,
         //   messages: [
         //     {
@@ -338,7 +338,8 @@ export class HedgehogActorInterface {
         const messages = sample(this.messages);
 
         if (Array.isArray(messages)) {
-          this.game.gameUI?.showDialogBox({
+          this.game.gameUI?.show({
+            screen: "dialog",
             actor: this.actor,
             messages,
           });
@@ -359,7 +360,8 @@ export class HedgehogActorInterface {
         selectedMessages.onStart?.();
       }
 
-      this.game.gameUI?.showDialogBox({
+      this.game.gameUI?.show({
+        screen: "dialog",
         actor: this.actor,
         messages,
       });
@@ -367,7 +369,8 @@ export class HedgehogActorInterface {
   }
 
   triggerCheatSheet(): void {
-    this.game.gameUI?.showDialogBox({
+    this.game.gameUI?.show({
+      screen: "dialog",
       actor: this.actor,
       messages: cheatSheetMessages,
     });

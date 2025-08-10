@@ -366,8 +366,10 @@ export class HedgehogActor extends Actor {
       this.hue += 360 * (ticker.deltaMS / 1000);
       this.hue = this.hue > 360 ? 0 : this.hue;
       this.filter.hue(this.hue, false);
-    } else if (this.options.color) {
-      const options = COLOR_TO_FILTER_MAP[this.options.color];
+    } else {
+      const options = this.options.color
+        ? COLOR_TO_FILTER_MAP[this.options.color]
+        : undefined;
       this.filter.reset();
       options?.(this.filter);
     }

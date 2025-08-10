@@ -1,6 +1,6 @@
 import { sample } from "lodash";
 import type { HedgehogActor } from "../Hedgehog";
-import { Game, GameUIProps } from "../../types";
+import { HedgehogModeInterface, GameUIProps } from "../../types";
 
 const cheatSheetMessages: GameUIProps["messages"] = [
   {
@@ -302,7 +302,7 @@ export class HedgehogActorInterface {
   ];
 
   constructor(
-    private game: Game,
+    private game: HedgehogModeInterface,
     private actor: HedgehogActor
   ) {
     setTimeout(() => {

@@ -3,7 +3,7 @@ import {
   DEFAULT_COLLISION_FILTER,
   NO_PLATFORM_COLLISION_FILTER,
 } from "./Actor";
-import { Game, GameElement, UpdateTicker } from "../types";
+import { HedgehogModeInterface, GameElement, UpdateTicker } from "../types";
 import Matter, { Bodies, Composites, Constraint, Pair } from "matter-js";
 import { SyncedPlatform } from "../items/SyncedPlatform";
 import { AnimatedSprite, ColorMatrixFilter, Sprite } from "pixi.js";
@@ -82,7 +82,7 @@ export class HedgehogActor extends Actor {
   protected collisionFilter = DEFAULT_COLLISION_FILTER;
 
   constructor(
-    game: Game,
+    game: HedgehogModeInterface,
     public options: HedgehogActorOptions
   ) {
     super(game);

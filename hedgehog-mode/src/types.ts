@@ -35,7 +35,7 @@ export type HedgehogModeConfig = {
   state?: HedgehogModeGameState;
 };
 
-export type Game = {
+export type HedgehogModeInterface = {
   app: Application;
   engine: Matter.Engine;
   pointerEventsEnabled: boolean;

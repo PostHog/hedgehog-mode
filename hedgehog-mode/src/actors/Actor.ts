@@ -1,7 +1,7 @@
 import Matter, { Constraint } from "matter-js";
 import { AnimatedSprite } from "pixi.js";
 import { AvailableAnimations } from "../sprites/sprites";
-import { Game, GameElement, UpdateTicker } from "../types";
+import { HedgehogModeInterface, GameElement, UpdateTicker } from "../types";
 import { COLLISIONS } from "../misc/collisions";
 
 const BASE_COLLISION_FILTER = {
@@ -45,7 +45,7 @@ export class Actor implements GameElement {
   forceAngle = 0;
 
   constructor(
-    protected game: Game,
+    protected game: HedgehogModeInterface,
     private rigidBodyOptions: Matter.IBodyDefinition = {}
   ) {}
 

@@ -1,5 +1,5 @@
 import { Actor } from "../actors/Actor";
-import { Game, GameElement, UpdateTicker } from "../types";
+import { HedgehogModeInterface, GameElement, UpdateTicker } from "../types";
 import { COLLISIONS } from "../misc/collisions";
 import gsap from "gsap";
 import { range } from "lodash";
@@ -11,7 +11,7 @@ let TOTAL_NUM_FLAMES = 0;
 export class FlameActor extends Actor {
   public isFlammable = false;
 
-  static fireBurst(game: Game, position: Matter.Vector): void {
+  static fireBurst(game: HedgehogModeInterface, position: Matter.Vector): void {
     if (TOTAL_NUM_FLAMES > 200) {
       return;
     }
@@ -43,7 +43,7 @@ export class FlameActor extends Actor {
     mask: COLLISIONS.PLATFORM | COLLISIONS.GROUND,
   };
 
-  constructor(game: Game) {
+  constructor(game: HedgehogModeInterface) {
     super(game, {
       friction: 0.7,
       frictionStatic: 0,

@@ -2,7 +2,12 @@ import gsap from "gsap";
 
 import Matter, { Render, Runner } from "matter-js";
 import { Application } from "pixi.js";
-import { Game, GameElement, GameUI, HedgehogModeConfig } from "./types";
+import {
+  HedgehogModeInterface,
+  GameElement,
+  GameUI,
+  HedgehogModeConfig,
+} from "./types";
 import { SpritesManager } from "./sprites/sprites";
 import { HedgehogActor } from "./actors/Hedgehog";
 import { Ground } from "./items/Ground";
@@ -32,7 +37,7 @@ export { StaticHedgehogRenderer } from "./static-renderer/StaticHedgehog";
 
 export type * from "./types";
 
-export class HedgeHogMode implements Game {
+export class HedgeHogMode implements HedgehogModeInterface {
   ref?: HTMLDivElement;
   app!: Application;
   engine!: Matter.Engine;

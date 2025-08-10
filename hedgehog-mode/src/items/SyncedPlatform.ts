@@ -1,5 +1,5 @@
 import { COLLISIONS } from "../misc/collisions";
-import { Game, GameElement } from "../types";
+import { HedgehogModeInterface, GameElement } from "../types";
 import Matter from "matter-js";
 
 const PLATFORM_HEIGHT = 5;
@@ -10,7 +10,7 @@ export class SyncedPlatform implements GameElement {
   lastRect: DOMRect | null = null;
 
   constructor(
-    private game: Game,
+    private game: HedgehogModeInterface,
     public ref: HTMLElement
   ) {
     // update just once to set the sprite initial position

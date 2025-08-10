@@ -5,6 +5,8 @@ import type { SpritesManager } from "./sprites/sprites";
 import type { HedgehogActor } from "./actors/Hedgehog";
 import { HedgehogActorOptions } from "./actors/hedgehog/config";
 
+export type { HedgehogActor, HedgehogActorOptions };
+
 export type UpdateTicker = {
   deltaMS: number;
   deltaTime: number;

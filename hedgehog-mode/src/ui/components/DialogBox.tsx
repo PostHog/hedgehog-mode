@@ -39,10 +39,11 @@ export function DialogBox({
   );
 
   const derivedWidth = showConfiguration ? 500 : width;
+  const MIN_WINDOW_HEIGHT = showConfiguration ? 300 : 50;
 
   const setPosition = useCallback(
-    (actor?: GameUIDialogBoxProps["actor"]) => {
-      if (hovering) {
+    (actor?: GameUIDialogBoxProps["actor"], force?: boolean) => {
+      if (hovering && !force) {
         return;
       }
 
@@ -51,7 +52,6 @@ export function DialogBox({
       if (ref.current && pos) {
         let x = pos.x - derivedWidth / 2;
         let y = window.innerHeight - pos.y + 40; // offset for height of the hedgehog
-        const minHeight = 20;
 
         x = Math.max(WINDOW_MARGIN, x);
         x = Math.min(window.innerWidth - derivedWidth - WINDOW_MARGIN, x);
@@ -60,16 +60,29 @@ export function DialogBox({
         y = Math.min(window.innerHeight - WINDOW_MARGIN, y);
 
         // Height should not be more than the screen
-        const maxHeight = window.innerHeight - y - WINDOW_MARGIN;
+        const maxHeight = Math.max(
+          MIN_WINDOW_HEIGHT,
+          window.innerHeight - y - WINDOW_MARGIN
+        );
+
+        // If the window would push it off screen we adjust the bottom to fit
+        y = Math.max(
+          WINDOW_MARGIN,
+          window.innerHeight - maxHeight - WINDOW_MARGIN
+        );
 
         ref.current.style.left = `${x}px`;
         ref.current.style.bottom = `${y}px`;
         ref.current.style.maxHeight = `${maxHeight}px`;
-        ref.current.style.minHeight = `${minHeight}px`;
+        ref.current.style.minHeight = `${MIN_WINDOW_HEIGHT}px`;
       }
     },
-    [hovering]
+    [hovering, MIN_WINDOW_HEIGHT, derivedWidth]
   );
+
+  useEffect(() => {
+    setPosition(actor, true);
+  }, [showConfiguration]);
 
   useEffect(() => {
     if (!visible) {

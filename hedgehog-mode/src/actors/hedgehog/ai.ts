@@ -66,6 +66,7 @@ export class HedgehogActorAI {
       this.run();
     } else {
       clearTimeout(this.actionInterval);
+      this.actor.walkSpeed = 0;
     }
   }
 

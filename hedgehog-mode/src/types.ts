@@ -4,6 +4,9 @@ import { AnimatedSprite, Application } from "pixi.js";
 import type { SpritesManager } from "./sprites/sprites";
 import type { HedgehogActor } from "./actors/Hedgehog";
 import { HedgehogActorOptions } from "./actors/hedgehog/config";
+import type { GameStateManager } from "./state";
+
+export type { HedgehogActor, HedgehogActorOptions };
 
 export type UpdateTicker = {
   deltaMS: number;
@@ -32,7 +35,7 @@ export type HedgehogModeConfig = {
   state?: HedgehogModeGameState;
 };
 
-export type Game = {
+export type HedgehogModeInterface = {
   app: Application;
   engine: Matter.Engine;
   pointerEventsEnabled: boolean;
@@ -44,10 +47,13 @@ export type Game = {
   log: (...args: unknown[]) => void;
   setSpeed: (speed: number) => void;
   gameUI?: GameUI;
+  stateManager?: GameStateManager;
 };
 
 export type GameUI = {
-  showDialogBox: (dialogBox: GameUIDialogBoxProps) => void;
+  show: (dialogBox: GameUIProps) => void;
+  hide: () => void;
+  visible: boolean;
 };
 
 export type GameUIAnimatedTextProps = {
@@ -58,7 +64,8 @@ export type GameUIAnimatedTextProps = {
   onClick?: () => void;
 };
 
-export type GameUIDialogBoxProps = {
+export type GameUIProps = {
+  screen: "configuration" | "dialog";
   messages: {
     words: GameUIAnimatedTextProps["words"];
     onComplete?: () => void;

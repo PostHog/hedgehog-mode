@@ -153,7 +153,7 @@ function HedgehogOptions({
     <>
       <h4 className="CustomizationSectionTitle">options</h4>
       <Switch
-        checked={config.ai_enabled ?? false}
+        checked={config.ai_enabled ?? true}
         onChange={(val) =>
           setConfig({
             ...config,

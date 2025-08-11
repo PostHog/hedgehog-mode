@@ -1,4 +1,4 @@
-import { Game, GameElement } from "../types";
+import { HedgehogModeInterface, GameElement } from "../types";
 import Matter from "matter-js";
 import { COLLISIONS } from "../misc/collisions";
 
@@ -16,7 +16,7 @@ export class Ground implements GameElement {
   isInteractive = false;
   isFlammable = true;
 
-  constructor(game: Game) {
+  constructor(game: HedgehogModeInterface) {
     // Ground should be set to the bottom of the screen
 
     this.rigidBody = Matter.Bodies.rectangle(

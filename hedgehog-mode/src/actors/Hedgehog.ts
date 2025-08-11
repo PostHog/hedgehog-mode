@@ -3,7 +3,7 @@ import {
   DEFAULT_COLLISION_FILTER,
   NO_PLATFORM_COLLISION_FILTER,
 } from "./Actor";
-import { Game, GameElement, UpdateTicker } from "../types";
+import { HedgehogModeInterface, GameElement, UpdateTicker } from "../types";
 import Matter, { Bodies, Composites, Constraint, Pair } from "matter-js";
 import { SyncedPlatform } from "../items/SyncedPlatform";
 import { AnimatedSprite, ColorMatrixFilter, Sprite } from "pixi.js";
@@ -82,7 +82,7 @@ export class HedgehogActor extends Actor {
   protected collisionFilter = DEFAULT_COLLISION_FILTER;
 
   constructor(
-    game: Game,
+    game: HedgehogModeInterface,
     public options: HedgehogActorOptions
   ) {
     super(game);
@@ -366,8 +366,10 @@ export class HedgehogActor extends Actor {
       this.hue += 360 * (ticker.deltaMS / 1000);
       this.hue = this.hue > 360 ? 0 : this.hue;
       this.filter.hue(this.hue, false);
-    } else if (this.options.color) {
-      const options = COLOR_TO_FILTER_MAP[this.options.color];
+    } else {
+      const options = this.options.color
+        ? COLOR_TO_FILTER_MAP[this.options.color]
+        : undefined;
       this.filter.reset();
       options?.(this.filter);
     }

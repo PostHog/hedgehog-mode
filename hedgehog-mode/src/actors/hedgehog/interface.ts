@@ -1,8 +1,8 @@
 import { sample } from "lodash";
 import type { HedgehogActor } from "../Hedgehog";
-import { Game, GameUIDialogBoxProps } from "../../types";
+import { HedgehogModeInterface, GameUIProps } from "../../types";
 
-const cheatSheetMessages: GameUIDialogBoxProps["messages"] = [
+const cheatSheetMessages: GameUIProps["messages"] = [
   {
     words: [
       {
@@ -81,10 +81,10 @@ const cheatSheetMessages: GameUIDialogBoxProps["messages"] = [
 
 export class HedgehogActorInterface {
   private messages: (
-    | GameUIDialogBoxProps["messages"]
+    | GameUIProps["messages"]
     | {
         onStart?: () => void;
-        messages: GameUIDialogBoxProps["messages"];
+        messages: GameUIProps["messages"];
       }
   )[] = [
     [
@@ -302,12 +302,12 @@ export class HedgehogActorInterface {
   ];
 
   constructor(
-    private game: Game,
+    private game: HedgehogModeInterface,
     private actor: HedgehogActor
   ) {
     setTimeout(() => {
       if (actor.options.player) {
-        // this.game.gameUI?.showDialogBox({
+        // this.game.gameUI?.show({
         //   actor: this.actor,
         //   messages: [
         //     {
@@ -335,10 +335,15 @@ export class HedgehogActorInterface {
         //   ],
         // });
 
-        this.game.gameUI?.showDialogBox({
-          actor: this.actor,
-          messages: [{ words: ["i am the defining feature"] }],
-        });
+        const messages = sample(this.messages);
+
+        if (Array.isArray(messages)) {
+          this.game.gameUI?.show({
+            screen: "dialog",
+            actor: this.actor,
+            messages,
+          });
+        }
       }
     }, 1000);
   }
@@ -355,7 +360,8 @@ export class HedgehogActorInterface {
         selectedMessages.onStart?.();
       }
 
-      this.game.gameUI?.showDialogBox({
+      this.game.gameUI?.show({
+        screen: "dialog",
         actor: this.actor,
         messages,
       });
@@ -363,7 +369,8 @@ export class HedgehogActorInterface {
   }
 
   triggerCheatSheet(): void {
-    this.game.gameUI?.showDialogBox({
+    this.game.gameUI?.show({
+      screen: "dialog",
       actor: this.actor,
       messages: cheatSheetMessages,
     });

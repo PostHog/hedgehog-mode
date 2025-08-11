@@ -1,13 +1,13 @@
 import { range, sample, uniqueId } from "lodash";
 import { HedgehogActor } from "../actors/Hedgehog";
-import { Game } from "../types";
+import { HedgehogModeInterface } from "../types";
 import {
   getRandomAccessoryCombo,
   HedgehogActorColorOptions,
 } from "../actors/hedgehog/config";
 
 export class GlobalKeyboardListeners {
-  constructor(private game: Game) {
+  constructor(private game: HedgehogModeInterface) {
     this.setupKeyboardListeners();
   }
 

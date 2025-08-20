@@ -21,7 +21,7 @@ export default function StaticRendering() {
   }
 
   useEffect(() => {
-    const HEDGEHOGS: HedgehogActorOptions[] = range(1000).map((i) => ({
+    const HEDGEHOGS: HedgehogActorOptions[] = range(20).map((i) => ({
       id: `hedgehog-${i}`,
       accessories: getRandomAccessoryCombo(),
       color: sample(HedgehogActorColorOptions),
@@ -31,7 +31,7 @@ export default function StaticRendering() {
     const render = async () => {
       const images = await Promise.all(
         HEDGEHOGS.map(async (hedgehog) => {
-          const image = await rendererRef.current?.render(hedgehog);
+          const image = await rendererRef.current?.render(hedgehog, 160);
           return image;
         })
       );
@@ -46,7 +46,7 @@ export default function StaticRendering() {
     <div>
       <div className="flex flex-wrap gap-2">
         {images.map((image, i) => (
-          <img width={64} height={64} src={image} key={i} />
+          <img width={80} height={80} src={image} key={i} />
         ))}
       </div>
     </div>

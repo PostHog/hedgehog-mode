@@ -20,16 +20,19 @@ export function HedgehogImage({
 
   useEffect(() => {
     void renderer
-      .render({
-        id: JSON.stringify({
+      .render(
+        {
+          id: JSON.stringify({
+            skin,
+            accessories,
+            color,
+          }),
           skin,
           accessories,
           color,
-        }),
-        skin,
-        accessories,
-        color,
-      })
+        },
+        imgSize
+      )
       .then((src) => {
         setDataUrl(src);
       })
@@ -37,7 +40,7 @@ export function HedgehogImage({
         // eslint-disable-next-line no-console
         console.error("Error rendering hedgehog", e);
       });
-  }, [skin, accessories, color]);
+  }, [skin, accessories, color, imgSize]);
 
   return (
     <div className="relative" style={{ width: imgSize, height: imgSize }}>

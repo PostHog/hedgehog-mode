@@ -29,12 +29,15 @@ export class StaticHedgehogRenderer {
       backgroundAlpha: 0,
       resolution: window.devicePixelRatio || 1,
       autoDensity: true,
-      antialias: true,
-      roundPixels: true,
+      antialias: true, // Enable antialiasing for smoother edges
+      roundPixels: true, // Round pixels to prevent sub-pixel rendering issues
     });
   }
 
-  private createContainer(options: HedgehogActorOptions): Container {
+  private createContainer(
+    options: HedgehogActorOptions,
+    size: number
+  ): Container {
     const container = new Container();
     const filter = new ColorMatrixFilter();
 
@@ -48,9 +51,8 @@ export class StaticHedgehogRenderer {
     }
 
     const sprite = new Sprite(frame);
-    sprite.anchor.set(0.5);
-    sprite.filters = [filter];
     container.addChild(sprite);
+    sprite.anchor.set(0.5);
 
     // Center the container
     container.position.set(
@@ -69,9 +71,15 @@ export class StaticHedgehogRenderer {
       }
 
       const accessorySprite = new Sprite(accessoryFrame);
+      accessorySprite.texture.source.scaleMode = "nearest";
       accessorySprite.anchor.set(0.5);
       sprite.addChild(accessorySprite);
     });
+
+    sprite.texture.source.scaleMode = "nearest";
+    sprite.width = size;
+    sprite.height = size;
+    sprite.filters = [filter];
 
     // Apply color filter
     if (options.color) {
@@ -99,7 +107,9 @@ export class StaticHedgehogRenderer {
     this.app.stage.addChild(container);
     const texture = this.app.renderer.generateTexture(container);
     const canvas = this.app.renderer.extract.canvas(texture);
-    const dataURL = canvas.toDataURL?.("image/png");
+
+    // Use maximum quality for PNG export
+    const dataURL = canvas.toDataURL?.("image/png", 1.0);
 
     texture.destroy();
     this.app.stage.removeChild(container);
@@ -108,15 +118,22 @@ export class StaticHedgehogRenderer {
     return dataURL ?? "";
   }
 
-  private async performRender(options: HedgehogActorOptions): Promise<string> {
+  private async performRender(
+    options: HedgehogActorOptions,
+    size: number
+  ): Promise<string> {
     await this.ensureInitialized();
-    const container = this.createContainer(options);
+    const container = this.createContainer(options, size);
     const dataURL = await this.renderToDataURL(container);
+
     return dataURL;
   }
 
-  public async render(options: HedgehogActorOptions): Promise<string> {
-    const hash = this.getOptionsHash(options);
+  public async render(
+    options: HedgehogActorOptions,
+    size: number = 160
+  ): Promise<string> {
+    const hash = this.getOptionsHash(options) + `_${size}`;
 
     // Check the result cache first
     const cachedResult = this.resultCache.get(hash);
@@ -128,7 +145,7 @@ export class StaticHedgehogRenderer {
     let renderPromise = this.renderingCache.get(hash);
     if (!renderPromise) {
       // Create new render promise
-      renderPromise = this.performRender(options)
+      renderPromise = this.performRender(options, size)
         .then((result) => {
           // Store in result cache when complete
           this.resultCache.set(hash, result);

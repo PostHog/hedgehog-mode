@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - fix/renderer
+      - fix/blurry-render
 
 jobs:
   release:

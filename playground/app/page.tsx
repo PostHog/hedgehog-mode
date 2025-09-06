@@ -9,6 +9,7 @@ import { Logo } from "../components/logo";
 import { sample } from "lodash";
 import { Button } from "../components/Button";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function Home() {
   const [game, setGame] = useState<HedgeHogMode | null>(null);
@@ -47,6 +48,13 @@ export default function Home() {
           </Button>
 
           <Button onClick={() => game?.destroy()}>Stop game</Button>
+
+          <Link href="/config">
+            <Button>Config</Button>
+          </Link>
+          <Link href="/static-rendering">
+            <Button>Static rendering</Button>
+          </Link>
         </div>
       </main>
       <HedgehogModeRenderer

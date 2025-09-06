@@ -117,19 +117,37 @@ export class HedgehogActor extends Actor {
     this.setupSpiderHogRope();
   }
 
+  private isGhost(): boolean {
+    return this.options.skin === "ghost";
+  }
+
   updateSprite(
     sprite: string,
     options: { reset?: boolean; onComplete?: () => void } = {}
   ): void {
+    const idleAnimation = `skins/${this.options.skin ?? "default"}/idle/tile`;
     const possibleAnimation = `skins/${this.options.skin ?? "default"}/${sprite}/tile`;
 
     // Set the sprite but selecting the skin as well
-    const spriteName =
+    let spriteName =
       this.game.spritesManager.toAvailableAnimation(possibleAnimation);
 
     if (!spriteName) {
       this.game.log(`Tried to load ${possibleAnimation} but it doesn't exist`);
-      return;
+
+      if (!this.sprite) {
+        this.game.log(`Falling back to ${idleAnimation}`);
+        spriteName =
+          this.game.spritesManager.toAvailableAnimation(idleAnimation);
+
+        if (!spriteName) {
+          // Something went wrong!
+          return;
+        }
+      } else {
+        // We just ignore it
+        return;
+      }
     }
     super.updateSprite(spriteName, options);
     this.sprite!.filters = [this.filter];
@@ -316,11 +334,15 @@ export class HedgehogActor extends Actor {
   }
 
   update(ticker: UpdateTicker): void {
-    if (this.rigidBody!.velocity.y < -0.1) {
-      // We are moving upwards so we don't want to collide with platforms
+    if (this.isGhost()) {
       this.collisionFilter = NO_PLATFORM_COLLISION_FILTER;
     } else {
-      this.collisionFilter = DEFAULT_COLLISION_FILTER;
+      if (this.rigidBody!.velocity.y < -0.1) {
+        // We are moving upwards so we don't want to collide with platforms
+        this.collisionFilter = NO_PLATFORM_COLLISION_FILTER;
+      } else {
+        this.collisionFilter = DEFAULT_COLLISION_FILTER;
+      }
     }
 
     super.update(ticker);
@@ -449,6 +471,10 @@ export class HedgehogActor extends Actor {
       sprite.eventMode = "static";
       sprite.anchor.set(0.5);
       this.sprite!.addChild(sprite);
+
+      // if (this.options.skin === "ghost") {
+      //   sprite.anchor.set(0.75, 0.75);
+      // }
     });
   }
 

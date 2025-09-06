@@ -146,6 +146,17 @@ export class GlobalKeyboardListeners {
           this.getPlayableHedgehog()?.destroy();
         },
       },
+      {
+        keys: ["g", "h", "o", "s", "t"],
+        action: () => {
+          const player = this.getPlayableHedgehog();
+          if (!player) {
+            return;
+          }
+          player.updateOptions({ skin: "ghost" });
+          player.updateSprite("idle");
+        },
+      },
       // {
       // // konami code
       //   keys: [

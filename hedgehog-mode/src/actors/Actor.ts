@@ -23,6 +23,11 @@ export const NO_PLATFORM_COLLISION_FILTER = {
   mask: COLLISIONS.ACTOR | COLLISIONS.PROJECTILE | COLLISIONS.GROUND,
 };
 
+export const NO_ACTOR_COLLISION_FILTER = {
+  ...BASE_COLLISION_FILTER,
+  mask: COLLISIONS.PLATFORM | COLLISIONS.GROUND,
+};
+
 export class Actor implements GameElement {
   public sprite?: AnimatedSprite;
   public isDragging = false;

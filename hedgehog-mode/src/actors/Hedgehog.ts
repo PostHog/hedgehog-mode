@@ -151,6 +151,7 @@ export class HedgehogActor extends Actor {
     }
     super.updateSprite(spriteName, options);
     this.sprite!.filters = [this.filter];
+    this.sprite!.alpha = this.isGhost() ? 0.5 : 1;
   }
 
   get currentSprite(): string {
@@ -185,6 +186,7 @@ export class HedgehogActor extends Actor {
     this.options = { ...this.options, ...options };
     this.ai.enable(this.options.ai_enabled ?? true);
     this.syncAccessories();
+    this.syncRigidBody();
   }
 
   clearOverlayAnimation(): void {
@@ -334,16 +336,17 @@ export class HedgehogActor extends Actor {
   }
 
   update(ticker: UpdateTicker): void {
-    if (this.isGhost()) {
-      this.collisionFilter = NO_PLATFORM_COLLISION_FILTER;
+    let mask = this.isGhost()
+      ? COLLISIONS.GROUND
+      : COLLISIONS.ACTOR | COLLISIONS.PROJECTILE | COLLISIONS.GROUND;
+
+    if (this.rigidBody!.velocity.y < -0.1) {
+      // We are moving upwards so we don't want to collide with platforms
     } else {
-      if (this.rigidBody!.velocity.y < -0.1) {
-        // We are moving upwards so we don't want to collide with platforms
-        this.collisionFilter = NO_PLATFORM_COLLISION_FILTER;
-      } else {
-        this.collisionFilter = DEFAULT_COLLISION_FILTER;
-      }
+      mask = mask | COLLISIONS.PLATFORM;
     }
+
+    this.collisionFilter.mask = mask;
 
     super.update(ticker);
 
@@ -448,6 +451,20 @@ export class HedgehogActor extends Actor {
     }
   }
 
+  private syncRigidBody(): void {
+    if (this.isGhost()) {
+      this.rigidBody!.density = 0.0001;
+      this.rigidBody!.friction = 0.1;
+      this.rigidBody!.frictionStatic = 0;
+      this.rigidBody!.frictionAir = 0.05;
+    } else {
+      this.rigidBody!.density = 0.001;
+      this.rigidBody!.friction = 0.2;
+      this.rigidBody!.frictionStatic = 0;
+      this.rigidBody!.frictionAir = 0.01;
+    }
+  }
+
   private syncAccessories(): void {
     // TODO: Remove old accessories
     Object.values(this.accessorySprites).forEach((sprite) => {
@@ -472,9 +489,9 @@ export class HedgehogActor extends Actor {
       sprite.anchor.set(0.5);
       this.sprite!.addChild(sprite);
 
-      // if (this.options.skin === "ghost") {
-      //   sprite.anchor.set(0.75, 0.75);
-      // }
+      if (this.options.skin === "ghost") {
+        sprite.anchor.set(0.4, 0.55);
+      }
     });
   }
 

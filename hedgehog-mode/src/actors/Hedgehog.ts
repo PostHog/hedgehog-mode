@@ -450,6 +450,17 @@ export class HedgehogActor extends Actor {
     if (element.rigidBody!.bounds.min.y > this.rigidBody!.bounds.min.y) {
       this.game.log("Hit something below");
       this.jumps = 0;
+
+      if (element instanceof HedgehogActor) {
+        const velocity = this.rigidBody!.velocity.y;
+
+        // Min of 5 to start damage
+        const velocityMultiplier = Math.max(0, velocity - 5);
+        const weightMultiplier = this.sprite!.scale.y;
+        const damage = weightMultiplier * weightMultiplier * velocityMultiplier;
+
+        element.receiveDamage(damage);
+      }
     } else {
       this.game.log("Hit something above");
       // We check if it is a platform and if so we ignore it
@@ -528,11 +539,6 @@ export class HedgehogActor extends Actor {
       x: 0,
       y: 0,
     });
-
-    this.collisionFilterOverride = {
-      ...DEFAULT_COLLISION_FILTER,
-      mask: COLLISIONS.GROUND | COLLISIONS.PLATFORM,
-    };
 
     this.updateSprite("death", {
       reset: true,

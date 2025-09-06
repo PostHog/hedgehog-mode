@@ -116,14 +116,35 @@ export class GlobalKeyboardListeners {
         // giant
         keys: ["g", "i", "a", "n", "t"],
         action: () => {
-          this.getPlayableHedgehog()?.setScale(2);
+          const player = this.getPlayableHedgehog();
+          if (!player) {
+            return;
+          }
+
+          if (player.sprite!.scale.y > 1) {
+            // Make it even bigger if bigger
+            player.setScale(player.sprite!.scale.y + 1);
+          } else {
+            player.setScale(2);
+          }
         },
       },
       {
         // tiny
         keys: ["t", "i", "n", "y"],
         action: () => {
-          this.getPlayableHedgehog()?.setScale(0.5);
+          const player = this.getPlayableHedgehog();
+          if (!player) {
+            return;
+          }
+
+          if (player.sprite!.scale.y < 1) {
+            // Make it smaller if small
+            player.setScale(player.sprite!.scale.y - 0.1);
+            return;
+          } else {
+            player.setScale(0.5);
+          }
         },
       },
       {

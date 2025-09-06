@@ -134,6 +134,7 @@ export class Actor implements GameElement {
   protected updateSprite(
     animation: AvailableAnimations,
     options: {
+      loop?: boolean;
       reset?: boolean;
       onComplete?: () => void;
       animationSpeed?: number;
@@ -160,7 +161,7 @@ export class Actor implements GameElement {
       sprite.loop = false;
       sprite.onComplete = options.onComplete;
     } else {
-      sprite.loop = true;
+      sprite.loop = options.loop ?? true;
     }
     sprite.play();
   }

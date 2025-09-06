@@ -128,6 +128,7 @@ export class HedgehogActor extends Actor {
       animationSpeed?: number;
       onComplete?: () => void;
       forceSkin?: string;
+      loop?: boolean;
     } = {}
   ): void {
     const skin = options.forceSkin ?? this.options.skin ?? "default";
@@ -157,6 +158,7 @@ export class HedgehogActor extends Actor {
     }
     super.updateSprite(spriteName, {
       animationSpeed: this.isGhost() ? 0.1 : 0.5,
+      loop: options.loop ?? true,
       ...options,
     });
     this.sprite!.filters = [this.filter];
@@ -379,9 +381,14 @@ export class HedgehogActor extends Actor {
       // If horizontal movement is noticeable then walk
       this.updateSprite("walk");
     } else if (["fall", "walk"].includes(this.currentSprite)) {
-      // NOTE:  wave is just used as a placeholder anim. WE should have a dedicated idle animation
-      this.updateSprite("wave");
-      this.sprite!.stop();
+      this.updateSprite("idle", {
+        loop: false,
+        onComplete: () => {
+          this.updateSprite("idle", {
+            loop: true,
+          });
+        },
+      });
     }
 
     // We want to make it look like the hedgehog's accessories are disconnected. If we are falling then we position them slightly above

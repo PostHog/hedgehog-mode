@@ -42,7 +42,7 @@ export class StaticHedgehogRenderer {
     const filter = new ColorMatrixFilter();
 
     // Create base sprite
-    const spriteName = `skins/${options.skin ?? "default"}/wave/tile000.png`;
+    const spriteName = `skins/${options.skin ?? "default"}/idle/tile000.png`;
     const frame = this.spritesManager.getSpriteFrames(
       spriteName as AvailableSpriteFrames
     );
@@ -73,6 +73,11 @@ export class StaticHedgehogRenderer {
       const accessorySprite = new Sprite(accessoryFrame);
       accessorySprite.texture.source.scaleMode = "nearest";
       accessorySprite.anchor.set(0.5);
+
+      if (options.skin === "ghost") {
+        accessorySprite.anchor.set(0.4, 0.58);
+      }
+
       sprite.addChild(accessorySprite);
     });
 

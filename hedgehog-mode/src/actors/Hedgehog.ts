@@ -152,6 +152,7 @@ export class HedgehogActor extends Actor {
     super.updateSprite(spriteName, options);
     this.sprite!.filters = [this.filter];
     this.sprite!.alpha = this.isGhost() ? 0.5 : 1;
+    this.sprite!.animationSpeed = this.isGhost() ? 0.1 : 0.5;
   }
 
   get currentSprite(): string {
@@ -232,7 +233,7 @@ export class HedgehogActor extends Actor {
   }
 
   jump(): void {
-    const MAX_JUMPS = 2;
+    const MAX_JUMPS = this.isGhost() ? Infinity : 2;
     if (this.jumps + 1 > MAX_JUMPS) {
       return;
     }
@@ -456,7 +457,7 @@ export class HedgehogActor extends Actor {
       this.rigidBody!.density = 0.0001;
       this.rigidBody!.friction = 0.1;
       this.rigidBody!.frictionStatic = 0;
-      this.rigidBody!.frictionAir = 0.05;
+      this.rigidBody!.frictionAir = 0.2;
     } else {
       this.rigidBody!.density = 0.001;
       this.rigidBody!.friction = 0.2;

@@ -152,7 +152,8 @@ export class HedgehogActor extends Actor {
     super.updateSprite(spriteName, options);
     this.sprite!.filters = [this.filter];
     this.sprite!.alpha = this.isGhost() ? 0.5 : 1;
-    this.sprite!.animationSpeed = this.isGhost() ? 0.1 : 0.5;
+    this.sprite!.animationSpeed =
+      this.game.engine.timing.timeScale * (this.isGhost() ? 0.1 : 0.5);
   }
 
   get currentSprite(): string {

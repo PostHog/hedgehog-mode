@@ -34,6 +34,7 @@ export class HedgehogGhostActor extends Actor {
     this.isInteractive = false;
 
     this.loadSprite("skins/ghost/idle/tile");
+    this.sprite!.alpha = 0;
 
     this.x = position.x;
     this.y = position.y;

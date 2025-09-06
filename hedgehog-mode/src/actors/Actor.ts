@@ -54,6 +54,8 @@ export class Actor implements GameElement {
     private rigidBodyOptions: Matter.IBodyDefinition = {}
   ) {}
 
+  protected onClick(): void {}
+
   protected loadSprite(animation: AvailableAnimations): void {
     this.currentAnimation = animation;
     this.loadSpriteFrames(

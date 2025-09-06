@@ -131,14 +131,19 @@ export class Actor implements GameElement {
 
   protected updateSprite(
     animation: AvailableAnimations,
-    options: { reset?: boolean; onComplete?: () => void } = {}
+    options: {
+      reset?: boolean;
+      onComplete?: () => void;
+      animationSpeed?: number;
+    } = {}
   ): void {
     if (!this.currentAnimation) {
       return this.loadSprite(animation);
     }
     const sprite = this.sprite!;
 
-    sprite.animationSpeed = this.game.engine.timing.timeScale * 0.5;
+    sprite.animationSpeed =
+      this.game.engine.timing.timeScale * (options.animationSpeed ?? 0.5);
 
     if (this.currentAnimation === animation && !options.reset) {
       return;

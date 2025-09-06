@@ -125,6 +125,7 @@ export class HedgehogActor extends Actor {
     sprite: string,
     options: {
       reset?: boolean;
+      animationSpeed?: number;
       onComplete?: () => void;
       forceSkin?: string;
     } = {}
@@ -154,11 +155,12 @@ export class HedgehogActor extends Actor {
         return;
       }
     }
-    super.updateSprite(spriteName, options);
+    super.updateSprite(spriteName, {
+      animationSpeed: this.isGhost() ? 0.1 : 0.5,
+      ...options,
+    });
     this.sprite!.filters = [this.filter];
     this.sprite!.alpha = this.isGhost() ? 0.5 : 1;
-    this.sprite!.animationSpeed =
-      this.game.engine.timing.timeScale * (this.isGhost() ? 0.1 : 0.5);
   }
 
   get currentSprite(): string {
@@ -532,10 +534,9 @@ export class HedgehogActor extends Actor {
       mask: COLLISIONS.GROUND,
     };
 
-    this.sprite!.animationSpeed = 0.1;
-
     this.updateSprite("death", {
       reset: true,
+      animationSpeed: 0.1,
       forceSkin: "default",
       onComplete: () => {
         this.game.spawnHedgehogGhost(this.rigidBody!.position);

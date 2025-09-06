@@ -78,13 +78,15 @@ export class Accessory extends Actor {
       y: -5,
     });
 
-    // gsap.to(this.sprite!, {
-    //   alpha: 0,
-    //   duration: 5,
-    //   ease: "none",
-    //   onComplete: () => {
-    //     this.game.removeElement(this);
-    //   },
-    // });
+    setTimeout(() => {
+      gsap.to(this.sprite!, {
+        alpha: 0,
+        duration: 5,
+        ease: "none",
+        onComplete: () => {
+          this.game.removeElement(this);
+        },
+      });
+    }, 1000);
   }
 }

@@ -478,6 +478,7 @@ export class HedgehogActor extends Actor {
     this.updateSprite("death", {
       reset: true,
       onComplete: () => {
+        this.game.spawnHedgehogGhost(this.rigidBody!.position);
         gsap.to(this.sprite!, {
           alpha: 0,
           duration: 2,

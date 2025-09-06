@@ -18,6 +18,7 @@ import { HedgehogActorOptions } from "./actors/hedgehog/config";
 import { GameStateManager } from "./state";
 import { StaticHedgehogRenderer } from "./static-renderer/StaticHedgehog";
 import { uniqueId } from "lodash";
+import { HedgehogGhostActor } from "./actors/Ghost";
 
 export type {
   HedgehogActorOptions,
@@ -107,6 +108,12 @@ export class HedgeHogMode implements HedgehogModeInterface {
     this.log("Setting pointer events", enabled);
     this.ref?.style.setProperty("pointer-events", enabled ? "auto" : "none");
     this.pointerEventsEnabled = enabled;
+  }
+
+  spawnHedgehogGhost(position: Matter.Vector): HedgehogGhostActor {
+    const ghost = new HedgehogGhostActor(this, position);
+    this.elements.push(ghost);
+    return ghost;
   }
 
   spawnHedgehog(options: HedgehogActorOptions | undefined): HedgehogActor {

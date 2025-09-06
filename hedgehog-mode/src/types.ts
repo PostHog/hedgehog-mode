@@ -5,6 +5,7 @@ import type { SpritesManager } from "./sprites/sprites";
 import type { HedgehogActor } from "./actors/Hedgehog";
 import { HedgehogActorOptions } from "./actors/hedgehog/config";
 import type { GameStateManager } from "./state";
+import { HedgehogGhostActor } from "./actors/Ghost";
 
 export type { HedgehogActor, HedgehogActorOptions };
 
@@ -43,6 +44,7 @@ export type HedgehogModeInterface = {
   elapsed?: number;
   elements: GameElement[];
   spawnHedgehog: (options?: HedgehogActorOptions) => HedgehogActor;
+  spawnHedgehogGhost: (position: Matter.Vector) => HedgehogGhostActor;
   removeElement: (element: GameElement) => void;
   log: (...args: unknown[]) => void;
   setSpeed: (speed: number) => void;

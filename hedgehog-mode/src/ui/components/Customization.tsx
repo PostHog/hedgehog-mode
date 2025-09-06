@@ -49,7 +49,7 @@ function Switch({
 export function HedgehogCustomization(
   props: HedgehogOptionsProps & { game: HedgeHogMode }
 ): JSX.Element {
-  const { config, setConfig, game } = props;
+  const { config, game } = props;
 
   return (
     <div className="Customization">

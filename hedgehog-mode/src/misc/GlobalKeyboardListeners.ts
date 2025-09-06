@@ -142,10 +142,11 @@ export class GlobalKeyboardListeners {
       },
       {
         keys: ["d", "e", "a", "t", "h"],
-        action: () => {
-          this.getAllHedgehogs().forEach((hedgehog) => {
+        action: async () => {
+          for (const hedgehog of this.getAllHedgehogs()) {
             hedgehog.destroy();
-          });
+            await new Promise((r) => setTimeout(r, 50));
+          }
         },
       },
       {

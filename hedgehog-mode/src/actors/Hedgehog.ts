@@ -531,7 +531,7 @@ export class HedgehogActor extends Actor {
 
     this.collisionFilterOverride = {
       ...DEFAULT_COLLISION_FILTER,
-      mask: COLLISIONS.GROUND,
+      mask: COLLISIONS.GROUND | COLLISIONS.PLATFORM,
     };
 
     this.updateSprite("death", {

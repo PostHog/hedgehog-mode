@@ -65,6 +65,7 @@ export class HedgehogActor extends Actor {
   accessorySprites: { [key: string]: Sprite } = {};
   overlayAnimation?: AnimatedSprite;
   isFlammable = true;
+  isDead = false;
   hue = 0;
   health = 100;
   ai: HedgehogActorAI;
@@ -168,12 +169,22 @@ export class HedgehogActor extends Actor {
     this.syncAccessories();
   }
 
+  clearOverlayAnimation(): void {
+    if (this.overlayAnimation) {
+      this.sprite!.removeChild(this.overlayAnimation!);
+    }
+    this.overlayAnimation = undefined;
+  }
+
   setOnFire(times: number = 3): void {
+    if (this.isDead) {
+      return;
+    }
+
     clearTimeout(this.fireTimer);
     this.fireTimer = setTimeout(() => {
       if (times <= 1) {
-        this.sprite!.removeChild(this.overlayAnimation!);
-        this.overlayAnimation = undefined;
+        this.clearOverlayAnimation();
         this.fireTimer = undefined;
         return;
       }
@@ -314,6 +325,10 @@ export class HedgehogActor extends Actor {
 
     super.update(ticker);
 
+    if (this.isDead) {
+      return;
+    }
+
     const xForce = this.walkSpeed;
 
     if (xForce !== 0) {
@@ -438,23 +453,39 @@ export class HedgehogActor extends Actor {
   }
 
   destroy(): void {
+    if (this.isDead) {
+      return;
+    }
+    this.isDead = true;
+    this.updateOptions({
+      ai_enabled: false,
+      controls_enabled: false,
+    });
+    this.clearOverlayAnimation();
     this.setVelocity({
       x: 0,
-      y: -5,
+      y: 0,
     });
 
-    this.collisionFilter = {
-      category: COLLISIONS.NONE,
-      mask: COLLISIONS.NONE,
+    this.collisionFilterOverride = {
+      ...DEFAULT_COLLISION_FILTER,
+      mask: COLLISIONS.GROUND,
     };
 
-    gsap.to(this.sprite!.scale, {
-      x: 0,
-      y: 0,
-      duration: 3,
-      ease: "elastic.out",
+    this.sprite!.animationSpeed = 0.1;
+    this.sprite!.loop = false;
+
+    this.updateSprite("death", {
+      reset: true,
       onComplete: () => {
-        this.game.removeElement(this);
+        gsap.to(this.sprite!, {
+          alpha: 0,
+          duration: 2,
+          ease: "power2.inOut",
+          onComplete: () => {
+            this.game.removeElement(this);
+          },
+        });
       },
     });
   }

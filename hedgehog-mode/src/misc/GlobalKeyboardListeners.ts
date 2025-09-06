@@ -11,10 +11,10 @@ export class GlobalKeyboardListeners {
     this.setupKeyboardListeners();
   }
 
-  private getPlayableHedgehog(): HedgehogActor {
+  private getPlayableHedgehog(): HedgehogActor | undefined {
     return this.game.elements.find(
       (element) => element instanceof HedgehogActor && element.options.player
-    ) as HedgehogActor;
+    ) as HedgehogActor | undefined;
   }
 
   private getAllHedgehogs(): HedgehogActor[] {
@@ -57,11 +57,11 @@ export class GlobalKeyboardListeners {
       },
       {
         keys: ["f", "f", "f"],
-        action: () => this.getPlayableHedgehog().setOnFire(),
+        action: () => this.getPlayableHedgehog()?.setOnFire(),
       },
       {
         keys: ["f", "i", "r", "e"],
-        action: () => this.getPlayableHedgehog().setOnFire(),
+        action: () => this.getPlayableHedgehog()?.setOnFire(),
       },
 
       {
@@ -83,7 +83,7 @@ export class GlobalKeyboardListeners {
       {
         keys: ["s", "p", "i", "d", "e", "r", "h", "o", "g"],
         action: () => {
-          this.getPlayableHedgehog().updateOptions({
+          this.getPlayableHedgehog()?.updateOptions({
             skin: "spiderhog",
           });
         },
@@ -91,7 +91,7 @@ export class GlobalKeyboardListeners {
       {
         keys: ["r", "o", "b", "o", "h", "o", "g"],
         action: () => {
-          this.getPlayableHedgehog().updateOptions({
+          this.getPlayableHedgehog()?.updateOptions({
             skin: "robohog",
           });
         },
@@ -99,7 +99,7 @@ export class GlobalKeyboardListeners {
       {
         keys: ["c", "h", "e", "a", "t", "c", "o", "d", "e", "s"],
         action: () => {
-          this.getPlayableHedgehog().interface.triggerCheatSheet();
+          this.getPlayableHedgehog()?.interface.triggerCheatSheet();
         },
       },
       {
@@ -116,14 +116,14 @@ export class GlobalKeyboardListeners {
         // giant
         keys: ["g", "i", "a", "n", "t"],
         action: () => {
-          this.getPlayableHedgehog().setScale(2);
+          this.getPlayableHedgehog()?.setScale(2);
         },
       },
       {
         // tiny
         keys: ["t", "i", "n", "y"],
         action: () => {
-          this.getPlayableHedgehog().setScale(0.5);
+          this.getPlayableHedgehog()?.setScale(0.5);
         },
       },
       {
@@ -138,6 +138,12 @@ export class GlobalKeyboardListeners {
         keys: ["f", "a", "s", "t"],
         action: () => {
           this.game.setSpeed(this.game.engine.timing.timeScale === 2 ? 1 : 2);
+        },
+      },
+      {
+        keys: ["d", "e", "a", "t", "h"],
+        action: () => {
+          this.getPlayableHedgehog()?.destroy();
         },
       },
       // {

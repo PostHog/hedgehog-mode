@@ -3,9 +3,13 @@ import type Matter from "matter-js";
 import { AnimatedSprite, Application } from "pixi.js";
 import type { SpritesManager } from "./sprites/sprites";
 import type { HedgehogActor } from "./actors/Hedgehog";
-import { HedgehogActorOptions } from "./actors/hedgehog/config";
+import {
+  HedgehogActorAccessoryOption,
+  HedgehogActorOptions,
+} from "./actors/hedgehog/config";
 import type { GameStateManager } from "./state";
 import { HedgehogGhostActor } from "./actors/Ghost";
+import { Accessory } from "./items/Accessory";
 
 export type { HedgehogActor, HedgehogActorOptions };
 
@@ -45,6 +49,10 @@ export type HedgehogModeInterface = {
   elements: GameElement[];
   spawnHedgehog: (options?: HedgehogActorOptions) => HedgehogActor;
   spawnHedgehogGhost: (position: Matter.Vector) => HedgehogGhostActor;
+  spawnAccessory: (
+    accessory: HedgehogActorAccessoryOption,
+    position: Matter.Vector
+  ) => Accessory;
   removeElement: (element: GameElement) => void;
   log: (...args: unknown[]) => void;
   setSpeed: (speed: number) => void;

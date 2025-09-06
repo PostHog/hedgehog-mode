@@ -507,11 +507,21 @@ export class HedgehogActor extends Actor {
       return;
     }
     this.isDead = true;
+
     this.updateOptions({
       ai_enabled: false,
       controls_enabled: false,
     });
     this.clearOverlayAnimation();
+
+    const accessories = this.options.accessories;
+    this.options.accessories = [];
+    this.syncAccessories();
+
+    accessories?.forEach((accessory) => {
+      this.game.spawnAccessory(accessory, this.rigidBody!.position);
+    });
+
     this.setVelocity({
       x: 0,
       y: 0,

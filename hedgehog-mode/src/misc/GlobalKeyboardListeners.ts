@@ -143,7 +143,9 @@ export class GlobalKeyboardListeners {
       {
         keys: ["d", "e", "a", "t", "h"],
         action: () => {
-          this.getPlayableHedgehog()?.destroy();
+          this.getAllHedgehogs().forEach((hedgehog) => {
+            hedgehog.destroy();
+          });
         },
       },
       {

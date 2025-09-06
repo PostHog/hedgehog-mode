@@ -1,5 +1,5 @@
 import Matter, { Constraint } from "matter-js";
-import { AnimatedSprite } from "pixi.js";
+import { AnimatedSprite, AnimatedSpriteFrames } from "pixi.js";
 import { AvailableAnimations } from "../sprites/sprites";
 import { HedgehogModeInterface, GameElement, UpdateTicker } from "../types";
 import { COLLISIONS } from "../misc/collisions";
@@ -56,24 +56,24 @@ export class Actor implements GameElement {
 
   protected loadSprite(animation: AvailableAnimations): void {
     this.currentAnimation = animation;
-    this.sprite = new AnimatedSprite(
+    this.loadSpriteFrames(
       this.game.spritesManager.getAnimatedSpriteFrames(animation)
     );
+  }
 
+  protected loadSpriteFrames(frames: AnimatedSpriteFrames): void {
+    this.sprite = new AnimatedSprite(frames);
     this.loadRigidBody();
     this.sprite.eventMode = "static";
     this.sprite.texture.source.scaleMode = "nearest";
-
     this.sprite.play();
+
     this.sprite.anchor.set(0.5);
     this.sprite.x = this.rigidBody!.position.x;
     this.sprite.y = this.rigidBody!.position.y;
     this.game.app.stage.addChild(this.sprite);
-
     this.setupPointerEvents();
   }
-
-  protected onClick(): void {}
 
   private loadRigidBody(reset = false): void {
     // If reset is passed then we recreate the rigid body

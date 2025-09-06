@@ -123,10 +123,15 @@ export class HedgehogActor extends Actor {
 
   updateSprite(
     sprite: string,
-    options: { reset?: boolean; onComplete?: () => void } = {}
+    options: {
+      reset?: boolean;
+      onComplete?: () => void;
+      forceSkin?: string;
+    } = {}
   ): void {
-    const idleAnimation = `skins/${this.options.skin ?? "default"}/idle/tile`;
-    const possibleAnimation = `skins/${this.options.skin ?? "default"}/${sprite}/tile`;
+    const skin = options.forceSkin ?? this.options.skin ?? "default";
+    const idleAnimation = `skins/${skin}/idle/tile`;
+    const possibleAnimation = `skins/${skin}/${sprite}/tile`;
 
     // Set the sprite but selecting the skin as well
     let spriteName =
@@ -518,10 +523,10 @@ export class HedgehogActor extends Actor {
     };
 
     this.sprite!.animationSpeed = 0.1;
-    this.sprite!.loop = false;
 
     this.updateSprite("death", {
       reset: true,
+      forceSkin: "default",
       onComplete: () => {
         this.game.spawnHedgehogGhost(this.rigidBody!.position);
         gsap.to(this.sprite!, {

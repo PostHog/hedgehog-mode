@@ -181,30 +181,44 @@ export class GlobalKeyboardListeners {
           player.updateSprite("idle");
         },
       },
-      // {
-      // // konami code
-      //   keys: [
-      //     "arrowup",
-      //     "arrowup",
-      //     "arrowdown",
-      //     "arrowdown",
-      //     "arrowleft",
-      //     "arrowright",
-      //     "arrowleft",
-      //     "arrowright",
-      //     "b",
-      //     "a",
-      //   ],
-      //   action: () => {
-      //     this.getPlayableHedgehog().jump();
-      //     // this.gravity = -2;
+      {
+        // konami code
+        keys: [
+          "arrowup",
+          "arrowup",
+          "arrowdown",
+          "arrowdown",
+          "arrowleft",
+          "arrowright",
+          "arrowleft",
+          "arrowright",
+          "b",
+          "a",
+        ],
+        action: async () => {
+          this.getPlayableHedgehog()?.interface.triggerMessages([
+            {
+              words: [
+                {
+                  text: "nerd",
+                  style: { fontWeight: "bold", fontSize: "1.2em" },
+                },
+              ],
+            },
+            {
+              words: ["now you've asked for it"],
+            },
+            {
+              words: ["let's see how many hedgehogs your laptop can manage..."],
+            },
+          ]);
 
-      //     // lemonToast.info("I must leave. My people need me!");
-      //     // setTimeout(() => {
-      //     //   this.gravity = GRAVITY_PIXELS;
-      //     // }, 2000);
-      //   },
-      // },
+          for (const _ of range(10000)) {
+            spawnHedgehog();
+            await new Promise((r) => setTimeout(r, 100));
+          }
+        },
+      },
     ];
 
     const keyDownListener = (e: KeyboardEvent): void => {

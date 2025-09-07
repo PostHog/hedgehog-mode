@@ -9,6 +9,7 @@ import { Button } from "./components/Button";
 import { HedgehogCustomization } from "./components/Customization";
 import { Messages } from "./components/Messages";
 import { useOutsideClick } from "./hooks/useOutsideClick";
+import { useKeyboardListener } from "./hooks/useKeyboardListener";
 
 const WINDOW_MARGIN = 10;
 
@@ -37,10 +38,27 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
     uiRef.current.visible = visible;
   }, [uiRef.current, visible]);
 
+  const clearTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    if (clearTimeoutRef.current) {
+      clearTimeout(clearTimeoutRef.current);
+    }
+  }, [ui]);
+
   const onClose = useCallback(() => {
+    if (!visible) {
+      return;
+    }
     setVisible(false);
     ui?.onClose?.();
-  }, [ui]);
+    // Small delay to not mess with the fade out animation
+    clearTimeoutRef.current = setTimeout(() => {
+      setUI(null);
+    }, 100);
+  }, [ui, visible]);
+
+  useKeyboardListener(["escape"], onClose);
 
   const { actor, messages, screen } = ui || {};
 
@@ -130,7 +148,7 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
   }, [actor, setPosition]);
 
   useOutsideClick(ref, () => {
-    if (visible) {
+    if (visible && ui?.screen !== "dialog") {
       onClose?.();
     }
   });
@@ -173,7 +191,7 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
           )}
 
           {!showConfiguration && messages && (
-            <Messages messages={messages} onEnd={onClose} />
+            <Messages messages={messages} onEnd={onClose} containerRef={ref} />
           )}
         </div>
       </div>

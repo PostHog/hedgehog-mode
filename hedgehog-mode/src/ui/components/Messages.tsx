@@ -2,11 +2,16 @@ import { useEffect, useState, useCallback } from "react";
 import { AnimatedText } from "./AnimatedText";
 import { GameUIProps } from "../../types";
 import { ArrowButton } from "./Button";
+import { useOutsideClick } from "../hooks/useOutsideClick";
 
 export function Messages({
   messages,
   onEnd,
-}: Pick<GameUIProps, "messages"> & { onEnd?: () => void }) {
+  containerRef,
+}: Pick<GameUIProps, "messages"> & {
+  onEnd?: () => void;
+  containerRef: React.RefObject<HTMLDivElement>;
+}) {
   const [messageIndex, setMessageIndex] = useState<number>(0);
   const [animationCompleted, setAnimationCompleted] = useState<boolean>(false);
   const message = messages[messageIndex];
@@ -14,6 +19,10 @@ export function Messages({
   useEffect(() => {
     setMessageIndex(0);
   }, [messages]);
+
+  useOutsideClick(containerRef, () => {
+    setIndex(messageIndex + 1);
+  });
 
   const setIndex = useCallback(
     (index: number) => {

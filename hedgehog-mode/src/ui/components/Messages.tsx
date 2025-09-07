@@ -53,7 +53,6 @@ export function Messages({
   });
 
   useKeyboardListener(["enter", " "], () => {
-    console.log("firing!");
     if (message) {
       setIndex(messageIndex + 1);
     }

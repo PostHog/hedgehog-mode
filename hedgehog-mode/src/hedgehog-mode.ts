@@ -58,6 +58,7 @@ export class HedgeHogMode implements HedgehogModeInterface {
   gameUI!: GameUI;
   stateManager?: GameStateManager;
   staticHedgehogRenderer: StaticHedgehogRenderer;
+  syncPlatformsInterval?: NodeJS.Timeout;
 
   constructor(public options: HedgehogModeConfig) {
     this.spritesManager = new SpritesManager(options);
@@ -69,6 +70,9 @@ export class HedgeHogMode implements HedgehogModeInterface {
   }
 
   destroy(): void {
+    if (this.syncPlatformsInterval) {
+      clearInterval(this.syncPlatformsInterval);
+    }
     Runner.stop(this.runner);
     this.app.destroy({
       removeView: true,
@@ -227,8 +231,13 @@ export class HedgeHogMode implements HedgehogModeInterface {
 
     window.addEventListener("resize", () => this.resize());
 
-    setTimeout(() => this.syncPlatforms(), 1000);
-    this.syncPlatforms();
+    if (this.options.platforms) {
+      this.syncPlatformsInterval = setInterval(
+        () => this.syncPlatforms(),
+        this.options.platforms.syncFrequency ?? 200
+      );
+      this.syncPlatforms();
+    }
 
     // Add debug renderer
     this.debugRender = Render.create({
@@ -337,24 +346,61 @@ export class HedgeHogMode implements HedgehogModeInterface {
   }
 
   private syncPlatforms() {
-    if (!this.options.platformSelector) {
+    const platforms = this.options.platforms;
+    const {
+      selector,
+      viewportPadding,
+      minWidth = 10,
+      maxNumberOfPlatforms = 500,
+    } = platforms ?? {};
+    if (!selector) {
       return;
     }
-    const boxes = Array.from(
-      document.querySelectorAll(this.options.platformSelector)
-    );
-    const existingBoxes = this.elements.filter(
-      (el) => el instanceof SyncedPlatform
-    );
+    let boxes = Array.from(document.querySelectorAll(selector));
+
+    // Filter each to only show those that are visible in the viewport
+    boxes = boxes
+      .filter((box) => {
+        const rect = box.getBoundingClientRect();
+
+        if (minWidth && rect.width < minWidth) {
+          return false;
+        }
+
+        return (
+          rect.top >= (viewportPadding?.top ?? 0) &&
+          rect.left >= (viewportPadding?.left ?? 0) &&
+          rect.bottom <= window.innerHeight - (viewportPadding?.bottom ?? 0) &&
+          rect.right <= window.innerWidth - (viewportPadding?.right ?? 0)
+        );
+      })
+      .slice(0, maxNumberOfPlatforms);
+
+    const existingBoxes: SyncedPlatform[] = [];
+    const existingBoxesRefs: HTMLElement[] = [];
+
+    this.elements.forEach((el) => {
+      if (el instanceof SyncedPlatform) {
+        existingBoxes.push(el);
+        existingBoxesRefs.push(el.ref);
+      }
+    });
+
+    // Remove all platforms that are no longer visible
+    existingBoxes.forEach((box) => {
+      if (boxes.includes(box.ref)) {
+        return;
+      }
+      this.removeElement(box);
+    });
 
     boxes.forEach((box) => {
-      // TODO: Make this much faster...
-
-      if (existingBoxes.find((el) => el.ref === box)) {
+      if (existingBoxesRefs.includes(box as HTMLElement)) {
         return;
       }
 
       const platform = new SyncedPlatform(this, box as HTMLElement);
+      existingBoxes.push(platform);
       this.elements.push(platform);
     });
   }

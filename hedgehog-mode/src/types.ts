@@ -35,8 +35,23 @@ export type HedgehogModeGameState = {
 
 export type HedgehogModeConfig = {
   assetsUrl: string;
-  // Argument passed to document.querySelectorAll to find items to be used as platforms
-  platformSelector?: string;
+  platforms?: {
+    // Argument passed to document.querySelectorAll to find items to be used as platforms
+    selector?: string;
+    // Padding around the viewport to sync platforms
+    viewportPadding?: {
+      top?: number;
+      bottom?: number;
+      left?: number;
+      right?: number;
+    };
+    // Minimum width of the platform to be synced - default to 10px
+    minWidth?: number;
+    // Maximum number of platforms to be synced - default to 500
+    maxNumberOfPlatforms?: number;
+    // Sync frequency in milliseconds - default to 1000ms
+    syncFrequency?: number;
+  };
   state?: HedgehogModeGameState;
   onQuit?: (game: HedgehogModeInterface) => void;
 };

@@ -140,14 +140,12 @@ export class HedgehogActor extends Actor {
       this.game.spritesManager.toAvailableAnimation(possibleAnimation);
 
     if (!spriteName) {
-      this.game.log(`Tried to load ${possibleAnimation} but it doesn't exist`);
-
       if (!this.sprite) {
-        this.game.log(`Falling back to ${idleAnimation}`);
         spriteName =
           this.game.spritesManager.toAvailableAnimation(idleAnimation);
 
         if (!spriteName) {
+          this.game.log(`Tried to load ${idleAnimation} but it doesn't exist`);
           // Something went wrong!
           return;
         }

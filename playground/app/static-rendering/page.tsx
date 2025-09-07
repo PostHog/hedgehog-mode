@@ -47,7 +47,6 @@ let allCombinations = Object.values(HedgehogActorAccessoryOptions).flatMap(
     )
 );
 
-// Create a list of all groups like { headwear: [foo, bar], eyewear: [baz], other: [qux] }
 const accessoriesByGroup = Object.entries(HedgehogActorAccessories).reduce(
   (acc, [key, value]) => {
     acc[value.group] = acc[value.group] || [];
@@ -57,34 +56,42 @@ const accessoriesByGroup = Object.entries(HedgehogActorAccessories).reduce(
   {} as Record<string, HedgehogActorAccessoryOption[]>
 );
 
-const accessoryCombos: Set<Set<HedgehogActorAccessoryOption>> = new Set();
+function generateCombos(): HedgehogActorAccessoryOption[][] {
+  const out: HedgehogActorAccessoryOption[][] = [];
 
-for (const [group, accessories] of Object.entries(accessoriesByGroup)) {
-  // Iterate over all the other groups and add each option
+  const H = accessoriesByGroup.headwear;
+  const E = accessoriesByGroup.eyewear;
+  const O = accessoriesByGroup.other;
 
-  for (const [otherGroup, otherAccessories] of Object.entries(
-    accessoriesByGroup
-  )) {
-    if (group === otherGroup) {
-      continue;
-    }
-    for (const accessory of accessories) {
-      // Add jus the accessory on its own
-      accessoryCombos.add(new Set([accessory]));
-      // Add the accessory with each other accessory
-      for (const otherAccessory of otherAccessories) {
-        accessoryCombos.add(
-          new Set([accessory, otherAccessory] as HedgehogActorAccessoryOption[])
-        );
-      }
-    }
-  }
+  // singles
+  for (const a of [...H, ...E, ...O]) out.push([a]);
+
+  // pairs: H+E, H+O, E+O
+  for (const h of H) for (const e of E) out.push([h, e]);
+  for (const h of H) for (const o of O) out.push([h, o]);
+  for (const e of E) for (const o of O) out.push([e, o]);
+
+  // triples: H+E+O
+  for (const h of H) for (const e of E) for (const o of O) out.push([h, e, o]);
+
+  return out;
 }
 
+// If you truly need a Set (e.g., for uniqueness or fast lookups), serialize:
+function toKey(combo: HedgehogActorAccessoryOption[]): string {
+  // sort to make order-insensitive keys if you like
+  return [...combo].sort().join("|");
+}
+
+const combos = generateCombos();
+const comboSet = new Set(combos.map(toKey));
+
 // Create all possible combination of accessories by group
-const accessories: HedgehogActorOptions[] = Array.from(accessoryCombos).map(
+const accessories: HedgehogActorOptions[] = Array.from(comboSet).map(
   (accessories) => ({
-    accessories: Array.from(accessories),
+    accessories: accessories
+      .split("|")
+      .map((a) => a as HedgehogActorAccessoryOption),
     id: `hedgehog-${uniqueId()}`,
     skin: "default",
   })

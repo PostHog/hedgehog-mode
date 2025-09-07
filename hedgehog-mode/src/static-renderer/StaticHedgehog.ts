@@ -134,7 +134,6 @@ export class StaticHedgehogRenderer {
     await this.ensureInitialized();
 
     return this.semaphore.run(async () => {
-      console.log("Running render");
       await new Promise((resolve) => setTimeout(resolve, 1));
       const container = this.createContainer(options, size);
       const dataURL = await this.renderToDataURL(container);

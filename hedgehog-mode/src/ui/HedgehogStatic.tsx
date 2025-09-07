@@ -3,7 +3,7 @@ import { HedgehogActorOptions } from "../hedgehog-mode";
 import { StaticHedgehogRenderer } from "../static-renderer/StaticHedgehog";
 export type HedgehogImageProps = Partial<HedgehogActorOptions> & {
   renderer: StaticHedgehogRenderer;
-  size?: number | string;
+  size?: number;
 };
 
 // Takes a range of options and renders a static hedgehog
@@ -31,7 +31,7 @@ export function HedgehogImage({
           accessories,
           color,
         },
-        imgSize
+        imgSize * 4
       )
       .then((src) => {
         setDataUrl(src);

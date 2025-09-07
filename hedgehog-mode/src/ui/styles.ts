@@ -123,6 +123,13 @@ export const styles = `
     border-bottom: 1px solid transparent;
     padding: 0 var(--spacing-xs);
   }
+  .DialogBoxControlsLeft {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: var(--spacing-xs);
+  }
 
   .DialogBox:hover > .DialogBoxControls {
     padding: var(--spacing-xs);

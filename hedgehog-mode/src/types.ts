@@ -38,9 +38,11 @@ export type HedgehogModeConfig = {
   // Argument passed to document.querySelectorAll to find items to be used as platforms
   platformSelector?: string;
   state?: HedgehogModeGameState;
+  onQuit?: (game: HedgehogModeInterface) => void;
 };
 
 export type HedgehogModeInterface = {
+  options: HedgehogModeConfig;
   app: Application;
   engine: Matter.Engine;
   pointerEventsEnabled: boolean;
@@ -53,11 +55,14 @@ export type HedgehogModeInterface = {
     accessory: HedgehogActorAccessoryOption,
     position: Matter.Vector
   ) => Accessory;
+  getAllHedgehogs: () => HedgehogActor[];
+  getPlayableHedgehog: () => HedgehogActor | undefined;
   removeElement: (element: GameElement) => void;
   log: (...args: unknown[]) => void;
   setSpeed: (speed: number) => void;
   gameUI?: GameUI;
   stateManager?: GameStateManager;
+  destroy: () => void;
 };
 
 export type GameUI = {

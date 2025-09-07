@@ -4,6 +4,7 @@ import {
   getRandomAccessoryCombo,
   HedgehogModeRenderer,
   HedgeHogMode,
+  HedgehogModeInterface,
 } from "@posthog/hedgehog-mode";
 import { Logo } from "../components/logo";
 import { sample } from "lodash";
@@ -61,6 +62,18 @@ export default function Home() {
         config={{
           assetsUrl: "/assets",
           platformSelector: ".border",
+          onQuit: (game) => {
+            console.log("onQuit");
+            game.getAllHedgehogs().forEach((hedgehog) => {
+              hedgehog.updateSprite("wave", {
+                reset: true,
+              });
+            });
+
+            setTimeout(() => {
+              game.destroy();
+            }, 1000);
+          },
         }}
         onGameReady={setGame}
       />

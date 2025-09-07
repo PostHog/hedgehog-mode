@@ -165,6 +165,18 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
         onMouseLeave={() => setHovering(false)}
       >
         <div className="DialogBoxControls">
+          <div className="DialogBoxControlsLeft">
+            {game.options.onQuit && (
+              <Button
+                onClick={() => {
+                  game.options.onQuit?.(game);
+                  onClose?.();
+                }}
+              >
+                Quit
+              </Button>
+            )}
+          </div>
           <Button
             onClick={() => {
               if (ui) {

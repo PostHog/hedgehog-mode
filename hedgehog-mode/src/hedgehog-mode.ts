@@ -59,7 +59,7 @@ export class HedgeHogMode implements HedgehogModeInterface {
   stateManager?: GameStateManager;
   staticHedgehogRenderer: StaticHedgehogRenderer;
 
-  constructor(private options: HedgehogModeConfig) {
+  constructor(public options: HedgehogModeConfig) {
     this.spritesManager = new SpritesManager(options);
     this.staticHedgehogRenderer = new StaticHedgehogRenderer(
       options,
@@ -138,6 +138,18 @@ export class HedgeHogMode implements HedgehogModeInterface {
     const el = new Accessory(this, { accessory, position });
     this.elements.push(el);
     return el;
+  }
+
+  getPlayableHedgehog(): HedgehogActor | undefined {
+    return this.elements.find(
+      (element) => element instanceof HedgehogActor && element.options.player
+    ) as HedgehogActor | undefined;
+  }
+
+  getAllHedgehogs(): HedgehogActor[] {
+    return this.elements.filter(
+      (element) => element instanceof HedgehogActor
+    ) as HedgehogActor[];
   }
 
   public spawnActor(actor: Actor): void {

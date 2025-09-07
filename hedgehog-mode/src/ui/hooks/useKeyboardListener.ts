@@ -1,20 +1,15 @@
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 
 export const useKeyboardListener = (keys: string[], action: () => void) => {
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent) => {
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
       if (keys.includes(event.key.toLowerCase())) {
         action();
       }
-    },
-    [keys, action]
-  );
-
-  useEffect(() => {
+    };
     window.addEventListener("keydown", handleKeyDown);
-  }, [handleKeyDown]);
-
-  return () => {
-    window.removeEventListener("keydown", handleKeyDown);
-  };
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [keys, action]);
 };

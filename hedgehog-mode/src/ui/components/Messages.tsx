@@ -1,8 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
 import { AnimatedText } from "./AnimatedText";
 import { GameUIProps } from "../../types";
-import { ArrowButton } from "./Button";
+import { IconButton } from "./Button";
 import { useOutsideClick } from "../hooks/useOutsideClick";
+import { useKeyboardListener } from "../hooks/useKeyboardListener";
 
 export function Messages({
   messages,
@@ -19,10 +20,6 @@ export function Messages({
   useEffect(() => {
     setMessageIndex(0);
   }, [messages]);
-
-  useOutsideClick(containerRef, () => {
-    setIndex(messageIndex + 1);
-  });
 
   const setIndex = useCallback(
     (index: number) => {
@@ -51,18 +48,16 @@ export function Messages({
     [messageIndex, messages.length, animationCompleted, onEnd]
   );
 
-  useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
-      if ((event.key === "Enter" || event.key === " ") && message) {
-        setIndex(messageIndex + 1);
-      }
-    };
+  useOutsideClick(containerRef, () => {
+    setIndex(messageIndex + 1);
+  });
 
-    document.addEventListener("keydown", handleKeyPress);
-    return () => {
-      document.removeEventListener("keydown", handleKeyPress);
-    };
-  }, [message, messageIndex, setIndex]);
+  useKeyboardListener(["enter", " "], () => {
+    console.log("firing!");
+    if (message) {
+      setIndex(messageIndex + 1);
+    }
+  });
 
   if (!message) {
     return null;
@@ -88,15 +83,20 @@ export function Messages({
         }}
       >
         <div style={{ flex: 1 }} />
-        <ArrowButton
+        <IconButton
+          icon="chevron"
           onClick={() => setIndex(messageIndex - 1)}
-          direction="left"
           disabled={messageIndex === 0}
         />
-        <ArrowButton
-          onClick={() => setIndex(messageIndex + 1)}
-          direction="right"
-        />
+        {messages.length > 1 && messageIndex < messages.length - 1 ? (
+          <IconButton
+            icon="chevron"
+            onClick={() => setIndex(messageIndex + 1)}
+            rotation="180deg"
+          />
+        ) : (
+          <IconButton icon="done" onClick={() => onEnd?.()} />
+        )}
       </div>
     </div>
   );

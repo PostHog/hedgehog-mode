@@ -137,7 +137,7 @@ export const styles = `
     padding: var(--spacing-sm);
   }
 
-  .ArrowIcon {
+  .IconButton {
     vertical-align: middle;
     height: 1rem;
     width: 1rem;
@@ -146,8 +146,14 @@ export const styles = `
     justify-content: center;
   }
 
-  .ArrowIcon--right {
+  .IconButton--90deg {
+    transform: rotate(90deg);
+  }
+  .IconButton--180deg {
     transform: rotate(180deg);
+  }
+  .IconButton--270deg {
+    transform: rotate(270deg);
   }
 
   .AnimatedText {

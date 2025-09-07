@@ -28,10 +28,6 @@ export const styles = `
     --color-shadow: rgba(0, 0, 0, 0.3);
   }
 
-  * {
-    font-family: var(--font-family);
-    color: var(--color-text);
-  }
 
   .GameContainer {
     position: fixed;
@@ -42,6 +38,8 @@ export const styles = `
   .GameUI {
     position: relative;
     z-index: 2;
+    font-family: var(--font-family);
+    color: var(--color-text);
   }
 
   .Button {
@@ -249,13 +247,4 @@ export const styles = `
     cursor: pointer;
     transition: transform 0.2s var(--transition-timing);
   }
-
-  // .CustomizationItem:hover {
-  //   transform: scale(1.05);
-  // }
-
-  // .CustomizationItem--selected {
-  //   outline: 1px solid var(--color-border-light);
-  //   border-radius: var(--border-radius-sm);
-  // }
 `;

@@ -67,6 +67,7 @@ export default function Home() {
             game.getAllHedgehogs().forEach((hedgehog) => {
               hedgehog.updateSprite("wave", {
                 reset: true,
+                loop: false,
               });
             });
 

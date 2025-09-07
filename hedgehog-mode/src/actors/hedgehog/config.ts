@@ -4,6 +4,7 @@ export const HedgehogActorSkinOptions = [
   "default",
   "spiderhog",
   "robohog",
+  "ghost",
 ] as const;
 
 export type HedgehogActorSkinOption = (typeof HedgehogActorSkinOptions)[number];

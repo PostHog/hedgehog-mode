@@ -5,6 +5,27 @@ import root from "react-shadow";
 import { styles } from "./ui/styles";
 import { useTheme } from "./ui/hooks/useTheme";
 
+export function HedgehogModeRendererContent({
+  id,
+  theme,
+  style,
+  children,
+}: {
+  id: string;
+  theme?: "light" | "dark";
+  style?: React.CSSProperties;
+  children: React.ReactNode;
+}) {
+  const osTheme = useTheme();
+
+  return (
+    <root.div id={id} data-theme={theme ?? osTheme} style={style}>
+      <style>{styles}</style>
+      {children}
+    </root.div>
+  );
+}
+
 export function HedgehogModeRenderer({
   onGameReady,
   config,

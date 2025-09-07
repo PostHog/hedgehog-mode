@@ -3,6 +3,7 @@ import { COLOR_TO_FILTER_MAP } from "../actors/Hedgehog";
 import { AvailableSpriteFrames, SpritesManager } from "../sprites/sprites";
 import { HedgehogModeConfig } from "../types";
 import { HedgehogActorOptions } from "../actors/hedgehog/config";
+import { Semaphore } from "../utils/semaphore";
 
 export class StaticHedgehogRenderer {
   private resultCache: Map<string, string> = new Map();
@@ -10,6 +11,7 @@ export class StaticHedgehogRenderer {
   private app: Application;
   private spritesManager: SpritesManager;
   private initPromise: Promise<void> | null = null;
+  private semaphore = new Semaphore(1);
 
   constructor(options: HedgehogModeConfig, spritesManager?: SpritesManager) {
     this.app = new Application();
@@ -42,7 +44,7 @@ export class StaticHedgehogRenderer {
     const filter = new ColorMatrixFilter();
 
     // Create base sprite
-    const spriteName = `skins/${options.skin ?? "default"}/wave/tile000.png`;
+    const spriteName = `skins/${options.skin ?? "default"}/idle/tile000.png`;
     const frame = this.spritesManager.getSpriteFrames(
       spriteName as AvailableSpriteFrames
     );
@@ -73,6 +75,11 @@ export class StaticHedgehogRenderer {
       const accessorySprite = new Sprite(accessoryFrame);
       accessorySprite.texture.source.scaleMode = "nearest";
       accessorySprite.anchor.set(0.5);
+
+      if (options.skin === "ghost") {
+        accessorySprite.anchor.set(0.4, 0.58);
+      }
+
       sprite.addChild(accessorySprite);
     });
 
@@ -122,11 +129,16 @@ export class StaticHedgehogRenderer {
     options: HedgehogActorOptions,
     size: number
   ): Promise<string> {
+    // Sempahore ensures we only run one at a time and we can add a next tick to
+    // relieve the thread
     await this.ensureInitialized();
-    const container = this.createContainer(options, size);
-    const dataURL = await this.renderToDataURL(container);
 
-    return dataURL;
+    return this.semaphore.run(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 1));
+      const container = this.createContainer(options, size);
+      const dataURL = await this.renderToDataURL(container);
+      return dataURL;
+    });
   }
 
   public async render(

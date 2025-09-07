@@ -1,4 +1,7 @@
-export { HedgehogModeRenderer } from "./HedgehogModeRenderer";
+export {
+  HedgehogModeRenderer,
+  HedgehogModeRendererContent,
+} from "./HedgehogModeRenderer";
 export { HedgeHogMode } from "./hedgehog-mode";
 export * from "./types";
 
@@ -17,3 +20,4 @@ export {
   HedgehogActorAccessories,
 } from "./actors/hedgehog/config";
 export { StaticHedgehogRenderer } from "./static-renderer/StaticHedgehog";
+export { HedgehogCustomization } from "./ui/components/Customization";

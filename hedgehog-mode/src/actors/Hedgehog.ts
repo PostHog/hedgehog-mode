@@ -65,6 +65,7 @@ export class HedgehogActor extends Actor {
   accessorySprites: { [key: string]: Sprite } = {};
   overlayAnimation?: AnimatedSprite;
   isFlammable = true;
+  isDead = false;
   hue = 0;
   health = 100;
   ai: HedgehogActorAI;
@@ -116,22 +117,52 @@ export class HedgehogActor extends Actor {
     this.setupSpiderHogRope();
   }
 
+  private isGhost(): boolean {
+    return this.options.skin === "ghost";
+  }
+
   updateSprite(
     sprite: string,
-    options: { reset?: boolean; onComplete?: () => void } = {}
+    options: {
+      reset?: boolean;
+      animationSpeed?: number;
+      onComplete?: () => void;
+      forceSkin?: string;
+      loop?: boolean;
+    } = {}
   ): void {
-    const possibleAnimation = `skins/${this.options.skin ?? "default"}/${sprite}/tile`;
+    const skin = options.forceSkin ?? this.options.skin ?? "default";
+    const idleAnimation = `skins/${skin}/idle/tile`;
+    const possibleAnimation = `skins/${skin}/${sprite}/tile`;
 
     // Set the sprite but selecting the skin as well
-    const spriteName =
+    let spriteName =
       this.game.spritesManager.toAvailableAnimation(possibleAnimation);
 
     if (!spriteName) {
       this.game.log(`Tried to load ${possibleAnimation} but it doesn't exist`);
-      return;
+
+      if (!this.sprite) {
+        this.game.log(`Falling back to ${idleAnimation}`);
+        spriteName =
+          this.game.spritesManager.toAvailableAnimation(idleAnimation);
+
+        if (!spriteName) {
+          // Something went wrong!
+          return;
+        }
+      } else {
+        // We just ignore it
+        return;
+      }
     }
-    super.updateSprite(spriteName, options);
+    super.updateSprite(spriteName, {
+      animationSpeed: this.isGhost() ? 0.1 : 0.5,
+      loop: options.loop ?? true,
+      ...options,
+    });
     this.sprite!.filters = [this.filter];
+    this.sprite!.alpha = this.isGhost() ? 0.5 : 1;
   }
 
   get currentSprite(): string {
@@ -166,14 +197,25 @@ export class HedgehogActor extends Actor {
     this.options = { ...this.options, ...options };
     this.ai.enable(this.options.ai_enabled ?? true);
     this.syncAccessories();
+    this.syncRigidBody();
+  }
+
+  clearOverlayAnimation(): void {
+    if (this.overlayAnimation) {
+      this.sprite!.removeChild(this.overlayAnimation!);
+    }
+    this.overlayAnimation = undefined;
   }
 
   setOnFire(times: number = 3): void {
+    if (this.isDead) {
+      return;
+    }
+
     clearTimeout(this.fireTimer);
     this.fireTimer = setTimeout(() => {
       if (times <= 1) {
-        this.sprite!.removeChild(this.overlayAnimation!);
-        this.overlayAnimation = undefined;
+        this.clearOverlayAnimation();
         this.fireTimer = undefined;
         return;
       }
@@ -201,7 +243,7 @@ export class HedgehogActor extends Actor {
   }
 
   jump(): void {
-    const MAX_JUMPS = 2;
+    const MAX_JUMPS = this.isGhost() ? Infinity : 2;
     if (this.jumps + 1 > MAX_JUMPS) {
       return;
     }
@@ -305,14 +347,23 @@ export class HedgehogActor extends Actor {
   }
 
   update(ticker: UpdateTicker): void {
+    let mask = this.isGhost()
+      ? COLLISIONS.GROUND
+      : COLLISIONS.ACTOR | COLLISIONS.PROJECTILE | COLLISIONS.GROUND;
+
     if (this.rigidBody!.velocity.y < -0.1) {
       // We are moving upwards so we don't want to collide with platforms
-      this.collisionFilter = NO_PLATFORM_COLLISION_FILTER;
     } else {
-      this.collisionFilter = DEFAULT_COLLISION_FILTER;
+      mask = mask | COLLISIONS.PLATFORM;
     }
 
+    this.collisionFilter.mask = mask;
+
     super.update(ticker);
+
+    if (this.isDead) {
+      return;
+    }
 
     const xForce = this.walkSpeed;
 
@@ -330,9 +381,14 @@ export class HedgehogActor extends Actor {
       // If horizontal movement is noticeable then walk
       this.updateSprite("walk");
     } else if (["fall", "walk"].includes(this.currentSprite)) {
-      // NOTE:  wave is just used as a placeholder anim. WE should have a dedicated idle animation
-      this.updateSprite("wave");
-      this.sprite!.stop();
+      this.updateSprite("idle", {
+        loop: false,
+        onComplete: () => {
+          this.updateSprite("idle", {
+            loop: true,
+          });
+        },
+      });
     }
 
     // We want to make it look like the hedgehog's accessories are disconnected. If we are falling then we position them slightly above
@@ -401,6 +457,17 @@ export class HedgehogActor extends Actor {
     if (element.rigidBody!.bounds.min.y > this.rigidBody!.bounds.min.y) {
       this.game.log("Hit something below");
       this.jumps = 0;
+
+      if (element instanceof HedgehogActor) {
+        const velocity = this.rigidBody!.velocity.y;
+
+        // Min of 5 to start damage
+        const velocityMultiplier = Math.max(0, velocity - 5);
+        const weightMultiplier = this.sprite!.scale.y;
+        const damage = weightMultiplier * weightMultiplier * velocityMultiplier;
+
+        element.receiveDamage(damage);
+      }
     } else {
       this.game.log("Hit something above");
       // We check if it is a platform and if so we ignore it
@@ -408,6 +475,20 @@ export class HedgehogActor extends Actor {
       if (element instanceof SyncedPlatform) {
         pair.isActive = false;
       }
+    }
+  }
+
+  private syncRigidBody(): void {
+    if (this.isGhost()) {
+      this.rigidBody!.density = 0.0001;
+      this.rigidBody!.friction = 0.1;
+      this.rigidBody!.frictionStatic = 0;
+      this.rigidBody!.frictionAir = 0.2;
+    } else {
+      this.rigidBody!.density = 0.001;
+      this.rigidBody!.friction = 0.2;
+      this.rigidBody!.frictionStatic = 0;
+      this.rigidBody!.frictionAir = 0.01;
     }
   }
 
@@ -434,27 +515,52 @@ export class HedgehogActor extends Actor {
       sprite.eventMode = "static";
       sprite.anchor.set(0.5);
       this.sprite!.addChild(sprite);
+
+      if (this.options.skin === "ghost") {
+        sprite.anchor.set(0.4, 0.55);
+      }
     });
   }
 
   destroy(): void {
-    this.setVelocity({
-      x: 0,
-      y: -5,
+    if (this.isDead) {
+      return;
+    }
+    this.isDead = true;
+
+    this.updateOptions({
+      ai_enabled: false,
+      controls_enabled: false,
+    });
+    this.clearOverlayAnimation();
+
+    const accessories = this.options.accessories;
+    this.options.accessories = [];
+    this.syncAccessories();
+
+    accessories?.forEach((accessory) => {
+      this.game.spawnAccessory(accessory, this.rigidBody!.position);
     });
 
-    this.collisionFilter = {
-      category: COLLISIONS.NONE,
-      mask: COLLISIONS.NONE,
-    };
-
-    gsap.to(this.sprite!.scale, {
+    this.setVelocity({
       x: 0,
       y: 0,
-      duration: 3,
-      ease: "elastic.out",
+    });
+
+    this.updateSprite("death", {
+      reset: true,
+      animationSpeed: 0.1,
+      forceSkin: "default",
       onComplete: () => {
-        this.game.removeElement(this);
+        this.game.spawnHedgehogGhost(this.rigidBody!.position);
+        gsap.to(this.sprite!, {
+          alpha: 0,
+          duration: 2,
+          ease: "power2.inOut",
+          onComplete: () => {
+            this.game.removeElement(this);
+          },
+        });
       },
     });
   }

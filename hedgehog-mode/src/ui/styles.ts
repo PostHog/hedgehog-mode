@@ -28,6 +28,11 @@ export const styles = `
     --color-shadow: rgba(0, 0, 0, 0.3);
   }
 
+  * {
+    font-family: var(--font-family);
+    color: var(--color-text);
+  }
+
   .GameContainer {
     position: fixed;
     inset: 0;
@@ -36,9 +41,7 @@ export const styles = `
 
   .GameUI {
     position: relative;
-    font-family: var(--font-family);
     z-index: 2;
-    color: var(--color-text);
   }
 
   .Button {
@@ -84,10 +87,6 @@ export const styles = `
   .SwitchInput {
     display: none;
   }
-  
-  
-  
-  
 
   .DialogBox {
     position: fixed;

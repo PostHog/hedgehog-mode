@@ -6,9 +6,10 @@ import {
   HedgehogActorAccessoryOptions,
   HedgehogActorColorOptions,
   HedgehogActorOptions,
+  HedgehogActorSkinOptions,
   HedgeHogMode,
 } from "../..";
-import { HedgehogProfileImage, HedgehogImage } from "../HedgehogStatic";
+import { HedgehogProfileImage } from "../HedgehogStatic";
 import { Button } from "./Button";
 import { sample, uniqueId } from "lodash";
 
@@ -49,7 +50,7 @@ function Switch({
 export function HedgehogCustomization(
   props: HedgehogOptionsProps & { game: HedgeHogMode }
 ): JSX.Element {
-  const { config, setConfig, game } = props;
+  const { config, game } = props;
 
   return (
     <div className="Customization">
@@ -262,13 +263,11 @@ function HedgehogSkins({
   setConfig,
   game,
 }: HedgehogOptionsProps): JSX.Element | null {
-  const skins = ["default", "spiderhog", "robohog"];
-
   return (
     <div className="CustomizationSection">
       <h4 className="CustomizationSectionTitle">skins</h4>
       <div className="CustomizationGrid">
-        {skins.map((option) => (
+        {HedgehogActorSkinOptions.map((option) => (
           <Button
             key={option}
             active={(config.skin ?? "default") === option}

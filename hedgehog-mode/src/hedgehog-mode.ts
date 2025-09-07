@@ -14,10 +14,15 @@ import { Ground } from "./items/Ground";
 import { SyncedPlatform } from "./items/SyncedPlatform";
 import { Actor } from "./actors/Actor";
 import { GlobalKeyboardListeners } from "./misc/GlobalKeyboardListeners";
-import { HedgehogActorOptions } from "./actors/hedgehog/config";
+import {
+  HedgehogActorAccessoryOption,
+  HedgehogActorOptions,
+} from "./actors/hedgehog/config";
 import { GameStateManager } from "./state";
 import { StaticHedgehogRenderer } from "./static-renderer/StaticHedgehog";
 import { uniqueId } from "lodash";
+import { HedgehogGhostActor } from "./actors/Ghost";
+import { Accessory } from "./items/Accessory";
 
 export type {
   HedgehogActorOptions,
@@ -109,6 +114,12 @@ export class HedgeHogMode implements HedgehogModeInterface {
     this.pointerEventsEnabled = enabled;
   }
 
+  spawnHedgehogGhost(position: Matter.Vector): HedgehogGhostActor {
+    const ghost = new HedgehogGhostActor(this, position);
+    this.elements.push(ghost);
+    return ghost;
+  }
+
   spawnHedgehog(options: HedgehogActorOptions | undefined): HedgehogActor {
     const actor = new HedgehogActor(
       this,
@@ -118,6 +129,15 @@ export class HedgeHogMode implements HedgehogModeInterface {
     );
     this.spawnActor(actor);
     return actor;
+  }
+
+  spawnAccessory(
+    accessory: HedgehogActorAccessoryOption,
+    position: Matter.Vector
+  ): Accessory {
+    const el = new Accessory(this, { accessory, position });
+    this.elements.push(el);
+    return el;
   }
 
   public spawnActor(actor: Actor): void {

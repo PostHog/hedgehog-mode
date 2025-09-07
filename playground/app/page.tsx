@@ -4,7 +4,6 @@ import {
   getRandomAccessoryCombo,
   HedgehogModeRenderer,
   HedgeHogMode,
-  HedgehogModeInterface,
 } from "@posthog/hedgehog-mode";
 import { Logo } from "../components/logo";
 import { sample } from "lodash";

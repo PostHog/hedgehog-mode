@@ -1,5 +1,4 @@
 import { range, sample, uniqueId } from "lodash";
-import { HedgehogActor } from "../actors/Hedgehog";
 import { HedgehogModeInterface } from "../types";
 import {
   getRandomAccessoryCombo,
@@ -9,18 +8,6 @@ import {
 export class GlobalKeyboardListeners {
   constructor(private game: HedgehogModeInterface) {
     this.setupKeyboardListeners();
-  }
-
-  private getPlayableHedgehog(): HedgehogActor | undefined {
-    return this.game.elements.find(
-      (element) => element instanceof HedgehogActor && element.options.player
-    ) as HedgehogActor | undefined;
-  }
-
-  private getAllHedgehogs(): HedgehogActor[] {
-    return this.game.elements.filter(
-      (element) => element instanceof HedgehogActor
-    ) as HedgehogActor[];
   }
 
   setupKeyboardListeners(): () => void {
@@ -57,17 +44,17 @@ export class GlobalKeyboardListeners {
       },
       {
         keys: ["f", "f", "f"],
-        action: () => this.getPlayableHedgehog()?.setOnFire(),
+        action: () => this.game.getPlayableHedgehog()?.setOnFire(),
       },
       {
         keys: ["f", "i", "r", "e"],
-        action: () => this.getPlayableHedgehog()?.setOnFire(),
+        action: () => this.game.getPlayableHedgehog()?.setOnFire(),
       },
 
       {
         keys: ["h", "e", "l", "l", "o"],
         action: () =>
-          this.getAllHedgehogs().forEach((hedgehog) => {
+          this.game.getAllHedgehogs().forEach((hedgehog) => {
             hedgehog.updateSprite("wave");
           }),
       },
@@ -75,7 +62,7 @@ export class GlobalKeyboardListeners {
       {
         keys: ["h", "e", "a", "t", "m", "a", "p", "s"],
         action: () =>
-          this.getAllHedgehogs().forEach((hedgehog) => {
+          this.game.getAllHedgehogs().forEach((hedgehog) => {
             hedgehog.setOnFire();
           }),
       },
@@ -83,7 +70,7 @@ export class GlobalKeyboardListeners {
       {
         keys: ["s", "p", "i", "d", "e", "r", "h", "o", "g"],
         action: () => {
-          this.getPlayableHedgehog()?.updateOptions({
+          this.game.getPlayableHedgehog()?.updateOptions({
             skin: "spiderhog",
           });
         },
@@ -91,7 +78,7 @@ export class GlobalKeyboardListeners {
       {
         keys: ["r", "o", "b", "o", "h", "o", "g"],
         action: () => {
-          this.getPlayableHedgehog()?.updateOptions({
+          this.game.getPlayableHedgehog()?.updateOptions({
             skin: "robohog",
           });
         },
@@ -99,13 +86,13 @@ export class GlobalKeyboardListeners {
       {
         keys: ["c", "h", "e", "a", "t", "c", "o", "d", "e", "s"],
         action: () => {
-          this.getPlayableHedgehog()?.interface.triggerCheatSheet();
+          this.game.getPlayableHedgehog()?.interface.triggerCheatSheet();
         },
       },
       {
         keys: ["r", "a", "i", "n", "b", "o", "w"],
         action: () => {
-          this.getAllHedgehogs().forEach((hedgehog) => {
+          this.game.getAllHedgehogs().forEach((hedgehog) => {
             hedgehog.updateOptions({
               color: "rainbow",
             });
@@ -116,7 +103,7 @@ export class GlobalKeyboardListeners {
         // giant
         keys: ["g", "i", "a", "n", "t"],
         action: () => {
-          const player = this.getPlayableHedgehog();
+          const player = this.game.getPlayableHedgehog();
           if (!player) {
             return;
           }
@@ -133,7 +120,7 @@ export class GlobalKeyboardListeners {
         // tiny
         keys: ["t", "i", "n", "y"],
         action: () => {
-          const player = this.getPlayableHedgehog();
+          const player = this.game.getPlayableHedgehog();
           if (!player) {
             return;
           }
@@ -164,7 +151,7 @@ export class GlobalKeyboardListeners {
       {
         keys: ["d", "e", "a", "t", "h"],
         action: async () => {
-          for (const hedgehog of this.getAllHedgehogs()) {
+          for (const hedgehog of this.game.getAllHedgehogs()) {
             hedgehog.destroy();
             await new Promise((r) => setTimeout(r, 50));
           }
@@ -173,7 +160,7 @@ export class GlobalKeyboardListeners {
       {
         keys: ["g", "h", "o", "s", "t"],
         action: () => {
-          const player = this.getPlayableHedgehog();
+          const player = this.game.getPlayableHedgehog();
           if (!player) {
             return;
           }
@@ -181,30 +168,44 @@ export class GlobalKeyboardListeners {
           player.updateSprite("idle");
         },
       },
-      // {
-      // // konami code
-      //   keys: [
-      //     "arrowup",
-      //     "arrowup",
-      //     "arrowdown",
-      //     "arrowdown",
-      //     "arrowleft",
-      //     "arrowright",
-      //     "arrowleft",
-      //     "arrowright",
-      //     "b",
-      //     "a",
-      //   ],
-      //   action: () => {
-      //     this.getPlayableHedgehog().jump();
-      //     // this.gravity = -2;
+      {
+        // konami code
+        keys: [
+          "arrowup",
+          "arrowup",
+          "arrowdown",
+          "arrowdown",
+          "arrowleft",
+          "arrowright",
+          "arrowleft",
+          "arrowright",
+          "b",
+          "a",
+        ],
+        action: async () => {
+          this.game.getPlayableHedgehog()?.interface.triggerMessages([
+            {
+              words: [
+                {
+                  text: "nerd",
+                  style: { fontWeight: "bold", fontSize: "1.2em" },
+                },
+              ],
+            },
+            {
+              words: ["now you've asked for it"],
+            },
+            {
+              words: ["let's see how many hedgehogs your laptop can manage..."],
+            },
+          ]);
 
-      //     // lemonToast.info("I must leave. My people need me!");
-      //     // setTimeout(() => {
-      //     //   this.gravity = GRAVITY_PIXELS;
-      //     // }, 2000);
-      //   },
-      // },
+          for (const _ of range(10000)) {
+            spawnHedgehog();
+            await new Promise((r) => setTimeout(r, 100));
+          }
+        },
+      },
     ];
 
     const keyDownListener = (e: KeyboardEvent): void => {

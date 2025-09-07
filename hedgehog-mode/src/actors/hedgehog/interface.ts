@@ -304,49 +304,7 @@ export class HedgehogActorInterface {
   constructor(
     private game: HedgehogModeInterface,
     private actor: HedgehogActor
-  ) {
-    setTimeout(() => {
-      if (actor.options.player) {
-        // this.game.gameUI?.show({
-        //   actor: this.actor,
-        //   messages: [
-        //     {
-        //       words: [
-        //         "hedgehog",
-        //         "mode",
-        //         { text: "is", style: { fontStyle: "italic" } },
-        //         {
-        //           text: "coming soon",
-        //           style: { color: "orange", fontWeight: "bold" },
-        //         },
-        //       ],
-        //     },
-        //     {
-        //       words: ["ben is very excited for this..."],
-        //     },
-        //     {
-        //       words: [
-        //         "...i'm worried he is losing sight of the big picture...",
-        //       ],
-        //     },
-        //     {
-        //       words: ["...it's like a cry for help or something"],
-        //     },
-        //   ],
-        // });
-
-        const messages = sample(this.messages);
-
-        if (Array.isArray(messages)) {
-          this.game.gameUI?.show({
-            screen: "dialog",
-            actor: this.actor,
-            messages,
-          });
-        }
-      }
-    }, 1000);
-  }
+  ) {}
 
   onClick(): void {
     const selectedMessages = sample(this.messages);
@@ -373,6 +331,14 @@ export class HedgehogActorInterface {
       screen: "dialog",
       actor: this.actor,
       messages: cheatSheetMessages,
+    });
+  }
+
+  triggerMessages(messages: GameUIProps["messages"]): void {
+    this.game.gameUI?.show({
+      screen: "dialog",
+      actor: this.actor,
+      messages,
     });
   }
 }

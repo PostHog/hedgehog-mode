@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 export const useOutsideClick = (
   ref: React.RefObject<HTMLDivElement>,
-  onClickOutside: () => void
+  onClickOutside: (e: MouseEvent) => void
 ) => {
   // Uses a useEffect to set up a global click listener and one on the given ref
   // If we get a click outside we wait one tick and then check if we got the click on the ref as well
@@ -12,10 +12,10 @@ export const useOutsideClick = (
 
     let refClick = false;
 
-    const handleGlobalClick = () => {
+    const handleGlobalClick = (e: MouseEvent) => {
       setTimeout(() => {
         if (!refClick) {
-          onClickOutside();
+          onClickOutside(e);
         }
 
         refClick = false;

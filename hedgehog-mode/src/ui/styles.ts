@@ -28,10 +28,6 @@ export const styles = `
     --color-shadow: rgba(0, 0, 0, 0.3);
   }
 
-  * {
-    font-family: var(--font-family);
-    color: var(--color-text);
-  }
 
   .GameContainer {
     position: fixed;
@@ -42,6 +38,8 @@ export const styles = `
   .GameUI {
     position: relative;
     z-index: 2;
+    font-family: var(--font-family);
+    color: var(--color-text);
   }
 
   .Button {
@@ -125,6 +123,13 @@ export const styles = `
     border-bottom: 1px solid transparent;
     padding: 0 var(--spacing-xs);
   }
+  .DialogBoxControlsLeft {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: var(--spacing-xs);
+  }
 
   .DialogBox:hover > .DialogBoxControls {
     padding: var(--spacing-xs);
@@ -137,7 +142,7 @@ export const styles = `
     padding: var(--spacing-sm);
   }
 
-  .ArrowIcon {
+  .IconButton {
     vertical-align: middle;
     height: 1rem;
     width: 1rem;
@@ -146,8 +151,14 @@ export const styles = `
     justify-content: center;
   }
 
-  .ArrowIcon--right {
+  .IconButton--90deg {
+    transform: rotate(90deg);
+  }
+  .IconButton--180deg {
     transform: rotate(180deg);
+  }
+  .IconButton--270deg {
+    transform: rotate(270deg);
   }
 
   .AnimatedText {
@@ -243,13 +254,4 @@ export const styles = `
     cursor: pointer;
     transition: transform 0.2s var(--transition-timing);
   }
-
-  // .CustomizationItem:hover {
-  //   transform: scale(1.05);
-  // }
-
-  // .CustomizationItem--selected {
-  //   outline: 1px solid var(--color-border-light);
-  //   border-radius: var(--border-radius-sm);
-  // }
 `;

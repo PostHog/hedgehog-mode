@@ -60,7 +60,25 @@ export default function Home() {
       <HedgehogModeRenderer
         config={{
           assetsUrl: "/assets",
-          platformSelector: ".border",
+          platforms: {
+            selector: ".border",
+            viewportPadding: {
+              top: 50,
+            },
+          },
+          onQuit: (game) => {
+            console.log("onQuit");
+            game.getAllHedgehogs().forEach((hedgehog) => {
+              hedgehog.updateSprite("wave", {
+                reset: true,
+                loop: false,
+              });
+            });
+
+            setTimeout(() => {
+              game.destroy();
+            }, 1000);
+          },
         }}
         onGameReady={setGame}
       />

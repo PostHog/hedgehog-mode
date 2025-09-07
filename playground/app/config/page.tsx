@@ -22,7 +22,6 @@ export default function StaticRendering() {
   useEffect(() => {
     const game = new HedgeHogMode({
       assetsUrl: "/assets",
-      platformSelector: ".border",
     });
     setGame(game);
   }, []);

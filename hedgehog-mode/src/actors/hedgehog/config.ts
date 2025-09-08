@@ -128,4 +128,8 @@ export type HedgehogActorOptions = {
   interactions_enabled?: boolean;
   controls_enabled?: boolean;
   onClick?: () => void;
+  friends?: Pick<
+    HedgehogActorOptions,
+    "id" | "accessories" | "color" | "skin"
+  >[];
 };

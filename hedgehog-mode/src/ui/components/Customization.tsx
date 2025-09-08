@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   getRandomAccessoryCombo,
   HedgehogActorAccessories,
@@ -10,7 +10,7 @@ import {
   HedgeHogMode,
 } from "../..";
 import { HedgehogProfileImage } from "../HedgehogStatic";
-import { Button } from "./Button";
+import { Button, IconButton } from "./Button";
 import { sample, uniqueId } from "lodash";
 
 const ACCESSORY_GROUPS = ["headwear", "eyewear", "other"] as const;
@@ -112,44 +112,6 @@ function HedgehogOptions({
   setConfig,
   game,
 }: HedgehogOptionsProps): JSX.Element {
-  const [hedgehogsCount, setHedgehogsCount] = useState(0);
-
-  useEffect(() => {
-    setHedgehogsCount(game.stateManager?.getNumberOfHedgehogs() ?? 0);
-  }, [game.stateManager]);
-
-  const addFriend = () => {
-    game.stateManager?.setHedgehog({
-      id: uniqueId("friend-"),
-      player: false,
-      accessories: getRandomAccessoryCombo(),
-      color: sample(HedgehogActorColorOptions),
-    });
-    setHedgehogsCount(game.stateManager?.getNumberOfHedgehogs() ?? 0);
-  };
-
-  const removeFriend = () => {
-    const nonPlayerHedgehog = Object.values(
-      game.stateManager?.getState().hedgehogsById ?? {}
-    ).find((h) => !h.player);
-    if (nonPlayerHedgehog) {
-      game.stateManager?.removeHedgehog(nonPlayerHedgehog.id);
-    }
-    setHedgehogsCount(game.stateManager?.getNumberOfHedgehogs() ?? 0);
-  };
-
-  const removeAllFriends = () => {
-    Object.values(game.stateManager?.getState().hedgehogsById ?? {}).forEach(
-      (h) => {
-        if (!h.player) {
-          game.stateManager?.removeHedgehog(h.id);
-        }
-      }
-    );
-
-    setHedgehogsCount(game.stateManager?.getNumberOfHedgehogs() ?? 0);
-  };
-
   return (
     <div className="CustomizationSection">
       <h4 className="CustomizationSectionTitle">options</h4>
@@ -177,27 +139,65 @@ function HedgehogOptions({
       >
         Keyboard controls (WASD / arrow keys)
       </Switch>
-      <Switch
-        checked={hedgehogsCount > 1}
-        onChange={() => {
-          if (hedgehogsCount > 1) {
-            removeAllFriends();
-          } else {
-            // The most tragic line of code I've ever written
-            addFriend();
-          }
-        }}
-        title={`If enabled then ${hedgehogsCount - 1} friends will appear in your browser as hedgehogs as well!`}
-      >
-        Friends
-      </Switch>
-      {hedgehogsCount > 1 && (
-        <>
-          <Button onClick={addFriend}>Add</Button> /
-          <Button onClick={removeFriend}>Remove</Button>
-        </>
-      )}
+      <HedgehogFriends config={config} setConfig={setConfig} game={game} />
     </div>
+  );
+}
+
+function HedgehogFriends({
+  config,
+  setConfig,
+  game,
+}: HedgehogOptionsProps): JSX.Element {
+  const friends = useMemo(() => config.friends ?? [], [config.friends]);
+
+  const addFriend = () => {
+    const newFriend = {
+      id: uniqueId("friend-"),
+      player: false,
+      accessories: getRandomAccessoryCombo(),
+      color: sample(HedgehogActorColorOptions),
+    };
+    setConfig({ ...config, friends: [...friends, newFriend] });
+  };
+
+  const removeFriend = (friend: HedgehogActorOptions) => {
+    setConfig({
+      ...config,
+      friends: friends.filter((f) => f.id !== friend.id),
+    });
+  };
+
+  const removeAllFriends = () => {
+    setConfig({ ...config, friends: [] });
+  };
+
+  const friendsCount = friends.length;
+
+  return (
+    <>
+      <div className="CustomizationSection">
+        <h4 className="CustomizationSectionTitle">friends</h4>
+        <div className="CustomizationGrid">
+          {friends.map((friend) => (
+            <div key={friend.id} className="CustomizationFriend">
+              <IconButton
+                icon="x"
+                onClick={() => removeFriend(friend)}
+                className="CustomizationFriendRemove"
+              />
+              <HedgehogProfileImage
+                key={friend.id}
+                {...friend}
+                size={64}
+                renderer={game.staticHedgehogRenderer}
+              />
+            </div>
+          ))}
+          <Button onClick={addFriend}>Add friend</Button>
+        </div>
+      </div>
+    </>
   );
 }
 

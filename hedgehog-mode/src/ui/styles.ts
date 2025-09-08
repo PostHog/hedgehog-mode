@@ -211,6 +211,7 @@ export const styles = `
     display: flex;
     flex-direction: column;
     padding: var(--spacing-sm);
+    font-family: var(--font-family);
   }
 
   .CustomizationContainer {
@@ -248,11 +249,29 @@ export const styles = `
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    overflow-y: auto;
   }
 
   .CustomizationItem {
     cursor: pointer;
     transition: transform 0.2s var(--transition-timing);
+  }
+
+  .CustomizationFriend {
+    position: relative;
+  }
+  
+  .CustomizationFriendRemove {
+    position: absolute;
+    top: -0.5rem;
+    right: -0.5rem;
+    z-index: 1;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s var(--transition-timing);
+  }
+
+  .CustomizationFriend:hover .CustomizationFriendRemove {
+    opacity: 1;
+    visibility: visible;
   }
 `;

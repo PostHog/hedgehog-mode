@@ -3,6 +3,7 @@ export function Button({
   onClick,
   disabled,
   active,
+  className = "",
   ...props
 }: {
   children: React.ReactNode;
@@ -14,7 +15,7 @@ export function Button({
     <button
       className={`Button ${disabled ? "Button--disabled" : ""} ${
         active ? "Button--active" : ""
-      }`}
+      } ${className}`}
       onClick={onClick}
       disabled={disabled}
       {...props}
@@ -65,23 +66,54 @@ const Done = () => {
   );
 };
 
+const X = () => {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+      <g
+        id="SVGRepo_tracerCarrier"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      ></g>
+      <g id="SVGRepo_iconCarrier">
+        <path
+          d="M19 5L5 19"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        ></path>
+        <path
+          d="M5 5L19 19"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        ></path>
+      </g>
+    </svg>
+  );
+};
+
 export const IconButton = ({
   onClick,
   rotation,
   disabled,
   icon,
+  className = "",
 }: {
   onClick: () => void;
   rotation?: "90deg" | "180deg" | "270deg";
   disabled?: boolean;
-  icon: "chevron" | "done";
+  icon: "chevron" | "done" | "x";
+  className?: string;
 }) => {
   return (
-    <Button onClick={onClick} disabled={disabled}>
+    <Button onClick={onClick} disabled={disabled} className={className}>
       <div
         className={`IconButton ${rotation ? `IconButton--${rotation}` : ""}`}
       >
-        {icon === "chevron" ? <Chevron /> : <Done />}
+        {icon === "chevron" ? <Chevron /> : icon === "done" ? <Done /> : <X />}
       </div>
     </Button>
   );

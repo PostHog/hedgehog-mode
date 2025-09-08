@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   getRandomAccessoryCombo,
   HedgehogActorAccessories,
@@ -47,46 +47,51 @@ function Switch({
   );
 }
 
-export function HedgehogCustomization(
-  props: HedgehogOptionsProps & { game: HedgeHogMode }
-): JSX.Element {
-  const { game } = props;
+export function HedgehogCustomization({
+  game,
+  config,
+  setConfig,
+  defaultFriend,
+}: HedgehogOptionsProps & {
+  game: HedgeHogMode;
+  defaultFriend?: HedgehogActorOptions | null;
+}): JSX.Element {
   const [selectedFriend, setSelectedFriend] =
-    useState<HedgehogActorOptions | null>(null);
+    useState<HedgehogActorOptions | null>(defaultFriend ?? null);
 
-  const setConfig = (
-    config: Pick<HedgehogActorOptions, "accessories" | "color" | "skin">
+  const updateCustomization = (
+    customization: Pick<HedgehogActorOptions, "accessories" | "color" | "skin">
   ) => {
     if (selectedFriend) {
-      props.setConfig({
-        ...props.config,
+      setConfig({
         ...config,
-        friends: props.config.friends?.map((friend) =>
-          friend.id === selectedFriend.id ? { ...friend, ...config } : friend
+        friends: config.friends?.map((friend) =>
+          friend.id === selectedFriend.id
+            ? { ...friend, ...customization }
+            : friend
         ),
       });
     } else {
-      props.setConfig({ ...props.config, ...config });
+      setConfig({ ...config, ...customization });
     }
   };
 
-  const selectedConfig = selectedFriend ?? props.config;
-  console.log(selectedFriend, selectedConfig);
+  const selectedConfig = selectedFriend ?? config;
 
   return (
     <div className="Customization">
       <div className="CustomizationContainer">
         <HedgehogProfileImage
-          {...props.config}
+          {...config}
           size={100}
           renderer={game.staticHedgehogRenderer}
         />
         <div className="CustomizationContent">
           <h3 className="CustomizationTitle">
-            {props.config.player ? "hi, i'm Max!" : "hi, i'm Max's buddy!"}
+            {config.player ? "hi, i'm Max!" : "hi, i'm Max's buddy!"}
           </h3>
           <p className="CustomizationDescription">
-            {props.config.skin === "spiderhog" ? (
+            {config.skin === "spiderhog" ? (
               <>
                 well, it's not every day you meet a hedgehog with spider powers.
                 yep, that's me - spiderhog. i wasn't always this way. just your
@@ -98,7 +103,7 @@ export function HedgehogCustomization(
                 with WASD / arrow keys and I'll use your mouse as a web slinging
                 target.
               </>
-            ) : props.config.skin === "robohog" ? (
+            ) : config.skin === "robohog" ? (
               <>
                 RoboHog reporting for duty. dead or alive, you're coding with
                 me!
@@ -119,26 +124,28 @@ export function HedgehogCustomization(
       </div>
 
       <div className="CustomizationOptions">
-        <HedgehogOptions {...props} />
+        <HedgehogOptions game={game} config={config} setConfig={setConfig} />
         <HedgehogFriends
-          {...props}
+          game={game}
+          config={config}
+          setConfig={setConfig}
           setSelectedFriend={setSelectedFriend}
           selectedFriend={selectedFriend}
         />
         <HedgehogColor
           game={game}
           color={selectedConfig.color}
-          setColor={(color) => setConfig({ color })}
+          setColor={(color) => updateCustomization({ color })}
         />
         <HedgehogAccessories
           game={game}
           accessories={selectedConfig.accessories ?? []}
-          setAccessories={(accessories) => setConfig({ accessories })}
+          setAccessories={(accessories) => updateCustomization({ accessories })}
         />
         <HedgehogSkins
           game={game}
           skin={selectedConfig.skin}
-          setSkin={(skin) => setConfig({ skin })}
+          setSkin={(skin) => updateCustomization({ skin })}
         />
       </div>
     </div>

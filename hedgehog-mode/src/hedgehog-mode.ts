@@ -115,6 +115,8 @@ export class HedgeHogMode implements HedgehogModeInterface {
   setPointerEvents(enabled: boolean): void {
     this.log("Setting pointer events", enabled);
     this.ref?.style.setProperty("pointer-events", enabled ? "auto" : "none");
+    // Add a classname to indicate hovering
+    this.ref?.classList.toggle("GameContainer--hovering", enabled);
     this.pointerEventsEnabled = enabled;
   }
 

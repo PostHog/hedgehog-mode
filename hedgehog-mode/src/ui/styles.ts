@@ -35,6 +35,10 @@ export const styles = `
     z-index: 1;
   }
 
+  .GameContainer--hovering {
+    cursor: pointer;
+  }
+
   .GameUI {
     position: relative;
     z-index: 2;

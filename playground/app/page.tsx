@@ -81,7 +81,6 @@ export default function Home() {
           },
         }}
         onGameReady={setGame}
-        theme="dark"
       />
     </div>
   );

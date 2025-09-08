@@ -1,6 +1,6 @@
 {
   "name": "@posthog/hedgehog-mode",
-  "version": "0.0.40",
+  "version": "0.0.41",
   "description": "hedgehog mode",
   "type": "module",
   "main": "dist/index.js",
@@ -46,7 +46,8 @@
     "lodash": "^4.17.21",
     "matter-js": "^0.20.0",
     "pixi.js": "^8.4.0",
-    "react-shadow": "^20.6.0"
+    "react-shadow": "^20.6.0",
+    "uuid": "^12.0.0"
   },
   "peerDependencies": {
     "react": "^17.0.0 || ^18.0.0",

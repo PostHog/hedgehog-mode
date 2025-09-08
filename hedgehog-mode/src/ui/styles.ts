@@ -242,9 +242,15 @@ export const styles = `
     margin-bottom: 1rem;
   }
 
+  .CustomizationSection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
   .CustomizationSectionTitle {
     font-size: 1rem;
-    margin: 0.5rem 0;
+    margin: 0;
   }
 
   .CustomizationGrid {

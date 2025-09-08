@@ -10,8 +10,9 @@ import {
   HedgeHogMode,
 } from "../..";
 import { HedgehogProfileImage } from "../HedgehogStatic";
-import { Button, IconButton, IconX } from "./Button";
-import { sample, uniqueId } from "lodash";
+import { Button, IconX } from "./Button";
+import { sample } from "lodash";
+import { v4 as uuid } from "uuid";
 
 const ACCESSORY_GROUPS = ["headwear", "eyewear", "other"] as const;
 
@@ -56,17 +57,18 @@ export function HedgehogCustomization({
   game: HedgeHogMode;
   defaultFriend?: HedgehogActorOptions | null;
 }): JSX.Element {
-  const [selectedFriend, setSelectedFriend] =
-    useState<HedgehogActorOptions | null>(defaultFriend ?? null);
+  const [selectedFriendId, setSelectedFriendId] = useState<
+    HedgehogActorOptions["id"] | null
+  >(defaultFriend?.id ?? null);
 
   const updateCustomization = (
     customization: Pick<HedgehogActorOptions, "accessories" | "color" | "skin">
   ) => {
-    if (selectedFriend) {
+    if (selectedFriendId) {
       setConfig({
         ...config,
         friends: config.friends?.map((friend) =>
-          friend.id === selectedFriend.id
+          friend.id === selectedFriendId
             ? { ...friend, ...customization }
             : friend
         ),
@@ -75,6 +77,12 @@ export function HedgehogCustomization({
       setConfig({ ...config, ...customization });
     }
   };
+
+  const selectedFriend: HedgehogActorOptions | null = useMemo(() => {
+    return selectedFriendId
+      ? (config.friends?.find((f) => f.id === selectedFriendId) ?? null)
+      : null;
+  }, [selectedFriendId]);
 
   const selectedConfig = selectedFriend ?? config;
 
@@ -129,22 +137,22 @@ export function HedgehogCustomization({
           game={game}
           config={config}
           setConfig={setConfig}
-          setSelectedFriend={setSelectedFriend}
+          setSelectedFriend={(f) => setSelectedFriendId(f?.id ?? null)}
           selectedFriend={selectedFriend}
         />
         <HedgehogColor
           game={game}
-          color={selectedConfig.color}
+          color={selectedConfig?.color}
           setColor={(color) => updateCustomization({ color })}
         />
         <HedgehogAccessories
           game={game}
-          accessories={selectedConfig.accessories ?? []}
+          accessories={selectedConfig?.accessories ?? []}
           setAccessories={(accessories) => updateCustomization({ accessories })}
         />
         <HedgehogSkins
           game={game}
-          skin={selectedConfig.skin}
+          skin={selectedConfig?.skin}
           setSkin={(skin) => updateCustomization({ skin })}
         />
       </div>
@@ -201,7 +209,7 @@ function HedgehogFriends({
 
   const addFriend = () => {
     const newFriend = {
-      id: uniqueId("friend-"),
+      id: "friend-" + uuid(),
       player: false,
       accessories: getRandomAccessoryCombo(),
       color: sample(HedgehogActorColorOptions),
@@ -219,10 +227,21 @@ function HedgehogFriends({
     }
   };
 
+  const removeAllFriends = () => {
+    setConfig({ ...config, friends: [] });
+  };
+
   return (
     <>
       <div className="CustomizationSection">
         <h4 className="CustomizationSectionTitle">friends</h4>
+        <div className="CustomizationGrid">
+          <Button onClick={addFriend}>Add friend</Button>
+
+          {friends.length > 0 && (
+            <Button onClick={removeAllFriends}>Remove all friends</Button>
+          )}
+        </div>
         <div className="CustomizationGrid">
           {friends.map((friend) => (
             <div key={friend.id} className="CustomizationFriend">
@@ -248,7 +267,6 @@ function HedgehogFriends({
               </Button>
             </div>
           ))}
-          <Button onClick={addFriend}>Add friend</Button>
         </div>
       </div>
     </>

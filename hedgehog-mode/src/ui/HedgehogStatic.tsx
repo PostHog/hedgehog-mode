@@ -46,7 +46,7 @@ export function HedgehogImage({
     <div className="relative" style={{ width: imgSize, height: imgSize }}>
       {dataUrl ? (
         <img
-          className="rendering-pixelated"
+          style={{ imageRendering: "pixelated" }}
           src={dataUrl}
           width={imgSize}
           height={imgSize}
@@ -78,7 +78,7 @@ export function HedgehogProfileImage({
           top: "0",
           width: "100%",
           height: "100%",
-          transform: `translateX(-10%) scale(1.8)`,
+          transform: `translateX(-3%) translateY(10%) scale(1.8)`,
         }}
       >
         <HedgehogImage {...props} size={size} />

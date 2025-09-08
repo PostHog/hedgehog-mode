@@ -223,6 +223,12 @@ export const styles = `
     flex: 1;
   }
 
+  .CustomizationOptions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
   .CustomizationTitle {
     font-size: 1.25rem;
     margin-top: 0;
@@ -230,13 +236,6 @@ export const styles = `
   }
 
   .CustomizationDescription {
-    margin-bottom: 1rem;
-  }
-
-  .CustomizationOptions {
-  }
-
-  .CustomizationSection {
     margin-bottom: 1rem;
   }
 
@@ -249,8 +248,6 @@ export const styles = `
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    padding-top: 1px;
-    padding-bottom: 0.5rem;
     overflow-y: auto;
   }
 

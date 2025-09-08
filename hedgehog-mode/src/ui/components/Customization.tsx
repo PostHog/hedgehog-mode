@@ -151,7 +151,7 @@ function HedgehogOptions({
   };
 
   return (
-    <>
+    <div className="CustomizationSection">
       <h4 className="CustomizationSectionTitle">options</h4>
       <Switch
         checked={config.ai_enabled ?? true}
@@ -197,7 +197,7 @@ function HedgehogOptions({
           <Button onClick={removeFriend}>Remove</Button>
         </>
       )}
-    </>
+    </div>
   );
 }
 
@@ -232,7 +232,7 @@ function HedgehogAccessories({
   return (
     <>
       {ACCESSORY_GROUPS.map((group) => (
-        <React.Fragment key={group}>
+        <div className="CustomizationSection" key={group}>
           <h4 className="CustomizationSectionTitle">{group}</h4>
           <div className="CustomizationGrid">
             {HedgehogActorAccessoryOptions.filter(
@@ -252,7 +252,7 @@ function HedgehogAccessories({
               </Button>
             ))}
           </div>
-        </React.Fragment>
+        </div>
       ))}
     </>
   );

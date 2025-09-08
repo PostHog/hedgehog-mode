@@ -27,8 +27,8 @@ export default function StaticRendering() {
   }, []);
 
   return (
-    <div>
-      <div className="flex flex-wrap gap-2">
+    <div className="flex flex-col gap-2 justify-start p-4">
+      <div className="flex flex-wrap gap-2 border border-gray-200 rounded-md p-3 bg-white max-w-screen-lg">
         <HedgehogModeRendererContent id="hedgehog-mode">
           {game && (
             <HedgehogCustomization

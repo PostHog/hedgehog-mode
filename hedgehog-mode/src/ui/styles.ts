@@ -6,6 +6,7 @@ export const styles = `
     --color-border-light: #DDD;
     --color-hover: rgba(0, 0, 0, 0.1);
     --color-shadow: rgba(0, 0, 0, 0.1);
+    --color-danger: #FF0000;
     --transition-timing: cubic-bezier(0.34, 1.56, 0.64, 1);
     --transition-duration: 200ms;
     --border-radius-sm: 0.25rem;
@@ -49,7 +50,7 @@ export const styles = `
   .Button {
     background-color: transparent;
     color: var(--color-text);
-    border: none;
+    border: 1px solid transparent;
     padding: var(--spacing-xs);
     border-radius: var(--border-radius-sm);
     transition: background-color 300ms var(--transition-timing);
@@ -62,6 +63,7 @@ export const styles = `
   }
 
   .Button--active {
+    border-color: var(--color-border);
     background-color: var(--color-hover);
   }
 
@@ -211,6 +213,7 @@ export const styles = `
     display: flex;
     flex-direction: column;
     padding: var(--spacing-sm);
+    font-family: var(--font-family);
   }
 
   .CustomizationContainer {
@@ -223,6 +226,12 @@ export const styles = `
     flex: 1;
   }
 
+  .CustomizationOptions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
   .CustomizationTitle {
     font-size: 1.25rem;
     margin-top: 0;
@@ -233,29 +242,61 @@ export const styles = `
     margin-bottom: 1rem;
   }
 
-  .CustomizationOptions {
-  }
-
   .CustomizationSection {
-    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
   }
 
   .CustomizationSectionTitle {
     font-size: 1rem;
-    margin: 0.5rem 0;
+    margin: 0;
   }
 
   .CustomizationGrid {
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    padding-top: 1px;
-    padding-bottom: 0.5rem;
-    overflow-y: auto;
   }
 
   .CustomizationItem {
     cursor: pointer;
     transition: transform 0.2s var(--transition-timing);
+  }
+
+  .CustomizationFriend {
+    position: relative;
+  }
+  
+  .CustomizationFriendRemove {
+    position: absolute;
+    top: -0.5rem;
+    right: -0.5rem;
+    z-index: 1;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s var(--transition-timing);
+    vertical-align: middle;
+    height: 0.75rem;
+    width: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: .5;
+    background-color: var(--color-danger);
+    color: #fff;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 0.125rem;
+  }
+
+  .CustomizationFriendRemove:hover {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .CustomizationFriend:hover .CustomizationFriendRemove {
+    opacity: 1;
+    visibility: visible;
   }
 `;

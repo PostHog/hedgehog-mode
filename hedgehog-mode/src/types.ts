@@ -30,7 +30,7 @@ export type GameElement = {
 };
 
 export type HedgehogModeGameState = {
-  hedgehogsById: Record<string, HedgehogActorOptions>;
+  options: HedgehogActorOptions;
 };
 
 export type HedgehogModeConfig = {

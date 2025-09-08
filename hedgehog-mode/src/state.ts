@@ -23,29 +23,16 @@ export class GameStateManager {
         hedgehogsById: {},
       };
 
-    if (!("hedgehogsById" in this.state)) {
-      // Looks like bad state - reset it
-      this.state = {
-        hedgehogsById: {},
+    if (!this.state.options) {
+      this.state.options = {
+        id: "player",
+        controls_enabled: true,
+        player: true,
       };
     }
 
-    if (Object.keys(this.state.hedgehogsById).length === 0) {
-      this.state.hedgehogsById = {
-        player: {
-          id: "player",
-          controls_enabled: true,
-          player: true,
-        },
-      };
-    }
-
-    Object.keys(this.state.hedgehogsById).forEach((id) => {
-      this.upsertHedgehog(this.state.hedgehogsById[id]);
-    });
-
+    this.setHedgehog(this.state.options);
     this.config.state = this.state;
-    this.persistState();
   }
 
   getHedgehogActor(id: string): HedgehogActor | undefined {
@@ -60,29 +47,30 @@ export class GameStateManager {
     return this.state;
   }
 
-  getNumberOfHedgehogs() {
-    return Object.values(this.state.hedgehogsById).length;
-  }
-
   setHedgehog(config: HedgehogActorOptions) {
-    // Find the relevant hedgehog in the state and update it
+    this.state.options = {
+      ...this.state.options,
+      ...config,
+    };
 
-    this.state.hedgehogsById[config.id] = config;
-    this.upsertHedgehog(config);
-    this.persistState();
-  }
+    this.upsertHedgehog(this.state.options);
 
-  removeHedgehog(id: string) {
-    const hedgehog = this.state.hedgehogsById[id];
-    if (hedgehog) {
-      if (hedgehog.player) {
-        throw new Error("Cannot remove player hedgehog");
+    this.state.options.friends?.forEach((friend) => {
+      this.upsertHedgehog(friend);
+    });
+
+    // Remove all missing friends
+    Object.keys(this.hedgehogsById).forEach((id) => {
+      if (id === this.state.options.id) {
+        return;
       }
-      delete this.state.hedgehogsById[id];
-      this.hedgehogsById[id]?.destroy?.();
-      delete this.hedgehogsById[id];
-      this.persistState();
-    }
+      if (!this.state.options.friends?.find((f) => f.id === id)) {
+        this.hedgehogsById[id]?.destroy?.();
+        delete this.hedgehogsById[id];
+      }
+    });
+
+    this.persistState();
   }
 
   private persistState() {

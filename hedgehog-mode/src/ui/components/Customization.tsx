@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   getRandomAccessoryCombo,
   HedgehogActorAccessories,
@@ -10,8 +10,9 @@ import {
   HedgeHogMode,
 } from "../..";
 import { HedgehogProfileImage } from "../HedgehogStatic";
-import { Button } from "./Button";
-import { sample, uniqueId } from "lodash";
+import { Button, IconX } from "./Button";
+import { sample } from "lodash";
+import { v4 as uuid } from "uuid";
 
 const ACCESSORY_GROUPS = ["headwear", "eyewear", "other"] as const;
 
@@ -47,10 +48,43 @@ function Switch({
   );
 }
 
-export function HedgehogCustomization(
-  props: HedgehogOptionsProps & { game: HedgeHogMode }
-): JSX.Element {
-  const { config, game } = props;
+export function HedgehogCustomization({
+  game,
+  config,
+  setConfig,
+  defaultFriend,
+}: HedgehogOptionsProps & {
+  game: HedgeHogMode;
+  defaultFriend?: HedgehogActorOptions | null;
+}): JSX.Element {
+  const [selectedFriendId, setSelectedFriendId] = useState<
+    HedgehogActorOptions["id"] | null
+  >(defaultFriend?.id ?? null);
+
+  const updateCustomization = (
+    customization: Pick<HedgehogActorOptions, "accessories" | "color" | "skin">
+  ) => {
+    if (selectedFriendId) {
+      setConfig({
+        ...config,
+        friends: config.friends?.map((friend) =>
+          friend.id === selectedFriendId
+            ? { ...friend, ...customization }
+            : friend
+        ),
+      });
+    } else {
+      setConfig({ ...config, ...customization });
+    }
+  };
+
+  const selectedFriend: HedgehogActorOptions | null = useMemo(() => {
+    return selectedFriendId
+      ? (config.friends?.find((f) => f.id === selectedFriendId) ?? null)
+      : null;
+  }, [selectedFriendId]);
+
+  const selectedConfig = selectedFriend ?? config;
 
   return (
     <div className="Customization">
@@ -98,10 +132,29 @@ export function HedgehogCustomization(
       </div>
 
       <div className="CustomizationOptions">
-        <HedgehogOptions {...props} />
-        <HedgehogColor {...props} />
-        <HedgehogAccessories {...props} />
-        <HedgehogSkins {...props} />
+        <HedgehogOptions game={game} config={config} setConfig={setConfig} />
+        <HedgehogFriends
+          game={game}
+          config={config}
+          setConfig={setConfig}
+          setSelectedFriend={(f) => setSelectedFriendId(f?.id ?? null)}
+          selectedFriend={selectedFriend}
+        />
+        <HedgehogColor
+          game={game}
+          color={selectedConfig?.color}
+          setColor={(color) => updateCustomization({ color })}
+        />
+        <HedgehogAccessories
+          game={game}
+          accessories={selectedConfig?.accessories ?? []}
+          setAccessories={(accessories) => updateCustomization({ accessories })}
+        />
+        <HedgehogSkins
+          game={game}
+          skin={selectedConfig?.skin}
+          setSkin={(skin) => updateCustomization({ skin })}
+        />
       </div>
     </div>
   );
@@ -110,48 +163,9 @@ export function HedgehogCustomization(
 function HedgehogOptions({
   config,
   setConfig,
-  game,
 }: HedgehogOptionsProps): JSX.Element {
-  const [hedgehogsCount, setHedgehogsCount] = useState(0);
-
-  useEffect(() => {
-    setHedgehogsCount(game.stateManager?.getNumberOfHedgehogs() ?? 0);
-  }, [game.stateManager]);
-
-  const addFriend = () => {
-    game.stateManager?.setHedgehog({
-      id: uniqueId("friend-"),
-      player: false,
-      accessories: getRandomAccessoryCombo(),
-      color: sample(HedgehogActorColorOptions),
-    });
-    setHedgehogsCount(game.stateManager?.getNumberOfHedgehogs() ?? 0);
-  };
-
-  const removeFriend = () => {
-    const nonPlayerHedgehog = Object.values(
-      game.stateManager?.getState().hedgehogsById ?? {}
-    ).find((h) => !h.player);
-    if (nonPlayerHedgehog) {
-      game.stateManager?.removeHedgehog(nonPlayerHedgehog.id);
-    }
-    setHedgehogsCount(game.stateManager?.getNumberOfHedgehogs() ?? 0);
-  };
-
-  const removeAllFriends = () => {
-    Object.values(game.stateManager?.getState().hedgehogsById ?? {}).forEach(
-      (h) => {
-        if (!h.player) {
-          game.stateManager?.removeHedgehog(h.id);
-        }
-      }
-    );
-
-    setHedgehogsCount(game.stateManager?.getNumberOfHedgehogs() ?? 0);
-  };
-
   return (
-    <>
+    <div className="CustomizationSection">
       <h4 className="CustomizationSectionTitle">options</h4>
       <Switch
         checked={config.ai_enabled ?? true}
@@ -177,62 +191,120 @@ function HedgehogOptions({
       >
         Keyboard controls (WASD / arrow keys)
       </Switch>
-      <Switch
-        checked={hedgehogsCount > 1}
-        onChange={() => {
-          if (hedgehogsCount > 1) {
-            removeAllFriends();
-          } else {
-            // The most tragic line of code I've ever written
-            addFriend();
-          }
-        }}
-        title={`If enabled then ${hedgehogsCount - 1} friends will appear in your browser as hedgehogs as well!`}
-      >
-        Friends
-      </Switch>
-      {hedgehogsCount > 1 && (
-        <>
-          <Button onClick={addFriend}>Add</Button> /
-          <Button onClick={removeFriend}>Remove</Button>
-        </>
-      )}
+    </div>
+  );
+}
+
+function HedgehogFriends({
+  config,
+  setConfig,
+  game,
+  setSelectedFriend,
+  selectedFriend,
+}: HedgehogOptionsProps & {
+  setSelectedFriend: (friend: HedgehogActorOptions | null) => void;
+  selectedFriend: HedgehogActorOptions | null;
+}): JSX.Element {
+  const friends = useMemo(() => config.friends ?? [], [config.friends]);
+
+  const addFriend = () => {
+    const newFriend = {
+      id: "friend-" + uuid(),
+      player: false,
+      accessories: getRandomAccessoryCombo(),
+      color: sample(HedgehogActorColorOptions),
+    };
+    setConfig({ ...config, friends: [...friends, newFriend] });
+  };
+
+  const removeFriend = (friend: HedgehogActorOptions) => {
+    setConfig({
+      ...config,
+      friends: friends.filter((f) => f.id !== friend.id),
+    });
+    if (selectedFriend?.id === friend.id) {
+      setSelectedFriend(null);
+    }
+  };
+
+  const removeAllFriends = () => {
+    setConfig({ ...config, friends: [] });
+  };
+
+  return (
+    <>
+      <div className="CustomizationSection">
+        <h4 className="CustomizationSectionTitle">friends</h4>
+        <div className="CustomizationGrid">
+          <Button onClick={addFriend}>Add friend</Button>
+
+          {friends.length > 0 && (
+            <Button onClick={removeAllFriends}>Remove all friends</Button>
+          )}
+        </div>
+        <div className="CustomizationGrid">
+          {friends.map((friend) => (
+            <div key={friend.id} className="CustomizationFriend">
+              <IconX
+                onClick={() => removeFriend(friend)}
+                className="CustomizationFriendRemove"
+              />
+              <Button
+                active={selectedFriend?.id === friend.id}
+                onClick={() =>
+                  setSelectedFriend(
+                    selectedFriend?.id === friend.id ? null : friend
+                  )
+                }
+                title={friend.id}
+              >
+                <HedgehogProfileImage
+                  key={friend.id}
+                  {...friend}
+                  size={64}
+                  renderer={game.staticHedgehogRenderer}
+                />
+              </Button>
+            </div>
+          ))}
+        </div>
+      </div>
     </>
   );
 }
 
 function HedgehogAccessories({
-  config,
-  setConfig,
   game,
-}: HedgehogOptionsProps): JSX.Element {
-  const accessories =
-    config.accessories?.filter((acc) => !!HedgehogActorAccessories[acc]) ?? [];
+  accessories,
+  setAccessories,
+}: {
+  game: HedgeHogMode;
+  accessories: HedgehogActorAccessoryOption[];
+  setAccessories: (accessories: HedgehogActorAccessoryOption[]) => void;
+}): JSX.Element {
+  accessories =
+    accessories?.filter((acc) => !!HedgehogActorAccessories[acc]) ?? [];
 
   const onClick = (accessory: HedgehogActorAccessoryOption): void => {
     if (accessories.includes(accessory)) {
-      setConfig({
-        ...config,
-        accessories: accessories.filter((acc) => acc !== accessory),
-      });
+      setAccessories(accessories.filter((acc) => acc !== accessory));
     } else {
-      setConfig({
-        ...config,
-        accessories: accessories
+      setAccessories(
+        accessories
           .filter(
             (acc) =>
               HedgehogActorAccessories[acc].group !==
               HedgehogActorAccessories[accessory].group
           )
-          .concat(accessory),
-      });
+          .concat(accessory)
+      );
     }
   };
 
   return (
     <>
       {ACCESSORY_GROUPS.map((group) => (
-        <React.Fragment key={group}>
+        <div className="CustomizationSection" key={group}>
           <h4 className="CustomizationSectionTitle">{group}</h4>
           <div className="CustomizationGrid">
             {HedgehogActorAccessoryOptions.filter(
@@ -252,17 +324,21 @@ function HedgehogAccessories({
               </Button>
             ))}
           </div>
-        </React.Fragment>
+        </div>
       ))}
     </>
   );
 }
 
 function HedgehogSkins({
-  config,
-  setConfig,
   game,
-}: HedgehogOptionsProps): JSX.Element | null {
+  skin,
+  setSkin,
+}: {
+  game: HedgeHogMode;
+  skin: HedgehogActorOptions["skin"];
+  setSkin: (skin: HedgehogActorOptions["skin"]) => void;
+}): JSX.Element | null {
   return (
     <div className="CustomizationSection">
       <h4 className="CustomizationSectionTitle">skins</h4>
@@ -270,13 +346,8 @@ function HedgehogSkins({
         {HedgehogActorSkinOptions.map((option) => (
           <Button
             key={option}
-            active={(config.skin ?? "default") === option}
-            onClick={() =>
-              setConfig({
-                ...config,
-                skin: option as HedgehogActorOptions["skin"],
-              })
-            }
+            active={(skin ?? "default") === option}
+            onClick={() => setSkin(option as HedgehogActorOptions["skin"])}
             title={option.split("-").join(" ")}
           >
             <HedgehogProfileImage
@@ -292,10 +363,14 @@ function HedgehogSkins({
 }
 
 function HedgehogColor({
-  config,
-  setConfig,
   game,
-}: HedgehogOptionsProps): JSX.Element {
+  color,
+  setColor,
+}: {
+  game: HedgeHogMode;
+  color: HedgehogActorOptions["color"];
+  setColor: (color: HedgehogActorOptions["color"]) => void;
+}): JSX.Element {
   return (
     <div className="CustomizationSection">
       <h4 className="CustomizationSectionTitle">colors</h4>
@@ -303,15 +378,13 @@ function HedgehogColor({
         {["none", ...HedgehogActorColorOptions].map((option) => (
           <Button
             key={option}
-            active={config.color === (option === "none" ? null : option)}
+            active={color === (option === "none" ? null : option)}
             onClick={() =>
-              setConfig({
-                ...config,
-                color:
-                  option === "none"
-                    ? null
-                    : (option as HedgehogActorOptions["color"]),
-              })
+              setColor(
+                option === "none"
+                  ? null
+                  : (option as HedgehogActorOptions["color"])
+              )
             }
             title={option.split("-").join(" ")}
           >

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   GameUI,
   GameUIProps,
@@ -66,12 +66,14 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
 
   const ref = useRef<HTMLDivElement>(null);
   const [hovering, setHovering] = useState<boolean>(false);
+  const playerActor = game.stateManager?.getPlayerHedgehogActor();
+
   const [actorOptions, _setActorOptions] =
-    useState<HedgehogActorOptions | null>(ui?.actor?.options || null);
+    useState<HedgehogActorOptions | null>(playerActor?.options || null);
 
   useEffect(() => {
-    _setActorOptions(ui?.actor?.options || null);
-  }, [ui]);
+    _setActorOptions(playerActor?.options || null);
+  }, [playerActor]);
 
   const setActorOptions = useCallback(
     (options: HedgehogActorOptions) => {
@@ -153,6 +155,12 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
     }
   });
 
+  const defaultFriend = useMemo(() => {
+    return ui?.actor && ui.actor.options.id !== playerActor?.options.id
+      ? ui.actor.options
+      : undefined;
+  }, [ui?.actor?.options.id, playerActor?.options.id]);
+
   return (
     <div className="GameUI">
       <div
@@ -199,6 +207,7 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
               setConfig={(config) => {
                 setActorOptions(config);
               }}
+              defaultFriend={defaultFriend}
             />
           )}
 

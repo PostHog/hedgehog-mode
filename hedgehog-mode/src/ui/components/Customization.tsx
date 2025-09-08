@@ -10,7 +10,7 @@ import {
   HedgeHogMode,
 } from "../..";
 import { HedgehogProfileImage } from "../HedgehogStatic";
-import { Button, IconButton } from "./Button";
+import { Button, IconButton, IconX } from "./Button";
 import { sample, uniqueId } from "lodash";
 
 const ACCESSORY_GROUPS = ["headwear", "eyewear", "other"] as const;
@@ -214,6 +214,9 @@ function HedgehogFriends({
       ...config,
       friends: friends.filter((f) => f.id !== friend.id),
     });
+    if (selectedFriend?.id === friend.id) {
+      setSelectedFriend(null);
+    }
   };
 
   return (
@@ -223,8 +226,7 @@ function HedgehogFriends({
         <div className="CustomizationGrid">
           {friends.map((friend) => (
             <div key={friend.id} className="CustomizationFriend">
-              <IconButton
-                icon="x"
+              <IconX
                 onClick={() => removeFriend(friend)}
                 className="CustomizationFriendRemove"
               />

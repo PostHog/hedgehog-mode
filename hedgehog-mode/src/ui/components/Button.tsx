@@ -25,9 +25,16 @@ export function Button({
   );
 }
 
-const Chevron = () => {
+export const IconChevron: React.FC<React.HTMLAttributes<SVGSVGElement>> = (
+  props
+) => {
   return (
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
       <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
       <g
         id="SVGRepo_tracerCarrier"
@@ -47,9 +54,16 @@ const Chevron = () => {
   );
 };
 
-const Done = () => {
+export const IconDone: React.FC<React.HTMLAttributes<SVGSVGElement>> = (
+  props
+) => {
   return (
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
       <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
       <g
         id="SVGRepo_tracerCarrier"
@@ -66,9 +80,14 @@ const Done = () => {
   );
 };
 
-const X = () => {
+export const IconX: React.FC<React.HTMLAttributes<SVGSVGElement>> = (props) => {
   return (
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
       <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
       <g
         id="SVGRepo_tracerCarrier"
@@ -113,7 +132,13 @@ export const IconButton = ({
       <div
         className={`IconButton ${rotation ? `IconButton--${rotation}` : ""}`}
       >
-        {icon === "chevron" ? <Chevron /> : icon === "done" ? <Done /> : <X />}
+        {icon === "chevron" ? (
+          <IconChevron />
+        ) : icon === "done" ? (
+          <IconDone />
+        ) : (
+          <IconX />
+        )}
       </div>
     </Button>
   );

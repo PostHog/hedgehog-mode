@@ -26,6 +26,11 @@ export class GameStateManager {
     if (!("hedgehogsById" in this.state)) {
       // Looks like bad state - reset it
       this.state = {
+        options: {
+          id: "player",
+          controls_enabled: true,
+          player: true,
+        },
         hedgehogsById: {},
       };
     }

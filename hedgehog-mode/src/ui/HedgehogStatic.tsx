@@ -44,7 +44,14 @@ export function HedgehogImage({
 
   return (
     <div className="relative" style={{ width: imgSize, height: imgSize }}>
-      {dataUrl ? <img src={dataUrl} width={imgSize} height={imgSize} /> : null}
+      {dataUrl ? (
+        <img
+          className="rendering-pixelated"
+          src={dataUrl}
+          width={imgSize}
+          height={imgSize}
+        />
+      ) : null}
       <div className="absolute inset-0 bg-background-primary/50" />
     </div>
   );
@@ -71,7 +78,7 @@ export function HedgehogProfileImage({
           top: "0",
           width: "100%",
           height: "100%",
-          transform: `translateX(-3%) translateY(10%) scale(1.8)`,
+          transform: `translateX(-10%) scale(1.8)`,
         }}
       >
         <HedgehogImage {...props} size={size} />

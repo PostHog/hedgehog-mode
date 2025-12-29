@@ -4,6 +4,7 @@ export const HedgehogActorSkinOptions = [
   "default",
   "spiderhog",
   "robohog",
+  "hogzilla",
   "ghost",
 ] as const;
 

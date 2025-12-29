@@ -29,6 +29,20 @@ export class FlameActor extends Actor {
     });
   }
 
+  static spawnFireball(
+    game: HedgehogModeInterface,
+    position: Matter.Vector,
+    velocity: Matter.Vector
+  ): void {
+    const flame = new FlameActor(game);
+    flame.setPosition({
+      x: position.x,
+      y: position.y,
+    });
+    flame.setVelocity(velocity);
+    game.elements.push(flame);
+  }
+
   hitBoxModifier = {
     left: 0.25,
     right: 0.24,

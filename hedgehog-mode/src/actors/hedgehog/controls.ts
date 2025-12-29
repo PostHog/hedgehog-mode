@@ -21,6 +21,8 @@ export class HedgehogActorControls {
       s: "down",
       Shift: "shift",
       Alt: "alt",
+      f: "f",
+      F: "f",
     };
 
     const horizontalHandler = (e: KeyboardEvent) => {
@@ -56,6 +58,8 @@ export class HedgehogActorControls {
       this.actor.setDirection(direction);
       this.actor.ai.pause(5000);
     };
+
+    let fireInterval: NodeJS.Timeout | null = null;
 
     const keyHandlers: Record<
       string,
@@ -104,6 +108,22 @@ export class HedgehogActorControls {
       alt: {
         on: (e) => horizontalHandler(e),
         off: (e) => horizontalHandler(e),
+      },
+      f: {
+        on: () => {
+          if (fireInterval) {
+            clearInterval(fireInterval);
+          }
+          fireInterval = setInterval(() => {
+            this.actor.maybeSpawnFireball();
+          }, 250);
+        },
+        off: () => {
+          if (fireInterval) {
+            clearInterval(fireInterval);
+            fireInterval = null;
+          }
+        },
       },
     };
 

@@ -4,7 +4,7 @@
         <key>fileFormatVersion</key>
         <int>6</int>
         <key>texturePackerVersion</key>
-        <string>7.9.0</string>
+        <string>7.11.0</string>
         <key>autoSDSettings</key>
         <array>
             <struct type="AutoSDSettings">
@@ -455,6 +455,61 @@
             <key type="filename">assets/skins/ghost/idle/tile009.png</key>
             <key type="filename">assets/skins/ghost/idle/tile010.png</key>
             <key type="filename">assets/skins/ghost/idle/tile011.png</key>
+            <key type="filename">assets/skins/hogzilla/fall/tile000.png</key>
+            <key type="filename">assets/skins/hogzilla/fall/tile001.png</key>
+            <key type="filename">assets/skins/hogzilla/fall/tile002.png</key>
+            <key type="filename">assets/skins/hogzilla/fall/tile003.png</key>
+            <key type="filename">assets/skins/hogzilla/fall/tile004.png</key>
+            <key type="filename">assets/skins/hogzilla/fall/tile005.png</key>
+            <key type="filename">assets/skins/hogzilla/fall/tile006.png</key>
+            <key type="filename">assets/skins/hogzilla/fall/tile007.png</key>
+            <key type="filename">assets/skins/hogzilla/fall/tile008.png</key>
+            <key type="filename">assets/skins/hogzilla/idle/tile000.png</key>
+            <key type="filename">assets/skins/hogzilla/jump/tile000.png</key>
+            <key type="filename">assets/skins/hogzilla/jump/tile001.png</key>
+            <key type="filename">assets/skins/hogzilla/jump/tile002.png</key>
+            <key type="filename">assets/skins/hogzilla/jump/tile003.png</key>
+            <key type="filename">assets/skins/hogzilla/jump/tile004.png</key>
+            <key type="filename">assets/skins/hogzilla/jump/tile005.png</key>
+            <key type="filename">assets/skins/hogzilla/jump/tile006.png</key>
+            <key type="filename">assets/skins/hogzilla/jump/tile007.png</key>
+            <key type="filename">assets/skins/hogzilla/jump/tile008.png</key>
+            <key type="filename">assets/skins/hogzilla/jump/tile009.png</key>
+            <key type="filename">assets/skins/hogzilla/walk/tile000.png</key>
+            <key type="filename">assets/skins/hogzilla/walk/tile001.png</key>
+            <key type="filename">assets/skins/hogzilla/walk/tile002.png</key>
+            <key type="filename">assets/skins/hogzilla/walk/tile003.png</key>
+            <key type="filename">assets/skins/hogzilla/walk/tile004.png</key>
+            <key type="filename">assets/skins/hogzilla/walk/tile005.png</key>
+            <key type="filename">assets/skins/hogzilla/walk/tile006.png</key>
+            <key type="filename">assets/skins/hogzilla/walk/tile007.png</key>
+            <key type="filename">assets/skins/hogzilla/walk/tile008.png</key>
+            <key type="filename">assets/skins/hogzilla/walk/tile009.png</key>
+            <key type="filename">assets/skins/hogzilla/wave/tile000.png</key>
+            <key type="filename">assets/skins/hogzilla/wave/tile001.png</key>
+            <key type="filename">assets/skins/hogzilla/wave/tile0010.png</key>
+            <key type="filename">assets/skins/hogzilla/wave/tile0011.png</key>
+            <key type="filename">assets/skins/hogzilla/wave/tile0012.png</key>
+            <key type="filename">assets/skins/hogzilla/wave/tile0013.png</key>
+            <key type="filename">assets/skins/hogzilla/wave/tile0014.png</key>
+            <key type="filename">assets/skins/hogzilla/wave/tile0015.png</key>
+            <key type="filename">assets/skins/hogzilla/wave/tile0016.png</key>
+            <key type="filename">assets/skins/hogzilla/wave/tile0017.png</key>
+            <key type="filename">assets/skins/hogzilla/wave/tile0018.png</key>
+            <key type="filename">assets/skins/hogzilla/wave/tile0019.png</key>
+            <key type="filename">assets/skins/hogzilla/wave/tile002.png</key>
+            <key type="filename">assets/skins/hogzilla/wave/tile0020.png</key>
+            <key type="filename">assets/skins/hogzilla/wave/tile0021.png</key>
+            <key type="filename">assets/skins/hogzilla/wave/tile0022.png</key>
+            <key type="filename">assets/skins/hogzilla/wave/tile0023.png</key>
+            <key type="filename">assets/skins/hogzilla/wave/tile0024.png</key>
+            <key type="filename">assets/skins/hogzilla/wave/tile003.png</key>
+            <key type="filename">assets/skins/hogzilla/wave/tile004.png</key>
+            <key type="filename">assets/skins/hogzilla/wave/tile005.png</key>
+            <key type="filename">assets/skins/hogzilla/wave/tile006.png</key>
+            <key type="filename">assets/skins/hogzilla/wave/tile007.png</key>
+            <key type="filename">assets/skins/hogzilla/wave/tile008.png</key>
+            <key type="filename">assets/skins/hogzilla/wave/tile009.png</key>
             <key type="filename">assets/skins/robohog/fall/tile000.png</key>
             <key type="filename">assets/skins/robohog/fall/tile001.png</key>
             <key type="filename">assets/skins/robohog/fall/tile002.png</key>

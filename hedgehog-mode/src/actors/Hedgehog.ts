@@ -344,6 +344,10 @@ export class HedgehogActor extends Actor {
       this.sprite!.scale.x *= -1;
   }
 
+  getDirection(): "left" | "right" {
+    return this.sprite!.scale.x < 0 ? "left" : "right";
+  }
+
   update(ticker: UpdateTicker): void {
     let mask = this.isGhost()
       ? COLLISIONS.GROUND
@@ -448,6 +452,28 @@ export class HedgehogActor extends Actor {
     FlameActor.fireBurst(this.game, contact);
   }
 
+  maybeSpawnFireball(): void {
+    if (this.options.skin !== "hogzilla") {
+      return;
+    }
+
+    // Spawn a fireball in the direction the hedgehog is facing
+    FlameActor.spawnFireball(
+      this.game,
+      {
+        x:
+          this.rigidBody!.position.x +
+          (this.getDirection() === "left" ? -10 : 10),
+        // Y is slightly above the hedgehog
+        y: this.rigidBody!.position.y - this.sprite!.height * 0.3,
+      },
+      {
+        x: this.getDirection() === "left" ? -10 : 10,
+        y: -10,
+      }
+    );
+  }
+
   onCollisionStart(element: GameElement, pair: Matter.Pair): void {
     super.onCollisionStart(element, pair);
     this.maybeSetElementOnFire(element, pair);
@@ -516,6 +542,10 @@ export class HedgehogActor extends Actor {
 
       if (this.options.skin === "ghost") {
         sprite.anchor.set(0.4, 0.55);
+      }
+
+      if (this.options.skin === "hogzilla") {
+        sprite.anchor.set(0.45, 0.5);
       }
     });
   }

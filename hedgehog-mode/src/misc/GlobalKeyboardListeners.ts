@@ -44,7 +44,13 @@ export class GlobalKeyboardListeners {
       },
       {
         keys: ["f", "f", "f"],
-        action: () => this.game.getPlayableHedgehog()?.setOnFire(),
+        action: () => {
+          const hedgehog = this.game.getPlayableHedgehog();
+
+          if (hedgehog?.options.skin !== "hogzilla") {
+            hedgehog?.setOnFire();
+          }
+        },
       },
       {
         keys: ["f", "i", "r", "e"],

@@ -175,7 +175,7 @@ export const styles = `
   .AnimatedTextWord {
     margin-right: var(--spacing-sm);
     user-select: none;
-    white-space: nowrap;
+    display: inline-block;
   }
 
   .AnimatedTextLetter {

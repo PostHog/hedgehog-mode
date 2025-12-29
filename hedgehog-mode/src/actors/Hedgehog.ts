@@ -517,6 +517,10 @@ export class HedgehogActor extends Actor {
       if (this.options.skin === "ghost") {
         sprite.anchor.set(0.4, 0.55);
       }
+
+      if (this.options.skin === "hogzilla") {
+        sprite.anchor.set(0.45, 0.5);
+      }
     });
   }
 

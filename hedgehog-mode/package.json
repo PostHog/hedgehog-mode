@@ -1,6 +1,6 @@
 {
   "name": "@posthog/hedgehog-mode",
-  "version": "0.0.45",
+  "version": "0.0.46",
   "description": "hedgehog mode",
   "type": "module",
   "main": "dist/index.js",

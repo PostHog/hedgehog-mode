@@ -7,7 +7,7 @@ import {
   HedgehogActorSkinOptions,
   HedgehogActorAccessories,
   HedgehogActorAccessoryOption,
-  CSSStaticHedgehog,
+  StaticHedgehog,
 } from "@posthog/hedgehog-mode";
 import { uniqueId } from "lodash";
 
@@ -107,7 +107,7 @@ export default function StaticRendering() {
         <div className="flex flex-wrap gap-2">
           {accessories.map((hedgehog, i) => (
             <span key={i} title={JSON.stringify(hedgehog)} className="relative">
-              <CSSStaticHedgehog
+              <StaticHedgehog
                 options={hedgehog}
                 size={80}
                 assetsUrl="/assets"
@@ -121,7 +121,7 @@ export default function StaticRendering() {
         <div className="flex flex-wrap gap-2">
           {HedgehogActorColorOptions.map((color) => (
             <span key={color} title={color} className="relative">
-              <CSSStaticHedgehog
+              <StaticHedgehog
                 options={{ id: `hedgehog-${uniqueId()}`, color }}
                 size={80}
                 assetsUrl="/assets"
@@ -135,7 +135,7 @@ export default function StaticRendering() {
         <div className="flex flex-wrap gap-2">
           {allCombinations.map((hedgehog, i) => (
             <span key={i} title={JSON.stringify(hedgehog)} className="relative">
-              <CSSStaticHedgehog
+              <StaticHedgehog
                 options={hedgehog}
                 size={80}
                 assetsUrl="/assets"

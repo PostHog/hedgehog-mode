@@ -24,18 +24,18 @@ jobs:
         with:
           path: hedgehog-mode
 
-      - uses: pnpm/action-setup@v4
-        if: steps.check-package-version.outputs.is-new-version == 'true'
-        name: Install pnpm
-        with:
-          version: 8
-          run_install: false
+      # - uses: pnpm/action-setup@v4
+      #   if: steps.check-package-version.outputs.is-new-version == 'true'
+      #   name: Install pnpm
+      #   with:
+      #     version: 8
+      #     run_install: false
 
-      - name: Set up Node 18
+      - name: Set up Node 22
         uses: actions/setup-node@v4
         if: steps.check-package-version.outputs.is-new-version == 'true'
         with:
-          node-version: 18
+          node-version: 22
           registry-url: https://registry.npmjs.org
           cache: "pnpm"
 

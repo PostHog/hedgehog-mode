@@ -11,7 +11,7 @@ jobs:
     name: Publish
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       id-token: write
 
     steps:
@@ -41,12 +41,7 @@ jobs:
 
       - name: Ensure latest npm with OIDC support (npm 11.5.1+)
         shell: bash
-        run: |
-          echo "npm version before update:"
-          npm --version
-          npm install -g npm@11.6.4
-          echo "npm version after update:"
-          npm --version
+        run: npm install -g npm@11.6.4
 
       - name: Install dependencies
         if: steps.check-package-version.outputs.is-new-version == 'true'
@@ -56,13 +51,6 @@ jobs:
         if: steps.check-package-version.outputs.is-new-version == 'true'
         working-directory: hedgehog-mode
         run: pnpm build
-
-      - name: Debug npm config
-        if: steps.check-package-version.outputs.is-new-version == 'true'
-        run: |
-          echo "Checking npm whoami and config..."
-          npm whoami || echo "Not logged in"
-          cat ~/.npmrc || echo "No .npmrc found"
 
       - name: Publish the package in the npm registry
         id: publish-package

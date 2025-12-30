@@ -39,31 +39,29 @@ interface StaticHedgehogProps {
   options: HedgehogActorOptions;
   size?: number;
   assetsUrl: string;
+  className?: string;
+  style?: CSSProperties;
 }
 
-function getSpriteStyle(
-  spriteName: string,
-  assetsUrl: string,
-  size: number = 80
-): CSSProperties {
+function getSpriteStyle(spriteName: string, assetsUrl: string): CSSProperties {
   const frame = sprites.frames[spriteName];
   if (!frame) {
     return {};
   }
 
-  // Calculate scale factor based on desired size vs original sprite size
-  const scale = size / frame.sourceSize.w;
-
   // Sprite sheet dimensions from sprites.json meta
   const sheetWidth = 2000;
   const sheetHeight = 1440;
 
+  // Responsive mode: scale to parent using percentages
+  const scaleX = 100 / frame.sourceSize.w;
+  const scaleY = 100 / frame.sourceSize.h;
   return {
-    width: `${size}px`,
-    height: `${size}px`,
+    width: "100%",
+    height: "100%",
     backgroundImage: `url(${assetsUrl}/sprites.png)`,
-    backgroundPosition: `-${frame.frame.x * scale}px -${frame.frame.y * scale}px`,
-    backgroundSize: `${sheetWidth * scale}px ${sheetHeight * scale}px`,
+    backgroundPosition: `-${frame.frame.x * scaleX}% -${frame.frame.y * scaleY}%`,
+    backgroundSize: `${sheetWidth * scaleX}% ${sheetHeight * scaleY}%`,
     imageRendering: "pixelated",
     position: "absolute",
     top: 0,
@@ -73,11 +71,13 @@ function getSpriteStyle(
 
 export function StaticHedgehog({
   options,
-  size = 80,
+  size,
   assetsUrl,
+  className,
+  style,
 }: StaticHedgehogProps): JSX.Element {
   const spriteName = `skins/${options.skin ?? "default"}/idle/tile000.png`;
-  const baseStyle = getSpriteStyle(spriteName, assetsUrl, size);
+  const baseStyle = getSpriteStyle(spriteName, assetsUrl);
 
   // Apply color filter
   const colorFilter = options.color
@@ -88,9 +88,11 @@ export function StaticHedgehog({
     <div
       style={{
         position: "relative",
-        width: `${size}px`,
-        height: `${size}px`,
+        width: size ? `${size}px` : "100%",
+        height: size ? `${size}px` : "100%",
+        ...style,
       }}
+      className={className}
     >
       {/* Base sprite with color filter */}
       <div
@@ -103,7 +105,7 @@ export function StaticHedgehog({
       {/* Accessories */}
       {options.accessories?.map((accessory) => {
         const accessoryName = `accessories/${accessory}.png`;
-        const accessoryStyle = getSpriteStyle(accessoryName, assetsUrl, size);
+        const accessoryStyle = getSpriteStyle(accessoryName, assetsUrl);
 
         return (
           <div

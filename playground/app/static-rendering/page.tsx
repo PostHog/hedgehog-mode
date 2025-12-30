@@ -103,7 +103,7 @@ export default function StaticRendering() {
   return (
     <div className="p-8 flex flex-col gap-2">
       <div>
-        <h2 className="text-2xl font-bold">Accessories (CSS)</h2>
+        <h2 className="text-2xl font-bold">Accessories</h2>
         <div className="flex flex-wrap gap-2">
           {accessories.map((hedgehog, i) => (
             <span key={i} title={JSON.stringify(hedgehog)} className="relative">
@@ -117,7 +117,7 @@ export default function StaticRendering() {
         </div>
       </div>
       <div>
-        <h2 className="text-2xl font-bold">Colors (CSS)</h2>
+        <h2 className="text-2xl font-bold">Colors</h2>
         <div className="flex flex-wrap gap-2">
           {HedgehogActorColorOptions.map((color) => (
             <span key={color} title={color} className="relative">
@@ -131,7 +131,7 @@ export default function StaticRendering() {
         </div>
       </div>
       <div>
-        <h2 className="text-2xl font-bold">All combinations (CSS)</h2>
+        <h2 className="text-2xl font-bold">All combinations</h2>
         <div className="flex flex-wrap gap-2">
           {allCombinations.map((hedgehog, i) => (
             <span key={i} title={JSON.stringify(hedgehog)} className="relative">
@@ -141,6 +141,27 @@ export default function StaticRendering() {
                 assetsUrl="/assets"
               />
             </span>
+          ))}
+        </div>
+      </div>
+
+      <div>
+        <h2 className="text-2xl font-bold">All profiles</h2>
+        <div className="flex flex-wrap gap-2">
+          {allCombinations.map((hedgehog, i) => (
+            <div
+              key={i}
+              title={JSON.stringify(hedgehog)}
+              className="relative rounded-full overflow-hidden w-12 h-12 border border-gray-900"
+            >
+              <StaticHedgehog
+                options={hedgehog}
+                size={100}
+                assetsUrl="/assets"
+                // Translate minus 20%
+                className="transform translate-x-[-30%] translate-y-[-20%]"
+              />
+            </div>
           ))}
         </div>
       </div>

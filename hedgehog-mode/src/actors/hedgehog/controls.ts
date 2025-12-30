@@ -59,7 +59,8 @@ export class HedgehogActorControls {
       this.actor.ai.pause(5000);
     };
 
-    let fireInterval: NodeJS.Timeout | null = null;
+    let fireInterval: NodeJS.Timeout | undefined = undefined;
+    let jumpCancelTimeout: NodeJS.Timeout | undefined = undefined;
 
     const keyHandlers: Record<
       string,
@@ -88,10 +89,16 @@ export class HedgehogActorControls {
       },
       up: {
         on: () => {
+          clearTimeout(jumpCancelTimeout ?? undefined);
           this.actor.jump();
           this.actor.ai.pause(5000);
         },
-        off: () => {},
+        off: () => {
+          clearTimeout(jumpCancelTimeout);
+          jumpCancelTimeout = setTimeout(() => {
+            this.actor.cancelJump();
+          }, 100);
+        },
       },
       left: {
         on: (e) => horizontalHandler(e),
@@ -122,7 +129,7 @@ export class HedgehogActorControls {
         off: () => {
           if (fireInterval) {
             clearInterval(fireInterval);
-            fireInterval = null;
+            fireInterval = undefined;
           }
         },
       },

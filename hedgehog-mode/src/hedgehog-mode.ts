@@ -161,7 +161,9 @@ export class HedgeHogMode implements HedgehogModeInterface {
     this.setPointerEvents(false);
     // Create the application helper and add its render target to the page
     this.app = new Application();
-    this.engine = Matter.Engine.create();
+    this.engine = Matter.Engine.create({
+      gravity: { x: 0, y: 2 },
+    });
     this.runner = Runner.create();
 
     Matter.Events.on(this.engine, "collisionStart", (event) =>

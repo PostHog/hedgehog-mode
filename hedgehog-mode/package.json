@@ -1,10 +1,14 @@
 {
   "name": "@posthog/hedgehog-mode",
-  "version": "0.0.42",
+  "version": "0.0.43",
   "description": "hedgehog mode",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "assets"
+  ],
   "scripts": {
     "test": "vitest",
     "build": "vite build",
@@ -17,7 +21,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/posthog/hedgehog-mode.git"
+    "url": "git+https://github.com/PostHog/hedgehog-mode.git"
   },
   "devDependencies": {
     "@eslint/js": "^9.7.0",

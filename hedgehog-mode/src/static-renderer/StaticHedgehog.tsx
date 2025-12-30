@@ -37,7 +37,7 @@ const COLOR_TO_CSS_FILTER_MAP: Record<HedgehogActorColorOption, string> = {
 
 interface StaticHedgehogProps {
   options: HedgehogActorOptions;
-  size?: number;
+  size?: number | string;
   assetsUrl: string;
   className?: string;
   style?: CSSProperties;
@@ -88,8 +88,8 @@ export function StaticHedgehog({
     <div
       style={{
         position: "relative",
-        width: size ? `${size}px` : "100%",
-        height: size ? `${size}px` : "100%",
+        width: size ? (typeof size === "number" ? `${size}px` : size) : "100%",
+        height: size ? (typeof size === "number" ? `${size}px` : size) : "100%",
         ...style,
       }}
       className={className}

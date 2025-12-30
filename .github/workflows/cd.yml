@@ -48,6 +48,13 @@ jobs:
         working-directory: hedgehog-mode
         run: pnpm build
 
+      - name: Debug npm config
+        if: steps.check-package-version.outputs.is-new-version == 'true'
+        run: |
+          echo "Checking npm whoami and config..."
+          npm whoami || echo "Not logged in"
+          cat ~/.npmrc || echo "No .npmrc found"
+
       - name: Publish the package in the npm registry
         id: publish-package
         if: steps.check-package-version.outputs.is-new-version == 'true'

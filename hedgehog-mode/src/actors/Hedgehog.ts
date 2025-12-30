@@ -247,10 +247,20 @@ export class HedgehogActor extends Actor {
 
     this.setVelocity({
       x: 0,
-      y: -10,
+      y: this.isGhost() ? -20 : -15,
     });
 
     this.jumps++;
+  }
+
+  cancelJump(): void {
+    if (this.rigidBody!.velocity.y > 0) {
+      return;
+    }
+    this.setVelocity({
+      x: this.rigidBody!.velocity.x,
+      y: 0,
+    });
   }
 
   receiveDamage(amount: number): void {

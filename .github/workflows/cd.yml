@@ -30,7 +30,6 @@ jobs:
         with:
           node-version: 18
           registry-url: https://registry.npmjs.org
-          scope: "@posthog"
 
       - uses: pnpm/action-setup@v4
         if: steps.check-package-version.outputs.is-new-version == 'true'

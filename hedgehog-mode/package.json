@@ -17,7 +17,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/posthog/hedgehog-mode.git"
+    "url": "git+https://github.com/PostHog/hedgehog-mode.git"
   },
   "devDependencies": {
     "@eslint/js": "^9.7.0",

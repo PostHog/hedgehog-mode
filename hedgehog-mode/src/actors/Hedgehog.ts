@@ -46,8 +46,7 @@ export const COLOR_TO_FILTER_MAP: Record<
     filter.brightness(1.3, true);
   },
   sepia: (filter) => {
-    filter.saturate(3.0, true);
-    filter.brightness(0.7, true);
+    filter.sepia(true);
   },
   invert: (filter) => {
     filter.negative(true);

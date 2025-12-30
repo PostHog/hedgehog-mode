@@ -25,11 +25,11 @@ const sprites = spritesData as SpritesJSON;
 const COLOR_TO_CSS_FILTER_MAP: Record<HedgehogActorColorOption, string> = {
   red: "hue-rotate(-40deg) saturate(280%) brightness(90%)",
   green: "hue-rotate(60deg) saturate(100%)",
-  blue: "hue-rotate(210deg) saturate(300%) brightness(90%)",
+  blue: "hue-rotate(200deg) saturate(300%) brightness(100%)",
   purple: "hue-rotate(240deg)",
   dark: "brightness(70%)",
   light: "brightness(130%)",
-  sepia: "saturate(300%) brightness(70%)",
+  sepia: "sepia(100%)", // Use native CSS sepia filter for proper sepia tone
   invert: "invert(100%)",
   greyscale: "grayscale(100%)",
   rainbow: "", // No filter for rainbow
@@ -48,7 +48,6 @@ function getSpriteStyle(
 ): CSSProperties {
   const frame = sprites.frames[spriteName];
   if (!frame) {
-    console.warn(`Sprite not found: ${spriteName}`);
     return {};
   }
 

@@ -58,7 +58,7 @@ jobs:
             tag="latest"
           fi
 
-          pnpm publish --access public --tag $tag --no-git-checks
+          pnpm publish --access public --tag $tag
         env:
           NPM_CONFIG_PROVENANCE: true
           VERSION: ${{ steps.check-package-version.outputs.committed-version }}

@@ -1,27 +1,25 @@
-import { useEffect, useState } from "react";
 import { HedgehogActorOptions } from "../hedgehog-mode";
-import { StaticHedgehogRenderer } from "../static-renderer/StaticHedgehog";
+import { CSSStaticHedgehog } from "../static-renderer/CSSStaticHedgehog";
+
 export type HedgehogImageProps = Partial<HedgehogActorOptions> & {
-  renderer: StaticHedgehogRenderer;
   size?: number;
+  assetsUrl: string;
 };
 
 // Takes a range of options and renders a static hedgehog
 export function HedgehogImage({
-  renderer,
   accessories,
   color,
   size,
   skin = "default",
+  assetsUrl,
 }: HedgehogImageProps): JSX.Element | null {
   const imgSize = size ?? 60;
 
-  const [dataUrl, setDataUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    void renderer
-      .render(
-        {
+  return (
+    <div className="relative" style={{ width: imgSize, height: imgSize }}>
+      <CSSStaticHedgehog
+        options={{
           id: JSON.stringify({
             skin,
             accessories,
@@ -30,28 +28,10 @@ export function HedgehogImage({
           skin,
           accessories,
           color,
-        },
-        imgSize * 4
-      )
-      .then((src) => {
-        setDataUrl(src);
-      })
-      .catch((e) => {
-        // eslint-disable-next-line no-console
-        console.error("Error rendering hedgehog", e);
-      });
-  }, [skin, accessories, color, imgSize]);
-
-  return (
-    <div className="relative" style={{ width: imgSize, height: imgSize }}>
-      {dataUrl ? (
-        <img
-          style={{ imageRendering: "pixelated" }}
-          src={dataUrl}
-          width={imgSize}
-          height={imgSize}
-        />
-      ) : null}
+        }}
+        size={imgSize}
+        assetsUrl={assetsUrl}
+      />
       <div className="absolute inset-0 bg-background-primary/50" />
     </div>
   );

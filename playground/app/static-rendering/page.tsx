@@ -8,6 +8,7 @@ import {
   HedgehogActorSkinOptions,
   HedgehogActorAccessories,
   HedgehogActorAccessoryOption,
+  CSSStaticHedgehog,
 } from "@posthog/hedgehog-mode";
 import { uniqueId } from "lodash";
 import { useEffect, useRef, useState } from "react";
@@ -136,29 +137,60 @@ export default function StaticRendering() {
   }
 
   return (
-    <div className="p-8 flex flex-col gap-2">
-      <div>
-        <h2 className="text-2xl font-bold">Accessories</h2>
-        <div className="flex flex-wrap gap-2">
-          {accessories.map((hedgehog, i) => (
-            <StaticHedgehog
-              hedgehog={hedgehog}
-              renderer={rendererRef.current!}
-              key={i}
-            />
-          ))}
+    <div className="flex flex-row gap-2">
+      <div className="p-8 flex flex-col gap-2">
+        <div>
+          <h2 className="text-2xl font-bold">Accessories (CSS)</h2>
+          <div className="flex flex-wrap gap-2">
+            {accessories.map((hedgehog, i) => (
+              <CSSStaticHedgehog
+                key={i}
+                options={hedgehog}
+                size={80}
+                assetsUrl="/assets"
+              />
+            ))}
+          </div>
+        </div>
+        <div>
+          <h2 className="text-2xl font-bold">All combinations (CSS)</h2>
+          <div className="flex flex-wrap gap-2">
+            {allCombinations.map((hedgehog, i) => (
+              <CSSStaticHedgehog
+                options={hedgehog}
+                size={80}
+                assetsUrl="/assets"
+                key={i}
+              />
+            ))}
+          </div>
         </div>
       </div>
-      <div>
-        <h2 className="text-2xl font-bold">All combinations</h2>
-        <div className="flex flex-wrap gap-2">
-          {allCombinations.map((hedgehog, i) => (
-            <StaticHedgehog
-              hedgehog={hedgehog}
-              renderer={rendererRef.current!}
-              key={i}
-            />
-          ))}
+
+      <div className="p-8 flex flex-col gap-2">
+        <div>
+          <h2 className="text-2xl font-bold">Accessories (Canvas)</h2>
+          <div className="flex flex-wrap gap-2">
+            {accessories.map((hedgehog, i) => (
+              <StaticHedgehog
+                hedgehog={hedgehog}
+                renderer={rendererRef.current!}
+                key={i}
+              />
+            ))}
+          </div>
+        </div>
+        <div>
+          <h2 className="text-2xl font-bold">All combinations (Canvas)</h2>
+          <div className="flex flex-wrap gap-2">
+            {allCombinations.map((hedgehog, i) => (
+              <StaticHedgehog
+                hedgehog={hedgehog}
+                renderer={rendererRef.current!}
+                key={i}
+              />
+            ))}
+          </div>
         </div>
       </div>
     </div>

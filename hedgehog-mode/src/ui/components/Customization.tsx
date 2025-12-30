@@ -92,7 +92,7 @@ export function HedgehogCustomization({
         <HedgehogProfileImage
           {...config}
           size={100}
-          renderer={game.staticHedgehogRenderer}
+          assetsUrl={game.options.assetsUrl}
         />
         <div className="CustomizationContent">
           <h3 className="CustomizationTitle">
@@ -262,7 +262,7 @@ function HedgehogFriends({
                   key={friend.id}
                   {...friend}
                   size={64}
-                  renderer={game.staticHedgehogRenderer}
+                  assetsUrl={game.options.assetsUrl}
                 />
               </Button>
             </div>
@@ -319,7 +319,7 @@ function HedgehogAccessories({
                 <HedgehogProfileImage
                   size={64}
                   accessories={[acc]}
-                  renderer={game.staticHedgehogRenderer}
+                  assetsUrl={game.options.assetsUrl}
                 />
               </Button>
             ))}
@@ -353,7 +353,7 @@ function HedgehogSkins({
             <HedgehogProfileImage
               size={64}
               skin={option as HedgehogActorOptions["skin"]}
-              renderer={game.staticHedgehogRenderer}
+              assetsUrl={game.options.assetsUrl}
             />
           </Button>
         ))}
@@ -391,7 +391,7 @@ function HedgehogColor({
             <HedgehogProfileImage
               size={64}
               color={option as HedgehogActorOptions["color"]}
-              renderer={game.staticHedgehogRenderer}
+              assetsUrl={game.options.assetsUrl}
             />
           </Button>
         ))}

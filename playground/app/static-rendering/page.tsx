@@ -143,12 +143,31 @@ export default function StaticRendering() {
           <h2 className="text-2xl font-bold">Accessories (CSS)</h2>
           <div className="flex flex-wrap gap-2">
             {accessories.map((hedgehog, i) => (
-              <CSSStaticHedgehog
+              <span
                 key={i}
-                options={hedgehog}
-                size={80}
-                assetsUrl="/assets"
-              />
+                title={JSON.stringify(hedgehog)}
+                className="relative"
+              >
+                <CSSStaticHedgehog
+                  options={hedgehog}
+                  size={80}
+                  assetsUrl="/assets"
+                />
+              </span>
+            ))}
+          </div>
+        </div>
+        <div>
+          <h2 className="text-2xl font-bold">Colors (CSS)</h2>
+          <div className="flex flex-wrap gap-2">
+            {HedgehogActorColorOptions.map((color) => (
+              <span key={color} title={color} className="relative">
+                <CSSStaticHedgehog
+                  options={{ id: `hedgehog-${uniqueId()}`, color }}
+                  size={80}
+                  assetsUrl="/assets"
+                />
+              </span>
             ))}
           </div>
         </div>
@@ -156,12 +175,17 @@ export default function StaticRendering() {
           <h2 className="text-2xl font-bold">All combinations (CSS)</h2>
           <div className="flex flex-wrap gap-2">
             {allCombinations.map((hedgehog, i) => (
-              <CSSStaticHedgehog
-                options={hedgehog}
-                size={80}
-                assetsUrl="/assets"
+              <span
                 key={i}
-              />
+                title={JSON.stringify(hedgehog)}
+                className="relative"
+              >
+                <CSSStaticHedgehog
+                  options={hedgehog}
+                  size={80}
+                  assetsUrl="/assets"
+                />
+              </span>
             ))}
           </div>
         </div>
@@ -172,11 +196,33 @@ export default function StaticRendering() {
           <h2 className="text-2xl font-bold">Accessories (Canvas)</h2>
           <div className="flex flex-wrap gap-2">
             {accessories.map((hedgehog, i) => (
-              <StaticHedgehog
-                hedgehog={hedgehog}
-                renderer={rendererRef.current!}
+              <span
                 key={i}
-              />
+                title={JSON.stringify(hedgehog)}
+                className="relative"
+              >
+                <StaticHedgehog
+                  hedgehog={hedgehog}
+                  renderer={rendererRef.current!}
+                  key={i}
+                />
+              </span>
+            ))}
+          </div>
+        </div>
+        <div>
+          <h2 className="text-2xl font-bold">Colors (Canvas)</h2>
+          <div className="flex flex-wrap gap-2">
+            {HedgehogActorColorOptions.map((color) => (
+              <span key={color} title={color} className="relative">
+                <StaticHedgehog
+                  hedgehog={{
+                    id: `hedgehog-${uniqueId()}`,
+                    color,
+                  }}
+                  renderer={rendererRef.current!}
+                />
+              </span>
             ))}
           </div>
         </div>
@@ -184,11 +230,17 @@ export default function StaticRendering() {
           <h2 className="text-2xl font-bold">All combinations (Canvas)</h2>
           <div className="flex flex-wrap gap-2">
             {allCombinations.map((hedgehog, i) => (
-              <StaticHedgehog
-                hedgehog={hedgehog}
-                renderer={rendererRef.current!}
+              <span
                 key={i}
-              />
+                title={JSON.stringify(hedgehog)}
+                className="relative"
+              >
+                <StaticHedgehog
+                  hedgehog={hedgehog}
+                  renderer={rendererRef.current!}
+                  key={i}
+                />
+              </span>
             ))}
           </div>
         </div>

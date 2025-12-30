@@ -18,16 +18,20 @@ type SpritesJSON = {
 const sprites = spritesData as SpritesJSON;
 
 // Convert PixiJS ColorMatrixFilter operations to CSS filters
+// Note: CSS filters work slightly differently than PixiJS ColorMatrixFilter
+// hue-rotate: degrees (same as PixiJS)
+// saturate: multiplier (1 = 100%, 1.2 = 120%, 3 = 300%)
+// brightness: multiplier (1 = 100%, 0.7 = 70%, 1.3 = 130%)
 const COLOR_TO_CSS_FILTER_MAP: Record<HedgehogActorColorOption, string> = {
-  red: "hue-rotate(350deg) saturate(1.2) brightness(0.9)",
-  green: "hue-rotate(60deg) saturate(1)",
-  blue: "hue-rotate(210deg) saturate(3) brightness(0.9)",
+  red: "hue-rotate(-40deg) saturate(280%) brightness(90%)",
+  green: "hue-rotate(60deg) saturate(100%)",
+  blue: "hue-rotate(210deg) saturate(300%) brightness(90%)",
   purple: "hue-rotate(240deg)",
-  dark: "brightness(0.7)",
-  light: "brightness(1.3)",
-  sepia: "saturate(3) brightness(0.7)",
-  invert: "invert(1)",
-  greyscale: "grayscale(0.3)",
+  dark: "brightness(70%)",
+  light: "brightness(130%)",
+  sepia: "saturate(300%) brightness(70%)",
+  invert: "invert(100%)",
+  greyscale: "grayscale(100%)",
   rainbow: "", // No filter for rainbow
 };
 

@@ -116,7 +116,8 @@ export class HedgehogActorControls {
           }
           fireInterval = setInterval(() => {
             this.actor.maybeSpawnFireball();
-          }, 250);
+          }, 100);
+          this.actor.maybeSpawnFireball();
         },
         off: () => {
           if (fireInterval) {

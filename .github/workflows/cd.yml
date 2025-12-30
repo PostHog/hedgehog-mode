@@ -18,7 +18,14 @@ jobs:
       - name: Checkout the repository
         uses: actions/checkout@v4
 
+      - name: Check package version and detect an update
+        id: check-package-version
+        uses: PostHog/check-package-version@v2
+        with:
+          path: hedgehog-mode
+
       - uses: pnpm/action-setup@v4
+        if: steps.check-package-version.outputs.is-new-version == 'true'
         name: Install pnpm
         with:
           version: 9
@@ -26,16 +33,20 @@ jobs:
 
       - name: Set up Node 22
         uses: actions/setup-node@v4
+        if: steps.check-package-version.outputs.is-new-version == 'true'
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org
           cache: "pnpm"
 
-      - name: Check package version and detect an update
-        id: check-package-version
-        uses: PostHog/check-package-version@v2
-        with:
-          path: hedgehog-mode
+      - name: Ensure latest npm with OIDC support (npm 11.5.1+)
+        shell: bash
+        run: |
+          echo "npm version before update:"
+          npm --version
+          npm install -g npm@11.6.4
+          echo "npm version after update:"
+          npm --version
 
       - name: Install dependencies
         if: steps.check-package-version.outputs.is-new-version == 'true'

@@ -45,6 +45,7 @@ jobs:
 
       - name: Build
         if: steps.check-package-version.outputs.is-new-version == 'true'
+        working-directory: hedgehog-mode
         run: pnpm build
 
       - name: Publish the package in the npm registry

@@ -1,4 +1,4 @@
-import React, { CSSProperties } from "react";
+import { CSSProperties } from "react";
 import spritesData from "../../assets/sprites.json";
 import { HedgehogActorOptions } from "../actors/hedgehog/config";
 import { HedgehogActorColorOption } from "../actors/hedgehog/config";
@@ -35,7 +35,7 @@ const COLOR_TO_CSS_FILTER_MAP: Record<HedgehogActorColorOption, string> = {
   rainbow: "", // No filter for rainbow
 };
 
-interface CSSStaticHedgehogProps {
+interface StaticHedgehogProps {
   options: HedgehogActorOptions;
   size?: number;
   assetsUrl: string;
@@ -71,11 +71,11 @@ function getSpriteStyle(
   };
 }
 
-export function CSSStaticHedgehog({
+export function StaticHedgehog({
   options,
   size = 80,
   assetsUrl,
-}: CSSStaticHedgehogProps): JSX.Element {
+}: StaticHedgehogProps): JSX.Element {
   const spriteName = `skins/${options.skin ?? "default"}/idle/tile000.png`;
   const baseStyle = getSpriteStyle(spriteName, assetsUrl, size);
 

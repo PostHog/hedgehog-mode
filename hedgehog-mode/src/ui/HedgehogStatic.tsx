@@ -1,5 +1,5 @@
 import { HedgehogActorOptions } from "../hedgehog-mode";
-import { CSSStaticHedgehog } from "../static-renderer/CSSStaticHedgehog";
+import { StaticHedgehog } from "../static-renderer/StaticHedgehog";
 
 export type HedgehogImageProps = Partial<HedgehogActorOptions> & {
   size?: number;
@@ -18,7 +18,7 @@ export function HedgehogImage({
 
   return (
     <div className="relative" style={{ width: imgSize, height: imgSize }}>
-      <CSSStaticHedgehog
+      <StaticHedgehog
         options={{
           id: JSON.stringify({
             skin,

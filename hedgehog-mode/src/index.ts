@@ -19,6 +19,5 @@ export {
   HedgehogActorSkinOptions,
   HedgehogActorAccessories,
 } from "./actors/hedgehog/config";
-export { StaticHedgehogRenderer } from "./static-renderer/StaticHedgehog";
-export { CSSStaticHedgehog } from "./static-renderer/CSSStaticHedgehog";
+export { StaticHedgehog as CSSStaticHedgehog } from "./static-renderer/StaticHedgehog";
 export { HedgehogCustomization } from "./ui/components/Customization";

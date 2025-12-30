@@ -129,7 +129,7 @@ export class HedgehogActorControls {
         off: () => {
           if (fireInterval) {
             clearInterval(fireInterval);
-            fireInterval = null;
+            fireInterval = undefined;
           }
         },
       },

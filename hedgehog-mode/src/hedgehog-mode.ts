@@ -19,7 +19,6 @@ import {
   HedgehogActorOptions,
 } from "./actors/hedgehog/config";
 import { GameStateManager } from "./state";
-import { StaticHedgehogRenderer } from "./static-renderer/StaticHedgehog";
 import { uniqueId } from "lodash";
 import { HedgehogGhostActor } from "./actors/Ghost";
 import { Accessory } from "./items/Accessory";
@@ -38,7 +37,6 @@ export {
   HedgehogActorSkinOptions,
   HedgehogActorAccessories,
 } from "./actors/hedgehog/config";
-export { StaticHedgehogRenderer } from "./static-renderer/StaticHedgehog";
 
 export type * from "./types";
 
@@ -57,15 +55,10 @@ export class HedgeHogMode implements HedgehogModeInterface {
   lastTime?: number;
   gameUI!: GameUI;
   stateManager?: GameStateManager;
-  staticHedgehogRenderer: StaticHedgehogRenderer;
   syncPlatformsInterval?: NodeJS.Timeout;
 
   constructor(public options: HedgehogModeConfig) {
     this.spritesManager = new SpritesManager(options);
-    this.staticHedgehogRenderer = new StaticHedgehogRenderer(
-      options,
-      this.spritesManager
-    );
     this.setupDebugListeners();
   }
 

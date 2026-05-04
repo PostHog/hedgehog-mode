@@ -27,6 +27,9 @@ export const HedgehogActorAccessories = {
   beret: {
     group: "headwear",
   },
+  "red-beret": {
+    group: "headwear",
+  },
   cap: {
     group: "headwear",
   },

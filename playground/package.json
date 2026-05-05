@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "copy-assets": "rm -rf public/assets && cp -R node_modules/@posthog/hedgehog-mode/assets public/assets",
+    "copy-assets": "rm -rf public/assets && mkdir -p public && cp -R node_modules/@posthog/hedgehog-mode/assets public/assets",
     "dev": "pnpm copy-assets && next dev -p 8002",
     "build": "pnpm --dir ../hedgehog-mode build && pnpm copy-assets && next build",
     "build:next": "pnpm copy-assets && next build",

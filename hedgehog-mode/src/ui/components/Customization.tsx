@@ -33,7 +33,7 @@ function Switch({
 } & Pick<
   React.HTMLAttributes<HTMLDivElement>,
   "title" | "children"
->): JSX.Element {
+>) {
   return (
     <span className="Switch" {...props}>
       <label className="SwitchLabel">
@@ -56,7 +56,7 @@ export function HedgehogCustomization({
 }: HedgehogOptionsProps & {
   game: HedgeHogMode;
   defaultFriend?: HedgehogActorOptions | null;
-}): JSX.Element {
+}) {
   const [selectedFriendId, setSelectedFriendId] = useState<
     HedgehogActorOptions["id"] | null
   >(defaultFriend?.id ?? null);
@@ -163,7 +163,7 @@ export function HedgehogCustomization({
 function HedgehogOptions({
   config,
   setConfig,
-}: HedgehogOptionsProps): JSX.Element {
+}: HedgehogOptionsProps) {
   return (
     <div className="CustomizationSection">
       <h4 className="CustomizationSectionTitle">options</h4>
@@ -204,7 +204,7 @@ function HedgehogFriends({
 }: HedgehogOptionsProps & {
   setSelectedFriend: (friend: HedgehogActorOptions | null) => void;
   selectedFriend: HedgehogActorOptions | null;
-}): JSX.Element {
+}) {
   const friends = useMemo(() => config.friends ?? [], [config.friends]);
 
   const addFriend = () => {
@@ -281,7 +281,7 @@ function HedgehogAccessories({
   game: HedgeHogMode;
   accessories: HedgehogActorAccessoryOption[];
   setAccessories: (accessories: HedgehogActorAccessoryOption[]) => void;
-}): JSX.Element {
+}) {
   accessories =
     accessories?.filter((acc) => !!HedgehogActorAccessories[acc]) ?? [];
 
@@ -338,7 +338,7 @@ function HedgehogSkins({
   game: HedgeHogMode;
   skin: HedgehogActorOptions["skin"];
   setSkin: (skin: HedgehogActorOptions["skin"]) => void;
-}): JSX.Element | null {
+}) {
   return (
     <div className="CustomizationSection">
       <h4 className="CustomizationSectionTitle">skins</h4>
@@ -370,7 +370,7 @@ function HedgehogColor({
   game: HedgeHogMode;
   color: HedgehogActorOptions["color"];
   setColor: (color: HedgehogActorOptions["color"]) => void;
-}): JSX.Element {
+}) {
   return (
     <div className="CustomizationSection">
       <h4 className="CustomizationSectionTitle">colors</h4>

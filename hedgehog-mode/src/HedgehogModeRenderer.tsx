@@ -1,9 +1,31 @@
-import { useEffect, useState } from "react";
+import { ComponentType, useEffect, useState } from "react";
 import { HedgeHogMode, HedgehogModeConfig } from "./hedgehog-mode";
 import { HedgehogModeUI } from "./ui/GameUI";
-import root from "react-shadow";
 import { styles } from "./ui/styles";
 import { useTheme } from "./ui/hooks/useTheme";
+
+type ShadowDivProps = {
+  id?: string;
+  "data-theme"?: string;
+  style?: React.CSSProperties;
+  children?: React.ReactNode;
+};
+
+let cachedShadowDiv: ComponentType<ShadowDivProps> | null = null;
+
+function useShadowDiv(): ComponentType<ShadowDivProps> | null {
+  const [Div, setDiv] = useState<ComponentType<ShadowDivProps> | null>(
+    cachedShadowDiv
+  );
+  useEffect(() => {
+    if (cachedShadowDiv) return;
+    void import("react-shadow").then((m) => {
+      cachedShadowDiv = m.default.div as ComponentType<ShadowDivProps>;
+      setDiv(() => cachedShadowDiv);
+    });
+  }, []);
+  return Div;
+}
 
 export function HedgehogModeRendererContent({
   id,
@@ -17,12 +39,14 @@ export function HedgehogModeRendererContent({
   children: React.ReactNode;
 }) {
   const osTheme = useTheme();
+  const ShadowDiv = useShadowDiv();
+  if (!ShadowDiv) return null;
 
   return (
-    <root.div id={id} data-theme={theme ?? osTheme} style={style}>
+    <ShadowDiv id={id} data-theme={theme ?? osTheme} style={style}>
       <style>{styles}</style>
       {children}
-    </root.div>
+    </ShadowDiv>
   );
 }
 
@@ -38,6 +62,7 @@ export function HedgehogModeRenderer({
   style?: React.CSSProperties;
 }) {
   const [game, setGame] = useState<HedgeHogMode | null>(null);
+  const ShadowDiv = useShadowDiv();
 
   const setupHedgehogMode = async (container: HTMLDivElement) => {
     const hedgeHogMode = new HedgeHogMode(config);
@@ -52,8 +77,10 @@ export function HedgehogModeRenderer({
     return () => game?.destroy();
   }, [game]);
 
+  if (!ShadowDiv) return null;
+
   return (
-    <root.div
+    <ShadowDiv
       id="hedgehog-mode-root"
       data-theme={theme ?? osTheme}
       style={style}
@@ -68,6 +95,6 @@ export function HedgehogModeRenderer({
         }}
       />
       {game && <HedgehogModeUI game={game} />}
-    </root.div>
+    </ShadowDiv>
   );
 }

@@ -75,7 +75,7 @@ export function StaticHedgehog({
   assetsUrl,
   className,
   style,
-}: StaticHedgehogProps): JSX.Element {
+}: StaticHedgehogProps) {
   const spriteName = `skins/${options.skin ?? "default"}/idle/tile000.png`;
   const baseStyle = getSpriteStyle(spriteName, assetsUrl);
 

@@ -12,5 +12,11 @@
   "license": "ISC",
   "dependencies": {
     "react-shadow": "^20.6.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "react": "19.3.0-canary-3f0b9e61-20260317",
+      "react-dom": "19.3.0-canary-3f0b9e61-20260317"
+    }
   }
 }

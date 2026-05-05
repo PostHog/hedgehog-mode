@@ -13,7 +13,7 @@ export function HedgehogImage({
   size,
   skin = "default",
   assetsUrl,
-}: HedgehogImageProps): JSX.Element | null {
+}: HedgehogImageProps) {
   const imgSize = size ?? 60;
 
   return (
@@ -40,7 +40,7 @@ export function HedgehogImage({
 export function HedgehogProfileImage({
   size,
   ...props
-}: HedgehogImageProps): JSX.Element {
+}: HedgehogImageProps) {
   return (
     <div
       style={{

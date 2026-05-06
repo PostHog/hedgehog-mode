@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 export const useOutsideClick = (
-  ref: React.RefObject<HTMLDivElement>,
+  ref: React.RefObject<HTMLDivElement | null>,
   onClickOutside: (e: MouseEvent) => void
 ) => {
   // Uses a useEffect to set up a global click listener and one on the given ref

@@ -11,7 +11,7 @@ export function Messages({
   containerRef,
 }: Pick<GameUIProps, "messages"> & {
   onEnd?: () => void;
-  containerRef: React.RefObject<HTMLDivElement>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
 }) {
   const [messageIndex, setMessageIndex] = useState<number>(0);
   const [animationCompleted, setAnimationCompleted] = useState<boolean>(false);

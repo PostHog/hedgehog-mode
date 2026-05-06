@@ -6,7 +6,7 @@ import {
   HedgeHogMode,
 } from "@posthog/hedgehog-mode";
 import { Logo } from "../components/logo";
-import { sample } from "lodash";
+import { sample, uniqueId } from "lodash";
 import { Button } from "../components/Button";
 import { useState } from "react";
 import Link from "next/link";
@@ -16,7 +16,7 @@ export default function Home() {
   const spawnHedgehog = async (count: number) => {
     for (let i = 0; i < count; i++) {
       game?.spawnHedgehog({
-        id: `hedgehog-${i}`,
+        id: uniqueId("hedgehog-"),
         controls_enabled: false,
         accessories: getRandomAccessoryCombo(),
         color: sample(HedgehogActorColorOptions),

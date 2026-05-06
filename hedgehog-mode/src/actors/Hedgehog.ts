@@ -180,14 +180,20 @@ export class HedgehogActor extends Actor {
     }
   }
 
-  setupPointerEvents(): void {
-    super.setupPointerEvents();
+  protected setupSpriteEvents(): void {
+    super.setupSpriteEvents();
 
     this.sprite!.on("pointerover", () => {
       this.ai.run("wave");
     });
+  }
 
-    this.sprite!.on("pointerout", () => {});
+  public startDrag(downEvent: PointerEvent): void {
+    // Touch users never get pointerover, so wave when they grab us instead
+    if (downEvent.pointerType !== "mouse") {
+      this.ai.run("wave");
+    }
+    super.startDrag(downEvent);
   }
 
   updateOptions(options: Partial<HedgehogActorOptions>): void {

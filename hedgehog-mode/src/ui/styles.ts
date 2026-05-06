@@ -144,6 +144,15 @@ export const styles = `
     border-bottom-color: var(--color-border-light);
   }
 
+  @media (hover: none) {
+    .DialogBox > .DialogBoxControls {
+      padding: var(--spacing-xs);
+      opacity: 1;
+      height: 1.5rem;
+      border-bottom-color: var(--color-border-light);
+    }
+  }
+
   .Messages {
     padding: var(--spacing-sm);
   }

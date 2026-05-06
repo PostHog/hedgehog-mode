@@ -269,6 +269,24 @@ export class HedgeHogMode implements HedgehogModeInterface {
       this.mousePosition = { x: event.clientX, y: event.clientY };
     });
 
+    // Window-level pointerdown hit-test so taps on hedgehogs land on touch
+    // devices (no hover-driven canvas pointer-events toggle to rely on)
+    window.addEventListener(
+      "pointerdown",
+      (event) => {
+        const point = { x: event.clientX, y: event.clientY };
+        for (const el of this.elements) {
+          if (el instanceof Actor && el.hitTest(point)) {
+            el.startDrag(event);
+            event.preventDefault();
+            event.stopPropagation();
+            break;
+          }
+        }
+      },
+      { capture: true }
+    );
+
     new GlobalKeyboardListeners(this);
     gsap.ticker.remove(gsap.updateRoot);
     this.elements.push(new Ground(this));

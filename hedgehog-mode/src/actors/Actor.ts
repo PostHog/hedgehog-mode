@@ -74,7 +74,7 @@ export class Actor implements GameElement {
     this.sprite.x = this.rigidBody!.position.x;
     this.sprite.y = this.rigidBody!.position.y;
     this.game.app.stage.addChild(this.sprite);
-    this.setupPointerEvents();
+    this.setupSpriteEvents();
   }
 
   private loadRigidBody(reset = false): void {
@@ -181,62 +181,83 @@ export class Actor implements GameElement {
     this.loadRigidBody(true);
   }
 
-  setupPointerEvents(): void {
-    this.sprite!.on("pointerdown", (e) => {
-      if (!this.isInteractive) {
+  protected setupSpriteEvents(): void {}
+
+  public hitTest(point: Matter.Vector): boolean {
+    if (!this.isInteractive || !this.rigidBody) {
+      return false;
+    }
+    return Matter.Query.point([this.rigidBody], point).length > 0;
+  }
+
+  public startDrag(downEvent: PointerEvent): void {
+    if (!this.isInteractive) {
+      return;
+    }
+
+    const pointerId = downEvent.pointerId;
+    const startPoint = { x: downEvent.clientX, y: downEvent.clientY };
+    let ropeConstraint: Constraint | null = null;
+
+    const onMove = (e: PointerEvent) => {
+      if (e.pointerId !== pointerId) {
         return;
       }
 
-      let ropeConstraint: Constraint | null = null;
-      const startPoint: { x: number; y: number } = {
-        x: e.clientX,
-        y: e.clientY,
-      };
-
-      const onDragMove = () => {
-        // We only want to start dragging if the distance moved is greater than 10px
-        if (!ropeConstraint) {
-          const distance = Math.sqrt(
-            (e.clientX - startPoint.x) ** 2 + (e.clientY - startPoint.y) ** 2
-          );
-          if (distance < 10) {
-            return;
-          }
-
-          ropeConstraint = Constraint.create({
-            pointA: { x: e.clientX, y: e.clientY },
-            bodyB: this.rigidBody!,
-            stiffness: 0.2,
-            damping: 1,
-            length: 2,
-          });
-          Matter.World.addConstraint(this.game.engine.world, ropeConstraint);
-
-          this.isDragging = true;
-        }
-        ropeConstraint!.pointA.x = e.clientX;
-        ropeConstraint!.pointA.y = e.clientY;
-      };
-
-      const onDragEnd = () => {
-        if (!this.isDragging) {
-          this.onClick();
+      if (!ropeConstraint) {
+        const dx = e.clientX - startPoint.x;
+        const dy = e.clientY - startPoint.y;
+        // Only start dragging once the pointer has moved beyond the click threshold
+        if (Math.sqrt(dx * dx + dy * dy) < 10) {
+          return;
         }
 
-        this.isDragging = false;
-        if (ropeConstraint) {
-          Matter.World.remove(this.game.engine.world, ropeConstraint);
-        }
+        ropeConstraint = Constraint.create({
+          pointA: { x: e.clientX, y: e.clientY },
+          bodyB: this.rigidBody!,
+          stiffness: 0.2,
+          damping: 1,
+          length: 2,
+        });
+        Matter.World.addConstraint(this.game.engine.world, ropeConstraint);
+        this.isDragging = true;
+      }
 
-        this.game.app.stage.off("pointermove", onDragMove);
-        this.game.app.stage.off("pointerup", onDragEnd);
-        this.game.app.stage.off("pointerupoutside", onDragEnd);
-      };
+      ropeConstraint.pointA.x = e.clientX;
+      ropeConstraint.pointA.y = e.clientY;
+    };
 
-      this.game.app.stage.on("pointermove", onDragMove);
-      this.game.app.stage.on("pointerup", onDragEnd);
-      this.game.app.stage.on("pointerupoutside", onDragEnd);
-    });
+    // Block page scroll while dragging on touch devices
+    const onTouchMove = (e: TouchEvent) => {
+      if (this.isDragging) {
+        e.preventDefault();
+      }
+    };
+
+    const onEnd = (e: PointerEvent) => {
+      if (e.pointerId !== pointerId) {
+        return;
+      }
+
+      if (!this.isDragging) {
+        this.onClick();
+      }
+
+      this.isDragging = false;
+      if (ropeConstraint) {
+        Matter.World.remove(this.game.engine.world, ropeConstraint);
+      }
+
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onEnd);
+      window.removeEventListener("pointercancel", onEnd);
+      document.removeEventListener("touchmove", onTouchMove);
+    };
+
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onEnd);
+    window.addEventListener("pointercancel", onEnd);
+    document.addEventListener("touchmove", onTouchMove, { passive: false });
   }
 
   update(ticker: UpdateTicker): void {

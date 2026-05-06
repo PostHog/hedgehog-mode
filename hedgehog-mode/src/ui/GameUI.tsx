@@ -85,23 +85,44 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
 
   const showConfiguration = screen === "configuration";
 
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(hover: none)");
+    setIsTouchDevice(mq.matches);
+    const listener = (e: MediaQueryListEvent) => setIsTouchDevice(e.matches);
+    mq.addEventListener("change", listener);
+    return () => mq.removeEventListener("change", listener);
+  }, []);
+
+  const isFullscreen = isTouchDevice && showConfiguration;
   const derivedWidth = showConfiguration ? 500 : width;
   const MIN_WINDOW_HEIGHT = showConfiguration ? 300 : 50;
 
   const setPosition = useCallback(
     (actor?: GameUIProps["actor"], force?: boolean) => {
-      if (hovering && !force) {
+      if (hovering && !force && !isTouchDevice) {
+        return;
+      }
+
+      if (ref.current && isFullscreen) {
+        const fullHeight = window.innerHeight - WINDOW_MARGIN * 2;
+        ref.current.style.left = `${WINDOW_MARGIN}px`;
+        ref.current.style.bottom = `${WINDOW_MARGIN}px`;
+        ref.current.style.maxHeight = `${fullHeight}px`;
+        ref.current.style.minHeight = `${fullHeight}px`;
         return;
       }
 
       const pos = actor?.rigidBody?.position || { y: 999999999, x: 999999999 };
 
       if (ref.current && pos) {
-        let x = pos.x - derivedWidth / 2;
+        // Use the rendered width so clamping respects the viewport-clamped max-width
+        const renderedWidth = ref.current.offsetWidth || derivedWidth;
+        let x = pos.x - renderedWidth / 2;
         let y = window.innerHeight - pos.y + 40; // offset for height of the hedgehog
 
         x = Math.max(WINDOW_MARGIN, x);
-        x = Math.min(window.innerWidth - derivedWidth - WINDOW_MARGIN, x);
+        x = Math.min(window.innerWidth - renderedWidth - WINDOW_MARGIN, x);
 
         y = Math.max(WINDOW_MARGIN, y);
         y = Math.min(window.innerHeight - WINDOW_MARGIN, y);
@@ -124,7 +145,7 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
         ref.current.style.minHeight = `${MIN_WINDOW_HEIGHT}px`;
       }
     },
-    [hovering, MIN_WINDOW_HEIGHT, derivedWidth]
+    [hovering, MIN_WINDOW_HEIGHT, derivedWidth, isTouchDevice, isFullscreen]
   );
 
   useEffect(() => {
@@ -167,7 +188,10 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
         ref={ref}
         className={`DialogBox ${visible ? "DialogBox--visible" : ""}`}
         style={{
-          width: derivedWidth,
+          width: isFullscreen
+            ? `calc(100vw - ${WINDOW_MARGIN * 2}px)`
+            : derivedWidth,
+          maxWidth: `calc(100vw - ${WINDOW_MARGIN * 2}px)`,
         }}
         onMouseOver={() => setHovering(true)}
         onMouseLeave={() => setHovering(false)}

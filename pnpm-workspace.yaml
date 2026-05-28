@@ -1,3 +1,5 @@
 packages:
   - "playground"
   - "hedgehog-mode"
+
+minimumReleaseAge: 10080

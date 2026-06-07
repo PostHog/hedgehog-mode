@@ -1,29 +1,17 @@
 import type { HedgehogModeInterface } from "../../types";
 import type { HedgehogActor } from "../Hedgehog";
 import { SpiderWebActor } from "../../items/SpiderWebActor";
+import { FlameActor } from "../../items/Flame";
 
 /**
- * A skin-specific active behaviour bound to a single hedgehog. The seed of a
- * per-skin behaviour abstraction: today only spiderhog has one, but hogzilla's
- * fireball and ghost's physics could migrate here so the actor stops branching
- * on `options.skin` inline.
+ * A skin-specific active behaviour bound to a single hedgehog. Built by the
+ * skin registry (see ./skins.ts) and owned by the actor for its lifetime.
  */
 export interface HedgehogSkinAbility {
+  /** Trigger the skin's "fire" action (the `f` key). No-op if unsupported. */
+  fire?(): void;
   /** Detach listeners / tear down any owned state. */
   destroy(): void;
-}
-
-/** Build the ability for an actor's current skin, if any. */
-export function createSkinAbility(
-  actor: HedgehogActor,
-  game: HedgehogModeInterface
-): HedgehogSkinAbility | undefined {
-  switch (actor.options.skin) {
-    case "spiderhog":
-      return new SpiderHogAbility(actor, game);
-    default:
-      return undefined;
-  }
 }
 
 /**
@@ -32,7 +20,7 @@ export function createSkinAbility(
  * webs per pointer id so multitouch slings don't clobber each other. Owns —
  * and crucially cleans up — its global listeners.
  */
-class SpiderHogAbility implements HedgehogSkinAbility {
+export class SpiderHogAbility implements HedgehogSkinAbility {
   private activeWebs = new Map<number, SpiderWebActor>();
 
   constructor(
@@ -91,4 +79,31 @@ class SpiderHogAbility implements HedgehogSkinAbility {
     this.activeWebs.forEach((web) => web.release());
     this.activeWebs.clear();
   }
+}
+
+/** Hogzilla breathes fire — a fireball in the direction it's facing. */
+export class HogzillaAbility implements HedgehogSkinAbility {
+  constructor(
+    private actor: HedgehogActor,
+    private game: HedgehogModeInterface
+  ) {}
+
+  fire(): void {
+    const direction = this.actor.getDirection();
+    const body = this.actor.rigidBody!;
+    FlameActor.spawnFireball(
+      this.game,
+      {
+        x: body.position.x + (direction === "left" ? -10 : 10),
+        // Y is slightly above the hedgehog
+        y: body.position.y - this.actor.sprite!.height * 0.3,
+      },
+      {
+        x: direction === "left" ? -10 : 10,
+        y: -10,
+      }
+    );
+  }
+
+  destroy(): void {}
 }

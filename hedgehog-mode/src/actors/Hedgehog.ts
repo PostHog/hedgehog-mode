@@ -15,7 +15,8 @@ import { HedgehogActorControls } from "./hedgehog/controls";
 import { HedgehogActorOptions } from "./hedgehog/config";
 import { HedgehogActorInterface } from "./hedgehog/interface";
 import { applyStaticColor } from "./hedgehog/colors";
-import { createSkinAbility, HedgehogSkinAbility } from "./hedgehog/abilities";
+import type { HedgehogSkinAbility } from "./hedgehog/abilities";
+import { getSkinDefinition, HedgehogSkinDefinition } from "./hedgehog/skins";
 import type { SpiderWebActor } from "../items/SpiderWebActor";
 
 export class HedgehogActor extends Actor {
@@ -82,8 +83,10 @@ export class HedgehogActor extends Actor {
     this.updateOptions(options);
   }
 
-  private isGhost(): boolean {
-    return this.options.skin === "ghost";
+  // Per-skin tuning (physics, jump, render, ...). Reads `options.skin` each
+  // time so runtime skin changes are picked up automatically.
+  private get skinDefinition(): HedgehogSkinDefinition {
+    return getSkinDefinition(this.options.skin);
   }
 
   // While a web strand is attached the hog swings purely under physics — its
@@ -142,12 +145,12 @@ export class HedgehogActor extends Actor {
       }
     }
     super.updateSprite(spriteName, {
-      animationSpeed: this.isGhost() ? 0.1 : 0.5,
+      animationSpeed: this.skinDefinition.animationSpeed,
       loop: options.loop ?? true,
       ...options,
     });
     this.sprite!.filters = [this.filter];
-    this.sprite!.alpha = this.isGhost() ? 0.5 : 1;
+    this.sprite!.alpha = this.skinDefinition.spriteAlpha;
   }
 
   get currentSprite(): string {
@@ -200,7 +203,7 @@ export class HedgehogActor extends Actor {
       return;
     }
     this.ability?.destroy();
-    this.ability = createSkinAbility(this, this.game);
+    this.ability = this.skinDefinition.createAbility?.(this, this.game);
     this.abilitySkin = this.options.skin;
   }
 
@@ -250,14 +253,13 @@ export class HedgehogActor extends Actor {
     if (this.isWebSlinging) {
       return;
     }
-    const MAX_JUMPS = this.isGhost() ? Infinity : 2;
-    if (this.jumps + 1 > MAX_JUMPS) {
+    if (this.jumps + 1 > this.skinDefinition.maxJumps) {
       return;
     }
 
     this.setVelocity({
       x: 0,
-      y: this.isGhost() ? -20 : -15,
+      y: this.skinDefinition.jumpVelocity,
     });
 
     this.jumps++;
@@ -293,9 +295,7 @@ export class HedgehogActor extends Actor {
   }
 
   update(ticker: UpdateTicker): void {
-    let mask = this.isGhost()
-      ? COLLISIONS.GROUND
-      : COLLISIONS.ACTOR | COLLISIONS.PROJECTILE | COLLISIONS.GROUND;
+    let mask = this.skinDefinition.collisionMask;
 
     if (this.rigidBody!.velocity.y < -0.1) {
       // We are moving upwards so we don't want to collide with platforms
@@ -392,26 +392,9 @@ export class HedgehogActor extends Actor {
     FlameActor.fireBurst(this.game, contact);
   }
 
+  // Triggered by the `f` key; delegates to the skin's ability (hogzilla only).
   maybeSpawnFireball(): void {
-    if (this.options.skin !== "hogzilla") {
-      return;
-    }
-
-    // Spawn a fireball in the direction the hedgehog is facing
-    FlameActor.spawnFireball(
-      this.game,
-      {
-        x:
-          this.rigidBody!.position.x +
-          (this.getDirection() === "left" ? -10 : 10),
-        // Y is slightly above the hedgehog
-        y: this.rigidBody!.position.y - this.sprite!.height * 0.3,
-      },
-      {
-        x: this.getDirection() === "left" ? -10 : 10,
-        y: -10,
-      }
-    );
+    this.ability?.fire?.();
   }
 
   onCollisionStart(element: GameElement, pair: Matter.Pair): void {
@@ -443,17 +426,11 @@ export class HedgehogActor extends Actor {
   }
 
   private syncRigidBody(): void {
-    if (this.isGhost()) {
-      this.rigidBody!.density = 0.0001;
-      this.rigidBody!.friction = 0.1;
-      this.rigidBody!.frictionStatic = 0;
-      this.rigidBody!.frictionAir = 0.2;
-    } else {
-      this.rigidBody!.density = 0.001;
-      this.rigidBody!.friction = 0.2;
-      this.rigidBody!.frictionStatic = 0;
-      this.rigidBody!.frictionAir = 0.01;
-    }
+    const body = this.skinDefinition.body;
+    this.rigidBody!.density = body.density!;
+    this.rigidBody!.friction = body.friction!;
+    this.rigidBody!.frictionStatic = body.frictionStatic!;
+    this.rigidBody!.frictionAir = body.frictionAir!;
   }
 
   private syncAccessories(): void {
@@ -480,12 +457,9 @@ export class HedgehogActor extends Actor {
       sprite.anchor.set(0.5);
       this.sprite!.addChild(sprite);
 
-      if (this.options.skin === "ghost") {
-        sprite.anchor.set(0.4, 0.55);
-      }
-
-      if (this.options.skin === "hogzilla") {
-        sprite.anchor.set(0.45, 0.5);
+      const anchor = this.skinDefinition.accessoryAnchor;
+      if (anchor) {
+        sprite.anchor.set(anchor.x, anchor.y);
       }
     });
   }

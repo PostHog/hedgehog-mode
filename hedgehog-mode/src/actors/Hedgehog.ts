@@ -19,12 +19,17 @@ import type { HedgehogSkinAbility } from "./hedgehog/abilities";
 import { getSkinDefinition, HedgehogSkinDefinition } from "./hedgehog/skins";
 import type { SpiderWebActor } from "../items/SpiderWebActor";
 
+// Horizontal speed a swing must exceed before the hog commits to facing that
+// way. Below it he holds his current facing (hysteresis), so the jittery near-
+// zero velocities at the bottom and apexes of a swing don't make him flicker.
+const SWING_FACING_VELOCITY = 2;
+
 export class HedgehogActor extends Actor {
   jumps = 0;
   walkSpeed = 0;
-  // Webs currently attached to (and pulling) this hog. Once empty the hog moves
-  // under its own power again.
-  private activeWebs = new Set<SpiderWebActor>();
+  // The web currently attached to (and pulling) this hog, if any. Only one at a
+  // time — released webs detach and drift off on their own.
+  private attachedWeb?: SpiderWebActor;
   private ability?: HedgehogSkinAbility;
   // The skin `ability` was built for, so we only rebuild on real skin changes.
   private abilitySkin?: HedgehogActorOptions["skin"];
@@ -93,22 +98,23 @@ export class HedgehogActor extends Actor {
   // own AI/keyboard movement (walkSpeed, jump) is suppressed so it can't push
   // itself off the web.
   get isWebSlinging(): boolean {
-    return this.activeWebs.size > 0;
+    return !!this.attachedWeb;
   }
 
   /** Called by a {@link SpiderWebActor} when it latches onto this hog. */
   attachWeb(web: SpiderWebActor): void {
-    this.activeWebs.add(web);
+    this.attachedWeb = web;
     // Pass through platforms while swinging.
     this.collisionFilterOverride = NO_PLATFORM_COLLISION_FILTER;
   }
 
   /** Called when a web releases the hog (or is torn down). */
   detachWeb(web: SpiderWebActor): void {
-    this.activeWebs.delete(web);
-    if (this.activeWebs.size === 0) {
-      this.collisionFilterOverride = undefined;
+    if (this.attachedWeb !== web) {
+      return;
     }
+    this.attachedWeb = undefined;
+    this.collisionFilterOverride = undefined;
   }
 
   updateSprite(
@@ -318,6 +324,19 @@ export class HedgehogActor extends Actor {
         x: xForce,
         y: this.rigidBody!.velocity.y,
       });
+    }
+
+    // While swinging he's physics-driven, so face the way he's moving — but
+    // only once his horizontal speed clearly commits to a direction. Below the
+    // threshold he holds his facing, so the near-zero velocities at the bottom
+    // and apexes of a swing don't make him flicker.
+    if (this.isWebSlinging) {
+      const vx = this.rigidBody!.velocity.x;
+      if (vx < -SWING_FACING_VELOCITY) {
+        this.setDirection("left");
+      } else if (vx > SWING_FACING_VELOCITY) {
+        this.setDirection("right");
+      }
     }
 
     // Set the appropriate animation

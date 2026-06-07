@@ -11,6 +11,18 @@ const FADE_DURATION_S = 1.5;
 // Soft cap so spamming clicks can't flood the world with rope bodies.
 const MAX_WEBS = 40;
 
+// The silk reads white, but a translucent dark outline underneath keeps it
+// visible on light backgrounds (the hog overlays arbitrary web pages, so we
+// can't assume a dark canvas). Dark edge shows on white; white core shows on
+// dark; both show on everything in between.
+const SILK_COLOR = 0xffffff;
+const OUTLINE_COLOR = 0x1b1b2a;
+
+// Where the strand grips the hog: offset sideways from centre toward the hand
+// (a fraction of the sprite width), in the direction it's facing. Same height
+// as the body centre.
+const HAND_X_FRACTION = 0.25;
+
 let TOTAL_WEBS = 0;
 
 /**
@@ -136,7 +148,9 @@ export class SpiderWebActor implements GameElement {
   }
 
   // Silk strand: anchor -> rope body centres -> hog (while attached). Drawn as a
-  // soft glow under a crisp line with a "stuck" splat at the anchor.
+  // dark contrast outline under a crisp white line, with a "stuck" splat at the
+  // anchor. Two passes (dark wider, white narrower) keep it readable on both
+  // light and dark backgrounds.
   private draw(): void {
     const alpha = 1 - this.fade;
     const points: Matter.Vector[] = [
@@ -147,51 +161,63 @@ export class SpiderWebActor implements GameElement {
       })),
     ];
     if (this.attachment) {
-      points.push({
-        x: this.actor.rigidBody!.position.x,
-        y: this.actor.rigidBody!.position.y,
-      });
+      // Grip the hog at the hand, not the centre. Offset relative to the body
+      // (its angle is forced upright, so no rotation needed) keeps the physics
+      // constraint and the drawn endpoint in sync.
+      const body = this.actor.rigidBody!;
+      const direction = this.actor.getDirection() === "left" ? -1 : 1;
+      const reach = Math.abs(this.actor.sprite!.width) * HAND_X_FRACTION;
+      this.attachment.pointB = { x: direction * reach, y: 0 };
+      points.push({ x: body.position.x + direction * reach, y: body.position.y });
     }
 
     const graphics = this.graphics;
     graphics.clear();
 
-    const trace = () => {
+    const traceStrand = () => {
       graphics.moveTo(points[0].x, points[0].y);
       for (let i = 1; i < points.length; i++) {
         graphics.lineTo(points[i].x, points[i].y);
       }
     };
 
-    // Soft glow underlay
-    trace();
+    // Dark outline underlay — gives contrast on light backgrounds.
+    traceStrand();
     graphics.stroke({
-      width: 4,
-      color: 0xffffff,
-      alpha: 0.18 * alpha,
+      width: 3.5,
+      color: OUTLINE_COLOR,
+      alpha: 0.35 * alpha,
       cap: "round",
       join: "round",
     });
 
-    // Crisp strand
-    trace();
+    // Crisp silk strand on top.
+    traceStrand();
     graphics.stroke({
       width: 1.5,
-      color: 0xffffff,
-      alpha: 0.9 * alpha,
+      color: SILK_COLOR,
+      alpha: 0.95 * alpha,
       cap: "round",
       join: "round",
     });
 
-    // Anchor splat where the web sticks
+    // Anchor splat where the web sticks — dark halo then white core.
     const a = points[0];
-    graphics.circle(a.x, a.y, 3).fill({ color: 0xffffff, alpha: 0.7 * alpha });
-    for (let i = 0; i < 4; i++) {
-      const angle = (Math.PI / 2) * i + Math.PI / 4;
-      graphics.moveTo(a.x, a.y);
-      graphics.lineTo(a.x + Math.cos(angle) * 6, a.y + Math.sin(angle) * 6);
-    }
-    graphics.stroke({ width: 1, color: 0xffffff, alpha: 0.5 * alpha, cap: "round" });
+    graphics.circle(a.x, a.y, 4).fill({ color: OUTLINE_COLOR, alpha: 0.3 * alpha });
+    graphics.circle(a.x, a.y, 3).fill({ color: SILK_COLOR, alpha: 0.85 * alpha });
+
+    const traceSplatLegs = () => {
+      for (let i = 0; i < 4; i++) {
+        const angle = (Math.PI / 2) * i + Math.PI / 4;
+        graphics.moveTo(a.x, a.y);
+        graphics.lineTo(a.x + Math.cos(angle) * 6, a.y + Math.sin(angle) * 6);
+      }
+    };
+
+    traceSplatLegs();
+    graphics.stroke({ width: 2, color: OUTLINE_COLOR, alpha: 0.3 * alpha, cap: "round" });
+    traceSplatLegs();
+    graphics.stroke({ width: 1, color: SILK_COLOR, alpha: 0.6 * alpha, cap: "round" });
   }
 
   beforeUnload(): void {

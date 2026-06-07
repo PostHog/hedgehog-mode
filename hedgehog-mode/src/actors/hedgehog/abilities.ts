@@ -16,12 +16,13 @@ export interface HedgehogSkinAbility {
 
 /**
  * Spiderhog web-slinging. A pointer down spawns a web pinned at the cursor and
- * attached to the hog; dragging moves the anchor; releasing detaches it. Tracks
- * webs per pointer id so multitouch slings don't clobber each other. Owns —
- * and crucially cleans up — its global listeners.
+ * attached to the hog; dragging moves the anchor; releasing detaches it so it
+ * drifts off on its own. Only one web is slung at a time. Owns — and crucially
+ * cleans up — its global listeners.
  */
 export class SpiderHogAbility implements HedgehogSkinAbility {
-  private activeWebs = new Map<number, SpiderWebActor>();
+  private activeWeb?: SpiderWebActor;
+  private activePointerId?: number;
 
   constructor(
     private actor: HedgehogActor,
@@ -31,7 +32,11 @@ export class SpiderHogAbility implements HedgehogSkinAbility {
   }
 
   private onPointerDown = (e: PointerEvent): void => {
-    if (this.actor.options.skin !== "spiderhog" || this.actor.isDead) {
+    if (
+      this.activeWeb ||
+      this.actor.options.skin !== "spiderhog" ||
+      this.actor.isDead
+    ) {
       return;
     }
 
@@ -43,41 +48,39 @@ export class SpiderHogAbility implements HedgehogSkinAbility {
       return;
     }
 
-    this.activeWebs.set(e.pointerId, web);
+    this.activeWeb = web;
+    this.activePointerId = e.pointerId;
     window.addEventListener("pointermove", this.onPointerMove);
     window.addEventListener("pointerup", this.onPointerUp);
     window.addEventListener("pointercancel", this.onPointerUp);
   };
 
   private onPointerMove = (e: PointerEvent): void => {
-    this.activeWebs.get(e.pointerId)?.moveAnchor({
-      x: e.clientX,
-      y: e.clientY,
-    });
+    if (e.pointerId !== this.activePointerId) {
+      return;
+    }
+    this.activeWeb?.moveAnchor({ x: e.clientX, y: e.clientY });
   };
 
   private onPointerUp = (e: PointerEvent): void => {
-    const web = this.activeWebs.get(e.pointerId);
-    if (!web) {
+    if (e.pointerId !== this.activePointerId) {
       return;
     }
-    web.release();
-    this.activeWebs.delete(e.pointerId);
-
-    if (this.activeWebs.size === 0) {
-      window.removeEventListener("pointermove", this.onPointerMove);
-      window.removeEventListener("pointerup", this.onPointerUp);
-      window.removeEventListener("pointercancel", this.onPointerUp);
-    }
+    this.endSling();
   };
 
-  destroy(): void {
-    window.removeEventListener("pointerdown", this.onPointerDown);
+  private endSling(): void {
+    this.activeWeb?.release();
+    this.activeWeb = undefined;
+    this.activePointerId = undefined;
     window.removeEventListener("pointermove", this.onPointerMove);
     window.removeEventListener("pointerup", this.onPointerUp);
     window.removeEventListener("pointercancel", this.onPointerUp);
-    this.activeWebs.forEach((web) => web.release());
-    this.activeWebs.clear();
+  }
+
+  destroy(): void {
+    this.endSling();
+    window.removeEventListener("pointerdown", this.onPointerDown);
   }
 }
 

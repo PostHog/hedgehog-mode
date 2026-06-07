@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "pnpm --filter @posthog/hedgehog-mode build && pnpm -r --parallel run dev",
+    "dev": "pnpm -r --parallel --no-bail run dev",
     "build": "pnpm --dir ./playground build"
   },
   "keywords": [],

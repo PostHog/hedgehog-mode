@@ -260,6 +260,13 @@ export class Actor implements GameElement {
     document.addEventListener("touchmove", onTouchMove, { passive: false });
   }
 
+  // Whether the actor should be clamped/wrapped to the screen edges. Subclasses
+  // can opt out (e.g. while tethered to a web, so wrapping doesn't teleport the
+  // body across the screen and explode the constraint tension).
+  protected get keepOnScreen(): boolean {
+    return true;
+  }
+
   update(ticker: UpdateTicker): void {
     // Apply the collision filter override if it exists
     this.rigidBody!.collisionFilter.mask =
@@ -267,13 +274,15 @@ export class Actor implements GameElement {
     this.rigidBody!.collisionFilter.category =
       this.collisionFilterOverride?.category ?? this.collisionFilter.category;
 
-    const yDiff = this.game.app.screen.height - this.rigidBody!.position.y;
+    if (this.keepOnScreen) {
+      const yDiff = this.game.app.screen.height - this.rigidBody!.position.y;
 
-    if (yDiff < 0) {
-      this.setPosition({
-        x: this.rigidBody!.position.x,
-        y: Math.max(this.rigidBody!.position.y - yDiff, 0),
-      });
+      if (yDiff < 0) {
+        this.setPosition({
+          x: this.rigidBody!.position.x,
+          y: Math.max(this.rigidBody!.position.y - yDiff, 0),
+        });
+      }
     }
 
     // TRICKY: This offsets the rendered sprite to match the hitbox
@@ -302,19 +311,21 @@ export class Actor implements GameElement {
     sprite.y = rigidBody.position.y - yOffsetDiff + yCenterDiff;
     sprite.rotation = rigidBody.angle;
 
-    const { width: rigidBodyWidth } = this.getRigidBodyDimensions();
-    if (rigidBody.position.x > window.innerWidth + rigidBodyWidth) {
-      this.setPosition({
-        x: 0,
-        y: rigidBody.position.y,
-      });
-    }
+    if (this.keepOnScreen) {
+      const { width: rigidBodyWidth } = this.getRigidBodyDimensions();
+      if (rigidBody.position.x > window.innerWidth + rigidBodyWidth) {
+        this.setPosition({
+          x: 0,
+          y: rigidBody.position.y,
+        });
+      }
 
-    if (rigidBody.position.x < 0 - rigidBodyWidth) {
-      this.setPosition({
-        x: window.innerWidth,
-        y: rigidBody.position.y,
-      });
+      if (rigidBody.position.x < 0 - rigidBodyWidth) {
+        this.setPosition({
+          x: window.innerWidth,
+          y: rigidBody.position.y,
+        });
+      }
     }
 
     // // TRICKY: The scale of the hitbox is different to the sprite

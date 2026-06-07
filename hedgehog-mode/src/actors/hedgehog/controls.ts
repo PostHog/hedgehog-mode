@@ -59,6 +59,16 @@ export class HedgehogActorControls {
       this.actor.ai.pause(5000);
     };
 
+    // While web-slinging, up/down climb the web instead of jumping/ducking.
+    const verticalHandler = () => {
+      if (!this.actor.isWebSlinging) {
+        return;
+      }
+      const up = heldKeys.has("up");
+      const down = heldKeys.has("down");
+      this.actor.webClimbDirection = up && !down ? 1 : down && !up ? -1 : 0;
+    };
+
     let fireInterval: NodeJS.Timeout | undefined = undefined;
     let jumpCancelTimeout: NodeJS.Timeout | undefined = undefined;
 
@@ -82,9 +92,11 @@ export class HedgehogActorControls {
               y: 0,
             });
           }
+          verticalHandler();
         },
         off: () => {
           this.actor.collisionFilterOverride = undefined;
+          verticalHandler();
         },
       },
       up: {
@@ -92,12 +104,14 @@ export class HedgehogActorControls {
           clearTimeout(jumpCancelTimeout ?? undefined);
           this.actor.jump();
           this.actor.ai.pause(5000);
+          verticalHandler();
         },
         off: () => {
           clearTimeout(jumpCancelTimeout);
           jumpCancelTimeout = setTimeout(() => {
             this.actor.cancelJump();
           }, 100);
+          verticalHandler();
         },
       },
       left: {

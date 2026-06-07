@@ -30,6 +30,9 @@ export class HedgehogActor extends Actor {
   // The web currently attached to (and pulling) this hog, if any. Only one at a
   // time — released webs detach and drift off on their own.
   private attachedWeb?: SpiderWebActor;
+  // Climb intent while web-slinging: 1 = up the web, -1 = down, 0 = hold. Set by
+  // the controls and read by the attached SpiderWebActor.
+  webClimbDirection: -1 | 0 | 1 = 0;
   private ability?: HedgehogSkinAbility;
   // The skin `ability` was built for, so we only rebuild on real skin changes.
   private abilitySkin?: HedgehogActorOptions["skin"];
@@ -101,6 +104,13 @@ export class HedgehogActor extends Actor {
     return !!this.attachedWeb;
   }
 
+  // Don't wrap/clamp to the screen edges while tethered — otherwise wrapping
+  // teleports the body across the screen and the web tension explodes, flinging
+  // him in a loop. Let him swing freely out of frame and back instead.
+  protected get keepOnScreen(): boolean {
+    return !this.isWebSlinging;
+  }
+
   /** Called by a {@link SpiderWebActor} when it latches onto this hog. */
   attachWeb(web: SpiderWebActor): void {
     this.attachedWeb = web;
@@ -114,6 +124,7 @@ export class HedgehogActor extends Actor {
       return;
     }
     this.attachedWeb = undefined;
+    this.webClimbDirection = 0;
     this.collisionFilterOverride = undefined;
   }
 
@@ -371,8 +382,12 @@ export class HedgehogActor extends Actor {
       });
     }
 
-    // Check if below screen and if so then move up
-    if (this.rigidBody!.position.y > this.game.app.screen.height) {
+    // Check if below screen and if so then move up (but not while tethered to a
+    // web — teleporting across the screen would explode the constraint tension).
+    if (
+      this.keepOnScreen &&
+      this.rigidBody!.position.y > this.game.app.screen.height
+    ) {
       this.setPosition({
         x: this.rigidBody!.position.x,
         y: 0,

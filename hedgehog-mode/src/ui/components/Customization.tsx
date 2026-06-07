@@ -108,8 +108,8 @@ export function HedgehogCustomization({
                 because this hedgehog's got a whole data warehouse to protect...
                 <br />
                 you can move me around by clicking and dragging or control me
-                with WASD / arrow keys and I'll use your mouse as a web slinging
-                target.
+                with WASD / arrow keys, and i'll use your mouse as a web-slinging
+                target. hold the web and press W / S to climb up and down it.
               </>
             ) : config.skin === "robohog" ? (
               <>

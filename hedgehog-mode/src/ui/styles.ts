@@ -218,6 +218,54 @@ export const styles = `
     animation: letter-pop 0.5s var(--transition-timing) forwards;
   }
 
+  .Flash {
+    position: fixed;
+    left: 50%;
+    bottom: 80px;
+    transform: translateX(-50%);
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .Flash--actor {
+    /* left/bottom are set per-frame to follow the hog */
+    left: 0;
+  }
+
+  .FlashBubble {
+    position: relative;
+    overflow: hidden;
+    max-width: 220px;
+    padding: var(--spacing-sm);
+    background-color: var(--color-background);
+    color: var(--color-text);
+    border: 2px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    box-shadow: 0 10px 15px -3px var(--color-shadow);
+    animation: flash-pop 200ms var(--transition-timing);
+  }
+
+  @keyframes flash-pop {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .FlashBar {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 3px;
+    width: 100%;
+    background-color: var(--color-border);
+    transform-origin: left center;
+    animation: flash-bar linear forwards;
+  }
+
+  @keyframes flash-bar {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(0); }
+  }
+
   .Customization {
     display: flex;
     flex-direction: column;

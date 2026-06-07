@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   GameUI,
+  GameUIFlashProps,
   GameUIProps,
   HedgehogActorOptions,
   HedgeHogMode,
@@ -8,6 +9,7 @@ import {
 import { Button } from "./components/Button";
 import { HedgehogCustomization } from "./components/Customization";
 import { Messages } from "./components/Messages";
+import { Flash } from "./components/Flash";
 import { useOutsideClick } from "./hooks/useOutsideClick";
 import { useKeyboardListener } from "./hooks/useKeyboardListener";
 
@@ -16,6 +18,7 @@ const WINDOW_MARGIN = 10;
 export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
   const [ui, setUI] = useState<GameUIProps | null>(null);
   const [visible, setVisible] = useState<boolean>(false);
+  const [flash, setFlash] = useState<GameUIFlashProps | null>(null);
 
   const uiRef = useRef<GameUI>({
     show: (ui) => {
@@ -24,6 +27,9 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
     },
     hide: () => {
       setVisible(false);
+    },
+    flash: (flash) => {
+      setFlash(flash);
     },
     visible,
   });
@@ -184,6 +190,7 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
 
   return (
     <div className="GameUI">
+      {flash && <Flash flash={flash} onDone={() => setFlash(null)} />}
       <div
         ref={ref}
         className={`DialogBox ${visible ? "DialogBox--visible" : ""}`}

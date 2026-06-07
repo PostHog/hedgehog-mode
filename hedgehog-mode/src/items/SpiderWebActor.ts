@@ -1,7 +1,7 @@
-import Matter, { Bodies, Composite, Composites, Constraint } from "matter-js";
+import Matter, { Bodies, Composite, Constraint } from "matter-js";
 import { Graphics } from "pixi.js";
 import gsap from "gsap";
-import { HedgehogModeInterface, GameElement } from "../types";
+import { HedgehogModeInterface, GameElement, UpdateTicker } from "../types";
 import type { HedgehogActor } from "../actors/Hedgehog";
 
 const NUM_LINKS = 8;
@@ -10,6 +10,25 @@ const FADE_DELAY_S = 2;
 const FADE_DURATION_S = 1.5;
 // Soft cap so spamming clicks can't flood the world with rope bodies.
 const MAX_WEBS = 40;
+
+// Rope feel: springy + damped so the strand flexes instead of snapping rigid.
+const ANCHOR_STIFFNESS = 1; // firmly stuck to the point it grabbed
+const LINK_STIFFNESS = 0.8;
+const LINK_DAMPING = 0.1;
+const ATTACH_STIFFNESS = 0.6;
+const ATTACH_DAMPING = 0.2;
+
+// The rope is built spanning anchor -> hog, then sized to SLACK_FACTOR of that
+// distance so it rests shorter than the span — giving a gentle but real tension
+// drawing him in (no violent yank, however far the click). Lower = more pull.
+// He then climbs the rope himself with W/S.
+const SLACK_FACTOR = 0.8;
+// How fast climbing shortens/lengthens the rope (multiplier per second held).
+const CLIMB_PER_SECOND = 2.5;
+const MIN_LINK_LENGTH = 6;
+// Descending can extend the rope well past where it started; this just keeps the
+// numbers bounded so a held key can't blow the link lengths up to infinity.
+const MAX_LINK_LENGTH_FLOOR = 400;
 
 // The silk reads white, but a translucent dark outline underneath keeps it
 // visible on light backgrounds (the hog overlays arbitrary web pages, so we
@@ -43,6 +62,10 @@ export class SpiderWebActor implements GameElement {
   private anchor: Constraint;
   // Constraint tying the strand to the hog; dropped on release.
   private attachment?: Constraint;
+  // The inter-link constraints, whose rest length we shrink/grow to climb.
+  private links: Constraint[] = [];
+  private initialLinkLength = 0;
+  private maxLinkLength = 0;
   private graphics = new Graphics();
   private released = false;
   private fade = 0;
@@ -67,38 +90,73 @@ export class SpiderWebActor implements GameElement {
     private actor: HedgehogActor,
     point: Matter.Vector
   ) {
-    this.rope = Composites.stack(
-      point.x,
-      point.y,
-      1,
-      NUM_LINKS,
-      0,
-      5,
-      (x: number, y: number) =>
-        Bodies.rectangle(x, y, 5, 20, {
-          density: 0.0005,
-          frictionAir: 0.02,
-          // The strand is decorative — it shouldn't knock actors around.
-          collisionFilter: { mask: 0 },
-        })
+    // Build the rope spanning anchor -> hog, links evenly spaced along the line.
+    // Its rest length is based on the *vertical* drop to the hog, not the full
+    // diagonal — so a sideways click yields a rope that's short relative to the
+    // span and pulls him over to settle hovering below the anchor, rather than a
+    // long slack rope he just dangles from. A click straight up gives a gentle
+    // lift (vertical ~= full distance).
+    const hog = this.actor.rigidBody!.position;
+    const verticalSpan = Math.abs(hog.y - point.y);
+    this.initialLinkLength = Math.max(
+      MIN_LINK_LENGTH,
+      (verticalSpan / (NUM_LINKS - 1)) * SLACK_FACTOR
     );
-    Composites.chain(this.rope, 0.5, 0, -0.5, 0, { stiffness: 0.9 });
+    // Allow descending well past the starting length, proportional to it.
+    this.maxLinkLength = Math.max(
+      this.initialLinkLength * 4,
+      MAX_LINK_LENGTH_FLOOR
+    );
 
-    const firstLink = this.rope.bodies[0];
-    const lastLink = this.rope.bodies[this.rope.bodies.length - 1];
+    const bodies: Matter.Body[] = [];
+    for (let i = 0; i < NUM_LINKS; i++) {
+      const t = i / (NUM_LINKS - 1);
+      bodies.push(
+        Bodies.rectangle(
+          point.x + (hog.x - point.x) * t,
+          point.y + (hog.y - point.y) * t,
+          5,
+          20,
+          {
+            density: 0.0005,
+            frictionAir: 0.02,
+            // The strand is decorative — it shouldn't knock actors around.
+            collisionFilter: { mask: 0 },
+          }
+        )
+      );
+    }
+
+    this.rope = Composite.create();
+    Composite.add(this.rope, bodies);
+    for (let i = 0; i < bodies.length - 1; i++) {
+      const link = Constraint.create({
+        bodyA: bodies[i],
+        bodyB: bodies[i + 1],
+        length: this.initialLinkLength,
+        stiffness: LINK_STIFFNESS,
+        damping: LINK_DAMPING,
+      });
+      this.links.push(link);
+      Composite.add(this.rope, link);
+    }
+
+    const firstLink = bodies[0];
+    const lastLink = bodies[bodies.length - 1];
 
     this.anchor = Constraint.create({
       pointA: { x: point.x, y: point.y },
       bodyB: firstLink,
       length: 0,
-      stiffness: 1,
+      stiffness: ANCHOR_STIFFNESS,
     });
 
     this.attachment = Constraint.create({
       bodyA: lastLink,
       bodyB: this.actor.rigidBody!,
       length: 10,
-      stiffness: 1,
+      stiffness: ATTACH_STIFFNESS,
+      damping: ATTACH_DAMPING,
     });
 
     Matter.World.add(this.game.engine.world, [
@@ -143,8 +201,31 @@ export class SpiderWebActor implements GameElement {
     });
   }
 
-  update(): void {
+  update(ticker: UpdateTicker): void {
+    this.climb(ticker.deltaMS / 1000);
     this.draw();
+  }
+
+  // Reel the rope shorter (climb up) or longer (descend) while the hog signals
+  // an intent. Shrinking the link rest lengths draws him toward the anchor with
+  // building tension; growing them lowers him back down, never past where the
+  // web first reached.
+  private climb(dtSeconds: number): void {
+    if (!this.attachment) {
+      return;
+    }
+    const direction = this.actor.webClimbDirection;
+    if (direction === 0) {
+      return;
+    }
+    const step = Math.pow(CLIMB_PER_SECOND, dtSeconds);
+    const multiplier = direction > 0 ? 1 / step : step;
+    this.links.forEach((link) => {
+      link.length = Math.min(
+        this.maxLinkLength,
+        Math.max(MIN_LINK_LENGTH, link.length * multiplier)
+      );
+    });
   }
 
   // Silk strand: anchor -> rope body centres -> hog (while attached). Drawn as a

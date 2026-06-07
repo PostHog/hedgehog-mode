@@ -2,6 +2,7 @@ import type { HedgehogModeInterface } from "../../types";
 import type { HedgehogActor } from "../Hedgehog";
 import { SpiderWebActor } from "../../items/SpiderWebActor";
 import { FlameActor } from "../../items/Flame";
+import { HOUR_MS, oncePerInterval } from "../../misc/storage";
 
 /**
  * A skin-specific active behaviour bound to a single hedgehog. Built by the
@@ -53,6 +54,26 @@ export class SpiderHogAbility implements HedgehogSkinAbility {
     window.addEventListener("pointermove", this.onPointerMove);
     window.addEventListener("pointerup", this.onPointerUp);
     window.addEventListener("pointercancel", this.onPointerUp);
+
+    // Hint at the climb controls the first time the player slings — at most once
+    // a day so it isn't nagging.
+    if (
+      this.actor.options.player &&
+      this.game.gameUI &&
+      oncePerInterval("web-climb-hint", HOUR_MS)
+    ) {
+      this.game.gameUI.flash({
+        words: [
+          "nice sling! press",
+          { text: "W", style: { fontWeight: "bold" } },
+          "/",
+          { text: "S", style: { fontWeight: "bold" } },
+          "to climb the web",
+        ],
+        actor: this.actor,
+        duration: 5000,
+      });
+    }
   };
 
   private onPointerMove = (e: PointerEvent): void => {

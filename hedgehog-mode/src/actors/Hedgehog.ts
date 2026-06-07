@@ -4,76 +4,29 @@ import {
   NO_PLATFORM_COLLISION_FILTER,
 } from "./Actor";
 import { HedgehogModeInterface, GameElement, UpdateTicker } from "../types";
-import Matter, {
-  Bodies,
-  Composite,
-  Composites,
-  Constraint,
-  Pair,
-} from "matter-js";
+import Matter, { Pair } from "matter-js";
 import { SyncedPlatform } from "../items/SyncedPlatform";
-import { AnimatedSprite, ColorMatrixFilter, Graphics, Sprite } from "pixi.js";
+import { AnimatedSprite, ColorMatrixFilter, Sprite } from "pixi.js";
 import { FlameActor } from "../items/Flame";
 import gsap from "gsap";
 import { COLLISIONS } from "../misc/collisions";
 import { HedgehogActorAI } from "./hedgehog/ai";
 import { HedgehogActorControls } from "./hedgehog/controls";
-import {
-  HedgehogActorColorOption,
-  HedgehogActorOptions,
-} from "./hedgehog/config";
+import { HedgehogActorOptions } from "./hedgehog/config";
 import { HedgehogActorInterface } from "./hedgehog/interface";
-
-export const COLOR_TO_FILTER_MAP: Record<
-  HedgehogActorColorOption,
-  (filter: ColorMatrixFilter) => void
-> = {
-  red: (filter) => {
-    filter.hue(350, true);
-    filter.saturate(1.2, true);
-    filter.brightness(0.9, true);
-  },
-  green: (filter) => {
-    filter.hue(60, true);
-    filter.saturate(1, true);
-  },
-  blue: (filter) => {
-    filter.hue(210, true);
-    filter.saturate(3, true);
-    filter.brightness(0.9, true);
-  },
-  purple: (filter) => {
-    filter.hue(240, true);
-  },
-  dark: (filter) => {
-    filter.brightness(0.7, true);
-  },
-  light: (filter) => {
-    filter.brightness(1.3, true);
-  },
-  sepia: (filter) => {
-    filter.sepia(true);
-  },
-  invert: (filter) => {
-    filter.negative(true);
-  },
-  greyscale: (filter) => {
-    filter.grayscale(0.3, true);
-  },
-  rainbow: (filter) => {},
-};
+import { applyStaticColor } from "./hedgehog/colors";
+import { createSkinAbility, HedgehogSkinAbility } from "./hedgehog/abilities";
+import type { SpiderWebActor } from "../items/SpiderWebActor";
 
 export class HedgehogActor extends Actor {
   jumps = 0;
   walkSpeed = 0;
-  ropeConstraint?: Constraint;
-  // Active spiderhog web strand (procedurally drawn each frame). The physics
-  // rope lives in the Matter world; this is its Pixi visual.
-  private spiderWeb?: {
-    graphics: Graphics;
-    rope: Composite;
-    anchor: Constraint;
-  };
+  // Webs currently attached to (and pulling) this hog. Once empty the hog moves
+  // under its own power again.
+  private activeWebs = new Set<SpiderWebActor>();
+  private ability?: HedgehogSkinAbility;
+  // The skin `ability` was built for, so we only rebuild on real skin changes.
+  private abilitySkin?: HedgehogActorOptions["skin"];
   accessorySprites: { [key: string]: Sprite } = {};
   overlayAnimation?: AnimatedSprite;
   isFlammable = true;
@@ -125,8 +78,8 @@ export class HedgehogActor extends Actor {
       ease: "elastic.out",
     });
 
+    // Wires up the skin ability via syncSkinAbility().
     this.updateOptions(options);
-    this.setupSpiderHogRope();
   }
 
   private isGhost(): boolean {
@@ -137,7 +90,22 @@ export class HedgehogActor extends Actor {
   // own AI/keyboard movement (walkSpeed, jump) is suppressed so it can't push
   // itself off the web.
   get isWebSlinging(): boolean {
-    return !!this.spiderWeb;
+    return this.activeWebs.size > 0;
+  }
+
+  /** Called by a {@link SpiderWebActor} when it latches onto this hog. */
+  attachWeb(web: SpiderWebActor): void {
+    this.activeWebs.add(web);
+    // Pass through platforms while swinging.
+    this.collisionFilterOverride = NO_PLATFORM_COLLISION_FILTER;
+  }
+
+  /** Called when a web releases the hog (or is torn down). */
+  detachWeb(web: SpiderWebActor): void {
+    this.activeWebs.delete(web);
+    if (this.activeWebs.size === 0) {
+      this.collisionFilterOverride = undefined;
+    }
   }
 
   updateSprite(
@@ -221,6 +189,19 @@ export class HedgehogActor extends Actor {
     this.ai.enable(this.options.ai_enabled ?? true);
     this.syncAccessories();
     this.syncRigidBody();
+    this.syncSkinAbility();
+  }
+
+  // Skin can change at runtime (e.g. "become spiderhog"), so keep the skin
+  // ability in sync. Only rebuilds when the skin actually changes, so unrelated
+  // option updates (colour, accessories, ...) don't tear down an active sling.
+  private syncSkinAbility(): void {
+    if (this.options.skin === this.abilitySkin) {
+      return;
+    }
+    this.ability?.destroy();
+    this.ability = createSkinAbility(this, this.game);
+    this.abilitySkin = this.options.skin;
   }
 
   clearOverlayAnimation(): void {
@@ -300,157 +281,6 @@ export class HedgehogActor extends Actor {
     }
   }
 
-  setupSpiderHogRope(): void {
-    window.addEventListener("pointerdown", (e) => {
-      if (this.options.skin !== "spiderhog") {
-        return;
-      }
-
-      // Clean up any strand still attached (e.g. a stray second pointer)
-      this.clearSpiderWeb();
-
-      this.collisionFilterOverride = NO_PLATFORM_COLLISION_FILTER;
-
-      const rope = Composites.stack(
-        400,
-        100,
-        1,
-        8,
-        0,
-        5,
-        (x: number, y: number) => {
-          return Bodies.rectangle(x, y, 5, 20, {
-            density: 0.0005,
-            frictionAir: 0.02,
-          });
-        }
-      );
-      Composites.chain(rope, 0.5, 0, -0.5, 0, {
-        stiffness: 0.9,
-        render: { visible: true },
-      });
-
-      const firstLink = rope.bodies[0];
-      const lastLink = rope.bodies[rope.bodies.length - 1];
-
-      const webAnchor = Constraint.create({
-        pointA: { x: e.clientX, y: e.clientY },
-        bodyB: firstLink,
-        length: 0,
-        stiffness: 1,
-        render: { visible: true },
-      });
-
-      const webAttachment = Constraint.create({
-        bodyA: lastLink,
-        bodyB: this.rigidBody!,
-        length: 10,
-        stiffness: 1,
-        render: { visible: true },
-      });
-
-      Matter.World.add(this.game.engine.world, [
-        rope,
-        webAnchor,
-        webAttachment,
-      ]);
-
-      // Visual strand, redrawn each frame in update() to follow the rope sag
-      const graphics = new Graphics();
-      this.game.app.stage.addChild(graphics);
-      this.spiderWeb = { graphics, rope, anchor: webAnchor };
-
-      const onDragMove = (e: PointerEvent) => {
-        webAnchor.pointA.x = e.clientX;
-        webAnchor.pointA.y = e.clientY;
-      };
-
-      const onDragEnd = (e: PointerEvent) => {
-        this.isDragging = false;
-        Matter.World.remove(this.game.engine.world, [
-          rope,
-          webAnchor,
-          webAttachment,
-        ]);
-        this.clearSpiderWeb();
-
-        window.removeEventListener("pointermove", onDragMove);
-        this.collisionFilterOverride = undefined;
-      };
-
-      window.addEventListener("pointermove", onDragMove);
-      window.addEventListener("pointerup", onDragEnd);
-      window.addEventListener("pointercancel", onDragEnd);
-    });
-  }
-
-  private clearSpiderWeb(): void {
-    if (!this.spiderWeb) {
-      return;
-    }
-    this.spiderWeb.graphics.destroy();
-    this.spiderWeb = undefined;
-  }
-
-  // Redraw the silk strand: anchor -> rope body centres -> hedgehog. Drawn as a
-  // soft glow underneath a crisp white line, with a little "stuck" splat at the
-  // anchor point so it reads as web rather than a generic rope.
-  private drawSpiderWeb(): void {
-    if (!this.spiderWeb) {
-      return;
-    }
-
-    const { graphics, rope, anchor } = this.spiderWeb;
-
-    const points: Matter.Vector[] = [
-      { x: anchor.pointA.x, y: anchor.pointA.y },
-      ...rope.bodies.map((body) => ({
-        x: body.position.x,
-        y: body.position.y,
-      })),
-      { x: this.rigidBody!.position.x, y: this.rigidBody!.position.y },
-    ];
-
-    graphics.clear();
-
-    const trace = () => {
-      graphics.moveTo(points[0].x, points[0].y);
-      for (let i = 1; i < points.length; i++) {
-        graphics.lineTo(points[i].x, points[i].y);
-      }
-    };
-
-    // Soft glow underlay
-    trace();
-    graphics.stroke({
-      width: 4,
-      color: 0xffffff,
-      alpha: 0.18,
-      cap: "round",
-      join: "round",
-    });
-
-    // Crisp strand
-    trace();
-    graphics.stroke({
-      width: 1.5,
-      color: 0xffffff,
-      alpha: 0.9,
-      cap: "round",
-      join: "round",
-    });
-
-    // Anchor splat where the web sticks
-    const a = points[0];
-    graphics.circle(a.x, a.y, 3).fill({ color: 0xffffff, alpha: 0.7 });
-    for (let i = 0; i < 4; i++) {
-      const angle = (Math.PI / 2) * i + Math.PI / 4;
-      graphics.moveTo(a.x, a.y);
-      graphics.lineTo(a.x + Math.cos(angle) * 6, a.y + Math.sin(angle) * 6);
-    }
-    graphics.stroke({ width: 1, color: 0xffffff, alpha: 0.5, cap: "round" });
-  }
-
   setDirection(direction: "left" | "right"): void {
     if (direction === "left" && this.sprite!.scale.x > 0) {
       this.sprite!.scale.x *= -1;
@@ -476,8 +306,6 @@ export class HedgehogActor extends Actor {
     this.collisionFilter.mask = mask;
 
     super.update(ticker);
-
-    this.drawSpiderWeb();
 
     if (this.isDead) {
       return;
@@ -541,11 +369,7 @@ export class HedgehogActor extends Actor {
       this.hue = this.hue > 360 ? 0 : this.hue;
       this.filter.hue(this.hue, false);
     } else {
-      const options = this.options.color
-        ? COLOR_TO_FILTER_MAP[this.options.color]
-        : undefined;
-      this.filter.reset();
-      options?.(this.filter);
+      applyStaticColor(this.filter, this.options.color);
     }
   }
 
@@ -710,7 +534,7 @@ export class HedgehogActor extends Actor {
   }
 
   beforeUnload(): void {
-    this.clearSpiderWeb();
+    this.ability?.destroy();
     this.ai.enable(false);
     Object.values(this.accessorySprites).forEach((sprite) => {
       this.game.app.stage.removeChild(sprite);

@@ -4,9 +4,15 @@ import {
   NO_PLATFORM_COLLISION_FILTER,
 } from "./Actor";
 import { HedgehogModeInterface, GameElement, UpdateTicker } from "../types";
-import Matter, { Bodies, Composites, Constraint, Pair } from "matter-js";
+import Matter, {
+  Bodies,
+  Composite,
+  Composites,
+  Constraint,
+  Pair,
+} from "matter-js";
 import { SyncedPlatform } from "../items/SyncedPlatform";
-import { AnimatedSprite, ColorMatrixFilter, Sprite } from "pixi.js";
+import { AnimatedSprite, ColorMatrixFilter, Graphics, Sprite } from "pixi.js";
 import { FlameActor } from "../items/Flame";
 import gsap from "gsap";
 import { COLLISIONS } from "../misc/collisions";
@@ -61,6 +67,13 @@ export class HedgehogActor extends Actor {
   jumps = 0;
   walkSpeed = 0;
   ropeConstraint?: Constraint;
+  // Active spiderhog web strand (procedurally drawn each frame). The physics
+  // rope lives in the Matter world; this is its Pixi visual.
+  private spiderWeb?: {
+    graphics: Graphics;
+    rope: Composite;
+    anchor: Constraint;
+  };
   accessorySprites: { [key: string]: Sprite } = {};
   overlayAnimation?: AnimatedSprite;
   isFlammable = true;
@@ -118,6 +131,13 @@ export class HedgehogActor extends Actor {
 
   private isGhost(): boolean {
     return this.options.skin === "ghost";
+  }
+
+  // While a web strand is attached the hog swings purely under physics — its
+  // own AI/keyboard movement (walkSpeed, jump) is suppressed so it can't push
+  // itself off the web.
+  get isWebSlinging(): boolean {
+    return !!this.spiderWeb;
   }
 
   updateSprite(
@@ -246,6 +266,9 @@ export class HedgehogActor extends Actor {
   }
 
   jump(): void {
+    if (this.isWebSlinging) {
+      return;
+    }
     const MAX_JUMPS = this.isGhost() ? Infinity : 2;
     if (this.jumps + 1 > MAX_JUMPS) {
       return;
@@ -260,7 +283,7 @@ export class HedgehogActor extends Actor {
   }
 
   cancelJump(): void {
-    if (this.rigidBody!.velocity.y > 0) {
+    if (this.isWebSlinging || this.rigidBody!.velocity.y > 0) {
       return;
     }
     this.setVelocity({
@@ -282,6 +305,9 @@ export class HedgehogActor extends Actor {
       if (this.options.skin !== "spiderhog") {
         return;
       }
+
+      // Clean up any strand still attached (e.g. a stray second pointer)
+      this.clearSpiderWeb();
 
       this.collisionFilterOverride = NO_PLATFORM_COLLISION_FILTER;
 
@@ -329,6 +355,11 @@ export class HedgehogActor extends Actor {
         webAttachment,
       ]);
 
+      // Visual strand, redrawn each frame in update() to follow the rope sag
+      const graphics = new Graphics();
+      this.game.app.stage.addChild(graphics);
+      this.spiderWeb = { graphics, rope, anchor: webAnchor };
+
       const onDragMove = (e: PointerEvent) => {
         webAnchor.pointA.x = e.clientX;
         webAnchor.pointA.y = e.clientY;
@@ -341,6 +372,7 @@ export class HedgehogActor extends Actor {
           webAnchor,
           webAttachment,
         ]);
+        this.clearSpiderWeb();
 
         window.removeEventListener("pointermove", onDragMove);
         this.collisionFilterOverride = undefined;
@@ -350,6 +382,73 @@ export class HedgehogActor extends Actor {
       window.addEventListener("pointerup", onDragEnd);
       window.addEventListener("pointercancel", onDragEnd);
     });
+  }
+
+  private clearSpiderWeb(): void {
+    if (!this.spiderWeb) {
+      return;
+    }
+    this.spiderWeb.graphics.destroy();
+    this.spiderWeb = undefined;
+  }
+
+  // Redraw the silk strand: anchor -> rope body centres -> hedgehog. Drawn as a
+  // soft glow underneath a crisp white line, with a little "stuck" splat at the
+  // anchor point so it reads as web rather than a generic rope.
+  private drawSpiderWeb(): void {
+    if (!this.spiderWeb) {
+      return;
+    }
+
+    const { graphics, rope, anchor } = this.spiderWeb;
+
+    const points: Matter.Vector[] = [
+      { x: anchor.pointA.x, y: anchor.pointA.y },
+      ...rope.bodies.map((body) => ({
+        x: body.position.x,
+        y: body.position.y,
+      })),
+      { x: this.rigidBody!.position.x, y: this.rigidBody!.position.y },
+    ];
+
+    graphics.clear();
+
+    const trace = () => {
+      graphics.moveTo(points[0].x, points[0].y);
+      for (let i = 1; i < points.length; i++) {
+        graphics.lineTo(points[i].x, points[i].y);
+      }
+    };
+
+    // Soft glow underlay
+    trace();
+    graphics.stroke({
+      width: 4,
+      color: 0xffffff,
+      alpha: 0.18,
+      cap: "round",
+      join: "round",
+    });
+
+    // Crisp strand
+    trace();
+    graphics.stroke({
+      width: 1.5,
+      color: 0xffffff,
+      alpha: 0.9,
+      cap: "round",
+      join: "round",
+    });
+
+    // Anchor splat where the web sticks
+    const a = points[0];
+    graphics.circle(a.x, a.y, 3).fill({ color: 0xffffff, alpha: 0.7 });
+    for (let i = 0; i < 4; i++) {
+      const angle = (Math.PI / 2) * i + Math.PI / 4;
+      graphics.moveTo(a.x, a.y);
+      graphics.lineTo(a.x + Math.cos(angle) * 6, a.y + Math.sin(angle) * 6);
+    }
+    graphics.stroke({ width: 1, color: 0xffffff, alpha: 0.5, cap: "round" });
   }
 
   setDirection(direction: "left" | "right"): void {
@@ -378,13 +477,15 @@ export class HedgehogActor extends Actor {
 
     super.update(ticker);
 
+    this.drawSpiderWeb();
+
     if (this.isDead) {
       return;
     }
 
     const xForce = this.walkSpeed;
 
-    if (xForce !== 0) {
+    if (!this.isWebSlinging && xForce !== 0) {
       this.setVelocity({
         x: xForce,
         y: this.rigidBody!.velocity.y,
@@ -609,6 +710,7 @@ export class HedgehogActor extends Actor {
   }
 
   beforeUnload(): void {
+    this.clearSpiderWeb();
     this.ai.enable(false);
     Object.values(this.accessorySprites).forEach((sprite) => {
       this.game.app.stage.removeChild(sprite);

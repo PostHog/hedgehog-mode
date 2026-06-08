@@ -80,9 +80,20 @@ export type HedgehogModeInterface = {
   destroy: () => void;
 };
 
+export type GameUIFlashProps = {
+  words: GameUIAnimatedTextProps["words"];
+  // How long the toast stays up before auto-hiding (ms). Default ~4000.
+  duration?: number;
+  // Actor to hover the toast above; falls back to bottom-centre if omitted.
+  actor?: HedgehogActor;
+};
+
 export type GameUI = {
   show: (dialogBox: GameUIProps) => void;
   hide: () => void;
+  // Transient, auto-hiding toast with a countdown indicator (distinct from the
+  // click-triggered speech bubble shown via `show`).
+  flash: (flash: GameUIFlashProps) => void;
   visible: boolean;
 };
 

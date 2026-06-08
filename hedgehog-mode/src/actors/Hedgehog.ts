@@ -4,7 +4,7 @@ import {
   NO_PLATFORM_COLLISION_FILTER,
 } from "./Actor";
 import { HedgehogModeInterface, GameElement, UpdateTicker } from "../types";
-import Matter, { Bodies, Composites, Constraint, Pair } from "matter-js";
+import Matter, { Pair } from "matter-js";
 import { SyncedPlatform } from "../items/SyncedPlatform";
 import { AnimatedSprite, ColorMatrixFilter, Sprite } from "pixi.js";
 import { FlameActor } from "../items/Flame";
@@ -12,55 +12,30 @@ import gsap from "gsap";
 import { COLLISIONS } from "../misc/collisions";
 import { HedgehogActorAI } from "./hedgehog/ai";
 import { HedgehogActorControls } from "./hedgehog/controls";
-import {
-  HedgehogActorColorOption,
-  HedgehogActorOptions,
-} from "./hedgehog/config";
+import { HedgehogActorOptions } from "./hedgehog/config";
 import { HedgehogActorInterface } from "./hedgehog/interface";
+import { applyStaticColor } from "./hedgehog/colors";
+import type { HedgehogSkinAbility } from "./hedgehog/abilities";
+import { getSkinDefinition, HedgehogSkinDefinition } from "./hedgehog/skins";
+import type { SpiderWebActor } from "../items/SpiderWebActor";
 
-export const COLOR_TO_FILTER_MAP: Record<
-  HedgehogActorColorOption,
-  (filter: ColorMatrixFilter) => void
-> = {
-  red: (filter) => {
-    filter.hue(350, true);
-    filter.saturate(1.2, true);
-    filter.brightness(0.9, true);
-  },
-  green: (filter) => {
-    filter.hue(60, true);
-    filter.saturate(1, true);
-  },
-  blue: (filter) => {
-    filter.hue(210, true);
-    filter.saturate(3, true);
-    filter.brightness(0.9, true);
-  },
-  purple: (filter) => {
-    filter.hue(240, true);
-  },
-  dark: (filter) => {
-    filter.brightness(0.7, true);
-  },
-  light: (filter) => {
-    filter.brightness(1.3, true);
-  },
-  sepia: (filter) => {
-    filter.sepia(true);
-  },
-  invert: (filter) => {
-    filter.negative(true);
-  },
-  greyscale: (filter) => {
-    filter.grayscale(0.3, true);
-  },
-  rainbow: (filter) => {},
-};
+// Horizontal speed a swing must exceed before the hog commits to facing that
+// way. Below it he holds his current facing (hysteresis), so the jittery near-
+// zero velocities at the bottom and apexes of a swing don't make him flicker.
+const SWING_FACING_VELOCITY = 2;
 
 export class HedgehogActor extends Actor {
   jumps = 0;
   walkSpeed = 0;
-  ropeConstraint?: Constraint;
+  // The web currently attached to (and pulling) this hog, if any. Only one at a
+  // time — released webs detach and drift off on their own.
+  private attachedWeb?: SpiderWebActor;
+  // Climb intent while web-slinging: 1 = up the web, -1 = down, 0 = hold. Set by
+  // the controls and read by the attached SpiderWebActor.
+  webClimbDirection: -1 | 0 | 1 = 0;
+  private ability?: HedgehogSkinAbility;
+  // The skin `ability` was built for, so we only rebuild on real skin changes.
+  private abilitySkin?: HedgehogActorOptions["skin"];
   accessorySprites: { [key: string]: Sprite } = {};
   overlayAnimation?: AnimatedSprite;
   isFlammable = true;
@@ -112,12 +87,45 @@ export class HedgehogActor extends Actor {
       ease: "elastic.out",
     });
 
+    // Wires up the skin ability via syncSkinAbility().
     this.updateOptions(options);
-    this.setupSpiderHogRope();
   }
 
-  private isGhost(): boolean {
-    return this.options.skin === "ghost";
+  // Per-skin tuning (physics, jump, render, ...). Reads `options.skin` each
+  // time so runtime skin changes are picked up automatically.
+  private get skinDefinition(): HedgehogSkinDefinition {
+    return getSkinDefinition(this.options.skin);
+  }
+
+  // While a web strand is attached the hog swings purely under physics — its
+  // own AI/keyboard movement (walkSpeed, jump) is suppressed so it can't push
+  // itself off the web.
+  get isWebSlinging(): boolean {
+    return !!this.attachedWeb;
+  }
+
+  // Don't wrap/clamp to the screen edges while tethered — otherwise wrapping
+  // teleports the body across the screen and the web tension explodes, flinging
+  // him in a loop. Let him swing freely out of frame and back instead.
+  protected get keepOnScreen(): boolean {
+    return !this.isWebSlinging;
+  }
+
+  /** Called by a {@link SpiderWebActor} when it latches onto this hog. */
+  attachWeb(web: SpiderWebActor): void {
+    this.attachedWeb = web;
+    // Pass through platforms while swinging.
+    this.collisionFilterOverride = NO_PLATFORM_COLLISION_FILTER;
+  }
+
+  /** Called when a web releases the hog (or is torn down). */
+  detachWeb(web: SpiderWebActor): void {
+    if (this.attachedWeb !== web) {
+      return;
+    }
+    this.attachedWeb = undefined;
+    this.webClimbDirection = 0;
+    this.collisionFilterOverride = undefined;
   }
 
   updateSprite(
@@ -154,12 +162,12 @@ export class HedgehogActor extends Actor {
       }
     }
     super.updateSprite(spriteName, {
-      animationSpeed: this.isGhost() ? 0.1 : 0.5,
+      animationSpeed: this.skinDefinition.animationSpeed,
       loop: options.loop ?? true,
       ...options,
     });
     this.sprite!.filters = [this.filter];
-    this.sprite!.alpha = this.isGhost() ? 0.5 : 1;
+    this.sprite!.alpha = this.skinDefinition.spriteAlpha;
   }
 
   get currentSprite(): string {
@@ -201,6 +209,19 @@ export class HedgehogActor extends Actor {
     this.ai.enable(this.options.ai_enabled ?? true);
     this.syncAccessories();
     this.syncRigidBody();
+    this.syncSkinAbility();
+  }
+
+  // Skin can change at runtime (e.g. "become spiderhog"), so keep the skin
+  // ability in sync. Only rebuilds when the skin actually changes, so unrelated
+  // option updates (colour, accessories, ...) don't tear down an active sling.
+  private syncSkinAbility(): void {
+    if (this.options.skin === this.abilitySkin) {
+      return;
+    }
+    this.ability?.destroy();
+    this.ability = this.skinDefinition.createAbility?.(this, this.game);
+    this.abilitySkin = this.options.skin;
   }
 
   clearOverlayAnimation(): void {
@@ -246,21 +267,23 @@ export class HedgehogActor extends Actor {
   }
 
   jump(): void {
-    const MAX_JUMPS = this.isGhost() ? Infinity : 2;
-    if (this.jumps + 1 > MAX_JUMPS) {
+    if (this.isWebSlinging) {
+      return;
+    }
+    if (this.jumps + 1 > this.skinDefinition.maxJumps) {
       return;
     }
 
     this.setVelocity({
       x: 0,
-      y: this.isGhost() ? -20 : -15,
+      y: this.skinDefinition.jumpVelocity,
     });
 
     this.jumps++;
   }
 
   cancelJump(): void {
-    if (this.rigidBody!.velocity.y > 0) {
+    if (this.isWebSlinging || this.rigidBody!.velocity.y > 0) {
       return;
     }
     this.setVelocity({
@@ -277,81 +300,6 @@ export class HedgehogActor extends Actor {
     }
   }
 
-  setupSpiderHogRope(): void {
-    window.addEventListener("pointerdown", (e) => {
-      if (this.options.skin !== "spiderhog") {
-        return;
-      }
-
-      this.collisionFilterOverride = NO_PLATFORM_COLLISION_FILTER;
-
-      const rope = Composites.stack(
-        400,
-        100,
-        1,
-        8,
-        0,
-        5,
-        (x: number, y: number) => {
-          return Bodies.rectangle(x, y, 5, 20, {
-            density: 0.0005,
-            frictionAir: 0.02,
-          });
-        }
-      );
-      Composites.chain(rope, 0.5, 0, -0.5, 0, {
-        stiffness: 0.9,
-        render: { visible: true },
-      });
-
-      const firstLink = rope.bodies[0];
-      const lastLink = rope.bodies[rope.bodies.length - 1];
-
-      const webAnchor = Constraint.create({
-        pointA: { x: e.clientX, y: e.clientY },
-        bodyB: firstLink,
-        length: 0,
-        stiffness: 1,
-        render: { visible: true },
-      });
-
-      const webAttachment = Constraint.create({
-        bodyA: lastLink,
-        bodyB: this.rigidBody!,
-        length: 10,
-        stiffness: 1,
-        render: { visible: true },
-      });
-
-      Matter.World.add(this.game.engine.world, [
-        rope,
-        webAnchor,
-        webAttachment,
-      ]);
-
-      const onDragMove = (e: PointerEvent) => {
-        webAnchor.pointA.x = e.clientX;
-        webAnchor.pointA.y = e.clientY;
-      };
-
-      const onDragEnd = (e: PointerEvent) => {
-        this.isDragging = false;
-        Matter.World.remove(this.game.engine.world, [
-          rope,
-          webAnchor,
-          webAttachment,
-        ]);
-
-        window.removeEventListener("pointermove", onDragMove);
-        this.collisionFilterOverride = undefined;
-      };
-
-      window.addEventListener("pointermove", onDragMove);
-      window.addEventListener("pointerup", onDragEnd);
-      window.addEventListener("pointercancel", onDragEnd);
-    });
-  }
-
   setDirection(direction: "left" | "right"): void {
     if (direction === "left" && this.sprite!.scale.x > 0) {
       this.sprite!.scale.x *= -1;
@@ -364,9 +312,7 @@ export class HedgehogActor extends Actor {
   }
 
   update(ticker: UpdateTicker): void {
-    let mask = this.isGhost()
-      ? COLLISIONS.GROUND
-      : COLLISIONS.ACTOR | COLLISIONS.PROJECTILE | COLLISIONS.GROUND;
+    let mask = this.skinDefinition.collisionMask;
 
     if (this.rigidBody!.velocity.y < -0.1) {
       // We are moving upwards so we don't want to collide with platforms
@@ -384,11 +330,24 @@ export class HedgehogActor extends Actor {
 
     const xForce = this.walkSpeed;
 
-    if (xForce !== 0) {
+    if (!this.isWebSlinging && xForce !== 0) {
       this.setVelocity({
         x: xForce,
         y: this.rigidBody!.velocity.y,
       });
+    }
+
+    // While swinging he's physics-driven, so face the way he's moving — but
+    // only once his horizontal speed clearly commits to a direction. Below the
+    // threshold he holds his facing, so the near-zero velocities at the bottom
+    // and apexes of a swing don't make him flicker.
+    if (this.isWebSlinging) {
+      const vx = this.rigidBody!.velocity.x;
+      if (vx < -SWING_FACING_VELOCITY) {
+        this.setDirection("left");
+      } else if (vx > SWING_FACING_VELOCITY) {
+        this.setDirection("right");
+      }
     }
 
     // Set the appropriate animation
@@ -423,8 +382,12 @@ export class HedgehogActor extends Actor {
       });
     }
 
-    // Check if below screen and if so then move up
-    if (this.rigidBody!.position.y > this.game.app.screen.height) {
+    // Check if below screen and if so then move up (but not while tethered to a
+    // web — teleporting across the screen would explode the constraint tension).
+    if (
+      this.keepOnScreen &&
+      this.rigidBody!.position.y > this.game.app.screen.height
+    ) {
       this.setPosition({
         x: this.rigidBody!.position.x,
         y: 0,
@@ -440,11 +403,7 @@ export class HedgehogActor extends Actor {
       this.hue = this.hue > 360 ? 0 : this.hue;
       this.filter.hue(this.hue, false);
     } else {
-      const options = this.options.color
-        ? COLOR_TO_FILTER_MAP[this.options.color]
-        : undefined;
-      this.filter.reset();
-      options?.(this.filter);
+      applyStaticColor(this.filter, this.options.color);
     }
   }
 
@@ -467,26 +426,9 @@ export class HedgehogActor extends Actor {
     FlameActor.fireBurst(this.game, contact);
   }
 
+  // Triggered by the `f` key; delegates to the skin's ability (hogzilla only).
   maybeSpawnFireball(): void {
-    if (this.options.skin !== "hogzilla") {
-      return;
-    }
-
-    // Spawn a fireball in the direction the hedgehog is facing
-    FlameActor.spawnFireball(
-      this.game,
-      {
-        x:
-          this.rigidBody!.position.x +
-          (this.getDirection() === "left" ? -10 : 10),
-        // Y is slightly above the hedgehog
-        y: this.rigidBody!.position.y - this.sprite!.height * 0.3,
-      },
-      {
-        x: this.getDirection() === "left" ? -10 : 10,
-        y: -10,
-      }
-    );
+    this.ability?.fire?.();
   }
 
   onCollisionStart(element: GameElement, pair: Matter.Pair): void {
@@ -518,17 +460,11 @@ export class HedgehogActor extends Actor {
   }
 
   private syncRigidBody(): void {
-    if (this.isGhost()) {
-      this.rigidBody!.density = 0.0001;
-      this.rigidBody!.friction = 0.1;
-      this.rigidBody!.frictionStatic = 0;
-      this.rigidBody!.frictionAir = 0.2;
-    } else {
-      this.rigidBody!.density = 0.001;
-      this.rigidBody!.friction = 0.2;
-      this.rigidBody!.frictionStatic = 0;
-      this.rigidBody!.frictionAir = 0.01;
-    }
+    const body = this.skinDefinition.body;
+    this.rigidBody!.density = body.density!;
+    this.rigidBody!.friction = body.friction!;
+    this.rigidBody!.frictionStatic = body.frictionStatic!;
+    this.rigidBody!.frictionAir = body.frictionAir!;
   }
 
   private syncAccessories(): void {
@@ -555,12 +491,9 @@ export class HedgehogActor extends Actor {
       sprite.anchor.set(0.5);
       this.sprite!.addChild(sprite);
 
-      if (this.options.skin === "ghost") {
-        sprite.anchor.set(0.4, 0.55);
-      }
-
-      if (this.options.skin === "hogzilla") {
-        sprite.anchor.set(0.45, 0.5);
+      const anchor = this.skinDefinition.accessoryAnchor;
+      if (anchor) {
+        sprite.anchor.set(anchor.x, anchor.y);
       }
     });
   }
@@ -609,6 +542,7 @@ export class HedgehogActor extends Actor {
   }
 
   beforeUnload(): void {
+    this.ability?.destroy();
     this.ai.enable(false);
     Object.values(this.accessorySprites).forEach((sprite) => {
       this.game.app.stage.removeChild(sprite);

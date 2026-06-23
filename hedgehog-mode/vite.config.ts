@@ -24,13 +24,9 @@ export default defineConfig(({ mode }) => {
         // `react-dom/server` crashes on a React 18 host). Always defer to the
         // host's React via the peer dependency.
         //
-        // pixi.js (and subpaths like pixi.js/unsafe-eval) is externalized for
-        // the same single-instance reason: pixi is already a dependency, so
-        // consumers resolve one shared copy from their tree rather than a ~1.3MB
-        // duplicate welded into this bundle. Inlining it also makes pixi
-        // unreachable — consumers can't apply `pixi.js/unsafe-eval` (needed under
-        // strict-CSP / MV3 hosts that forbid `new Function`) or otherwise
-        // configure the renderer, because the patch can't see the bundled copy.
+        // Externalize pixi.js for the same single-instance reason: it's already a
+        // consumer dependency, so they share one copy (~1.3MB) and can still patch it
+        // (e.g. pixi.js/unsafe-eval, required under strict-CSP/MV3 hosts that ban new Function).
         external: [/^react($|\/)/, /^react-dom($|\/)/, /^pixi\.js($|\/)/],
         output: {
           globals: {

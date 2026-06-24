@@ -23,7 +23,11 @@ export default defineConfig(({ mode }) => {
         // React it throws at module-eval (e.g. a React 19 build of
         // `react-dom/server` crashes on a React 18 host). Always defer to the
         // host's React via the peer dependency.
-        external: [/^react($|\/)/, /^react-dom($|\/)/],
+        //
+        // Externalize pixi.js for the same single-instance reason: it's already a
+        // consumer dependency, so they share one copy (~1.3MB) and can still patch it
+        // (e.g. pixi.js/unsafe-eval, required under strict-CSP/MV3 hosts that ban new Function).
+        external: [/^react($|\/)/, /^react-dom($|\/)/, /^pixi\.js($|\/)/],
         output: {
           globals: {
             react: "React",
@@ -34,10 +38,10 @@ export default defineConfig(({ mode }) => {
     },
     resolve: {
       alias: { src: resolve("src/") },
-      dedupe: ["react", "react-dom"],
+      dedupe: ["react", "react-dom", "pixi.js"],
     },
     optimizeDeps: {
-      include: ["react", "react-dom"],
+      include: ["react", "react-dom", "pixi.js"],
       exclude: ["@posthog/hedgehog-mode"],
     },
     test: {

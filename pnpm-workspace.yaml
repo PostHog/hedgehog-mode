@@ -1,5 +1,6 @@
 packages:
   - "playground"
   - "hedgehog-mode"
+  - "hedgehog-mode-anywhere"
 
 minimumReleaseAge: 10080

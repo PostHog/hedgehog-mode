@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "pnpm -r --parallel --no-bail run dev",
-    "build": "pnpm --dir ./playground build"
+    "build": "pnpm --dir ./playground build && pnpm --dir ./hedgehog-mode-anywhere build"
   },
   "keywords": [],
   "author": "",
@@ -17,6 +17,9 @@
     "overrides": {
       "react": "19.3.0-canary-3f0b9e61-20260317",
       "react-dom": "19.3.0-canary-3f0b9e61-20260317"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }

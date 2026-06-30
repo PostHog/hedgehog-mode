@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "Hedgehog Mode",
+  "version": "2.0.0",
+  "description": "Add an adorable animated hedgehog buddy to any website!",
+  "permissions": ["storage", "activeTab", "tabs"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/hedgehog-16.png",
+      "32": "icons/hedgehog-32.png",
+      "48": "icons/hedgehog-48.png",
+      "128": "icons/hedgehog-128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/hedgehog-16.png",
+    "32": "icons/hedgehog-32.png",
+    "48": "icons/hedgehog-48.png",
+    "128": "icons/hedgehog-128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["dist/content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["assets/*"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

@@ -13,6 +13,8 @@ pnpm monorepo:
 
 - `hedgehog-mode/` — the published library (`@posthog/hedgehog-mode`).
 - `playground/` — Next.js app for local development (port `8002`).
+- `hedgehog-mode-anywhere/` — MV3 browser extension that drops the hedgehog
+  onto any website. Private; consumes the library via `workspace:*` (esbuild, not vite).
 - `texturepacker/` — source sprite frames, packed into `hedgehog-mode/assets/sprites.{png,json}`.
 
 ## Dev workflow
@@ -43,6 +45,26 @@ pnpm test     # vitest
 
 Tip: in the running app, press `ctrl+d` five times to toggle the Matter.js
 debug renderer (bodies, constraints, velocities).
+
+### The browser extension
+
+`hedgehog-mode-anywhere/` bundles the library's `dist/`, so the library must be
+built first. It's kept out of `pnpm dev` on purpose — esbuild can't resolve the
+engine before its first emit, and a blocking pre-build is what crash-looped the
+dev loop before. Develop it alongside a running `pnpm dev` (which keeps `dist/`
+fresh):
+
+```bash
+pnpm --dir hedgehog-mode-anywhere watch
+```
+
+Load `hedgehog-mode-anywhere/` as an unpacked extension and reload after each
+rebuild. Root `pnpm build` covers the extension, so CI catches breakage.
+
+The extension's `.jsx` is untyped and esbuild doesn't type-check, so
+`hedgehog-mode-anywhere/api-contract.ts` pins the slice of the library API the
+extension consumes; `tsc --noEmit` (part of its `build`) fails if a `workspace:*`
+engine change drifts that surface. Keep the contract in sync with actual usage.
 
 ## Architecture
 

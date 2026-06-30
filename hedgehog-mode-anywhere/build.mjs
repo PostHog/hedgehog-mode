@@ -10,6 +10,7 @@ const options = {
   entryPoints: {
     content: join(root, "src/content.jsx"),
     popup: join(root, "src/popup.jsx"),
+    background: join(root, "src/background.js"),
   },
   outdir: join(root, "dist"),
   bundle: true,

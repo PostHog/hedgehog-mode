@@ -3,7 +3,10 @@
   "name": "Hedgehog Mode",
   "version": "2.0.0",
   "description": "Add an adorable animated hedgehog buddy to any website!",
-  "permissions": ["storage", "activeTab", "tabs"],
+  "permissions": ["storage", "activeTab", "tabs", "scripting"],
+  "background": {
+    "service_worker": "dist/background.js"
+  },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {

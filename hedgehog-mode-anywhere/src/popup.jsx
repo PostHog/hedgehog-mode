@@ -179,6 +179,7 @@ function saveAndSendConfig() {
 }
 
 function toggleHedgehog(enabled) {
+  // The background service worker watches this flag and injects into open tabs.
   chrome.storage.sync.set({ hedgehogEnabled: enabled });
 }
 

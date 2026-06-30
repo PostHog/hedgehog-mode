@@ -47,6 +47,10 @@ const startHedgehog = (config) => {
 
   const host = document.createElement("div");
   host.id = "hedgehog-mode-anywhere";
+  // The overlay's z-index lives inside its shadow root, so it only orders within itself;
+  // give the host a max-z-index stacking context so it sits above the page's modals and headers.
+  host.style.position = "relative";
+  host.style.zIndex = "2147483647";
   document.body.appendChild(host);
 
   root = createRoot(host);

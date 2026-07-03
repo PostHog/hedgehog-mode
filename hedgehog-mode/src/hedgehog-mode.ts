@@ -67,6 +67,18 @@ export class HedgeHogMode implements HedgehogModeInterface {
       clearInterval(this.syncPlatformsInterval);
     }
     Runner.stop(this.runner);
+    // Kill any in-flight gsap tweens (flame/ghost/web fades, dying hedgehogs)
+    // before we tear down the app. gsap is a global singleton driven by our
+    // afterUpdate handler, so nothing else stops these — and their onComplete
+    // callbacks call removeElement, which would otherwise flush against an
+    // already-destroyed stage.
+    this.elements.forEach((element) => {
+      gsap.killTweensOf(element);
+      if (element.sprite) {
+        gsap.killTweensOf(element.sprite);
+        gsap.killTweensOf(element.sprite.scale);
+      }
+    });
     this.app.destroy({
       removeView: true,
     });
@@ -339,7 +351,11 @@ export class HedgeHogMode implements HedgehogModeInterface {
     if (element.rigidBody) {
       Matter.Composite.remove(this.engine.world, element.rigidBody);
     }
-    if (element.sprite) {
+    // Once destroy() has run app.destroy(), Pixi sets `app.stage` to null. A
+    // pending gsap fade (flame, ghost, web) can still flush its onComplete and
+    // land here against a torn-down instance — bail rather than crash on
+    // removeChild of null.
+    if (element.sprite && this.app?.stage) {
       this.app.stage.removeChild(element.sprite);
     }
     this.elements = this.elements.filter((el) => el != element);

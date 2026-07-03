@@ -545,7 +545,9 @@ export class HedgehogActor extends Actor {
     this.ability?.destroy();
     this.ai.enable(false);
     Object.values(this.accessorySprites).forEach((sprite) => {
-      this.game.app.stage.removeChild(sprite);
+      // `app.stage` is null once the app has been destroyed; guard so a
+      // teardown-time unload doesn't crash on removeChild.
+      this.game.app?.stage?.removeChild(sprite);
     });
   }
 }

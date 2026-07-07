@@ -3423,6 +3423,70 @@
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":20,"h":20},
 	"sourceSize": {"w":20,"h":20}
+},
+"skins/default/punch/tile000.png":
+{
+	"frame": {"x":0,"y":1360,"w":80,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
+	"sourceSize": {"w":80,"h":80}
+},
+"skins/default/punch/tile001.png":
+{
+	"frame": {"x":80,"y":1360,"w":80,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
+	"sourceSize": {"w":80,"h":80}
+},
+"skins/default/punch/tile002.png":
+{
+	"frame": {"x":160,"y":1360,"w":80,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
+	"sourceSize": {"w":80,"h":80}
+},
+"skins/default/punch/tile003.png":
+{
+	"frame": {"x":240,"y":1360,"w":80,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
+	"sourceSize": {"w":80,"h":80}
+},
+"skins/default/punch/tile004.png":
+{
+	"frame": {"x":320,"y":1360,"w":80,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
+	"sourceSize": {"w":80,"h":80}
+},
+"skins/default/punch/tile005.png":
+{
+	"frame": {"x":400,"y":1360,"w":80,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
+	"sourceSize": {"w":80,"h":80}
+},
+"skins/default/punch/tile006.png":
+{
+	"frame": {"x":480,"y":1360,"w":80,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
+	"sourceSize": {"w":80,"h":80}
+},
+"skins/default/punch/tile007.png":
+{
+	"frame": {"x":560,"y":1360,"w":80,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
+	"sourceSize": {"w":80,"h":80}
 }},
 "animations": {
 	"inventory/bazooka-held-tile": ["inventory/bazooka-held-tile001.png","inventory/bazooka-held-tile002.png"],
@@ -3444,6 +3508,7 @@
 	"skins/default/jump-armless/tile": ["skins/default/jump-armless/tile0.png","skins/default/jump-armless/tile1.png","skins/default/jump-armless/tile2.png","skins/default/jump-armless/tile3.png","skins/default/jump-armless/tile4.png","skins/default/jump-armless/tile5.png","skins/default/jump-armless/tile6.png","skins/default/jump-armless/tile7.png","skins/default/jump-armless/tile8.png","skins/default/jump-armless/tile9.png"],
 	"skins/default/jump/tile": ["skins/default/jump/tile000.png","skins/default/jump/tile001.png","skins/default/jump/tile002.png","skins/default/jump/tile003.png","skins/default/jump/tile004.png","skins/default/jump/tile005.png","skins/default/jump/tile006.png","skins/default/jump/tile007.png","skins/default/jump/tile008.png","skins/default/jump/tile009.png"],
 	"skins/default/phone/tile": ["skins/default/phone/tile000.png","skins/default/phone/tile001.png","skins/default/phone/tile002.png","skins/default/phone/tile003.png","skins/default/phone/tile004.png","skins/default/phone/tile005.png","skins/default/phone/tile006.png","skins/default/phone/tile007.png","skins/default/phone/tile008.png","skins/default/phone/tile009.png","skins/default/phone/tile010.png","skins/default/phone/tile011.png","skins/default/phone/tile012.png","skins/default/phone/tile013.png","skins/default/phone/tile014.png","skins/default/phone/tile015.png","skins/default/phone/tile016.png","skins/default/phone/tile017.png","skins/default/phone/tile018.png","skins/default/phone/tile019.png","skins/default/phone/tile020.png","skins/default/phone/tile021.png","skins/default/phone/tile022.png","skins/default/phone/tile023.png","skins/default/phone/tile024.png","skins/default/phone/tile025.png","skins/default/phone/tile026.png","skins/default/phone/tile027.png"],
+	"skins/default/punch/tile": ["skins/default/punch/tile000.png","skins/default/punch/tile001.png","skins/default/punch/tile002.png","skins/default/punch/tile003.png","skins/default/punch/tile004.png","skins/default/punch/tile005.png","skins/default/punch/tile006.png","skins/default/punch/tile007.png"],
 	"skins/default/shock-armless/shock-armless": ["skins/default/shock-armless/shock-armless-0.png","skins/default/shock-armless/shock-armless-1.png","skins/default/shock-armless/shock-armless-2.png","skins/default/shock-armless/shock-armless-3.png","skins/default/shock-armless/shock-armless-4.png","skins/default/shock-armless/shock-armless-5.png","skins/default/shock-armless/shock-armless-6.png","skins/default/shock-armless/shock-armless-7.png","skins/default/shock-armless/shock-armless-8.png","skins/default/shock-armless/shock-armless-9.png","skins/default/shock-armless/shock-armless-10.png","skins/default/shock-armless/shock-armless-11.png","skins/default/shock-armless/shock-armless-12.png","skins/default/shock-armless/shock-armless-13.png","skins/default/shock-armless/shock-armless-14.png"],
 	"skins/default/shock/tile": ["skins/default/shock/tile-0.png","skins/default/shock/tile-1.png","skins/default/shock/tile-2.png","skins/default/shock/tile-3.png","skins/default/shock/tile-4.png","skins/default/shock/tile-5.png","skins/default/shock/tile-6.png","skins/default/shock/tile-7.png","skins/default/shock/tile-8.png","skins/default/shock/tile-9.png","skins/default/shock/tile-10.png","skins/default/shock/tile-11.png","skins/default/shock/tile-12.png","skins/default/shock/tile-13.png","skins/default/shock/tile-14.png"],
 	"skins/default/sign/tile": ["skins/default/sign/tile000.png","skins/default/sign/tile001.png","skins/default/sign/tile002.png","skins/default/sign/tile003.png","skins/default/sign/tile004.png","skins/default/sign/tile005.png","skins/default/sign/tile006.png","skins/default/sign/tile007.png","skins/default/sign/tile008.png","skins/default/sign/tile009.png","skins/default/sign/tile010.png","skins/default/sign/tile011.png","skins/default/sign/tile012.png","skins/default/sign/tile013.png","skins/default/sign/tile014.png","skins/default/sign/tile015.png","skins/default/sign/tile016.png","skins/default/sign/tile017.png","skins/default/sign/tile018.png","skins/default/sign/tile019.png","skins/default/sign/tile020.png","skins/default/sign/tile021.png","skins/default/sign/tile022.png","skins/default/sign/tile023.png","skins/default/sign/tile024.png","skins/default/sign/tile025.png","skins/default/sign/tile026.png","skins/default/sign/tile027.png","skins/default/sign/tile028.png","skins/default/sign/tile029.png","skins/default/sign/tile030.png","skins/default/sign/tile031.png","skins/default/sign/tile032.png"],
@@ -3462,7 +3527,7 @@
 	"version": "1.1",
 	"image": "sprites.png",
 	"format": "RGBA8888",
-	"size": {"w":2000,"h":1360},
+	"size": {"w":2000,"h":1440},
 	"scale": "1",
 	"smartupdate": "$TexturePacker:SmartUpdate:3c12f4495428b4c1fb41c944b2648f45:334853605b5f7bb843bd4c556178ff47:1eabdf11f75e3a4fe3147baf7b5be24b$"
 }

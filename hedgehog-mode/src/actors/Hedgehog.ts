@@ -23,6 +23,13 @@ import { AvailableSpriteFrames } from "../sprites/sprites";
 import { Inventory } from "../items/Inventory";
 import { COLLISIONS } from "../misc/collisions";
 import { ActionSound, AudioManager } from "../audio";
+import {
+  PUNCH_COOLDOWN_MS,
+  PUNCH_HIT_DELAY_MS,
+  getKnockbackVelocity,
+  getPunchDirection,
+  isInPunchRange,
+} from "./hedgehog/punch";
 
 export const PLAYER_HEALTH = 300;
 export const ENEMY_HEALTH = 100;
@@ -256,6 +263,7 @@ export class HedgehogActor extends Actor {
 
   fireWeapon(target: Vector): void {
     if (this.inventories.length === 0) {
+      this.punch(target);
       return;
     }
 
@@ -264,6 +272,54 @@ export class HedgehogActor extends Actor {
     });
     this.game.world.addElement(projectile);
     AudioManager.getInstance().play(ActionSound.FIRE);
+  }
+
+  private lastPunchTime = 0;
+
+  punch(target: Vector): void {
+    const now = Date.now();
+    if (now - this.lastPunchTime < PUNCH_COOLDOWN_MS) {
+      return;
+    }
+    if (this.currentSprite === "death") {
+      return;
+    }
+    this.lastPunchTime = now;
+
+    const direction = getPunchDirection(this.rigidBody!.position, target);
+    this.setDirection(direction === 1 ? "right" : "left");
+    this.updateSprite("punch", {
+      reset: true,
+      onComplete: () => {
+        this.updateSprite("idle");
+      },
+    });
+
+    // Land the hit when the arm is extended, not on wind-up
+    setTimeout(() => {
+      if (!this.rigidBody) {
+        return;
+      }
+      const origin = this.rigidBody.position;
+      this.game.world.elements.forEach((element) => {
+        if (!(element instanceof HedgehogActor) || element === this) {
+          return;
+        }
+        if (!element.rigidBody || element.currentSprite === "death") {
+          return;
+        }
+        if (isInPunchRange(origin, direction, element.rigidBody.position)) {
+          element.receiveKnockback(this);
+          AudioManager.getInstance().play(ActionSound.PUNCH);
+        }
+      });
+    }, PUNCH_HIT_DELAY_MS);
+  }
+
+  receiveKnockback(source: Actor): void {
+    this.setVelocity(
+      getKnockbackVelocity(source.rigidBody!.position, this.rigidBody!.position)
+    );
   }
 
   receiveDamage(amount: number, source: Actor): void {
@@ -418,7 +474,7 @@ export class HedgehogActor extends Actor {
       });
     }
 
-    if (!["shock", "wave"].includes(this.currentSprite)) {
+    if (!["shock", "wave", "punch"].includes(this.currentSprite)) {
       // Set the appropriate animation unless certain ones are playing
       if (!this.getGround()) {
         this.updateSprite("fall");

@@ -3,9 +3,17 @@ import {
   getKnockbackVelocity,
   getPunchDirection,
   isInPunchRange,
+  PUNCH_DAMAGE,
   PUNCH_RANGE_X,
   PUNCH_RANGE_Y,
 } from "../src/actors/hedgehog/punch";
+
+describe("PUNCH_DAMAGE", () => {
+  it("hurts, but less than a projectile hit (50)", () => {
+    expect(PUNCH_DAMAGE).toBeGreaterThan(0);
+    expect(PUNCH_DAMAGE).toBeLessThan(50);
+  });
+});
 
 describe("getPunchDirection", () => {
   it("punches right when the target is to the right", () => {

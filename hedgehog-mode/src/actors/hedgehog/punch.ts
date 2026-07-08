@@ -4,6 +4,8 @@ export const PUNCH_RANGE_X = 70;
 export const PUNCH_RANGE_Y = 60;
 export const PUNCH_COOLDOWN_MS = 300;
 export const PUNCH_HIT_DELAY_MS = 50;
+// Weaker than a projectile hit (50, see Projectile.onCollisionStart)
+export const PUNCH_DAMAGE = 20;
 
 const KNOCKBACK_X = 12;
 const KNOCKBACK_Y = -4;

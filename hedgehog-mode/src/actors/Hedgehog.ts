@@ -25,6 +25,7 @@ import { COLLISIONS } from "../misc/collisions";
 import { ActionSound, AudioManager } from "../audio";
 import {
   PUNCH_COOLDOWN_MS,
+  PUNCH_DAMAGE,
   PUNCH_HIT_DELAY_MS,
   getKnockbackVelocity,
   getPunchDirection,
@@ -309,6 +310,8 @@ export class HedgehogActor extends Actor {
           return;
         }
         if (isInPunchRange(origin, direction, element.rigidBody.position)) {
+          element.receiveDamage(PUNCH_DAMAGE, this);
+          // After receiveDamage so the punch's directional knockback wins
           element.receiveKnockback(this);
           AudioManager.getInstance().play(ActionSound.PUNCH);
         }
@@ -347,6 +350,13 @@ export class HedgehogActor extends Actor {
   }
 
   setupPointerListener(): void {
+    // Right click is reserved for punching
+    window.addEventListener("contextmenu", (e) => {
+      if (this.options.player) {
+        e.preventDefault();
+      }
+    });
+
     window.addEventListener("pointerdown", (e) => {
       if (!this.options.player) {
         return;
@@ -354,13 +364,19 @@ export class HedgehogActor extends Actor {
       let pointerX = e.clientX;
       let pointerY = e.clientY;
 
-      this.fireWeapon({
+      // Right click always punches, even when holding a weapon
+      const attack =
+        e.button === 2
+          ? (target: Vector) => this.punch(target)
+          : (target: Vector) => this.fireWeapon(target);
+
+      attack({
         x: pointerX,
         y: pointerY,
       });
 
       const interval = setInterval(() => {
-        this.fireWeapon({
+        attack({
           x: pointerX,
           y: pointerY,
         });
@@ -474,7 +490,9 @@ export class HedgehogActor extends Actor {
       });
     }
 
-    if (!["shock", "wave", "punch"].includes(this.currentSprite)) {
+    if (
+      !["shock", "wave", "punch", "punch-armless"].includes(this.currentSprite)
+    ) {
       // Set the appropriate animation unless certain ones are playing
       if (!this.getGround()) {
         this.updateSprite("fall");

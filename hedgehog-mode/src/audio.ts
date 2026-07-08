@@ -11,6 +11,7 @@ export enum ActionSound {
   LAND = "land",
   PLAYER_SPAWN = "player_spawn",
   SPAWN = "spawn",
+  PUNCH = "punch",
 }
 
 export const SOUND_MAP: Record<string, string[]> = {
@@ -22,6 +23,7 @@ export const SOUND_MAP: Record<string, string[]> = {
   //   [ActionSound.DEATH]: ["death.wav"],
   //   [ActionSound.HURT]: ["hurt.wav"],
   [ActionSound.WALK]: ["walk.wav" /*, "walk_walk_walk_walk.wav"*/],
+  [ActionSound.PUNCH]: ["hit.wav"],
   //   [ActionSound.LAND]: ["land.wav"],
   //   [ActionSound.PLAYER_SPAWN]: ["player_spawn.wav"],
   //   [ActionSound.SPAWN]: ["spawn.wav"],

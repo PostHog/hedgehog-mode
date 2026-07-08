@@ -1,6 +1,7 @@
 import { sample } from "lodash";
 import type { HedgehogActor } from "../Hedgehog";
 import { Inventory } from "../../items/Inventory";
+import { PUNCH_RANGE_X } from "./punch";
 import { Game } from "../../types";
 
 const WALK_SPEED = 2;
@@ -126,17 +127,25 @@ export class HedgehogActorAI {
           }, itemsWithDistance[0])
         : null;
 
-    if (!nearestInventoryItem) {
-      // If there are no weapons, run away from the player and jump sometimes
-      const direction = actorX < playerX ? "left" : "right";
-      this.actor.setDirection(direction);
-      this.actor.walkSpeed = direction === "left" ? -1 : 1;
+    const distance = Math.abs(playerX - actorX);
+    const directionToPlayer = actorX > playerX ? "left" : "right";
 
-      if (Math.random() < 0.5) {
-        this.actor.jump();
+    if (this.actor.inventories.length > 0) {
+      // If we have a weapon, move towards the player and shoot them
+      this.actor.setDirection(directionToPlayer);
+      if (distance < 200) {
+        this.actor.fireWeapon(player.rigidBody!.position);
+        this.actor.walkSpeed = 0;
+      } else {
+        this.actor.walkSpeed =
+          directionToPlayer === "left" ? -WALK_SPEED : WALK_SPEED;
       }
-    } else if (this.actor.inventories.length === 0 && nearestInventoryItem) {
-      // If we don't have a weapon, move towards the nearest weapon
+    } else if (nearestInventoryItem) {
+      // If we don't have a weapon, move towards the nearest weapon,
+      // punching the player if they get in reach on the way
+      if (distance < PUNCH_RANGE_X) {
+        this.actor.fireWeapon(player.rigidBody!.position);
+      }
       const direction =
         nearestInventoryItem.item.rigidBody!.position.x < actorX
           ? "left"
@@ -144,17 +153,17 @@ export class HedgehogActorAI {
       this.actor.setDirection(direction);
       this.actor.walkSpeed = direction === "left" ? -WALK_SPEED : WALK_SPEED;
     } else {
-      // If we have a weapon, move towards the player and shoot them
-      const direction = actorX > playerX ? "left" : "right";
-      const distance = Math.abs(playerX - actorX);
-
-      if (distance < 200) {
-        this.actor.fireWeapon(player.rigidBody!.position);
-        this.actor.setDirection(direction);
+      // No weapons anywhere: chase the player and punch them
+      this.actor.setDirection(directionToPlayer);
+      if (distance < PUNCH_RANGE_X) {
         this.actor.walkSpeed = 0;
+        this.actor.fireWeapon(player.rigidBody!.position);
       } else {
-        this.actor.setDirection(direction);
-        this.actor.walkSpeed = direction === "left" ? -WALK_SPEED : WALK_SPEED;
+        this.actor.walkSpeed =
+          directionToPlayer === "left" ? -WALK_SPEED : WALK_SPEED;
+        if (Math.random() < 0.25) {
+          this.actor.jump();
+        }
       }
     }
     // If we don't have a weapon, move towards the nearest weapon

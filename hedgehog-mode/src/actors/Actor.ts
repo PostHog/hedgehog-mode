@@ -73,7 +73,16 @@ export class Actor implements GameElement {
     this.sprite.anchor.set(0.5);
     this.sprite.x = this.rigidBody!.position.x;
     this.sprite.y = this.rigidBody!.position.y;
-    this.game.app.stage.addChild(this.sprite);
+
+    // The PIXI stage only exists between app.init() and app.destroy(). A
+    // pointer-driven spawn (e.g. spiderhog web-slinging) can fire in that gap —
+    // during startup or after teardown — so bail instead of dereferencing a
+    // stage that isn't there.
+    const stage = this.game.app?.stage;
+    if (!stage) {
+      return;
+    }
+    stage.addChild(this.sprite);
     this.setupSpriteEvents();
   }
 

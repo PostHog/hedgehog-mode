@@ -22,6 +22,7 @@ pnpm monorepo:
 From the repo root:
 
 ```bash
+nvm use        # Node.js 24 LTS
 pnpm dev      # runs the library watcher AND the playground together
 ```
 

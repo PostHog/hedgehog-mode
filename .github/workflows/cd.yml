@@ -27,7 +27,6 @@ jobs:
         if: steps.check-package-version.outputs.is-new-version == 'true'
         name: Install pnpm
         with:
-          version: 10
           run_install: false
 
       - name: Use Node.js from .nvmrc

@@ -56,34 +56,34 @@ This produces `dist/content.js`, `dist/popup.js`, and copies the hedgehog sprite
 
 ### 🎮 Controls
 
-| Input | Action |
-| --- | --- |
-| Arrow keys / WASD | Move left/right |
-| Space / W / Up | Jump (hold for height) |
-| Down / S | Drop through platforms |
-| Shift + direction | Run 🏃 |
-| Alt + direction | Moonwalk 🕺 |
-| Hold F | 🔥 Breathe fire |
+| Input                | Action                                         |
+| -------------------- | ---------------------------------------------- |
+| Arrow keys / WASD    | Move left/right                                |
+| Space / W / Up       | Jump (hold for height)                         |
+| Down / S             | Drop through platforms                         |
+| Shift + direction    | Run 🏃                                         |
+| Alt + direction      | Moonwalk 🕺                                    |
+| Hold F               | 🔥 Breathe fire                                |
 | Click (as Spiderhog) | 🕸️ Sling a web — hold and press W / S to climb |
-| Click and drag | Pick up and throw |
+| Click and drag       | Pick up and throw                              |
 
 ### 🤫 Secret Codes
 
 Type these while on a page with the hedgehog:
 
-| Code | Effect |
-| --- | --- |
-| `fff` or `fire` | 🔥 Sets the hedgehog on fire |
-| `spiderhog` / `robohog` / `ghost` | 🕷️🤖👻 Change skin |
-| `rainbow` | 🌈 Rainbow color |
-| `spawn` or `hedgehog` | 🦔 Spawn a friend |
-| `chaos` | 🦔🦔🦔 Spawn ten friends |
-| `hello` | 👋 Wave |
-| `giant` / `tiny` | Resize the hedgehog |
-| `slow` / `fast` | Change game speed |
-| `cheatcodes` | 📜 Show the full cheat sheet |
-| `death` | ☠️ Clear all hedgehogs |
-| ↑↑↓↓←→←→BA | 🚀 Konami code |
+| Code                              | Effect                       |
+| --------------------------------- | ---------------------------- |
+| `fff` or `fire`                   | 🔥 Sets the hedgehog on fire |
+| `spiderhog` / `robohog` / `ghost` | 🕷️🤖👻 Change skin           |
+| `rainbow`                         | 🌈 Rainbow color             |
+| `spawn` or `hedgehog`             | 🦔 Spawn a friend            |
+| `chaos`                           | 🦔🦔🦔 Spawn ten friends     |
+| `hello`                           | 👋 Wave                      |
+| `giant` / `tiny`                  | Resize the hedgehog          |
+| `slow` / `fast`                   | Change game speed            |
+| `cheatcodes`                      | 📜 Show the full cheat sheet |
+| `death`                           | ☠️ Clear all hedgehogs       |
+| ↑↑↓↓←→←→BA                        | 🚀 Konami code               |
 
 ## ⚙️ Options
 

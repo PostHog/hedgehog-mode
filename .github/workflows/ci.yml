@@ -23,7 +23,9 @@ jobs:
           node-version-file: .nvmrc
           scope: "@posthog"
 
-      - name: pnpm install, build, and test
+      - name: Install dependencies and run checks
         run: |
           pnpm install
+          pnpm lint
+          pnpm format:check
           pnpm build

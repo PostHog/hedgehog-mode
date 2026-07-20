@@ -35,12 +35,13 @@ This runs `pnpm -r --parallel --no-bail run dev`:
   pause-on-error and resume on the next save. Don't reintroduce a blocking
   pre-build or `&&` chaining here; that's what made it loop before.
 
-Other commands (run inside `hedgehog-mode/`):
+Other commands:
 
 ```bash
-pnpm build    # vite build
-pnpm lint     # eslint
-pnpm test     # vitest
+pnpm lint                          # oxlint, from the repo root
+pnpm format                        # oxfmt, from the repo root
+pnpm --dir hedgehog-mode build     # vite build
+pnpm --dir hedgehog-mode test      # vitest
 ```
 
 Tip: in the running app, press `ctrl+d` five times to toggle the Matter.js
@@ -99,15 +100,15 @@ pointer/`clientX` positions map 1:1 — no transforms needed.
 
 ## Conventions
 
-- TypeScript, Prettier, ESLint. Match the surrounding style; keep new skin/item
+- TypeScript, Oxfmt, Oxlint. Match the surrounding style; keep new skin/item
   logic out of the actor when a registry/entity fits.
 - Always run `pnpm build` (or at least `tsc --noEmit`) before declaring done —
   the build runs the dts plugin and will catch type errors.
 
 ## Writing PRs (important)
 
-The hedgehog has *opinions* about lazy PRs — one of its actual in-app barbs is
-"the pr is just *fix* with no description." So don't be that PR.
+The hedgehog has _opinions_ about lazy PRs — one of its actual in-app barbs is
+"the pr is just _fix_ with no description." So don't be that PR.
 
 **PR descriptions should be fun and written in the spirit of the project** —
 the same dry, lowercase, startup-satire voice the hedgehog uses in

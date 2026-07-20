@@ -25,7 +25,7 @@ export class HedgehogActorControls {
       F: "f",
     };
 
-    const horizontalHandler = (e: KeyboardEvent) => {
+    const horizontalHandler = (_e: KeyboardEvent) => {
       const left = heldKeys.has("left");
       const right = heldKeys.has("right");
 

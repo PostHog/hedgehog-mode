@@ -7,8 +7,7 @@
     "dev": "pnpm copy-assets && next dev -p 8002",
     "build": "pnpm --dir ../hedgehog-mode build && pnpm copy-assets && next build",
     "build:next": "pnpm copy-assets && next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "next start"
   },
   "dependencies": {
     "@posthog/hedgehog-mode": "workspace:@posthog/hedgehog-mode@*",
@@ -22,8 +21,6 @@
     "@types/node": "^20",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "eslint": "^9",
-    "eslint-config-next": "^16.0.0",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"

@@ -1,15 +1,14 @@
 {
   "name": "hedgehog-mode-anywhere",
   "version": "2.0.0",
-  "description": "Add an adorable animated hedgehog buddy to any website, powered by PostHog's hedgehog-mode engine.",
   "private": true,
+  "description": "Add an adorable animated hedgehog buddy to any website, powered by PostHog's hedgehog-mode engine.",
   "type": "module",
   "scripts": {
     "typecheck": "tsc --noEmit",
     "build": "tsc --noEmit && node build.mjs",
     "watch": "node build.mjs --watch"
   },
-  "comment": "Depends on the workspace @posthog/hedgehog-mode, which must keep pixi.js externalized (PostHog/hedgehog-mode#30): the inlined-pixi builds can't be patched for the eval/worker CSP limits of MV3 content scripts. pixi.js is a direct dep because content.jsx imports pixi.js/unsafe-eval and loadTextures.",
   "dependencies": {
     "@posthog/hedgehog-mode": "workspace:*",
     "pixi.js": "^8.4.0",
@@ -20,5 +19,6 @@
     "@types/react": "^19.2.14",
     "esbuild": "^0.25.12",
     "typescript": "^6.0.3"
-  }
+  },
+  "comment": "Depends on the workspace @posthog/hedgehog-mode, which must keep pixi.js externalized (PostHog/hedgehog-mode#30): the inlined-pixi builds can't be patched for the eval/worker CSP limits of MV3 content scripts. pixi.js is a direct dep because content.jsx imports pixi.js/unsafe-eval and loadTextures."
 }

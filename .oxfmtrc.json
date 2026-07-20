@@ -1,0 +1,15 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "trailingComma": "es5",
+  "tabWidth": 2,
+  "semi": true,
+  "singleQuote": false,
+  "printWidth": 80,
+  "proseWrap": "preserve",
+  "ignorePatterns": [
+    "node_modules",
+    "dist",
+    ".next",
+    "hedgehog-mode/assets/sprites.json"
+  ]
+}

@@ -59,11 +59,14 @@ function renderStatic(container, options) {
     root = createRoot(container);
     staticRoots.set(container, root);
   }
-  root.render(<StaticHedgehog options={options} assetsUrl={ASSETS_URL} size="100%" />);
+  root.render(
+    <StaticHedgehog options={options} assetsUrl={ASSETS_URL} size="100%" />
+  );
 }
 
 function getCurrentSkinColorId() {
-  if (currentConfig.skin && currentConfig.skin !== "default") return currentConfig.skin;
+  if (currentConfig.skin && currentConfig.skin !== "default")
+    return currentConfig.skin;
   return currentConfig.color || "default";
 }
 
@@ -97,7 +100,10 @@ function initSkinsGrid() {
 function initAccessoryGrid({ gridId, ids }) {
   const container = document.getElementById(gridId);
 
-  const noneBtn = createPreviewButton({ skin: "default", accessories: [] }, "None");
+  const noneBtn = createPreviewButton(
+    { skin: "default", accessories: [] },
+    "None"
+  );
   noneBtn.dataset.accessory = NONE;
   noneBtn.addEventListener("click", () => selectAccessory(NONE, ids));
   container.appendChild(noneBtn);
@@ -160,9 +166,12 @@ function updateUI() {
     });
   });
 
-  document.getElementById("walkingEnabled").checked = currentConfig.walking_enabled;
-  document.getElementById("interactionsEnabled").checked = currentConfig.interactions_enabled;
-  document.getElementById("controlsEnabled").checked = currentConfig.controls_enabled;
+  document.getElementById("walkingEnabled").checked =
+    currentConfig.walking_enabled;
+  document.getElementById("interactionsEnabled").checked =
+    currentConfig.interactions_enabled;
+  document.getElementById("controlsEnabled").checked =
+    currentConfig.controls_enabled;
 
   updatePreview();
 }
@@ -172,7 +181,10 @@ function saveAndSendConfig() {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (tabs[0]) {
       chrome.tabs
-        .sendMessage(tabs[0].id, { type: "UPDATE_CONFIG", config: currentConfig })
+        .sendMessage(tabs[0].id, {
+          type: "UPDATE_CONFIG",
+          config: currentConfig,
+        })
         .catch(() => {});
     }
   });
@@ -207,11 +219,13 @@ function initSiteToggle() {
     }
     if (!hostname) return;
 
-    document.getElementById("siteToggleLabel").textContent = `Disable on ${hostname}`;
+    document.getElementById("siteToggleLabel").textContent =
+      `Disable on ${hostname}`;
 
     chrome.storage.sync.get(["disabledSites"], (result) => {
       const disabledSites = result.disabledSites || [];
-      document.getElementById("siteToggle").checked = disabledSites.includes(hostname);
+      document.getElementById("siteToggle").checked =
+        disabledSites.includes(hostname);
     });
 
     document.getElementById("siteToggle").addEventListener("change", (e) => {
@@ -237,7 +251,8 @@ document.addEventListener("DOMContentLoaded", () => {
     if (result.hedgehogConfig) {
       currentConfig = { ...currentConfig, ...result.hedgehogConfig };
     }
-    document.getElementById("enableToggle").checked = result.hedgehogEnabled || false;
+    document.getElementById("enableToggle").checked =
+      result.hedgehogEnabled || false;
     updateUI();
   });
 

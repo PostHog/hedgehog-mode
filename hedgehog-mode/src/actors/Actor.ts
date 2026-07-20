@@ -267,7 +267,7 @@ export class Actor implements GameElement {
     return true;
   }
 
-  update(ticker: UpdateTicker): void {
+  update(_ticker: UpdateTicker): void {
     // Apply the collision filter override if it exists
     this.rigidBody!.collisionFilter.mask =
       this.collisionFilterOverride?.mask ?? this.collisionFilter.mask;

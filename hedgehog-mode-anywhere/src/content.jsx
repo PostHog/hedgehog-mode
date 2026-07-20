@@ -60,7 +60,9 @@ const startHedgehog = (config) => {
         assetsUrl: chrome.runtime.getURL("assets"),
         platforms: { selector: PLATFORM_SELECTOR },
         // The engine spawns the player hedgehog itself from this state; we don't spawn one.
-        state: { options: { id: "player", player: true, ...toActorOptions(config) } },
+        state: {
+          options: { id: "player", player: true, ...toActorOptions(config) },
+        },
       }}
       onGameReady={(readyGame) => {
         game = readyGame;

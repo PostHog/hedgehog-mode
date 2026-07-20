@@ -82,6 +82,11 @@ export class SpiderWebActor implements GameElement {
     if (TOTAL_WEBS >= MAX_WEBS) {
       return null;
     }
+    // No stage means the app isn't initialised yet (or has been torn down) —
+    // there's nowhere to render the strand, so don't build one.
+    if (!game.app?.stage) {
+      return null;
+    }
     return new SpiderWebActor(game, actor, point);
   }
 

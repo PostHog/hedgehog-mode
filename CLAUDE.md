@@ -40,8 +40,8 @@ Other commands:
 ```bash
 pnpm lint                          # oxlint, from the repo root
 pnpm format                        # oxfmt, from the repo root
+pnpm test                          # vitest, from the repo root
 pnpm --dir hedgehog-mode build     # vite build
-pnpm --dir hedgehog-mode test      # vitest
 ```
 
 Tip: in the running app, press `ctrl+d` five times to toggle the Matter.js

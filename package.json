@@ -10,6 +10,7 @@
   "scripts": {
     "dev": "pnpm -r --parallel --no-bail run dev",
     "build": "pnpm --dir ./playground build && pnpm --dir ./hedgehog-mode-anywhere build",
+    "test": "pnpm --dir ./hedgehog-mode test",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
     "format": "oxfmt .",

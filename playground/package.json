@@ -12,16 +12,16 @@
   "dependencies": {
     "@posthog/hedgehog-mode": "workspace:@posthog/hedgehog-mode@*",
     "lodash": "^4.17.21",
-    "next": "^16.0.0",
+    "next": "^16.2.10",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.15",
     "@types/node": "^20",
-    "@types/react": "^19.0.0",
+    "@types/react": "^19.2.17",
     "@types/react-dom": "^19.0.0",
-    "postcss": "^8",
+    "postcss": "^8.5.18",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }

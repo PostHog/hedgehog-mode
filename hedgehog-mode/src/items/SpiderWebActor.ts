@@ -249,7 +249,10 @@ export class SpiderWebActor implements GameElement {
       const direction = this.actor.getDirection() === "left" ? -1 : 1;
       const reach = Math.abs(this.actor.sprite!.width) * HAND_X_FRACTION;
       this.attachment.pointB = { x: direction * reach, y: 0 };
-      points.push({ x: body.position.x + direction * reach, y: body.position.y });
+      points.push({
+        x: body.position.x + direction * reach,
+        y: body.position.y,
+      });
     }
 
     const graphics = this.graphics;
@@ -284,8 +287,12 @@ export class SpiderWebActor implements GameElement {
 
     // Anchor splat where the web sticks — dark halo then white core.
     const a = points[0];
-    graphics.circle(a.x, a.y, 4).fill({ color: OUTLINE_COLOR, alpha: 0.3 * alpha });
-    graphics.circle(a.x, a.y, 3).fill({ color: SILK_COLOR, alpha: 0.85 * alpha });
+    graphics
+      .circle(a.x, a.y, 4)
+      .fill({ color: OUTLINE_COLOR, alpha: 0.3 * alpha });
+    graphics
+      .circle(a.x, a.y, 3)
+      .fill({ color: SILK_COLOR, alpha: 0.85 * alpha });
 
     const traceSplatLegs = () => {
       for (let i = 0; i < 4; i++) {
@@ -296,9 +303,19 @@ export class SpiderWebActor implements GameElement {
     };
 
     traceSplatLegs();
-    graphics.stroke({ width: 2, color: OUTLINE_COLOR, alpha: 0.3 * alpha, cap: "round" });
+    graphics.stroke({
+      width: 2,
+      color: OUTLINE_COLOR,
+      alpha: 0.3 * alpha,
+      cap: "round",
+    });
     traceSplatLegs();
-    graphics.stroke({ width: 1, color: SILK_COLOR, alpha: 0.6 * alpha, cap: "round" });
+    graphics.stroke({
+      width: 1,
+      color: SILK_COLOR,
+      alpha: 0.6 * alpha,
+      cap: "round",
+    });
   }
 
   beforeUnload(): void {

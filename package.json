@@ -1,18 +1,32 @@
 {
   "name": "hedgehog-mode",
   "version": "1.0.0",
+  "private": true,
   "description": "",
+  "keywords": [],
+  "license": "ISC",
+  "author": "",
   "main": "index.js",
   "scripts": {
     "dev": "pnpm -r --parallel --no-bail run dev",
-    "build": "pnpm --dir ./playground build && pnpm --dir ./hedgehog-mode-anywhere build"
+    "build": "pnpm --dir ./playground build && pnpm --dir ./hedgehog-mode-anywhere build",
+    "test": "pnpm --dir ./hedgehog-mode test",
+    "lint": "oxlint .",
+    "lint:fix": "oxlint --fix .",
+    "format": "oxfmt .",
+    "format:check": "oxfmt --check ."
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "react-shadow": "^20.6.0"
   },
+  "devDependencies": {
+    "oxfmt": "0.58.0",
+    "oxlint": "1.73.0"
+  },
+  "engines": {
+    "node": ">=24.18.0 <25"
+  },
+  "packageManager": "pnpm@10.29.3",
   "pnpm": {
     "overrides": {
       "react": "19.3.0-canary-3f0b9e61-20260317",

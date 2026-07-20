@@ -37,10 +37,7 @@ export function HedgehogImage({
   );
 }
 
-export function HedgehogProfileImage({
-  size,
-  ...props
-}: HedgehogImageProps) {
+export function HedgehogProfileImage({ size, ...props }: HedgehogImageProps) {
   return (
     <div
       style={{

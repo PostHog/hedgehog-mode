@@ -37,6 +37,45 @@ This produces `dist/content.js`, `dist/popup.js`, and copies the hedgehog sprite
 
 > The bundled `@posthog/hedgehog-mode` must keep pixi.js externalized ([PostHog/hedgehog-mode#30](https://github.com/PostHog/hedgehog-mode/pull/30)). Builds that inline pixi.js use a `new Function` shader path that MV3 content scripts forbid and that the extension can't patch. With pixi external, `src/content.jsx` patches the single shared pixi.js for eval-free shaders and main-thread texture loading, so the hedgehog runs on any page even under a strict Content-Security-Policy.
 
+## 🧪 Developing & testing locally
+
+There are two ways in, depending on what you're changing.
+
+### The customization UI, without a browser extension
+
+The popup renders the engine's own `HedgehogCustomization` component — the same one the playground's `/config` page uses — so the playground is the fastest way to iterate on it:
+
+```bash
+pnpm dev         # engine watcher + playground on http://localhost:8002
+```
+
+- **http://localhost:8002/config** — the customization panel (skins, colors, accessories, friends, options).
+- **http://localhost:8002/** — the live hedgehog, for physics and click/drag.
+
+Leave `pnpm dev` running while you work on the extension too: it keeps the engine's `dist/` fresh, which the extension bundles.
+
+### The extension itself
+
+Rebuild on change alongside a running `pnpm dev`, then reload the unpacked extension:
+
+```bash
+pnpm --dir hedgehog-mode-anywhere watch
+```
+
+Load it via [Installation](#-installation) below. After each rebuild, click the **reload** ↻ on the extension's card in `chrome://extensions`, then refresh the page you're testing (the content script injects at `document_end`, and only on `http(s)` pages — not `chrome://` or the web store).
+
+What to poke at:
+
+- **Platform inset** — enable the hedgehog on a site with a sticky header/nav bar; he should stay off the top strip of the window instead of perching there out of sight. Press **`ctrl+d` five times** on the page to toggle the matter.js debug renderer and see the platform bodies (none are created in the top 100px).
+- **Persistence & sync** — customize the hedgehog, then navigate to a _different_ domain: the look survives. Open a second window and change something; the other updates within a second. Settings live in `chrome.storage.sync` (shared across tabs, windows, sessions, and signed-in browsers), not the page's `localStorage`.
+- **Popup + in-page parity** — the popup and the in-page "Customize me!" panel are the same component, so a change in one shows up in the other. Add a friend from the popup and it appears (and persists) without a reload.
+
+Reset all state from the extension's service-worker console (`chrome://extensions` → the extension → **service worker**):
+
+```js
+chrome.storage.sync.clear();
+```
+
 ## 📦 Installation
 
 ### Chrome / Brave / Edge (Chromium browsers)

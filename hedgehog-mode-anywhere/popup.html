@@ -111,50 +111,11 @@
         transform: translateX(16px);
       }
 
-      .preview-card {
-        display: flex;
-        align-items: flex-start;
-        gap: 16px;
-        padding: 16px;
-        background: #2c2f3e;
-        border-radius: 12px;
-        margin-bottom: 20px;
-      }
-
-      .preview-hedgehog {
-        width: 80px;
-        height: 80px;
-        position: relative;
-        flex-shrink: 0;
-      }
-
-      .preview-text h2 {
-        font-size: 16px;
-        font-weight: 600;
-        margin-bottom: 6px;
-      }
-
-      .preview-text p {
-        font-size: 13px;
-        color: #9ba0b0;
-        line-height: 1.5;
-      }
-
-      .section {
-        margin-bottom: 20px;
-      }
-
-      .section-title {
-        font-size: 14px;
-        font-weight: 600;
-        color: #fff;
-        margin-bottom: 12px;
-      }
-
       .options-toggles {
         display: flex;
         flex-wrap: wrap;
         gap: 10px;
+        margin-bottom: 16px;
       }
 
       .option-toggle {
@@ -187,45 +148,8 @@
         transform: translateX(14px);
       }
 
-      .preview-grid {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 8px;
-      }
-
-      .preview-btn {
-        width: 100%;
-        aspect-ratio: 1;
-        border: 2px solid transparent;
-        border-radius: 8px;
-        background: transparent;
-        cursor: pointer;
-        padding: 0;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
-        overflow: hidden;
-      }
-
-      .preview-btn:hover {
-        background: #3c4152;
-      }
-
-      .preview-btn:focus-visible {
-        outline: 2px solid #d4a019;
-        outline-offset: 2px;
-      }
-
-      .preview-btn.active {
-        border-color: #d4a019;
-      }
-
-      .preview-btn .sprite-container {
-        width: 100%;
-        height: 100%;
-        position: relative;
+      #hedgehog-customization {
+        display: block;
       }
 
       .footer {
@@ -248,134 +172,7 @@
     </style>
   </head>
   <body>
-    <div class="header">
-      <h1>Hedgehog mode</h1>
-    </div>
-
-    <div class="top-toggles">
-      <label class="toggle-pill">
-        <span>Enabled hedgehog mode</span>
-        <span class="toggle">
-          <input
-            type="checkbox"
-            id="enableToggle"
-            aria-label="Enable hedgehog mode"
-          />
-          <span class="toggle-slider"></span>
-        </span>
-      </label>
-      <label class="toggle-pill">
-        <span id="siteToggleLabel">Disable on this site</span>
-        <span class="toggle">
-          <input
-            type="checkbox"
-            id="siteToggle"
-            aria-label="Disable on this site"
-          />
-          <span class="toggle-slider"></span>
-        </span>
-      </label>
-    </div>
-
-    <div class="preview-card">
-      <div class="preview-hedgehog" id="previewHedgehog"></div>
-      <div class="preview-text">
-        <h2>Hi, I'm Max!</h2>
-        <p>
-          Don't mind me. I'm just here to keep you company.<br />
-          You can move me around by clicking and dragging or control me with
-          WASD / arrow keys.
-        </p>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-title">Options</div>
-      <div class="options-toggles">
-        <label class="option-toggle">
-          <span>Walk around freely</span>
-          <span class="toggle">
-            <input
-              type="checkbox"
-              id="walkingEnabled"
-              checked
-              aria-label="Walk around freely"
-            />
-            <span class="toggle-slider"></span>
-          </span>
-        </label>
-        <label class="option-toggle">
-          <span>Interact with elements</span>
-          <span class="toggle">
-            <input
-              type="checkbox"
-              id="interactionsEnabled"
-              checked
-              aria-label="Interact with elements"
-            />
-            <span class="toggle-slider"></span>
-          </span>
-        </label>
-        <label class="option-toggle">
-          <span>Keyboard controls (WASD / arrow keys)</span>
-          <span class="toggle">
-            <input
-              type="checkbox"
-              id="controlsEnabled"
-              checked
-              aria-label="Keyboard controls"
-            />
-            <span class="toggle-slider"></span>
-          </span>
-        </label>
-      </div>
-    </div>
-
-    <div class="section">
-      <div class="section-title">Skins and colors</div>
-      <div
-        class="preview-grid"
-        id="skinsGrid"
-        role="group"
-        aria-label="Skins and colors"
-      ></div>
-    </div>
-
-    <div class="section">
-      <div class="section-title">Headwear</div>
-      <div
-        class="preview-grid"
-        id="headwearGrid"
-        role="group"
-        aria-label="Headwear"
-      ></div>
-    </div>
-
-    <div class="section">
-      <div class="section-title">Eyewear</div>
-      <div
-        class="preview-grid"
-        id="eyewearGrid"
-        role="group"
-        aria-label="Eyewear"
-      ></div>
-    </div>
-
-    <div class="section">
-      <div class="section-title">Other</div>
-      <div
-        class="preview-grid"
-        id="otherGrid"
-        role="group"
-        aria-label="Other accessories"
-      ></div>
-    </div>
-
-    <div class="footer">
-      Made with love by
-      <a href="https://posthog.com" target="_blank">PostHog</a>
-    </div>
-
+    <div id="root"></div>
     <script src="dist/popup.js"></script>
   </body>
 </html>

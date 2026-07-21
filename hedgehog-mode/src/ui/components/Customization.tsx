@@ -1,4 +1,7 @@
 import React, { useMemo, useState } from "react";
+// Import config values/types directly (not via the package index) so consumers that only
+// want this customization UI — e.g. the browser extension's popup — don't drag the whole
+// pixi/matter engine into their bundle just to render some sprite grids.
 import {
   getRandomAccessoryCombo,
   HedgehogActorAccessories,
@@ -7,8 +10,8 @@ import {
   HedgehogActorColorOptions,
   HedgehogActorOptions,
   HedgehogActorSkinOptions,
-  HedgeHogMode,
-} from "../..";
+} from "../../actors/hedgehog/config";
+import type { HedgeHogMode } from "../../hedgehog-mode";
 import { HedgehogProfileImage } from "../HedgehogStatic";
 import { Button, IconX } from "./Button";
 import { sample } from "lodash";
@@ -19,7 +22,7 @@ const ACCESSORY_GROUPS = ["headwear", "eyewear", "other"] as const;
 type HedgehogOptionsProps = {
   config: HedgehogActorOptions;
   setConfig: (config: HedgehogActorOptions) => void;
-  game: HedgeHogMode;
+  assetsUrl: string;
 };
 
 function Switch({
@@ -46,14 +49,27 @@ function Switch({
 }
 
 export function HedgehogCustomization({
+  assetsUrl,
   game,
   config,
   setConfig,
   defaultFriend,
-}: HedgehogOptionsProps & {
-  game: HedgeHogMode;
+}: {
+  config: HedgehogActorOptions;
+  setConfig: (config: HedgehogActorOptions) => void;
+  // Where the sprite sheet lives. Pass this directly — a running engine isn't needed to
+  // render the customization UI.
+  assetsUrl?: string;
+  /**
+   * @deprecated Pass `assetsUrl` instead. Only `game.options.assetsUrl` was ever read,
+   * and requiring a full engine instance stopped this UI being reused outside the game
+   * (e.g. in the extension popup). Still accepted so existing callers keep working.
+   */
+  game?: HedgeHogMode;
   defaultFriend?: HedgehogActorOptions | null;
 }) {
+  const resolvedAssetsUrl = assetsUrl ?? game?.options.assetsUrl ?? "";
+
   const [selectedFriendId, setSelectedFriendId] = useState<
     HedgehogActorOptions["id"] | null
   >(defaultFriend?.id ?? null);
@@ -89,7 +105,7 @@ export function HedgehogCustomization({
         <HedgehogProfileImage
           {...config}
           size={100}
-          assetsUrl={game.options.assetsUrl}
+          assetsUrl={resolvedAssetsUrl}
         />
         <div className="CustomizationContent">
           <h3 className="CustomizationTitle">
@@ -130,26 +146,30 @@ export function HedgehogCustomization({
       </div>
 
       <div className="CustomizationOptions">
-        <HedgehogOptions game={game} config={config} setConfig={setConfig} />
+        <HedgehogOptions
+          assetsUrl={resolvedAssetsUrl}
+          config={config}
+          setConfig={setConfig}
+        />
         <HedgehogFriends
-          game={game}
+          assetsUrl={resolvedAssetsUrl}
           config={config}
           setConfig={setConfig}
           setSelectedFriend={(f) => setSelectedFriendId(f?.id ?? null)}
           selectedFriend={selectedFriend}
         />
         <HedgehogColor
-          game={game}
+          assetsUrl={resolvedAssetsUrl}
           color={selectedConfig?.color}
           setColor={(color) => updateCustomization({ color })}
         />
         <HedgehogAccessories
-          game={game}
+          assetsUrl={resolvedAssetsUrl}
           accessories={selectedConfig?.accessories ?? []}
           setAccessories={(accessories) => updateCustomization({ accessories })}
         />
         <HedgehogSkins
-          game={game}
+          assetsUrl={resolvedAssetsUrl}
           skin={selectedConfig?.skin}
           setSkin={(skin) => updateCustomization({ skin })}
         />
@@ -193,7 +213,7 @@ function HedgehogOptions({ config, setConfig }: HedgehogOptionsProps) {
 function HedgehogFriends({
   config,
   setConfig,
-  game,
+  assetsUrl,
   setSelectedFriend,
   selectedFriend,
 }: HedgehogOptionsProps & {
@@ -257,7 +277,7 @@ function HedgehogFriends({
                   key={friend.id}
                   {...friend}
                   size={64}
-                  assetsUrl={game.options.assetsUrl}
+                  assetsUrl={assetsUrl}
                 />
               </Button>
             </div>
@@ -269,11 +289,11 @@ function HedgehogFriends({
 }
 
 function HedgehogAccessories({
-  game,
+  assetsUrl,
   accessories,
   setAccessories,
 }: {
-  game: HedgeHogMode;
+  assetsUrl: string;
   accessories: HedgehogActorAccessoryOption[];
   setAccessories: (accessories: HedgehogActorAccessoryOption[]) => void;
 }) {
@@ -314,7 +334,7 @@ function HedgehogAccessories({
                 <HedgehogProfileImage
                   size={64}
                   accessories={[acc]}
-                  assetsUrl={game.options.assetsUrl}
+                  assetsUrl={assetsUrl}
                 />
               </Button>
             ))}
@@ -326,11 +346,11 @@ function HedgehogAccessories({
 }
 
 function HedgehogSkins({
-  game,
+  assetsUrl,
   skin,
   setSkin,
 }: {
-  game: HedgeHogMode;
+  assetsUrl: string;
   skin: HedgehogActorOptions["skin"];
   setSkin: (skin: HedgehogActorOptions["skin"]) => void;
 }) {
@@ -348,7 +368,7 @@ function HedgehogSkins({
             <HedgehogProfileImage
               size={64}
               skin={option as HedgehogActorOptions["skin"]}
-              assetsUrl={game.options.assetsUrl}
+              assetsUrl={assetsUrl}
             />
           </Button>
         ))}
@@ -358,11 +378,11 @@ function HedgehogSkins({
 }
 
 function HedgehogColor({
-  game,
+  assetsUrl,
   color,
   setColor,
 }: {
-  game: HedgeHogMode;
+  assetsUrl: string;
   color: HedgehogActorOptions["color"];
   setColor: (color: HedgehogActorOptions["color"]) => void;
 }) {
@@ -386,7 +406,7 @@ function HedgehogColor({
             <HedgehogProfileImage
               size={64}
               color={option as HedgehogActorOptions["color"]}
-              assetsUrl={game.options.assetsUrl}
+              assetsUrl={assetsUrl}
             />
           </Button>
         ))}

@@ -233,7 +233,7 @@ export function HedgehogModeUI({ game }: { game: HedgeHogMode }) {
         <div className="DialogBoxContent">
           {showConfiguration && actorOptions && (
             <HedgehogCustomization
-              game={game}
+              assetsUrl={game.options.assetsUrl}
               config={actorOptions}
               setConfig={(config) => {
                 setActorOptions(config);

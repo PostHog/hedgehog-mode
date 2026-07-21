@@ -1,6 +1,6 @@
 // Content script: drives the hedgehog-mode engine on the page.
-// The popup owns customization and talks to us over chrome.runtime messages;
-// global enable/disable + per-site state live in chrome.storage.sync.
+// All config — customization, global enable/disable, per-site state — lives in
+// chrome.storage.sync; the popup writes it and every tab reacts via storage events.
 //
 // Two pixi.js behaviours break under MV3 / strict-CSP pages and are neutralised before any
 // renderer is created:
@@ -12,6 +12,7 @@ import "pixi.js/unsafe-eval";
 import { loadTextures } from "pixi.js";
 import { createRoot } from "react-dom/client";
 import { HedgehogModeRenderer } from "@posthog/hedgehog-mode";
+import { toActorOptions, fromActorOptions } from "./hedgehog-config";
 
 loadTextures.config.preferWorkers = false;
 
@@ -24,25 +25,6 @@ const PLATFORM_SELECTOR =
 // the top edge of the window where he's clipped and effectively invisible. Keep his world
 // starting a bit below the fold. (See HedgehogModeConfig.platforms.viewportPadding.)
 const PLATFORM_TOP_INSET = 100;
-
-// Stored config keys map onto the library's HedgehogActorOptions.
-const toActorOptions = (config = {}) => ({
-  skin: config.skin || "default",
-  color: config.color || null,
-  accessories: config.accessories || [],
-  ai_enabled: config.walking_enabled ?? true,
-  interactions_enabled: config.interactions_enabled ?? true,
-  controls_enabled: config.controls_enabled ?? true,
-});
-
-const fromActorOptions = (options) => ({
-  skin: options.skin || "default",
-  color: options.color || null,
-  accessories: options.accessories || [],
-  walking_enabled: options.ai_enabled ?? true,
-  interactions_enabled: options.interactions_enabled ?? true,
-  controls_enabled: options.controls_enabled ?? true,
-});
 
 // The engine persists its state through chrome.storage.sync (below) instead of writing to
 // the host page's localStorage. localStorage in a content script belongs to whatever site
@@ -116,25 +98,27 @@ const stopHedgehog = () => {
 };
 
 const updateConfig = (config) => {
-  if (!actor) return;
-  actor.updateOptions(toActorOptions(config));
-  // Reload the sprite so a skin change shows immediately, even when AI is off and
-  // the engine wouldn't otherwise re-render the actor.
+  // Route through the state manager (not actor.updateOptions) so friend hedgehogs get
+  // spawned/removed too — not just the player's own skin/colour/accessories.
+  if (!game?.stateManager) return;
+  game.stateManager.setHedgehog({
+    id: "player",
+    player: true,
+    ...toActorOptions(config),
+  });
+  // Reload the sprite so a skin change shows immediately, even when AI is off and the
+  // engine wouldn't otherwise re-render the player.
+  const player = game.getPlayableHedgehog();
   try {
-    actor.updateSprite(actor.currentSprite ?? "idle");
+    player?.updateSprite(player.currentSprite ?? "idle");
   } catch {
-    actor.updateSprite("idle");
+    player?.updateSprite("idle");
   }
 };
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message.type === "UPDATE_CONFIG") {
-    updateConfig(message.config);
-    persistConfig(message.config);
-    sendResponse({ success: true });
-    return true;
-  }
-
+  // Config changes flow through chrome.storage.sync now (see the popup + onChanged below),
+  // so there's no UPDATE_CONFIG message — every tab reacts to the storage event instead.
   if (message.type === "GET_STATUS") {
     sendResponse({ config: actor ? fromActorOptions(actor.options) : null });
     return true;
@@ -170,9 +154,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
   if (changes.hedgehogConfig) {
     // Record what's now in storage so our own onStateChange doesn't echo it straight back.
     lastConfigJson = JSON.stringify(changes.hedgehogConfig.newValue ?? null);
-    if (actor) {
-      updateConfig(changes.hedgehogConfig.newValue || {});
-    }
+    updateConfig(changes.hedgehogConfig.newValue || {});
   }
   if (changes.hedgehogEnabled || changes.disabledSites) {
     reconcileState();

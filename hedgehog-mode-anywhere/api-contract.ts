@@ -7,10 +7,8 @@
 import type { ComponentProps } from "react";
 import {
   HedgehogModeRenderer,
-  StaticHedgehog,
-  HedgehogActorSkinOptions,
-  HedgehogActorColorOptions,
-  HedgehogActorAccessories,
+  HedgehogModeRendererContent,
+  HedgehogCustomization,
 } from "@posthog/hedgehog-mode";
 
 // content.jsx: <HedgehogModeRenderer config={...} onGameReady={...} />
@@ -22,25 +20,33 @@ const _config: RendererProps["config"] = {
   onStateChange: (state) => void state.options,
 };
 const _onReady: NonNullable<RendererProps["onGameReady"]> = (game) => {
-  // content.jsx drives the actor returned here; pin the members it calls.
+  // content.jsx drives the game returned here; pin the members it calls.
+  game.stateManager?.setHedgehog({ id: "player", player: true });
   const actor = game.getPlayableHedgehog();
   if (!actor) return;
-  actor.updateOptions(actor.options);
   actor.updateSprite(actor.currentSprite ?? "idle");
   actor.setOnFire();
+  void actor.options;
 };
 
-// popup.jsx: <StaticHedgehog options={...} assetsUrl={...} size="100%" /> and the option lists.
-type StaticProps = ComponentProps<typeof StaticHedgehog>;
-const _static: Pick<StaticProps, "options" | "assetsUrl" | "size"> = {
-  options: { id: "preview" },
+// popup.jsx renders the library's own customization UI inside HedgehogModeRendererContent
+// (for the engine's shadow-root styles) instead of a hand-rolled grid.
+type CustomizationProps = ComponentProps<typeof HedgehogCustomization>;
+const _customization: Pick<
+  CustomizationProps,
+  "config" | "setConfig" | "assetsUrl"
+> = {
+  config: { id: "player", player: true },
+  setConfig: (config) => void config,
   assetsUrl: "",
-  size: "100%",
 };
-HedgehogActorSkinOptions.map((skin) => skin);
-HedgehogActorColorOptions.map((color) => color);
-Object.values(HedgehogActorAccessories).map((accessory) => accessory.group);
+type ContentProps = ComponentProps<typeof HedgehogModeRendererContent>;
+const _content: Pick<ContentProps, "id" | "theme"> = {
+  id: "hedgehog-customization",
+  theme: "dark",
+};
 
 void _config;
 void _onReady;
-void _static;
+void _customization;
+void _content;

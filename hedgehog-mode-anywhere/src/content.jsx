@@ -19,6 +19,12 @@ loadTextures.config.preferWorkers = false;
 const PLATFORM_SELECTOR =
   'button, input, select, .btn, [role="button"], nav, header, footer, aside, .card, .modal, .dialog';
 
+// Ignore elements in the top strip of the viewport when discovering platforms. Sticky
+// headers and nav bars sit at y≈0, and a hedgehog perched on one ends up jammed against
+// the top edge of the window where he's clipped and effectively invisible. Keep his world
+// starting a bit below the fold. (See HedgehogModeConfig.platforms.viewportPadding.)
+const PLATFORM_TOP_INSET = 100;
+
 // Stored config keys map onto the library's HedgehogActorOptions.
 const toActorOptions = (config = {}) => ({
   skin: config.skin || "default",
@@ -38,12 +44,34 @@ const fromActorOptions = (options) => ({
   controls_enabled: options.controls_enabled ?? true,
 });
 
+// The engine persists its state through chrome.storage.sync (below) instead of writing to
+// the host page's localStorage. localStorage in a content script belongs to whatever site
+// you're on: it's per-origin (your hedgehog would reset on every different domain), it
+// litters every page with our key, and it can't sync across windows, sessions or devices.
+// chrome.storage.sync is shared by every tab and window, survives restarts, and roams across
+// the user's signed-in browsers. We store the same flattened `hedgehogConfig` the popup uses,
+// so in-page customization and the popup stay in lockstep.
+let lastConfigJson = null;
+
+const persistConfig = (config) => {
+  const json = JSON.stringify(config);
+  // Skip no-op writes (e.g. the engine re-persisting the state we just seeded it with) so we
+  // don't burn chrome.storage.sync's write quota or fire redundant storage events.
+  if (json === lastConfigJson) return;
+  lastConfigJson = json;
+  chrome.storage.sync.set({ hedgehogConfig: config });
+};
+
 let root = null;
 let game = null;
 let actor = null;
 
 const startHedgehog = (config) => {
   if (root) return;
+
+  // Baseline for persistConfig's dedupe: normalise the seed the same way the engine will
+  // hand it back via onStateChange, so its initial persist-on-spawn is a genuine no-op.
+  lastConfigJson = JSON.stringify(fromActorOptions(toActorOptions(config)));
 
   const host = document.createElement("div");
   host.id = "hedgehog-mode-anywhere";
@@ -58,11 +86,18 @@ const startHedgehog = (config) => {
     <HedgehogModeRenderer
       config={{
         assetsUrl: chrome.runtime.getURL("assets"),
-        platforms: { selector: PLATFORM_SELECTOR },
+        platforms: {
+          selector: PLATFORM_SELECTOR,
+          viewportPadding: { top: PLATFORM_TOP_INSET },
+        },
         // The engine spawns the player hedgehog itself from this state; we don't spawn one.
         state: {
           options: { id: "player", player: true, ...toActorOptions(config) },
         },
+        // Persist state changes (incl. in-page customization) to chrome.storage instead of
+        // the page's localStorage, so they survive navigation and sync across windows.
+        onStateChange: (state) =>
+          persistConfig(fromActorOptions(state.options)),
       }}
       onGameReady={(readyGame) => {
         game = readyGame;
@@ -95,7 +130,7 @@ const updateConfig = (config) => {
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message.type === "UPDATE_CONFIG") {
     updateConfig(message.config);
-    chrome.storage.sync.set({ hedgehogConfig: message.config });
+    persistConfig(message.config);
     sendResponse({ success: true });
     return true;
   }
@@ -132,8 +167,12 @@ const reconcileState = () => {
 
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area !== "sync") return;
-  if (changes.hedgehogConfig && actor) {
-    updateConfig(changes.hedgehogConfig.newValue || {});
+  if (changes.hedgehogConfig) {
+    // Record what's now in storage so our own onStateChange doesn't echo it straight back.
+    lastConfigJson = JSON.stringify(changes.hedgehogConfig.newValue ?? null);
+    if (actor) {
+      updateConfig(changes.hedgehogConfig.newValue || {});
+    }
   }
   if (changes.hedgehogEnabled || changes.disabledSites) {
     reconcileState();

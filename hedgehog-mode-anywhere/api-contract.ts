@@ -17,8 +17,9 @@ import {
 type RendererProps = ComponentProps<typeof HedgehogModeRenderer>;
 const _config: RendererProps["config"] = {
   assetsUrl: "",
-  platforms: { selector: "" },
+  platforms: { selector: "", viewportPadding: { top: 100 } },
   state: { options: { id: "player", player: true } },
+  onStateChange: (state) => void state.options,
 };
 const _onReady: NonNullable<RendererProps["onGameReady"]> = (game) => {
   // content.jsx drives the actor returned here; pin the members it calls.

@@ -53,6 +53,13 @@ export type HedgehogModeConfig = {
     syncFrequency?: number;
   };
   state?: HedgehogModeGameState;
+  // Called whenever the engine persists its state (initial spawn, in-app
+  // customization, friends changing). When provided, the engine hands persistence
+  // entirely to the host and does NOT touch localStorage — pair it with `state` for
+  // the initial value. Browser extensions use this to store state in chrome.storage,
+  // which (unlike the host page's per-origin localStorage) survives navigation across
+  // origins and syncs across windows, sessions and even devices.
+  onStateChange?: (state: HedgehogModeGameState) => void;
   onQuit?: (game: HedgehogModeInterface) => void;
 };
 

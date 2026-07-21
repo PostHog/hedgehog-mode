@@ -75,12 +75,31 @@ export class GameStateManager {
 
   private persistState() {
     this.config.state = this.state;
-    localStorage.setItem("@hedgehog-mode/state", JSON.stringify(this.state));
+    if (this.config.onStateChange) {
+      // Host owns persistence (e.g. a browser extension backing this with
+      // chrome.storage). Don't also write to the page's localStorage.
+      this.config.onStateChange(this.state);
+      return;
+    }
+    try {
+      localStorage.setItem("@hedgehog-mode/state", JSON.stringify(this.state));
+    } catch {
+      // Storage unavailable (private mode, blocked, SSR) — degrade gracefully.
+    }
   }
 
   private getPersistedState() {
-    const state = localStorage.getItem("@hedgehog-mode/state");
-    return state ? JSON.parse(state) : null;
+    // When the host owns persistence it also supplies the initial state via
+    // config.state; never fall back to the host page's localStorage.
+    if (this.config.onStateChange) {
+      return null;
+    }
+    try {
+      const state = localStorage.getItem("@hedgehog-mode/state");
+      return state ? JSON.parse(state) : null;
+    } catch {
+      return null;
+    }
   }
 
   private upsertHedgehog(config: HedgehogActorOptions) {

@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-07-21
+
+- Keep the hedgehog off the top strip of the window: platform discovery now ignores the top 100px, so he no longer perches on sticky headers/nav bars where he's clipped against the top edge (`platforms.viewportPadding.top`)
+- Persist engine state (including in-page customization) via `chrome.storage.sync` instead of the host page's `localStorage`, so it survives navigation across origins and syncs across windows and sessions (needs `@posthog/hedgehog-mode`'s new `onStateChange` config hook)
+
 ## 2026-06-24
 
 - Use `@posthog/hedgehog-mode@0.0.53`, which externalizes pixi.js for MV3 / strict-CSP compatibility ([PostHog/hedgehog-mode#30](https://github.com/PostHog/hedgehog-mode/pull/30))

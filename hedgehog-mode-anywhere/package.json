@@ -1,6 +1,6 @@
 {
   "name": "hedgehog-mode-anywhere",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
   "description": "Add an adorable animated hedgehog buddy to any website, powered by PostHog's hedgehog-mode engine.",
   "type": "module",

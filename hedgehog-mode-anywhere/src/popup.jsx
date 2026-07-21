@@ -8,7 +8,7 @@
 // All state lives in chrome.storage.sync, shared across every tab, window and session. Editing
 // here writes there; each content script reacts via chrome.storage.onChanged. We also listen for
 // changes so the popup reflects edits made from the in-page panel while it happens to be open.
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   HedgehogCustomization,
@@ -61,6 +61,9 @@ function App() {
   const [actorConfig, setActorConfig] = useState(() =>
     toActorConfig(DEFAULT_CONFIG)
   );
+  // JSON of the stored config we last wrote or received, so an onChanged event that just echoes
+  // our own edit doesn't re-render the whole customization grid again.
+  const lastConfigJson = useRef(null);
 
   // Load initial state + the active tab's hostname.
   useEffect(() => {
@@ -69,6 +72,7 @@ function App() {
       (result) => {
         setEnabled(!!result.hedgehogEnabled);
         setDisabledSites(result.disabledSites || []);
+        lastConfigJson.current = JSON.stringify(result.hedgehogConfig ?? null);
         setActorConfig(toActorConfig(result.hedgehogConfig));
       }
     );
@@ -88,7 +92,11 @@ function App() {
         setDisabledSites(changes.disabledSites.newValue || []);
       }
       if (changes.hedgehogConfig) {
-        setActorConfig(toActorConfig(changes.hedgehogConfig.newValue));
+        const json = JSON.stringify(changes.hedgehogConfig.newValue ?? null);
+        if (json !== lastConfigJson.current) {
+          lastConfigJson.current = json;
+          setActorConfig(toActorConfig(changes.hedgehogConfig.newValue));
+        }
       }
     };
     chrome.storage.onChanged.addListener(onChanged);
@@ -97,7 +105,9 @@ function App() {
 
   const saveConfig = (next) => {
     setActorConfig(next);
-    chrome.storage.sync.set({ hedgehogConfig: fromActorOptions(next) });
+    const stored = fromActorOptions(next);
+    lastConfigJson.current = JSON.stringify(stored);
+    chrome.storage.sync.set({ hedgehogConfig: stored });
   };
 
   const toggleEnabled = (value) => {

@@ -95,7 +95,10 @@ export function HedgehogCustomization({
     return selectedFriendId
       ? (config.friends?.find((f) => f.id === selectedFriendId) ?? null)
       : null;
-  }, [selectedFriendId]);
+    // Depend on config.friends too: editing the selected friend's skin/color/accessories
+    // replaces its entry, and without this the controls keep showing the old values until
+    // another friend is selected.
+  }, [selectedFriendId, config.friends]);
 
   const selectedConfig = selectedFriend ?? config;
 

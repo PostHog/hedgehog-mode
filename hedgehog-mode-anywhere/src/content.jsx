@@ -47,6 +47,10 @@ const persistConfig = (config) => {
 let root = null;
 let game = null;
 let actor = null;
+// The freshest config seen before the engine finished starting up. A cross-tab edit can land
+// after render() but before onGameReady (and before GameStateManager exists); we buffer it here
+// instead of dropping it, and flush it once the engine is ready. See updateConfig / onGameReady.
+let pendingConfig = null;
 
 const startHedgehog = (config) => {
   if (root) return;
@@ -78,12 +82,23 @@ const startHedgehog = (config) => {
         },
         // Persist state changes (incl. in-page customization) to chrome.storage instead of
         // the page's localStorage, so they survive navigation and sync across windows.
-        onStateChange: (state) =>
-          persistConfig(fromActorOptions(state.options)),
+        onStateChange: (state) => {
+          // If a newer config arrived during startup, the engine is seeding from a now-stale
+          // `state` prop — skip persisting it so we don't clobber the pending edit. The flush
+          // in onGameReady applies (and persists) the newer config instead.
+          if (pendingConfig !== null) return;
+          persistConfig(fromActorOptions(state.options));
+        },
       }}
       onGameReady={(readyGame) => {
         game = readyGame;
         actor = game.getPlayableHedgehog();
+        // Apply any config that landed while the engine was still starting up.
+        if (pendingConfig !== null) {
+          const config = pendingConfig;
+          pendingConfig = null;
+          updateConfig(config);
+        }
       }}
     />
   );
@@ -100,7 +115,11 @@ const stopHedgehog = () => {
 const updateConfig = (config) => {
   // Route through the state manager (not actor.updateOptions) so friend hedgehogs get
   // spawned/removed too — not just the player's own skin/colour/accessories.
-  if (!game?.stateManager) return;
+  if (!game?.stateManager) {
+    // Engine isn't ready yet — remember the latest config and apply it in onGameReady.
+    pendingConfig = config;
+    return;
+  }
   game.stateManager.setHedgehog({
     id: "player",
     player: true,
@@ -152,9 +171,14 @@ const reconcileState = () => {
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area !== "sync") return;
   if (changes.hedgehogConfig) {
-    // Record what's now in storage so our own onStateChange doesn't echo it straight back.
-    lastConfigJson = JSON.stringify(changes.hedgehogConfig.newValue ?? null);
-    updateConfig(changes.hedgehogConfig.newValue || {});
+    const json = JSON.stringify(changes.hedgehogConfig.newValue ?? null);
+    // Skip events that just echo the config we already hold: a local edit already updated the
+    // engine, and its own storage write comes back here — re-running the full actor/friend
+    // update and sprite refresh would be wasted work. Only genuine cross-tab changes differ.
+    if (json !== lastConfigJson) {
+      lastConfigJson = json;
+      updateConfig(changes.hedgehogConfig.newValue || {});
+    }
   }
   if (changes.hedgehogEnabled || changes.disabledSites) {
     reconcileState();

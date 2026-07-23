@@ -99,7 +99,7 @@ Launch Firefox with the temporary development build installed:
 pnpm --dir hedgehog-mode-anywhere run:firefox
 ```
 
-Lint the Firefox manifest and package a signed-submission ZIP with `pnpm --dir hedgehog-mode-anywhere lint:firefox` and `pnpm --dir hedgehog-mode-anywhere package:firefox`.
+Lint the Firefox manifest and package store-submission ZIPs with `pnpm --dir hedgehog-mode-anywhere lint:firefox`, `pnpm --dir hedgehog-mode-anywhere package:firefox`, and `pnpm --dir hedgehog-mode-anywhere package:chrome`.
 
 ## 🚀 Usage
 

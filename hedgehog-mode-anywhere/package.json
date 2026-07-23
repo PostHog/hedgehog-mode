@@ -10,7 +10,8 @@
     "watch": "node build.mjs --watch",
     "lint:firefox": "pnpm build && web-ext lint --source-dir artifacts/firefox",
     "run:firefox": "pnpm build && web-ext run --source-dir artifacts/firefox",
-    "package:firefox": "pnpm build && web-ext build --source-dir artifacts/firefox --artifacts-dir artifacts --overwrite-dest"
+    "package:chrome": "pnpm build && web-ext build --source-dir artifacts/chrome --artifacts-dir artifacts --filename hedgehog-mode-chrome.zip --overwrite-dest",
+    "package:firefox": "pnpm build && web-ext build --source-dir artifacts/firefox --artifacts-dir artifacts --filename hedgehog-mode-firefox.zip --overwrite-dest"
   },
   "dependencies": {
     "@posthog/hedgehog-mode": "workspace:*",

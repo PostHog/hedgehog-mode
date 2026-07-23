@@ -13,7 +13,7 @@ const injectIntoOpenTabs = () => {
         if (!chrome.runtime.lastError) return;
         chrome.scripting.executeScript(
           { target: { tabId }, files: ["dist/content.js"] },
-          () => void chrome.runtime.lastError,
+          () => void chrome.runtime.lastError
         );
       });
     }

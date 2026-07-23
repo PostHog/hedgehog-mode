@@ -32,7 +32,7 @@ export class FlameActor extends Actor {
   static spawnFireball(
     game: HedgehogModeInterface,
     position: Matter.Vector,
-    velocity: Matter.Vector,
+    velocity: Matter.Vector
   ): void {
     const flame = new FlameActor(game);
     flame.setPosition({

@@ -1,4 +1,4 @@
-import { sample, uniqueId } from "./utils";
+import { range, sample, uniqueId } from "./utils";
 import { HedgehogModeInterface } from "../types";
 import {
   getRandomAccessoryCombo,
@@ -28,7 +28,7 @@ export class GlobalKeyboardListeners {
       {
         keys: ["c", "h", "a", "o", "s"],
         action: async () => {
-          for (let remaining = 10; remaining > 0; remaining--) {
+          for (const _ of range(10)) {
             spawnHedgehog();
             await new Promise((r) => setTimeout(r, 100));
           }
@@ -144,7 +144,7 @@ export class GlobalKeyboardListeners {
         keys: ["s", "l", "o", "w"],
         action: () => {
           this.game.setSpeed(
-            this.game.engine.timing.timeScale === 0.5 ? 1 : 0.5,
+            this.game.engine.timing.timeScale === 0.5 ? 1 : 0.5
           );
         },
       },
@@ -206,7 +206,7 @@ export class GlobalKeyboardListeners {
             },
           ]);
 
-          for (let remaining = 10000; remaining > 0; remaining--) {
+          for (const _ of range(10000)) {
             spawnHedgehog();
             await new Promise((r) => setTimeout(r, 100));
           }

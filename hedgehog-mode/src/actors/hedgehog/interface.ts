@@ -303,7 +303,7 @@ export class HedgehogActorInterface {
 
   constructor(
     private game: HedgehogModeInterface,
-    private actor: HedgehogActor,
+    private actor: HedgehogActor
   ) {}
 
   onClick(): void {

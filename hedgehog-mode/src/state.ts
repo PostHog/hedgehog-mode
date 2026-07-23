@@ -16,7 +16,7 @@ export class GameStateManager {
 
   constructor(
     private game: HedgeHogMode,
-    private config: HedgehogModeConfig,
+    private config: HedgehogModeConfig
   ) {
     this.state = this.config.state ??
       this.getPersistedState() ?? {

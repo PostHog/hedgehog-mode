@@ -33,7 +33,10 @@ function Switch({
 }: {
   checked: boolean;
   onChange: (checked: boolean) => void;
-} & Pick<React.HTMLAttributes<HTMLDivElement>, "title" | "children">) {
+} & Pick<
+  React.HTMLAttributes<HTMLDivElement>,
+  "title" | "children"
+>) {
   return (
     <span className="Switch" {...props}>
       <label className="SwitchLabel">
@@ -75,7 +78,7 @@ export function HedgehogCustomization({
   >(defaultFriend?.id ?? null);
 
   const updateCustomization = (
-    customization: Pick<HedgehogActorOptions, "accessories" | "color" | "skin">,
+    customization: Pick<HedgehogActorOptions, "accessories" | "color" | "skin">
   ) => {
     if (selectedFriendId) {
       setConfig({
@@ -83,7 +86,7 @@ export function HedgehogCustomization({
         friends: config.friends?.map((friend) =>
           friend.id === selectedFriendId
             ? { ...friend, ...customization }
-            : friend,
+            : friend
         ),
       });
     } else {
@@ -124,9 +127,8 @@ export function HedgehogCustomization({
                 because this hedgehog's got a whole data warehouse to protect...
                 <br />
                 you can move me around by clicking and dragging or control me
-                with WASD / arrow keys, and i'll use your mouse as a
-                web-slinging target. hold the web and press W / S to climb up
-                and down it.
+                with WASD / arrow keys, and i'll use your mouse as a web-slinging
+                target. hold the web and press W / S to climb up and down it.
               </>
             ) : config.skin === "robohog" ? (
               <>
@@ -181,7 +183,10 @@ export function HedgehogCustomization({
   );
 }
 
-function HedgehogOptions({ config, setConfig }: HedgehogOptionsProps) {
+function HedgehogOptions({
+  config,
+  setConfig,
+}: HedgehogOptionsProps) {
   return (
     <div className="CustomizationSection">
       <h4 className="CustomizationSectionTitle">options</h4>
@@ -271,7 +276,7 @@ function HedgehogFriends({
                 active={selectedFriend?.id === friend.id}
                 onClick={() =>
                   setSelectedFriend(
-                    selectedFriend?.id === friend.id ? null : friend,
+                    selectedFriend?.id === friend.id ? null : friend
                   )
                 }
                 title={friend.id}
@@ -312,9 +317,9 @@ function HedgehogAccessories({
           .filter(
             (acc) =>
               HedgehogActorAccessories[acc].group !==
-              HedgehogActorAccessories[accessory].group,
+              HedgehogActorAccessories[accessory].group
           )
-          .concat(accessory),
+          .concat(accessory)
       );
     }
   };
@@ -326,7 +331,7 @@ function HedgehogAccessories({
           <h4 className="CustomizationSectionTitle">{group}</h4>
           <div className="CustomizationGrid">
             {HedgehogActorAccessoryOptions.filter(
-              (acc) => HedgehogActorAccessories[acc].group === group,
+              (acc) => HedgehogActorAccessories[acc].group === group
             ).map((acc) => (
               <Button
                 key={acc}
@@ -401,7 +406,7 @@ function HedgehogColor({
               setColor(
                 option === "none"
                   ? null
-                  : (option as HedgehogActorOptions["color"]),
+                  : (option as HedgehogActorOptions["color"])
               )
             }
             title={option.split("-").join(" ")}

@@ -2,7 +2,7 @@ import { Actor } from "../actors/Actor";
 import { HedgehogModeInterface, GameElement, UpdateTicker } from "../types";
 import { COLLISIONS } from "../misc/collisions";
 import gsap from "gsap";
-import { range } from "lodash";
+import { range } from "../misc/utils";
 
 const FLAME_SCALE = 0.2;
 

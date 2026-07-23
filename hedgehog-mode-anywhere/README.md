@@ -33,7 +33,7 @@ Or build just the extension — the engine's `dist/` has to exist first, which `
 pnpm --dir hedgehog-mode-anywhere build
 ```
 
-This produces `dist/content.js`, `dist/popup.js`, and copies the hedgehog spritesheet into `assets/`. Use `pnpm --dir hedgehog-mode-anywhere watch` to rebuild on change while developing.
+This produces `dist/content.js`, `dist/popup.js`, copies the hedgehog spritesheet into `assets/`, and creates ready-to-load builds in `artifacts/chrome/` and `artifacts/firefox/`. Use `pnpm --dir hedgehog-mode-anywhere watch` to rebuild on change while developing.
 
 > The bundled `@posthog/hedgehog-mode` must keep pixi.js externalized ([PostHog/hedgehog-mode#30](https://github.com/PostHog/hedgehog-mode/pull/30)). Builds that inline pixi.js use a `new Function` shader path that MV3 content scripts forbid and that the extension can't patch. With pixi external, `src/content.jsx` patches the single shared pixi.js for eval-free shaders and main-thread texture loading, so the hedgehog runs on any page even under a strict Content-Security-Policy.
 
@@ -78,14 +78,28 @@ chrome.storage.sync.clear();
 
 ## 📦 Installation
 
-### Chrome / Brave / Edge (Chromium browsers)
+Install [Hedgehog Mode Anywhere from the Chrome Web Store](https://chromewebstore.google.com/detail/hedgehog-mode-anywhere/pkbjccilodggopgideedpodjalmpbjkl).
+
+### Load an unpacked Chromium development build
+
+Use an unpacked build when developing or testing local changes:
 
 1. Clone the monorepo and run the build step above
 2. Open your browser and navigate to `chrome://extensions/` (or `brave://extensions/`, `edge://extensions/`)
 3. Enable "Developer mode" using the toggle in the top-right corner
 4. Click "Load unpacked"
-5. Select the `hedgehog-mode-anywhere/` folder
+5. Select the `hedgehog-mode-anywhere/artifacts/chrome/` folder
 6. The hedgehog icon should appear in your browser toolbar
+
+### Run in Firefox
+
+Launch Firefox with the temporary development build installed:
+
+```bash
+pnpm --dir hedgehog-mode-anywhere run:firefox
+```
+
+Lint the Firefox manifest and package store-submission ZIPs with `pnpm --dir hedgehog-mode-anywhere lint:firefox`, `pnpm --dir hedgehog-mode-anywhere package:firefox`, and `pnpm --dir hedgehog-mode-anywhere package:chrome`.
 
 ## 🚀 Usage
 

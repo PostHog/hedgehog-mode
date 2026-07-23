@@ -8,6 +8,7 @@
 //     side-effect import below swaps in pixi's eval-free polyfills.
 //  2. pixi's texture loader spawns a Web Worker from a blob: URL, which many sites' CSP
 //     blocks. Loading textures on the main thread avoids it.
+import "./browser-globals";
 import "pixi.js/unsafe-eval";
 import { loadTextures } from "pixi.js";
 import { createRoot } from "react-dom/client";
@@ -45,6 +46,7 @@ const persistConfig = (config) => {
 };
 
 let root = null;
+let host = null;
 let game = null;
 let actor = null;
 // The freshest config seen before the engine finished starting up. A cross-tab edit can land
@@ -59,7 +61,7 @@ const startHedgehog = (config) => {
   // hand it back via onStateChange, so its initial persist-on-spawn is a genuine no-op.
   lastConfigJson = JSON.stringify(fromActorOptions(toActorOptions(config)));
 
-  const host = document.createElement("div");
+  host = document.createElement("div");
   host.id = "hedgehog-mode-anywhere";
   // The overlay's z-index lives inside its shadow root, so it only orders within itself;
   // give the host a max-z-index stacking context so it sits above the page's modals and headers.
@@ -106,10 +108,17 @@ const startHedgehog = (config) => {
 
 const stopHedgehog = () => {
   if (!root) return;
-  root.unmount(); // triggers game.destroy() via the renderer's cleanup effect
+  const mountedRoot = root;
+  const mountedHost = host;
   root = null;
+  host = null;
   game = null;
   actor = null;
+  try {
+    mountedRoot.unmount(); // triggers game.destroy() via the renderer's cleanup effect
+  } finally {
+    mountedHost?.remove();
+  }
 };
 
 const updateConfig = (config) => {

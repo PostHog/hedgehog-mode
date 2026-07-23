@@ -1,4 +1,4 @@
-import { range, sample, uniqueId } from "lodash";
+import { range, sample, uniqueId } from "./utils";
 import { HedgehogModeInterface } from "../types";
 import {
   getRandomAccessoryCombo,

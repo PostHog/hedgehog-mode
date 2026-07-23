@@ -14,7 +14,7 @@ import {
 import type { HedgeHogMode } from "../../hedgehog-mode";
 import { HedgehogProfileImage } from "../HedgehogStatic";
 import { Button, IconX } from "./Button";
-import { sample } from "lodash";
+import { sample } from "../../misc/utils";
 import { v4 as uuid } from "uuid";
 
 const ACCESSORY_GROUPS = ["headwear", "eyewear", "other"] as const;

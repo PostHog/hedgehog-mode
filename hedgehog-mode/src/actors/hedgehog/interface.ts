@@ -1,4 +1,4 @@
-import { sample } from "lodash";
+import { sample } from "../../misc/utils";
 import type { HedgehogActor } from "../Hedgehog";
 import { HedgehogModeInterface, GameUIProps } from "../../types";
 

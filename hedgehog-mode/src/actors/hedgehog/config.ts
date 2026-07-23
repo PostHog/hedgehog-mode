@@ -1,4 +1,4 @@
-import { sample } from "lodash";
+import { sample } from "../../misc/utils";
 
 export const HedgehogActorSkinOptions = [
   "default",

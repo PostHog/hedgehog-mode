@@ -1,4 +1,4 @@
-import { uniqueId } from "lodash";
+import { uniqueId } from "./misc/utils";
 import { HedgehogActor } from "./actors/Hedgehog";
 import type {
   HedgehogActorOptions,

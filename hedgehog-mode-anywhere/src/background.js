@@ -11,9 +11,10 @@ const injectIntoOpenTabs = () => {
       if (tabId == null || !/^https?:/.test(tab.url || "")) continue;
       chrome.tabs.sendMessage(tabId, { type: "GET_STATUS" }, () => {
         if (!chrome.runtime.lastError) return;
-        chrome.scripting
-          .executeScript({ target: { tabId }, files: ["dist/content.js"] })
-          .catch(() => {});
+        chrome.scripting.executeScript(
+          { target: { tabId }, files: ["dist/content.js"] },
+          () => void chrome.runtime.lastError
+        );
       });
     }
   });

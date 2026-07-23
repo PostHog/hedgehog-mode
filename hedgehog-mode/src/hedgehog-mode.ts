@@ -19,7 +19,7 @@ import {
   HedgehogActorOptions,
 } from "./actors/hedgehog/config";
 import { GameStateManager } from "./state";
-import { uniqueId } from "lodash";
+import { uniqueId } from "./misc/utils";
 import { HedgehogGhostActor } from "./actors/Ghost";
 import { Accessory } from "./items/Accessory";
 

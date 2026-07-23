@@ -60,8 +60,7 @@ fresh):
 pnpm --dir hedgehog-mode-anywhere watch
 ```
 
-Load `hedgehog-mode-anywhere/` as an unpacked extension and reload after each
-rebuild. Root `pnpm build` covers the extension, so CI catches breakage.
+Load `hedgehog-mode-anywhere/artifacts/chrome/` as an unpacked extension and reload after each rebuild. Run `pnpm --dir hedgehog-mode-anywhere run:firefox` for a temporary Firefox profile. Root `pnpm build` covers both extension artifacts, so CI catches breakage.
 
 The extension's `.jsx` is untyped and esbuild doesn't type-check, so
 `hedgehog-mode-anywhere/api-contract.ts` pins the slice of the library API the

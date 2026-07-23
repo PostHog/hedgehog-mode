@@ -23,14 +23,12 @@
   },
   "dependencies": {
     "gsap": "^3.12.7",
-    "lodash": "^4.17.21",
     "matter-js": "^0.20.0",
     "pixi.js": "^8.19.0",
     "react-shadow": "^20.6.0",
     "uuid": "^12.0.0"
   },
   "devDependencies": {
-    "@types/lodash": "^4.17.15",
     "@types/matter-js": "^0.19.8",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.17",

@@ -2,7 +2,7 @@ import { Actor } from "../actors/Actor";
 import { HedgehogModeInterface, GameElement, UpdateTicker } from "../types";
 import { COLLISIONS } from "../misc/collisions";
 import gsap from "gsap";
-import { range } from "lodash";
+import { range } from "../misc/utils";
 
 const FLAME_SCALE = 0.2;
 
@@ -32,7 +32,7 @@ export class FlameActor extends Actor {
   static spawnFireball(
     game: HedgehogModeInterface,
     position: Matter.Vector,
-    velocity: Matter.Vector
+    velocity: Matter.Vector,
   ): void {
     const flame = new FlameActor(game);
     flame.setPosition({

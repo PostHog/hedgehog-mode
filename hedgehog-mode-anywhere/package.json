@@ -7,7 +7,10 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "build": "tsc --noEmit && node build.mjs",
-    "watch": "node build.mjs --watch"
+    "watch": "node build.mjs --watch",
+    "lint:firefox": "pnpm build && web-ext lint --source-dir artifacts/firefox",
+    "run:firefox": "pnpm build && web-ext run --source-dir artifacts/firefox",
+    "package:firefox": "pnpm build && web-ext build --source-dir artifacts/firefox --artifacts-dir artifacts --overwrite-dest"
   },
   "dependencies": {
     "@posthog/hedgehog-mode": "workspace:*",
@@ -18,7 +21,8 @@
   "devDependencies": {
     "@types/react": "^19.2.17",
     "esbuild": "^0.25.12",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "web-ext": "10.5.0"
   },
   "comment": "Depends on the workspace @posthog/hedgehog-mode, which must keep pixi.js externalized (PostHog/hedgehog-mode#30): the inlined-pixi builds can't be patched for the eval/worker CSP limits of MV3 content scripts. pixi.js is a direct dep because content.jsx imports pixi.js/unsafe-eval and loadTextures."
 }

@@ -1,4 +1,4 @@
-import { sample } from "lodash";
+import { sample } from "../../misc/utils";
 
 export const HedgehogActorSkinOptions = [
   "default",
@@ -86,7 +86,7 @@ type AccessoryKey = keyof typeof HedgehogActorAccessories;
 
 export type HedgehogActorAccessoryOption = AccessoryKey;
 export const HedgehogActorAccessoryOptions = Object.keys(
-  HedgehogActorAccessories
+  HedgehogActorAccessories,
 ) as HedgehogActorAccessoryOption[];
 
 export const getRandomAccessoryCombo = (): HedgehogActorAccessoryOption[] => {
@@ -95,20 +95,20 @@ export const getRandomAccessoryCombo = (): HedgehogActorAccessoryOption[] => {
       Object.keys(HedgehogActorAccessories).filter(
         (accessory) =>
           HedgehogActorAccessories[accessory as AccessoryKey].group ===
-          "headwear"
-      ) as HedgehogActorAccessoryOption[]
+          "headwear",
+      ) as HedgehogActorAccessoryOption[],
     ),
     sample(
       Object.keys(HedgehogActorAccessories).filter(
         (accessory) =>
           HedgehogActorAccessories[accessory as AccessoryKey].group ===
-          "eyewear"
-      ) as HedgehogActorAccessoryOption[]
+          "eyewear",
+      ) as HedgehogActorAccessoryOption[],
     ),
     sample([
       ...(Object.keys(HedgehogActorAccessories).filter(
         (accessory) =>
-          HedgehogActorAccessories[accessory as AccessoryKey].group === "other"
+          HedgehogActorAccessories[accessory as AccessoryKey].group === "other",
       ) as HedgehogActorAccessoryOption[]),
       // A few undefined to make it less likely to have the other accessories
       undefined,

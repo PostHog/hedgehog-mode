@@ -14,7 +14,7 @@ import {
 import type { HedgeHogMode } from "../../hedgehog-mode";
 import { HedgehogProfileImage } from "../HedgehogStatic";
 import { Button, IconX } from "./Button";
-import { sample } from "lodash";
+import { sample } from "../../misc/utils";
 import { v4 as uuid } from "uuid";
 
 const ACCESSORY_GROUPS = ["headwear", "eyewear", "other"] as const;
@@ -75,7 +75,7 @@ export function HedgehogCustomization({
   >(defaultFriend?.id ?? null);
 
   const updateCustomization = (
-    customization: Pick<HedgehogActorOptions, "accessories" | "color" | "skin">
+    customization: Pick<HedgehogActorOptions, "accessories" | "color" | "skin">,
   ) => {
     if (selectedFriendId) {
       setConfig({
@@ -83,7 +83,7 @@ export function HedgehogCustomization({
         friends: config.friends?.map((friend) =>
           friend.id === selectedFriendId
             ? { ...friend, ...customization }
-            : friend
+            : friend,
         ),
       });
     } else {
@@ -271,7 +271,7 @@ function HedgehogFriends({
                 active={selectedFriend?.id === friend.id}
                 onClick={() =>
                   setSelectedFriend(
-                    selectedFriend?.id === friend.id ? null : friend
+                    selectedFriend?.id === friend.id ? null : friend,
                   )
                 }
                 title={friend.id}
@@ -312,9 +312,9 @@ function HedgehogAccessories({
           .filter(
             (acc) =>
               HedgehogActorAccessories[acc].group !==
-              HedgehogActorAccessories[accessory].group
+              HedgehogActorAccessories[accessory].group,
           )
-          .concat(accessory)
+          .concat(accessory),
       );
     }
   };
@@ -326,7 +326,7 @@ function HedgehogAccessories({
           <h4 className="CustomizationSectionTitle">{group}</h4>
           <div className="CustomizationGrid">
             {HedgehogActorAccessoryOptions.filter(
-              (acc) => HedgehogActorAccessories[acc].group === group
+              (acc) => HedgehogActorAccessories[acc].group === group,
             ).map((acc) => (
               <Button
                 key={acc}
@@ -401,7 +401,7 @@ function HedgehogColor({
               setColor(
                 option === "none"
                   ? null
-                  : (option as HedgehogActorOptions["color"])
+                  : (option as HedgehogActorOptions["color"]),
               )
             }
             title={option.split("-").join(" ")}

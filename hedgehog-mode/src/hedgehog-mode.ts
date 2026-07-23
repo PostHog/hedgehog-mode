@@ -19,7 +19,7 @@ import {
   HedgehogActorOptions,
 } from "./actors/hedgehog/config";
 import { GameStateManager } from "./state";
-import { uniqueId } from "lodash";
+import { uniqueId } from "./misc/utils";
 import { HedgehogGhostActor } from "./actors/Ghost";
 import { Accessory } from "./items/Accessory";
 
@@ -124,7 +124,7 @@ export class HedgeHogMode implements HedgehogModeInterface {
       this,
       options || {
         id: uniqueId("hedgehog-"),
-      }
+      },
     );
     this.spawnActor(actor);
     return actor;
@@ -132,7 +132,7 @@ export class HedgeHogMode implements HedgehogModeInterface {
 
   spawnAccessory(
     accessory: HedgehogActorAccessoryOption,
-    position: Matter.Vector
+    position: Matter.Vector,
   ): Accessory {
     const el = new Accessory(this, { accessory, position });
     this.elements.push(el);
@@ -141,13 +141,13 @@ export class HedgeHogMode implements HedgehogModeInterface {
 
   getPlayableHedgehog(): HedgehogActor | undefined {
     return this.elements.find(
-      (element) => element instanceof HedgehogActor && element.options.player
+      (element) => element instanceof HedgehogActor && element.options.player,
     ) as HedgehogActor | undefined;
   }
 
   getAllHedgehogs(): HedgehogActor[] {
     return this.elements.filter(
-      (element) => element instanceof HedgehogActor
+      (element) => element instanceof HedgehogActor,
     ) as HedgehogActor[];
   }
 
@@ -167,11 +167,11 @@ export class HedgeHogMode implements HedgehogModeInterface {
     this.runner = Runner.create();
 
     Matter.Events.on(this.engine, "collisionStart", (event) =>
-      this.onCollisionStart(event)
+      this.onCollisionStart(event),
     );
 
     Matter.Events.on(this.engine, "collisionEnd", (event) =>
-      this.onCollisionEnd(event)
+      this.onCollisionEnd(event),
     );
 
     Matter.Events.on(this.engine, "afterUpdate", () => {
@@ -231,7 +231,7 @@ export class HedgeHogMode implements HedgehogModeInterface {
     if (this.options.platforms) {
       this.syncPlatformsInterval = setInterval(
         () => this.syncPlatforms(),
-        this.options.platforms.syncFrequency ?? 200
+        this.options.platforms.syncFrequency ?? 200,
       );
       this.syncPlatforms();
     }
@@ -284,7 +284,7 @@ export class HedgeHogMode implements HedgehogModeInterface {
           }
         }
       },
-      { capture: true }
+      { capture: true },
     );
 
     new GlobalKeyboardListeners(this);
@@ -312,7 +312,7 @@ export class HedgeHogMode implements HedgehogModeInterface {
     event.pairs.forEach((pair) => {
       const [bodyA, bodyB] = [pair.bodyA, pair.bodyB];
       this.log(
-        `${bodyA.label} ${bodyA.id} stops hitting ${bodyB.label} ${bodyA.id}`
+        `${bodyA.label} ${bodyA.id} stops hitting ${bodyB.label} ${bodyA.id}`,
       );
 
       const elementA = this.findElementWithRigidBody(bodyA);

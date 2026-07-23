@@ -1,4 +1,4 @@
-import { uniqueId } from "lodash";
+import { uniqueId } from "./misc/utils";
 import { HedgehogActor } from "./actors/Hedgehog";
 import type {
   HedgehogActorOptions,
@@ -16,7 +16,7 @@ export class GameStateManager {
 
   constructor(
     private game: HedgeHogMode,
-    private config: HedgehogModeConfig
+    private config: HedgehogModeConfig,
   ) {
     this.state = this.config.state ??
       this.getPersistedState() ?? {

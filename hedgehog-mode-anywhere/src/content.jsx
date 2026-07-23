@@ -8,6 +8,7 @@
 //     side-effect import below swaps in pixi's eval-free polyfills.
 //  2. pixi's texture loader spawns a Web Worker from a blob: URL, which many sites' CSP
 //     blocks. Loading textures on the main thread avoids it.
+import "./browser-globals";
 import "pixi.js/unsafe-eval";
 import { loadTextures } from "pixi.js";
 import { createRoot } from "react-dom/client";

@@ -52,7 +52,7 @@ const options = {
 
         build.onLoad({ filter: /pixi\.js.*\.mjs$/ }, (args) => {
           const replacement = replacements.find(([pattern]) =>
-            pattern.test(args.path),
+            pattern.test(args.path)
           );
           return replacement
             ? { contents: replacement[1], loader: "js" }
@@ -80,7 +80,7 @@ async function packageExtensions() {
   await copyAssets();
 
   const chromeManifest = JSON.parse(
-    await readFile(join(root, "manifest.json"), "utf8"),
+    await readFile(join(root, "manifest.json"), "utf8")
   );
   const firefoxManifest = {
     ...chromeManifest,
@@ -108,13 +108,13 @@ async function packageExtension(browser, manifest) {
     ["assets", "dist", "icons"].map((directory) =>
       cp(join(root, directory), join(destination, directory), {
         recursive: true,
-      }),
-    ),
+      })
+    )
   );
   await cp(join(root, "popup.html"), join(destination, "popup.html"));
   await writeFile(
     join(destination, "manifest.json"),
-    `${JSON.stringify(manifest, null, 2)}\n`,
+    `${JSON.stringify(manifest, null, 2)}\n`
   );
 }
 

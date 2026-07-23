@@ -33,10 +33,7 @@ function Switch({
 }: {
   checked: boolean;
   onChange: (checked: boolean) => void;
-} & Pick<
-  React.HTMLAttributes<HTMLDivElement>,
-  "title" | "children"
->) {
+} & Pick<React.HTMLAttributes<HTMLDivElement>, "title" | "children">) {
   return (
     <span className="Switch" {...props}>
       <label className="SwitchLabel">
@@ -127,8 +124,9 @@ export function HedgehogCustomization({
                 because this hedgehog's got a whole data warehouse to protect...
                 <br />
                 you can move me around by clicking and dragging or control me
-                with WASD / arrow keys, and i'll use your mouse as a web-slinging
-                target. hold the web and press W / S to climb up and down it.
+                with WASD / arrow keys, and i'll use your mouse as a
+                web-slinging target. hold the web and press W / S to climb up
+                and down it.
               </>
             ) : config.skin === "robohog" ? (
               <>
@@ -183,10 +181,7 @@ export function HedgehogCustomization({
   );
 }
 
-function HedgehogOptions({
-  config,
-  setConfig,
-}: HedgehogOptionsProps) {
+function HedgehogOptions({ config, setConfig }: HedgehogOptionsProps) {
   return (
     <div className="CustomizationSection">
       <h4 className="CustomizationSectionTitle">options</h4>

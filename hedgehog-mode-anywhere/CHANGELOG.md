@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-07-21
+
+- Keep the hedgehog off the top strip of the window: platform discovery now ignores the top 100px, so he no longer perches on sticky headers/nav bars where he's clipped against the top edge (`platforms.viewportPadding.top`)
+- Persist engine state (including in-page customization) via `chrome.storage.sync` instead of the host page's `localStorage`, so it survives navigation across origins and syncs across windows and sessions (via `@posthog/hedgehog-mode@0.0.54`'s new `onStateChange` config hook)
+- Replaced the hand-built popup customization grid with the engine's own `HedgehogCustomization` component (the same UI as the in-page "Customize me!" panel), so the popup and in-page editing stay identical for free — and gained the friends section. The extension shell keeps the global-enable, per-site-disable, and interactions toggles
+- Added a friend hedgehog? They now persist and sync like the main one
+- Engine change (`@posthog/hedgehog-mode@0.0.54`): `HedgehogCustomization` takes `assetsUrl` directly instead of a whole `HedgeHogMode` instance, so the UI can render without a running game (`game` still accepted, deprecated)
+
 ## 2026-06-24
 
 - Use `@posthog/hedgehog-mode@0.0.53`, which externalizes pixi.js for MV3 / strict-CSP compatibility ([PostHog/hedgehog-mode#30](https://github.com/PostHog/hedgehog-mode/pull/30))

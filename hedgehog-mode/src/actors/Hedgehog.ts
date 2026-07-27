@@ -104,6 +104,27 @@ export class HedgehogActor extends Actor {
     return !!this.attachedWeb;
   }
 
+  // Nothing solid under him: mid-jump, falling, thrown, or swinging on a web.
+  get isAirborne(): boolean {
+    return !this.getGround();
+  }
+
+  /**
+   * Whether the idle AI is allowed to take an action right now. Mid-air (thrown,
+   * falling, web-swinging) or held in the player's pointer, an AI walk or jump
+   * reads as the hog jinking sideways or double-jumping out of nothing — so the
+   * AI waits until he's back on something solid. Deliberate player input is
+   * still free to steer him in the air; that's the fun bit.
+   */
+  get isSettled(): boolean {
+    return (
+      !this.isDead &&
+      !this.isDragging &&
+      !this.isWebSlinging &&
+      !this.isAirborne
+    );
+  }
+
   // Don't wrap/clamp to the screen edges while tethered — otherwise wrapping
   // teleports the body across the screen and the web tension explodes, flinging
   // him in a loop. Let him swing freely out of frame and back instead.
@@ -328,6 +349,16 @@ export class HedgehogActor extends Actor {
       return;
     }
 
+    const isAirborne = this.isAirborne;
+
+    // A walk intent must not survive leaving the ground unless the player is
+    // actually holding a direction. Otherwise a hog who was mid-stroll when he
+    // got thrown (or slung on a web) keeps having his horizontal velocity
+    // overwritten every frame, which looks like he swerves in mid-flight.
+    if (isAirborne && !this.controls.isSteering) {
+      this.walkSpeed = 0;
+    }
+
     const xForce = this.walkSpeed;
 
     if (!this.isWebSlinging && xForce !== 0) {
@@ -351,7 +382,7 @@ export class HedgehogActor extends Actor {
     }
 
     // Set the appropriate animation
-    if (!this.getGround()) {
+    if (isAirborne) {
       this.updateSprite("fall");
     } else if (Math.abs(this.rigidBody!.velocity.x) > 0.1) {
       // If horizontal movement is noticeable then walk

@@ -4,7 +4,13 @@ import gsap from "gsap";
 import { HedgehogModeInterface, GameElement, UpdateTicker } from "../types";
 import type { HedgehogActor } from "../actors/Hedgehog";
 
-const NUM_LINKS = 8;
+// Segment count drives how round the strand can look — the silk bends only where
+// there's a joint. Each link is correspondingly small and light so the *total*
+// rope mass (and therefore the swing feel) stays where it was with fewer, longer
+// links.
+const NUM_LINKS = 16;
+const LINK_WIDTH = 4;
+const LINK_HEIGHT = 12;
 // How long the strand stays fully visible after release before it fades.
 const FADE_DELAY_S = 2;
 const FADE_DURATION_S = 1.5;
@@ -13,7 +19,9 @@ const MAX_WEBS = 40;
 
 // Rope feel: springy + damped so the strand flexes instead of snapping rigid.
 const ANCHOR_STIFFNESS = 1; // firmly stuck to the point it grabbed
-const LINK_STIFFNESS = 0.8;
+// More joints in series means more total give, so each one pulls a little harder
+// than it did with half the links — keeps the reel-in tension feeling the same.
+const LINK_STIFFNESS = 0.9;
 const LINK_DAMPING = 0.1;
 const ATTACH_STIFFNESS = 0.6;
 const ATTACH_DAMPING = 0.2;
@@ -25,7 +33,9 @@ const ATTACH_DAMPING = 0.2;
 const SLACK_FACTOR = 0.8;
 // How fast climbing shortens/lengthens the rope (multiplier per second held).
 const CLIMB_PER_SECOND = 2.5;
-const MIN_LINK_LENGTH = 6;
+// Per-link floor, so it's how close to the anchor a full climb gets him: keep it
+// small enough that NUM_LINKS of them still add up to a short rope.
+const MIN_LINK_LENGTH = 3;
 // Descending can extend the rope well past where it started; this just keeps the
 // numbers bounded so a held key can't blow the link lengths up to infinity.
 const MAX_LINK_LENGTH_FLOOR = 400;
@@ -115,8 +125,8 @@ export class SpiderWebActor implements GameElement {
         Bodies.rectangle(
           point.x + (hog.x - point.x) * t,
           point.y + (hog.y - point.y) * t,
-          5,
-          20,
+          LINK_WIDTH,
+          LINK_HEIGHT,
           {
             density: 0.0005,
             frictionAir: 0.02,
@@ -228,10 +238,31 @@ export class SpiderWebActor implements GameElement {
     });
   }
 
+  // Path the strand through the given points as a smooth curve instead of a
+  // polyline: every point becomes the control point of a quadratic that runs
+  // between the midpoints of its neighbours, so each joint rounds off rather than
+  // showing up as a kink. Endpoints (the anchor and the hog's hand) stay exact.
+  private traceStrand(points: Matter.Vector[]): void {
+    const graphics = this.graphics;
+    graphics.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length - 1; i++) {
+      const next = points[i + 1];
+      graphics.quadraticCurveTo(
+        points[i].x,
+        points[i].y,
+        (points[i].x + next.x) / 2,
+        (points[i].y + next.y) / 2
+      );
+    }
+    const end = points[points.length - 1];
+    graphics.lineTo(end.x, end.y);
+  }
+
   // Silk strand: anchor -> rope body centres -> hog (while attached). Drawn as a
   // dark contrast outline under a crisp white line, with a "stuck" splat at the
   // anchor. Two passes (dark wider, white narrower) keep it readable on both
-  // light and dark backgrounds.
+  // light and dark backgrounds. The joints are smoothed into curves (see
+  // {@link traceStrand}) so the strand hangs rather than zig-zags.
   private draw(): void {
     const alpha = 1 - this.fade;
     const points: Matter.Vector[] = [
@@ -258,15 +289,8 @@ export class SpiderWebActor implements GameElement {
     const graphics = this.graphics;
     graphics.clear();
 
-    const traceStrand = () => {
-      graphics.moveTo(points[0].x, points[0].y);
-      for (let i = 1; i < points.length; i++) {
-        graphics.lineTo(points[i].x, points[i].y);
-      }
-    };
-
     // Dark outline underlay — gives contrast on light backgrounds.
-    traceStrand();
+    this.traceStrand(points);
     graphics.stroke({
       width: 3.5,
       color: OUTLINE_COLOR,
@@ -276,7 +300,7 @@ export class SpiderWebActor implements GameElement {
     });
 
     // Crisp silk strand on top.
-    traceStrand();
+    this.traceStrand(points);
     graphics.stroke({
       width: 1.5,
       color: SILK_COLOR,

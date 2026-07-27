@@ -1,6 +1,10 @@
 import { sample } from "../../misc/utils";
 import type { HedgehogActor } from "../Hedgehog";
 
+// How long to wait before looking again when the hog is in no state to act —
+// mid-air, mid-swing, or being dragged around by the player.
+const SETTLE_RETRY_MS = 250;
+
 export class HedgehogActorAI {
   private actionInterval?: NodeJS.Timeout;
   private enabled = false;
@@ -82,10 +86,18 @@ export class HedgehogActorAI {
       return;
     }
 
-    this.actor.walkSpeed = 0;
-
     clearTimeout(this.actionInterval);
     this.actionInterval = undefined;
+
+    // He's off the ground (falling, thrown, swinging) or in the player's grip.
+    // Acting now is what made him suddenly stride or jump in mid-air, so leave
+    // physics alone and check back once he's landed.
+    if (!this.actor.isSettled) {
+      this.pause(SETTLE_RETRY_MS);
+      return;
+    }
+
+    this.actor.walkSpeed = 0;
 
     if (action) {
       this.actions[action]?.act();

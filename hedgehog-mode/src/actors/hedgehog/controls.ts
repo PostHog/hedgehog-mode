@@ -2,12 +2,23 @@ import { NO_PLATFORM_COLLISION_FILTER } from "../Actor";
 import { HedgehogActor } from "../Hedgehog";
 
 export class HedgehogActorControls {
+  private heldKeys = new Set<string>();
+
   constructor(private actor: HedgehogActor) {
     this.setupKeyboardListeners();
   }
 
+  /**
+   * True while the player is holding exactly one horizontal direction — i.e. the
+   * walk intent belongs to a human, not the idle AI. The actor uses this to
+   * decide whether a walk should keep overriding his velocity in mid-air.
+   */
+  get isSteering(): boolean {
+    return this.heldKeys.has("left") !== this.heldKeys.has("right");
+  }
+
   setupKeyboardListeners(): () => void {
-    const heldKeys = new Set<string>();
+    const heldKeys = this.heldKeys;
 
     const keyMapping = {
       ArrowLeft: "left",

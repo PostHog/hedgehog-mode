@@ -105,6 +105,9 @@ export class FlameActor extends Actor {
   }
 
   beforeUnload(): void {
+    // Stop the fade tween if we're being torn down before it completes, so it
+    // can't flush its onComplete against a dead instance.
+    gsap.killTweensOf(this);
     TOTAL_NUM_FLAMES--;
   }
 }

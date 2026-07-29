@@ -12,6 +12,7 @@ import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { getVirtualDesktop } from "./window-bounds.mjs";
 import { isPointInArea } from "./desktop-interaction.mjs";
+import { listDesktopWindowPlatforms } from "./window-platforms.mjs";
 
 const directory = path.dirname(fileURLToPath(import.meta.url));
 const windows = new Set();
@@ -128,6 +129,16 @@ app.whenReady().then(() => {
 
 ipcMain.handle("state:load", loadState);
 ipcMain.handle("desktop:layout", desktopLayout);
+ipcMain.handle("desktop:window-platforms", async () => {
+  try {
+    return await listDesktopWindowPlatforms(
+      process.platform,
+      desktopLayout().bounds
+    );
+  } catch {
+    return [];
+  }
+});
 ipcMain.handle("assets:url", () => {
   const assetsPath = app.isPackaged
     ? path.join(process.resourcesPath, "assets")

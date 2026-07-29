@@ -1,6 +1,6 @@
 import { HedgehogModeRenderer } from "@posthog/hedgehog-mode";
 import { createRoot } from "react-dom/client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const desktop = window.hedgehogDesktop;
 const [assetsUrl, savedState, desktopLayout] = await Promise.all([
@@ -10,6 +10,22 @@ const [assetsUrl, savedState, desktopLayout] = await Promise.all([
 ]);
 
 function DesktopHedgehog() {
+  const [windowPlatforms, setWindowPlatforms] = useState([]);
+
+  useEffect(() => {
+    let active = true;
+    const refreshWindowPlatforms = async () => {
+      const platforms = await desktop.windowPlatforms();
+      if (active) setWindowPlatforms(platforms);
+    };
+    void refreshWindowPlatforms();
+    const interval = window.setInterval(refreshWindowPlatforms, 500);
+    return () => {
+      active = false;
+      window.clearInterval(interval);
+    };
+  }, []);
+
   return (
     <>
       {desktopLayout.floors.map((floor, index) => (
@@ -25,10 +41,26 @@ function DesktopHedgehog() {
           }}
         />
       ))}
+      {windowPlatforms.map((platform, index) => (
+        <div
+          className="DesktopWindowPlatform"
+          key={`${platform.x}:${platform.y}:${platform.width}:${index}`}
+          style={{
+            position: "fixed",
+            left: platform.x,
+            top: platform.y,
+            width: platform.width,
+            height: 1,
+          }}
+        />
+      ))}
       <HedgehogModeRenderer
         config={{
           assetsUrl,
-          platforms: { selector: ".DesktopFloor", syncFrequency: 1000 },
+          platforms: {
+            selector: ".DesktopFloor, .DesktopWindowPlatform",
+            syncFrequency: 250,
+          },
           state: savedState ?? {
             options: { id: "player", player: true, controls_enabled: true },
           },

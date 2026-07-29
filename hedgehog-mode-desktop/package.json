@@ -45,7 +45,10 @@
     },
     "mac": {
       "target": "dmg",
-      "category": "public.app-category.entertainment"
+      "category": "public.app-category.entertainment",
+      "extendInfo": {
+        "NSAppleEventsUsageDescription": "Hedgehog Mode reads visible window positions so hedgehogs can walk on top of them."
+      }
     },
     "nsis": {
       "oneClick": false,

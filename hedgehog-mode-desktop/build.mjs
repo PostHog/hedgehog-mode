@@ -1,7 +1,17 @@
 import { build } from "esbuild";
-import { copyFile, mkdir } from "node:fs/promises";
+import { chmod, copyFile, mkdir } from "node:fs/promises";
 
 await mkdir("dist", { recursive: true });
+
+async function copyMacOSWindowHelper() {
+  const destination = "dist/get-windows-macos";
+  await copyFile("node_modules/get-windows/main", destination);
+  await copyFile(
+    "node_modules/get-windows/license",
+    "dist/get-windows-LICENSE"
+  );
+  await chmod(destination, 0o755);
+}
 
 await Promise.all([
   build({
@@ -22,4 +32,5 @@ await Promise.all([
   }),
   copyFile("src/index.html", "dist/index.html"),
   copyFile("src/preload.cjs", "dist/preload.cjs"),
+  copyMacOSWindowHelper(),
 ]);

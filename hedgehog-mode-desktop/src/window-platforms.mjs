@@ -3,25 +3,6 @@ import { promisify } from "node:util";
 
 const execute = promisify(execFile);
 
-const MACOS_SCRIPT = `
-set windowList to ""
-tell application "System Events"
-  repeat with processItem in (application processes whose visible is true)
-    set processName to name of processItem
-    if processName is not "Hedgehog Mode" and processName is not "Electron" then
-      repeat with windowItem in windows of processItem
-        try
-          set windowPosition to position of windowItem
-          set windowSize to size of windowItem
-          set windowList to windowList & (item 1 of windowPosition) & tab & (item 2 of windowPosition) & tab & (item 1 of windowSize) & tab & (item 2 of windowSize) & linefeed
-        end try
-      end repeat
-    end if
-  end repeat
-end tell
-return windowList
-`;
-
 const WINDOWS_SCRIPT = String.raw`
 Add-Type @"
 using System;
@@ -78,12 +59,48 @@ export function parseWindowRects(output, desktopBounds) {
     .filter((rect) => rect.width >= 10);
 }
 
-export async function listDesktopWindowPlatforms(platform, desktopBounds) {
+export function normalizeNativeWindows(windows, desktopBounds) {
+  return windows
+    .filter(
+      (window) =>
+        window.owner?.processId !== process.pid &&
+        window.bounds?.width >= 10 &&
+        window.bounds?.height > 0
+    )
+    .map((window) => {
+      const { x, y, width } = window.bounds;
+      const left = Math.max(x, desktopBounds.x);
+      const right = Math.min(x + width, desktopBounds.x + desktopBounds.width);
+      return {
+        x: left - desktopBounds.x,
+        y:
+          Math.max(
+            desktopBounds.y,
+            Math.min(y, desktopBounds.y + desktopBounds.height)
+          ) - desktopBounds.y,
+        width: right - left,
+      };
+    })
+    .filter((rect) => rect.width >= 10);
+}
+
+export async function listDesktopWindowPlatforms(
+  platform,
+  desktopBounds,
+  macosBinary
+) {
   let result;
   if (platform === "darwin") {
-    result = await execute("osascript", ["-e", MACOS_SCRIPT], {
-      timeout: 3000,
-    });
+    result = await execute(
+      macosBinary,
+      [
+        "--no-accessibility-permission",
+        "--no-screen-recording-permission",
+        "--open-windows-list",
+      ],
+      { timeout: 3000 }
+    );
+    return normalizeNativeWindows(JSON.parse(result.stdout), desktopBounds);
   } else if (platform === "win32") {
     result = await execute(
       "powershell.exe",

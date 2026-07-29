@@ -22,7 +22,8 @@
   "devDependencies": {
     "electron": "43.2.0",
     "electron-builder": "26.15.3",
-    "esbuild": "^0.25.12"
+    "esbuild": "^0.25.12",
+    "get-windows": "9.3.0"
   },
   "build": {
     "appId": "com.posthog.hedgehog-mode",
@@ -30,6 +31,9 @@
     "directories": {
       "output": "release"
     },
+    "asarUnpack": [
+      "dist/get-windows-macos"
+    ],
     "files": [
       "dist/**/*",
       "package.json"
@@ -47,10 +51,7 @@
     "mac": {
       "target": "dmg",
       "icon": "build/icon.png",
-      "category": "public.app-category.entertainment",
-      "extendInfo": {
-        "NSAppleEventsUsageDescription": "Hedgehog Mode reads visible window positions so hedgehogs can walk on top of them."
-      }
+      "category": "public.app-category.entertainment"
     },
     "nsis": {
       "oneClick": false,

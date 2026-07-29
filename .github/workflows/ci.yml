@@ -55,6 +55,9 @@ jobs:
           pnpm install --frozen-lockfile
           pnpm --dir hedgehog-mode build
           pnpm --dir hedgehog-mode-desktop test
+          pnpm --dir hedgehog-mode-desktop build
+          hedgehog-mode-desktop/dist/get-windows-macos --no-accessibility-permission --no-screen-recording-permission --open-windows-list > /tmp/hedgehog-windows.json
+          node -e "JSON.parse(require('node:fs').readFileSync('/tmp/hedgehog-windows.json', 'utf8'))"
           pnpm build:macos
 
       - name: Upload macOS installer

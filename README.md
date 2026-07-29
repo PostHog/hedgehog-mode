@@ -10,7 +10,7 @@ A playful PixiJS-powered hedgehog game you can drop into any React app. Your DOM
 
 Hedgehog Mode can also live on your Windows or macOS desktop, above your wallpaper and below your patience. It stays out of the way of other apps, supports multiple displays and macOS Spaces, remembers customization, and lives in the system tray or menu bar.
 
-The desktop app treats the top edges of visible application windows as physics platforms. On macOS, grant Hedgehog Mode permission to control System Events when prompted; window physics is unavailable without that permission. Its status is shown in the menu-bar menu, which links to Accessibility Settings when access is blocked.
+The desktop app treats the top edges of visible application windows as physics platforms. Its status is shown in the system tray or menu-bar menu.
 
 Build the installer on its target operating system:
 

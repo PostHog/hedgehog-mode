@@ -5,7 +5,6 @@ import {
   Menu,
   nativeImage,
   screen,
-  shell,
   Tray,
 } from "electron";
 import { readFile, writeFile } from "node:fs/promises";
@@ -91,17 +90,6 @@ function updateTrayMenu() {
         label: `Window physics: ${windowPhysicsStatus}`,
         enabled: false,
       },
-      ...(process.platform === "darwin" && windowPhysicsStatus === "blocked"
-        ? [
-            {
-              label: "Open Accessibility Settings",
-              click: () =>
-                void shell.openExternal(
-                  "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
-                ),
-            },
-          ]
-        : []),
       { type: "separator" },
       { label: "Quit", click: () => app.quit() },
     ])
@@ -150,7 +138,8 @@ ipcMain.handle("desktop:window-platforms", async () => {
   try {
     const platforms = await listDesktopWindowPlatforms(
       process.platform,
-      desktopLayout().bounds
+      desktopLayout().bounds,
+      path.join(directory, "get-windows-macos")
     );
     if (windowPhysicsStatus !== "active") {
       windowPhysicsStatus = "active";

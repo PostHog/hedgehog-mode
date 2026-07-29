@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { parseWindowRects } from "./window-platforms.mjs";
+import {
+  normalizeNativeWindows,
+  parseWindowRects,
+} from "./window-platforms.mjs";
 
 test("translates OS window bounds into virtual desktop platforms", () => {
   assert.deepEqual(
@@ -27,5 +30,21 @@ test("clips windows to the virtual desktop and ignores invalid rows", () => {
       { x: 0, y: 20, width: 180 },
       { x: 3080, y: 0, width: 120 },
     ]
+  );
+});
+
+test("normalizes native macOS window metadata without titles", () => {
+  assert.deepEqual(
+    normalizeNativeWindows(
+      [
+        {
+          bounds: { x: -1200, y: 100, width: 800, height: 600 },
+          owner: { processId: 123 },
+        },
+        { bounds: { x: 10, y: 20, width: 5, height: 100 }, owner: {} },
+      ],
+      { x: -1280, y: 0, width: 3200, height: 1040 }
+    ),
+    [{ x: 80, y: 100, width: 800 }]
   );
 });

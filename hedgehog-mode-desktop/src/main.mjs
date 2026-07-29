@@ -11,6 +11,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { getDesktopBounds } from "./window-bounds.mjs";
+import { isPointInArea } from "./desktop-interaction.mjs";
 
 const directory = path.dirname(fileURLToPath(import.meta.url));
 const windows = new Set();
@@ -49,7 +50,10 @@ function createWindow(display) {
   });
 
   window.setAlwaysOnTop(true, "floating");
+  window.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
   window.setIgnoreMouseEvents(true, { forward: true });
+  window.hedgehogHitAreas = [];
+  window.hedgehogUIInteractive = false;
   void window.loadFile(path.join(directory, "index.html"));
   window.on("closed", () => windows.delete(window));
   windows.add(window);
@@ -81,6 +85,7 @@ function updateTrayMenu() {
 }
 
 app.whenReady().then(() => {
+  if (process.platform === "darwin") app.dock.hide();
   const spritesPath = app.isPackaged
     ? path.join(process.resourcesPath, "assets", "sprites.png")
     : path.join(
@@ -95,6 +100,7 @@ app.whenReady().then(() => {
     .createFromPath(spritesPath)
     .crop({ x: 80, y: 320, width: 80, height: 80 })
     .resize({ width: 24, height: 24 });
+  if (process.platform === "darwin") icon.setTemplateImage(true);
   tray = new Tray(icon);
   tray.setToolTip("Hedgehog Mode");
   updateTrayMenu();
@@ -102,6 +108,16 @@ app.whenReady().then(() => {
   screen.on("display-added", rebuildWindows);
   screen.on("display-removed", rebuildWindows);
   screen.on("display-metrics-changed", rebuildWindows);
+  setInterval(() => {
+    if (process.platform !== "darwin") return;
+    const cursor = screen.getCursorScreenPoint();
+    for (const window of windows) {
+      const interactive =
+        window.hedgehogUIInteractive ||
+        isPointInArea(cursor, window.getBounds(), window.hedgehogHitAreas);
+      window.setIgnoreMouseEvents(!interactive, { forward: true });
+    }
+  }, 50);
 });
 
 ipcMain.handle("state:load", loadState);
@@ -115,12 +131,17 @@ ipcMain.on("state:save", (_event, state) => {
   void writeFile(statePath(), JSON.stringify(state));
 });
 ipcMain.on("window:set-interactive", (event, interactive) => {
-  BrowserWindow.fromWebContents(event.sender)?.setIgnoreMouseEvents(
-    !interactive,
-    {
+  const window = BrowserWindow.fromWebContents(event.sender);
+  if (window) {
+    window.hedgehogUIInteractive = interactive;
+    window.setIgnoreMouseEvents(!interactive, {
       forward: true,
-    }
-  );
+    });
+  }
+});
+ipcMain.on("window:update-hit-areas", (event, areas) => {
+  const window = BrowserWindow.fromWebContents(event.sender);
+  if (window) window.hedgehogHitAreas = areas;
 });
 
 app.on("window-all-closed", () => {});

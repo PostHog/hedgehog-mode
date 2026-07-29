@@ -24,6 +24,14 @@ function DesktopHedgehog() {
           setPointerEvents(interactive);
           desktop.setInteractive(interactive || game.gameUI?.visible === true);
         };
+        window.setInterval(() => {
+          desktop.setInteractive(
+            game.pointerEventsEnabled || game.gameUI?.visible === true
+          );
+          desktop.updateHitAreas(
+            game.getAllHedgehogs().map((hedgehog) => hedgehog.rigidBody.bounds)
+          );
+        }, 50);
       }}
     />
   );

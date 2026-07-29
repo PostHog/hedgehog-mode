@@ -64,3 +64,33 @@ test("stops a falling hedgehog at its display floor", () => {
     { bottom: 799, velocityY: 0 }
   );
 });
+
+test("moves a hedgehog onto a higher neighboring display floor", () => {
+  const engine = Matter.Engine.create();
+  const actor = {
+    isDragging: false,
+    rigidBody: Matter.Bodies.rectangle(1200, 950, 80, 80),
+  };
+  const game = {
+    engine,
+    getAllHedgehogs: () => [actor],
+    elements: [
+      {
+        rigidBody: Matter.Bodies.rectangle(0, 0, 10, 10, {
+          label: "Ground",
+        }),
+      },
+    ],
+  };
+
+  addDesktopGroundSegments(game, [
+    { x: 0, y: 999, width: 1280 },
+    { x: 1280, y: 799, width: 1280 },
+  ]);
+  game.elements[0].update();
+  Matter.Body.setPosition(actor.rigidBody, { x: 1300, y: 900 });
+  Matter.Body.setVelocity(actor.rigidBody, { x: 2, y: -5 });
+  game.elements[0].update();
+
+  assert.equal(actor.rigidBody.bounds.max.y, 799);
+});

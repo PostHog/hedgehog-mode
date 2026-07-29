@@ -32,17 +32,26 @@ export function addDesktopGroundSegments(game, floors) {
   });
 
   game.elements.push(...elements);
+  const actorFloors = new WeakMap();
   game.elements.unshift({
     isInteractive: false,
     update() {
       for (const actor of game.getAllHedgehogs()) {
-        if (actor.isDragging || actor.rigidBody.velocity.y < 0) continue;
         const floor = floors.find(
           (candidate) =>
             actor.rigidBody.position.x >= candidate.x &&
             actor.rigidBody.position.x <= candidate.x + candidate.width
         );
-        if (!floor || actor.rigidBody.bounds.max.y <= floor.y) continue;
+        if (actor.isDragging) continue;
+        const previousFloor = actorFloors.get(actor);
+        actorFloors.set(actor, floor);
+        if (
+          !floor ||
+          actor.rigidBody.bounds.max.y <= floor.y ||
+          (actor.rigidBody.velocity.y < 0 && floor === previousFloor)
+        ) {
+          continue;
+        }
         const vertexY = actor.rigidBody.vertices.map((vertex) => vertex.y);
         const halfHeight = (Math.max(...vertexY) - Math.min(...vertexY)) / 2;
         Matter.Body.setVelocity(actor.rigidBody, {

@@ -45,7 +45,12 @@ export function getVisibleFloorSegments(floors, viewportWidth, viewportHeight) {
     );
 }
 
-export function getVisibleSpawnPosition(floors, viewportWidth, viewportHeight) {
+export function getVisibleSpawnPosition(
+  floors,
+  viewportWidth,
+  viewportHeight,
+  actorHalfHeight = 0
+) {
   const floor = getVisibleFloorSegments(
     floors,
     viewportWidth,
@@ -58,6 +63,6 @@ export function getVisibleSpawnPosition(floors, viewportWidth, viewportHeight) {
 
   return {
     x: (floor.left + floor.right) / 2,
-    y: Math.min(100, Math.max(40, floor.y / 2)),
+    y: floor.y - actorHalfHeight,
   };
 }

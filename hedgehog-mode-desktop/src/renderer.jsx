@@ -2,6 +2,7 @@ import { HedgehogModeRenderer } from "@posthog/hedgehog-mode";
 import { createRoot } from "react-dom/client";
 import React, { useEffect, useState } from "react";
 import { addDesktopGroundSegments } from "./desktop-grounds.mjs";
+import { findSpriteAtPoint, getSpriteHitArea } from "./desktop-interaction.mjs";
 import {
   getVisibleFloorSegments,
   getVisibleSpawnPosition,
@@ -68,10 +69,15 @@ function DesktopHedgehog() {
         onGameReady={(game) => {
           addDesktopGroundSegments(game, desktopLayout.floors);
           const player = game.getPlayableHedgehog();
+          const playerHalfHeight = player?.rigidBody
+            ? (player.rigidBody.bounds.max.y - player.rigidBody.bounds.min.y) /
+              2
+            : 0;
           const spawnPosition = getVisibleSpawnPosition(
             desktopLayout.floors,
             window.innerWidth,
-            window.innerHeight
+            window.innerHeight,
+            playerHalfHeight
           );
           player?.setPosition(spawnPosition);
           player?.setVelocity({ x: 0, y: 0 });
@@ -103,6 +109,19 @@ function DesktopHedgehog() {
               interactive || game.gameUI?.visible === true
             );
           };
+          window.addEventListener(
+            "pointerdown",
+            (event) => {
+              const point = { x: event.clientX, y: event.clientY };
+              const hedgehog = findSpriteAtPoint(game.getAllHedgehogs(), point);
+              if (hedgehog && !hedgehog.hitTest(point)) {
+                hedgehog.startDrag(event);
+                event.preventDefault();
+                event.stopPropagation();
+              }
+            },
+            { capture: true }
+          );
           window.setInterval(() => {
             desktop.setInteractive(
               game.pointerEventsEnabled || game.gameUI?.visible === true
@@ -110,7 +129,10 @@ function DesktopHedgehog() {
             desktop.updateHitAreas(
               game
                 .getAllHedgehogs()
-                .map((hedgehog) => hedgehog.rigidBody.bounds)
+                .filter((hedgehog) => hedgehog.sprite)
+                .map((hedgehog) =>
+                  getSpriteHitArea(hedgehog.sprite.getBounds())
+                )
             );
           }, 50);
         }}

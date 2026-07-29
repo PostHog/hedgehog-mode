@@ -69,7 +69,7 @@ test("positions floors relative to the actual Electron content bounds", () => {
   );
 });
 
-test("spawns the player on the largest display segment visible to the renderer", () => {
+test("spawns the player on the largest visible display floor", () => {
   assert.deepEqual(
     getVisibleSpawnPosition(
       [
@@ -78,9 +78,10 @@ test("spawns the player on the largest display segment visible to the renderer",
         { x: 1920, y: 899, width: 1280 },
       ],
       1920,
-      1000
+      1000,
+      40
     ),
-    { x: 960, y: 100 }
+    { x: 960, y: 959 }
   );
 });
 

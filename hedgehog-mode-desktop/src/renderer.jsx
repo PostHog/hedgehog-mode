@@ -1,6 +1,7 @@
 import { HedgehogModeRenderer } from "@posthog/hedgehog-mode";
 import { createRoot } from "react-dom/client";
 import React, { useEffect, useState } from "react";
+import { addDesktopGroundSegments } from "./desktop-grounds.mjs";
 
 const desktop = window.hedgehogDesktop;
 const [assetsUrl, savedState, desktopLayout] = await Promise.all([
@@ -35,19 +36,6 @@ function DesktopHedgehog() {
 
   return (
     <>
-      {desktopLayout.floors.map((floor, index) => (
-        <div
-          className="DesktopFloor"
-          key={index}
-          style={{
-            position: "fixed",
-            left: floor.x,
-            top: floor.y,
-            width: floor.width,
-            height: 1,
-          }}
-        />
-      ))}
       {windowPlatforms.map((platform, index) => (
         <div
           className="DesktopWindowPlatform"
@@ -65,7 +53,7 @@ function DesktopHedgehog() {
         config={{
           assetsUrl,
           platforms: {
-            selector: ".DesktopFloor, .DesktopWindowPlatform",
+            selector: ".DesktopWindowPlatform",
             syncFrequency: 250,
           },
           state: savedState ?? {
@@ -74,6 +62,7 @@ function DesktopHedgehog() {
           onStateChange: desktop.saveState,
         }}
         onGameReady={(game) => {
+          addDesktopGroundSegments(game, desktopLayout.floors);
           const player = game.getPlayableHedgehog();
           player?.setPosition(desktopLayout.spawnPosition);
           player?.setVelocity({ x: 0, y: 0 });

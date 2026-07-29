@@ -105,6 +105,9 @@ importers:
       '@posthog/hedgehog-mode':
         specifier: workspace:*
         version: link:../hedgehog-mode
+      matter-js:
+        specifier: ^0.20.0
+        version: 0.20.0
       react:
         specifier: 19.3.0-canary-3f0b9e61-20260317
         version: 19.3.0-canary-3f0b9e61-20260317

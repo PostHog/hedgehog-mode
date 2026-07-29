@@ -14,9 +14,16 @@ function DesktopHedgehog() {
 
   useEffect(() => {
     let active = true;
+    let refreshing = false;
     const refreshWindowPlatforms = async () => {
-      const platforms = await desktop.windowPlatforms();
-      if (active) setWindowPlatforms(platforms);
+      if (refreshing) return;
+      refreshing = true;
+      try {
+        const platforms = await desktop.windowPlatforms();
+        if (active) setWindowPlatforms(platforms);
+      } finally {
+        refreshing = false;
+      }
     };
     void refreshWindowPlatforms();
     const interval = window.setInterval(refreshWindowPlatforms, 500);

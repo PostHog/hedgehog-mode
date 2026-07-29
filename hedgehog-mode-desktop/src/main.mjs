@@ -5,6 +5,7 @@ import {
   Menu,
   nativeImage,
   screen,
+  shell,
   Tray,
 } from "electron";
 import { readFile, writeFile } from "node:fs/promises";
@@ -18,6 +19,7 @@ const directory = path.dirname(fileURLToPath(import.meta.url));
 const windows = new Set();
 let tray;
 let enabled = true;
+let windowPhysicsStatus = "checking";
 
 function statePath() {
   return path.join(app.getPath("userData"), "hedgehog-state.json");
@@ -85,6 +87,21 @@ function updateTrayMenu() {
           updateTrayMenu();
         },
       },
+      {
+        label: `Window physics: ${windowPhysicsStatus}`,
+        enabled: false,
+      },
+      ...(process.platform === "darwin" && windowPhysicsStatus === "blocked"
+        ? [
+            {
+              label: "Open Accessibility Settings",
+              click: () =>
+                void shell.openExternal(
+                  "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
+                ),
+            },
+          ]
+        : []),
       { type: "separator" },
       { label: "Quit", click: () => app.quit() },
     ])
@@ -131,11 +148,20 @@ ipcMain.handle("state:load", loadState);
 ipcMain.handle("desktop:layout", desktopLayout);
 ipcMain.handle("desktop:window-platforms", async () => {
   try {
-    return await listDesktopWindowPlatforms(
+    const platforms = await listDesktopWindowPlatforms(
       process.platform,
       desktopLayout().bounds
     );
+    if (windowPhysicsStatus !== "active") {
+      windowPhysicsStatus = "active";
+      updateTrayMenu();
+    }
+    return platforms;
   } catch {
+    if (windowPhysicsStatus !== "blocked") {
+      windowPhysicsStatus = "blocked";
+      updateTrayMenu();
+    }
     return [];
   }
 });
@@ -152,9 +178,11 @@ ipcMain.on("window:set-interactive", (event, interactive) => {
   const window = BrowserWindow.fromWebContents(event.sender);
   if (window) {
     window.hedgehogUIInteractive = interactive;
-    window.setIgnoreMouseEvents(!interactive, {
-      forward: true,
-    });
+    if (process.platform !== "darwin") {
+      window.setIgnoreMouseEvents(!interactive, {
+        forward: true,
+      });
+    }
   }
 });
 ipcMain.on("window:update-hit-areas", (event, areas) => {

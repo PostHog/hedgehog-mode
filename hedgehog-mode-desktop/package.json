@@ -12,7 +12,7 @@
     "dev": "node build.mjs && electron .",
     "test": "node --test",
     "package:windows": "pnpm build && electron-builder --win nsis",
-    "package:macos": "pnpm build && electron-builder --mac dmg"
+    "package:macos": "pnpm build && electron-builder --mac dmg --universal"
   },
   "dependencies": {
     "@posthog/hedgehog-mode": "workspace:*",

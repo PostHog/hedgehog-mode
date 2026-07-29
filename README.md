@@ -20,6 +20,8 @@ pnpm build:macos   # macOS
 
 The installer is written to `hedgehog-mode-desktop/release/`. For local development, run `pnpm --dir hedgehog-mode-desktop dev`.
 
+Pull request macOS artifacts are unsigned test builds. Follow [`MACOS-TESTING.md`](./hedgehog-mode-desktop/MACOS-TESTING.md) if Gatekeeper reports that the downloaded app is damaged. Public releases must be signed and notarized with an Apple Developer certificate.
+
 ---
 
 ## Get a hedgehog on your site in 60 seconds

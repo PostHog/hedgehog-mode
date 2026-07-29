@@ -17,14 +17,19 @@ export function getVirtualDesktop(displays) {
     ...displays.map((display) => display.workArea.y + display.workArea.height)
   );
 
+  const bounds = { x: left, y: top, width: right - left, height: bottom - top };
   return {
-    bounds: { x: left, y: top, width: right - left, height: bottom - top },
-    floors: displays.map((display) => ({
-      x: display.workArea.x - left,
-      y: display.workArea.y - top + display.workArea.height - 1,
-      width: display.workArea.width,
-    })),
+    bounds,
+    floors: getDisplayFloors(displays, bounds),
   };
+}
+
+export function getDisplayFloors(displays, viewportBounds) {
+  return displays.map((display) => ({
+    x: display.workArea.x - viewportBounds.x,
+    y: display.workArea.y - viewportBounds.y + display.workArea.height - 1,
+    width: display.workArea.width,
+  }));
 }
 
 export function getSpawnPosition(primaryDisplay, desktopBounds) {

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   getDesktopBounds,
+  getDisplayFloors,
   getSpawnPosition,
   getVirtualDesktop,
 } from "./window-bounds.mjs";
@@ -54,6 +55,16 @@ test("keeps every one-pixel floor inside the virtual desktop", () => {
       (floor) => floor.y >= 0 && floor.y + 1 <= layout.bounds.height
     ),
     true
+  );
+});
+
+test("positions floors relative to the actual Electron content bounds", () => {
+  assert.deepEqual(
+    getDisplayFloors(
+      [{ workArea: { x: 0, y: 24, width: 1920, height: 1016 } }],
+      { x: 0, y: 24, width: 1920, height: 1016 }
+    ),
+    [{ x: 0, y: 1015, width: 1920 }]
   );
 });
 

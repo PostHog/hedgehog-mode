@@ -10,7 +10,11 @@ import {
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { getSpawnPosition, getVirtualDesktop } from "./window-bounds.mjs";
+import {
+  getDisplayFloors,
+  getSpawnPosition,
+  getVirtualDesktop,
+} from "./window-bounds.mjs";
 import { isPointInArea } from "./desktop-interaction.mjs";
 import { listDesktopWindowPlatforms } from "./window-platforms.mjs";
 
@@ -32,11 +36,14 @@ async function loadState() {
   }
 }
 
-function desktopLayout() {
-  const layout = getVirtualDesktop(screen.getAllDisplays());
+function desktopLayout(actualBounds) {
+  const displays = screen.getAllDisplays();
+  const virtualDesktop = getVirtualDesktop(displays);
+  const bounds = actualBounds ?? virtualDesktop.bounds;
   return {
-    ...layout,
-    spawnPosition: getSpawnPosition(screen.getPrimaryDisplay(), layout.bounds),
+    bounds,
+    floors: getDisplayFloors(displays, bounds),
+    spawnPosition: getSpawnPosition(screen.getPrimaryDisplay(), bounds),
   };
 }
 
@@ -148,12 +155,16 @@ app.whenReady().then(() => {
 });
 
 ipcMain.handle("state:load", loadState);
-ipcMain.handle("desktop:layout", desktopLayout);
-ipcMain.handle("desktop:window-platforms", async () => {
+ipcMain.handle("desktop:layout", (event) => {
+  const window = BrowserWindow.fromWebContents(event.sender);
+  return desktopLayout(window?.getContentBounds());
+});
+ipcMain.handle("desktop:window-platforms", async (event) => {
   try {
+    const window = BrowserWindow.fromWebContents(event.sender);
     const platforms = await listDesktopWindowPlatforms(
       process.platform,
-      desktopLayout().bounds,
+      desktopLayout(window?.getContentBounds()).bounds,
       macosWindowHelperPath()
     );
     if (windowPhysicsStatus !== "active") {

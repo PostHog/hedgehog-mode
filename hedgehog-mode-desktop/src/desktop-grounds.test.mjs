@@ -33,3 +33,34 @@ test("adds a solid ground body at the bottom of every display", () => {
     ]
   );
 });
+
+test("stops a falling hedgehog at its display floor", () => {
+  const engine = Matter.Engine.create();
+  const actor = {
+    isDragging: false,
+    rigidBody: Matter.Bodies.rectangle(200, 850, 80, 80),
+  };
+  Matter.Body.setVelocity(actor.rigidBody, { x: 2, y: 10 });
+  const game = {
+    engine,
+    getAllHedgehogs: () => [actor],
+    elements: [
+      {
+        rigidBody: Matter.Bodies.rectangle(0, 0, 10, 10, {
+          label: "Ground",
+        }),
+      },
+    ],
+  };
+
+  addDesktopGroundSegments(game, [{ x: 0, y: 799, width: 1280 }]);
+  game.elements[0].update();
+
+  assert.deepEqual(
+    {
+      bottom: actor.rigidBody.bounds.max.y,
+      velocityY: actor.rigidBody.velocity.y,
+    },
+    { bottom: 799, velocityY: 0 }
+  );
+});

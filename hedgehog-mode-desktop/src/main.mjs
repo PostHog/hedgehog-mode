@@ -10,11 +10,7 @@ import {
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import {
-  getDisplayFloors,
-  getSpawnPosition,
-  getVirtualDesktop,
-} from "./window-bounds.mjs";
+import { getDisplayFloors, getVirtualDesktop } from "./window-bounds.mjs";
 import { isPointInArea } from "./desktop-interaction.mjs";
 import { listDesktopWindowPlatforms } from "./window-platforms.mjs";
 
@@ -43,7 +39,6 @@ function desktopLayout(actualBounds) {
   return {
     bounds,
     floors: getDisplayFloors(displays, bounds),
-    spawnPosition: getSpawnPosition(screen.getPrimaryDisplay(), bounds),
   };
 }
 

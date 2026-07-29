@@ -3,7 +3,8 @@ import test from "node:test";
 import {
   getDesktopBounds,
   getDisplayFloors,
-  getSpawnPosition,
+  getVisibleFloorSegments,
+  getVisibleSpawnPosition,
   getVirtualDesktop,
 } from "./window-bounds.mjs";
 
@@ -68,12 +69,31 @@ test("positions floors relative to the actual Electron content bounds", () => {
   );
 });
 
-test("spawns the player visibly on the primary display", () => {
+test("spawns the player on the largest display segment visible to the renderer", () => {
   assert.deepEqual(
-    getSpawnPosition(
-      { workArea: { x: 0, y: 24, width: 1920, height: 1016 } },
-      { x: -1280, y: 0, width: 4640, height: 1040 }
+    getVisibleSpawnPosition(
+      [
+        { x: -1280, y: 899, width: 1280 },
+        { x: 0, y: 999, width: 1920 },
+        { x: 1920, y: 899, width: 1280 },
+      ],
+      1920,
+      1000
     ),
-    { x: 2240, y: 124 }
+    { x: 960, y: 100 }
+  );
+});
+
+test("excludes monitor segments outside the actual renderer viewport", () => {
+  assert.deepEqual(
+    getVisibleFloorSegments(
+      [
+        { x: -1280, y: 799, width: 1280 },
+        { x: 0, y: 799, width: 1280 },
+      ],
+      1280,
+      800
+    ),
+    [{ left: 0, right: 1280, y: 799 }]
   );
 });

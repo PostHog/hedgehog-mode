@@ -2,6 +2,7 @@ const { contextBridge, ipcRenderer } = require("electron");
 
 contextBridge.exposeInMainWorld("hedgehogDesktop", {
   assetsUrl: () => ipcRenderer.invoke("assets:url"),
+  desktopLayout: () => ipcRenderer.invoke("desktop:layout"),
   loadState: () => ipcRenderer.invoke("state:load"),
   saveState: (state) => ipcRenderer.send("state:save", state),
   setInteractive: (interactive) =>

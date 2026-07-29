@@ -10,7 +10,7 @@ import {
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { getDesktopBounds } from "./window-bounds.mjs";
+import { getVirtualDesktop } from "./window-bounds.mjs";
 import { isPointInArea } from "./desktop-interaction.mjs";
 
 const directory = path.dirname(fileURLToPath(import.meta.url));
@@ -30,9 +30,14 @@ async function loadState() {
   }
 }
 
-function createWindow(display) {
+function desktopLayout() {
+  return getVirtualDesktop(screen.getAllDisplays());
+}
+
+function createWindow() {
+  const { bounds } = desktopLayout();
   const window = new BrowserWindow({
-    ...getDesktopBounds(display),
+    ...bounds,
     transparent: true,
     frame: false,
     resizable: false,
@@ -41,6 +46,7 @@ function createWindow(display) {
     alwaysOnTop: true,
     hasShadow: false,
     focusable: false,
+    enableLargerThanScreen: true,
     webPreferences: {
       preload: path.join(directory, "preload.cjs"),
       contextIsolation: true,
@@ -61,7 +67,7 @@ function createWindow(display) {
 
 function rebuildWindows() {
   for (const window of windows) window.destroy();
-  for (const display of screen.getAllDisplays()) createWindow(display);
+  createWindow();
 }
 
 function updateTrayMenu() {
@@ -121,6 +127,7 @@ app.whenReady().then(() => {
 });
 
 ipcMain.handle("state:load", loadState);
+ipcMain.handle("desktop:layout", desktopLayout);
 ipcMain.handle("assets:url", () => {
   const assetsPath = app.isPackaged
     ? path.join(process.resourcesPath, "assets")

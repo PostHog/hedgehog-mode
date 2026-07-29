@@ -35,11 +35,25 @@ test("combines all displays into one desktop with a floor per screen", () => {
     {
       bounds: { x: -1280, y: 0, width: 4640, height: 1040 },
       floors: [
-        { x: 0, y: 1024, width: 1280 },
-        { x: 1280, y: 1040, width: 1920 },
-        { x: 3200, y: 1020, width: 1440 },
+        { x: 0, y: 1023, width: 1280 },
+        { x: 1280, y: 1039, width: 1920 },
+        { x: 3200, y: 1019, width: 1440 },
       ],
     }
+  );
+});
+
+test("keeps every one-pixel floor inside the virtual desktop", () => {
+  const layout = getVirtualDesktop([
+    { workArea: { x: 0, y: 0, width: 1920, height: 1040 } },
+    { workArea: { x: 1920, y: 80, width: 1280, height: 900 } },
+  ]);
+
+  assert.equal(
+    layout.floors.every(
+      (floor) => floor.y >= 0 && floor.y + 1 <= layout.bounds.height
+    ),
+    true
   );
 });
 

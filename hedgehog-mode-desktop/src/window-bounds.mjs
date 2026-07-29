@@ -21,7 +21,7 @@ export function getVirtualDesktop(displays) {
     bounds: { x: left, y: top, width: right - left, height: bottom - top },
     floors: displays.map((display) => ({
       x: display.workArea.x - left,
-      y: display.workArea.y - top + display.workArea.height,
+      y: display.workArea.y - top + display.workArea.height - 1,
       width: display.workArea.width,
     })),
   };

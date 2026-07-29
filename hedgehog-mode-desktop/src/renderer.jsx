@@ -74,6 +74,9 @@ function DesktopHedgehog() {
           onStateChange: desktop.saveState,
         }}
         onGameReady={(game) => {
+          const player = game.getPlayableHedgehog();
+          player?.setPosition(desktopLayout.spawnPosition);
+          player?.setVelocity({ x: 0, y: 0 });
           const setPointerEvents = game.setPointerEvents.bind(game);
           game.setPointerEvents = (interactive) => {
             setPointerEvents(interactive);

@@ -26,3 +26,13 @@ export function getVirtualDesktop(displays) {
     })),
   };
 }
+
+export function getSpawnPosition(primaryDisplay, desktopBounds) {
+  return {
+    x:
+      primaryDisplay.workArea.x -
+      desktopBounds.x +
+      primaryDisplay.workArea.width / 2,
+    y: primaryDisplay.workArea.y - desktopBounds.y + 100,
+  };
+}

@@ -10,7 +10,7 @@ import {
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { getVirtualDesktop } from "./window-bounds.mjs";
+import { getSpawnPosition, getVirtualDesktop } from "./window-bounds.mjs";
 import { isPointInArea } from "./desktop-interaction.mjs";
 import { listDesktopWindowPlatforms } from "./window-platforms.mjs";
 
@@ -33,7 +33,22 @@ async function loadState() {
 }
 
 function desktopLayout() {
-  return getVirtualDesktop(screen.getAllDisplays());
+  const layout = getVirtualDesktop(screen.getAllDisplays());
+  return {
+    ...layout,
+    spawnPosition: getSpawnPosition(screen.getPrimaryDisplay(), layout.bounds),
+  };
+}
+
+function macosWindowHelperPath() {
+  return app.isPackaged
+    ? path.join(
+        process.resourcesPath,
+        "app.asar.unpacked",
+        "dist",
+        "get-windows-macos"
+      )
+    : path.join(directory, "get-windows-macos");
 }
 
 function createWindow() {
@@ -139,7 +154,7 @@ ipcMain.handle("desktop:window-platforms", async () => {
     const platforms = await listDesktopWindowPlatforms(
       process.platform,
       desktopLayout().bounds,
-      path.join(directory, "get-windows-macos")
+      macosWindowHelperPath()
     );
     if (windowPhysicsStatus !== "active") {
       windowPhysicsStatus = "active";

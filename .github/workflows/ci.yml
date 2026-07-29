@@ -56,9 +56,9 @@ jobs:
           pnpm --dir hedgehog-mode build
           pnpm --dir hedgehog-mode-desktop test
           pnpm --dir hedgehog-mode-desktop build
-          hedgehog-mode-desktop/dist/get-windows-macos --no-accessibility-permission --no-screen-recording-permission --open-windows-list > /tmp/hedgehog-windows.json
-          node -e "JSON.parse(require('node:fs').readFileSync('/tmp/hedgehog-windows.json', 'utf8'))"
           pnpm build:macos
+          "hedgehog-mode-desktop/release/mac-universal/Hedgehog Mode.app/Contents/Resources/app.asar.unpacked/dist/get-windows-macos" --no-accessibility-permission --no-screen-recording-permission --open-windows-list > /tmp/hedgehog-windows.json
+          node -e "JSON.parse(require('node:fs').readFileSync('/tmp/hedgehog-windows.json', 'utf8'))"
 
       - name: Upload macOS installer
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

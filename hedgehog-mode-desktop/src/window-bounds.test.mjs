@@ -1,6 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { getDesktopBounds, getVirtualDesktop } from "./window-bounds.mjs";
+import {
+  getDesktopBounds,
+  getSpawnPosition,
+  getVirtualDesktop,
+} from "./window-bounds.mjs";
 
 test("uses the display work area so the hedgehog stays above the taskbar", () => {
   assert.deepEqual(
@@ -36,5 +40,15 @@ test("combines all displays into one desktop with a floor per screen", () => {
         { x: 3200, y: 1020, width: 1440 },
       ],
     }
+  );
+});
+
+test("spawns the player visibly on the primary display", () => {
+  assert.deepEqual(
+    getSpawnPosition(
+      { workArea: { x: 0, y: 24, width: 1920, height: 1016 } },
+      { x: -1280, y: 0, width: 4640, height: 1040 }
+    ),
+    { x: 2240, y: 124 }
   );
 });

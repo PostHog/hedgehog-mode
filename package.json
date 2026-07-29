@@ -9,7 +9,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "pnpm -r --parallel --no-bail run dev",
-    "build": "pnpm --dir ./playground build && pnpm --dir ./hedgehog-mode-anywhere build",
+    "build": "pnpm --dir ./playground build && pnpm --dir ./hedgehog-mode-anywhere build && pnpm --dir ./hedgehog-mode-desktop build",
+    "build:windows": "pnpm --dir ./hedgehog-mode-desktop package:windows",
     "test": "pnpm --dir ./hedgehog-mode test",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",

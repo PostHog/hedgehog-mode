@@ -6,6 +6,19 @@ A playful PixiJS-powered hedgehog game you can drop into any React app. Your DOM
 
 [**▶ Try the playground**](./playground) · [**🐛 Report a bug**](https://github.com/PostHog/hedgehog-mode/issues)
 
+## Windows desktop app
+
+Hedgehog Mode can also live on your Windows desktop, above your wallpaper and below your patience. It stays out of the way of other apps, supports multiple displays, remembers customization, and lives in the system tray.
+
+Build the Windows installer from Windows:
+
+```sh
+pnpm install
+pnpm build:windows
+```
+
+The installer is written to `hedgehog-mode-desktop/release/`. For local development, run `pnpm --dir hedgehog-mode-desktop dev`.
+
 ---
 
 ## Get a hedgehog on your site in 60 seconds

@@ -2,7 +2,7 @@
   "name": "hedgehog-mode-desktop",
   "version": "0.1.0",
   "private": true,
-  "description": "A desktop hedgehog that roams around Windows and macOS.",
+  "description": "A desktop hedgehog that roams around Windows, macOS, and Linux.",
   "author": "PostHog",
   "repository": "https://github.com/PostHog/hedgehog-mode",
   "type": "module",
@@ -12,7 +12,8 @@
     "dev": "node build.mjs && electron .",
     "test": "node --test",
     "package:windows": "pnpm build && electron-builder --win nsis",
-    "package:macos": "pnpm build && electron-builder --mac dmg --universal"
+    "package:macos": "pnpm build && electron-builder --mac dmg --universal",
+    "package:linux": "pnpm build && electron-builder --linux AppImage"
   },
   "dependencies": {
     "@posthog/hedgehog-mode": "workspace:*",
@@ -54,9 +55,16 @@
       "icon": "build/icon.png",
       "category": "public.app-category.entertainment"
     },
+    "linux": {
+      "target": "AppImage",
+      "icon": "build/icon.png",
+      "category": "Game",
+      "syncDesktopName": true
+    },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
     }
-  }
+  },
+  "desktopName": "hedgehog-mode.desktop"
 }

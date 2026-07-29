@@ -18,7 +18,8 @@ const directory = path.dirname(fileURLToPath(import.meta.url));
 const windows = new Set();
 let tray;
 let enabled = true;
-let windowPhysicsStatus = "checking";
+let windowPhysicsStatus =
+  process.platform === "linux" ? "unavailable" : "checking";
 
 function statePath() {
   return path.join(app.getPath("userData"), "hedgehog-state.json");
@@ -155,6 +156,8 @@ ipcMain.handle("desktop:layout", (event) => {
   return desktopLayout(window?.getContentBounds());
 });
 ipcMain.handle("desktop:window-platforms", async (event) => {
+  if (process.platform === "linux") return [];
+
   try {
     const window = BrowserWindow.fromWebContents(event.sender);
     const platforms = await listDesktopWindowPlatforms(

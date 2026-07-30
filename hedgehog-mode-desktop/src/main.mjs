@@ -10,16 +10,13 @@ import {
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { getDisplayFloors, getVirtualDesktop } from "./window-bounds.mjs";
+import { getVirtualDesktop } from "./window-bounds.mjs";
 import { isPointInArea } from "./desktop-interaction.mjs";
-import { listDesktopWindowPlatforms } from "./window-platforms.mjs";
 
 const directory = path.dirname(fileURLToPath(import.meta.url));
 const windows = new Set();
 let tray;
 let enabled = true;
-let windowPhysicsStatus =
-  process.platform === "linux" ? "unavailable" : "checking";
 
 function statePath() {
   return path.join(app.getPath("userData"), "hedgehog-state.json");
@@ -33,25 +30,8 @@ async function loadState() {
   }
 }
 
-function desktopLayout(actualBounds) {
-  const displays = screen.getAllDisplays();
-  const virtualDesktop = getVirtualDesktop(displays, process.platform);
-  const bounds = actualBounds ?? virtualDesktop.bounds;
-  return {
-    bounds,
-    floors: getDisplayFloors(displays, bounds, process.platform),
-  };
-}
-
-function macosWindowHelperPath() {
-  return app.isPackaged
-    ? path.join(
-        process.resourcesPath,
-        "app.asar.unpacked",
-        "dist",
-        "get-windows-macos"
-      )
-    : path.join(directory, "get-windows-macos");
+function desktopLayout() {
+  return getVirtualDesktop(screen.getAllDisplays());
 }
 
 function createWindow() {
@@ -65,8 +45,7 @@ function createWindow() {
     show: enabled,
     alwaysOnTop: true,
     hasShadow: false,
-    focusable: true,
-    acceptFirstMouse: true,
+    focusable: false,
     enableLargerThanScreen: true,
     webPreferences: {
       preload: path.join(directory, "preload.cjs"),
@@ -104,10 +83,6 @@ function updateTrayMenu() {
           }
           updateTrayMenu();
         },
-      },
-      {
-        label: `Window physics: ${windowPhysicsStatus}`,
-        enabled: false,
       },
       { type: "separator" },
       { label: "Quit", click: () => app.quit() },
@@ -152,33 +127,7 @@ app.whenReady().then(() => {
 });
 
 ipcMain.handle("state:load", loadState);
-ipcMain.handle("desktop:layout", (event) => {
-  const window = BrowserWindow.fromWebContents(event.sender);
-  return desktopLayout(window?.getContentBounds());
-});
-ipcMain.handle("desktop:window-platforms", async (event) => {
-  if (process.platform === "linux") return [];
-
-  try {
-    const window = BrowserWindow.fromWebContents(event.sender);
-    const platforms = await listDesktopWindowPlatforms(
-      process.platform,
-      desktopLayout(window?.getContentBounds()).bounds,
-      macosWindowHelperPath()
-    );
-    if (windowPhysicsStatus !== "active") {
-      windowPhysicsStatus = "active";
-      updateTrayMenu();
-    }
-    return platforms;
-  } catch {
-    if (windowPhysicsStatus !== "blocked") {
-      windowPhysicsStatus = "blocked";
-      updateTrayMenu();
-    }
-    return [];
-  }
-});
+ipcMain.handle("desktop:layout", desktopLayout);
 ipcMain.handle("assets:url", () => {
   const assetsPath = app.isPackaged
     ? path.join(process.resourcesPath, "assets")
@@ -192,11 +141,9 @@ ipcMain.on("window:set-interactive", (event, interactive) => {
   const window = BrowserWindow.fromWebContents(event.sender);
   if (window) {
     window.hedgehogUIInteractive = interactive;
-    if (process.platform !== "darwin") {
-      window.setIgnoreMouseEvents(!interactive, {
-        forward: true,
-      });
-    }
+    window.setIgnoreMouseEvents(!interactive, {
+      forward: true,
+    });
   }
 });
 ipcMain.on("window:update-hit-areas", (event, areas) => {

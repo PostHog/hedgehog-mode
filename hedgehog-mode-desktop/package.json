@@ -2,7 +2,7 @@
   "name": "hedgehog-mode-desktop",
   "version": "0.1.0",
   "private": true,
-  "description": "A desktop hedgehog that roams around Windows, macOS, and Linux.",
+  "description": "A desktop hedgehog that roams around Windows and macOS.",
   "author": "PostHog",
   "repository": "https://github.com/PostHog/hedgehog-mode",
   "type": "module",
@@ -12,20 +12,17 @@
     "dev": "node build.mjs && electron .",
     "test": "node --test",
     "package:windows": "pnpm build && electron-builder --win nsis",
-    "package:macos": "pnpm build && electron-builder --mac dmg --universal",
-    "package:linux": "pnpm build && electron-builder --linux AppImage"
+    "package:macos": "pnpm build && electron-builder --mac dmg --universal"
   },
   "dependencies": {
     "@posthog/hedgehog-mode": "workspace:*",
-    "matter-js": "^0.20.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "electron": "43.2.0",
     "electron-builder": "26.15.3",
-    "esbuild": "^0.25.12",
-    "get-windows": "9.3.0"
+    "esbuild": "^0.25.12"
   },
   "build": {
     "appId": "com.posthog.hedgehog-mode",
@@ -33,9 +30,6 @@
     "directories": {
       "output": "release"
     },
-    "asarUnpack": [
-      "dist/get-windows-macos"
-    ],
     "files": [
       "dist/**/*",
       "package.json"
@@ -47,24 +41,15 @@
       }
     ],
     "win": {
-      "target": "nsis",
-      "icon": "build/icon.ico"
+      "target": "nsis"
     },
     "mac": {
       "target": "dmg",
-      "icon": "build/icon.png",
       "category": "public.app-category.entertainment"
-    },
-    "linux": {
-      "target": "AppImage",
-      "icon": "build/icon.png",
-      "category": "Game",
-      "syncDesktopName": true
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true
     }
-  },
-  "desktopName": "hedgehog-mode.desktop"
+  }
 }

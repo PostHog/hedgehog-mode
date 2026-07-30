@@ -12,7 +12,6 @@
     "build": "pnpm --dir ./playground build && pnpm --dir ./hedgehog-mode-anywhere build && pnpm --dir ./hedgehog-mode-desktop build",
     "build:windows": "pnpm --dir ./hedgehog-mode-desktop package:windows",
     "build:macos": "pnpm --dir ./hedgehog-mode-desktop package:macos",
-    "build:linux": "pnpm --dir ./hedgehog-mode-desktop package:linux",
     "test": "pnpm --dir ./hedgehog-mode test",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",

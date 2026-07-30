@@ -1,12 +1,6 @@
 import { HedgehogModeRenderer } from "@posthog/hedgehog-mode";
 import { createRoot } from "react-dom/client";
-import React, { useEffect, useState } from "react";
-import { addDesktopGroundSegments } from "./desktop-grounds.mjs";
-import { findSpriteAtPoint, getSpriteHitArea } from "./desktop-interaction.mjs";
-import {
-  getVisibleFloorSegments,
-  getVisibleSpawnPosition,
-} from "./window-bounds.mjs";
+import React from "react";
 
 const desktop = window.hedgehogDesktop;
 const [assetsUrl, savedState, desktopLayout] = await Promise.all([
@@ -16,40 +10,17 @@ const [assetsUrl, savedState, desktopLayout] = await Promise.all([
 ]);
 
 function DesktopHedgehog() {
-  const [windowPlatforms, setWindowPlatforms] = useState([]);
-
-  useEffect(() => {
-    let active = true;
-    let refreshing = false;
-    const refreshWindowPlatforms = async () => {
-      if (refreshing) return;
-      refreshing = true;
-      try {
-        const platforms = await desktop.windowPlatforms();
-        if (active) setWindowPlatforms(platforms);
-      } finally {
-        refreshing = false;
-      }
-    };
-    void refreshWindowPlatforms();
-    const interval = window.setInterval(refreshWindowPlatforms, 500);
-    return () => {
-      active = false;
-      window.clearInterval(interval);
-    };
-  }, []);
-
   return (
     <>
-      {windowPlatforms.map((platform, index) => (
+      {desktopLayout.floors.map((floor, index) => (
         <div
-          className="DesktopWindowPlatform"
-          key={`${platform.x}:${platform.y}:${platform.width}:${index}`}
+          className="DesktopFloor"
+          key={index}
           style={{
             position: "fixed",
-            left: platform.x,
-            top: platform.y,
-            width: platform.width,
+            left: floor.x,
+            top: floor.y,
+            width: floor.width,
             height: 1,
           }}
         />
@@ -57,51 +28,13 @@ function DesktopHedgehog() {
       <HedgehogModeRenderer
         config={{
           assetsUrl,
-          platforms: {
-            selector: ".DesktopWindowPlatform",
-            syncFrequency: 250,
-          },
+          platforms: { selector: ".DesktopFloor", syncFrequency: 1000 },
           state: savedState ?? {
             options: { id: "player", player: true, controls_enabled: true },
           },
           onStateChange: desktop.saveState,
         }}
         onGameReady={(game) => {
-          addDesktopGroundSegments(game, desktopLayout.floors);
-          const player = game.getPlayableHedgehog();
-          const playerHalfHeight = player?.rigidBody
-            ? (player.rigidBody.bounds.max.y - player.rigidBody.bounds.min.y) /
-              2
-            : 0;
-          const spawnPosition = getVisibleSpawnPosition(
-            desktopLayout.floors,
-            window.innerWidth,
-            window.innerHeight,
-            playerHalfHeight
-          );
-          player?.setPosition(spawnPosition);
-          player?.setVelocity({ x: 0, y: 0 });
-          const visibleFloors = getVisibleFloorSegments(
-            desktopLayout.floors,
-            window.innerWidth,
-            window.innerHeight
-          );
-          window.setInterval(() => {
-            const position = player?.rigidBody?.position;
-            const visible =
-              position &&
-              visibleFloors.some(
-                (floor) =>
-                  position.x >= floor.left &&
-                  position.x <= floor.right &&
-                  position.y >= -100 &&
-                  position.y <= floor.y
-              );
-            if (player && !visible) {
-              player.setPosition(spawnPosition);
-              player.setVelocity({ x: 0, y: 0 });
-            }
-          }, 500);
           const setPointerEvents = game.setPointerEvents.bind(game);
           game.setPointerEvents = (interactive) => {
             setPointerEvents(interactive);
@@ -109,19 +42,6 @@ function DesktopHedgehog() {
               interactive || game.gameUI?.visible === true
             );
           };
-          window.addEventListener(
-            "pointerdown",
-            (event) => {
-              const point = { x: event.clientX, y: event.clientY };
-              const hedgehog = findSpriteAtPoint(game.getAllHedgehogs(), point);
-              if (hedgehog && !hedgehog.hitTest(point)) {
-                hedgehog.startDrag(event);
-                event.preventDefault();
-                event.stopPropagation();
-              }
-            },
-            { capture: true }
-          );
           window.setInterval(() => {
             desktop.setInteractive(
               game.pointerEventsEnabled || game.gameUI?.visible === true
@@ -129,10 +49,7 @@ function DesktopHedgehog() {
             desktop.updateHitAreas(
               game
                 .getAllHedgehogs()
-                .filter((hedgehog) => hedgehog.sprite)
-                .map((hedgehog) =>
-                  getSpriteHitArea(hedgehog.sprite.getBounds())
-                )
+                .map((hedgehog) => hedgehog.rigidBody.bounds)
             );
           }, 50);
         }}

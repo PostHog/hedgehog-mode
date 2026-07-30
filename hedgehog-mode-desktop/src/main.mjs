@@ -242,11 +242,16 @@ app.whenReady().then(() => {
     if (process.platform !== "darwin") return;
     const cursor = screen.getCursorScreenPoint();
     for (const window of windows) {
+      const wasInteractive = window.hedgehogMouseInteractive;
       const interactive =
         window.hedgehogUIInteractive ||
         isPointInArea(cursor, window.getBounds(), window.hedgehogHitAreas);
       window.hedgehogMouseInteractive = interactive;
       window.setIgnoreMouseEvents(!interactive, { forward: true });
+      if (interactive && !wasInteractive) {
+        app.focus({ steal: true });
+        window.focus();
+      }
     }
   }, 50);
 });

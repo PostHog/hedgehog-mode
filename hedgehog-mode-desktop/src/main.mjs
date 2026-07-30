@@ -144,6 +144,14 @@ async function runMacOSE2E(window) {
     await execute(dragExecutable, [
       String(start.x),
       String(start.y),
+      String(start.x),
+      String(start.y),
+      "--move-only",
+    ]);
+    await waitForRuntimeState(() => window.hedgehogMouseInteractive, 2000);
+    await execute(dragExecutable, [
+      String(start.x),
+      String(start.y),
       String(start.x + 120),
       String(start.y - 80),
     ]);
@@ -225,6 +233,7 @@ app.whenReady().then(() => {
       const interactive =
         window.hedgehogUIInteractive ||
         isPointInArea(cursor, window.getBounds(), window.hedgehogHitAreas);
+      window.hedgehogMouseInteractive = interactive;
       window.setIgnoreMouseEvents(!interactive, { forward: true });
     }
   }, 50);

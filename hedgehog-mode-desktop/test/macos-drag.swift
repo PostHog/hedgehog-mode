@@ -8,6 +8,7 @@ guard values.count == 4 else {
 
 let start = CGPoint(x: values[0], y: values[1])
 let end = CGPoint(x: values[2], y: values[3])
+let moveOnly = CommandLine.arguments.last == "--move-only"
 
 func post(_ type: CGEventType, at point: CGPoint) {
     guard let event = CGEvent(mouseEventSource: nil, mouseType: type, mouseCursorPosition: point, mouseButton: .left) else {
@@ -17,6 +18,9 @@ func post(_ type: CGEventType, at point: CGPoint) {
 }
 
 post(.mouseMoved, at: start)
+if moveOnly {
+    exit(0)
+}
 usleep(250_000)
 post(.leftMouseDown, at: start)
 for step in 1...8 {

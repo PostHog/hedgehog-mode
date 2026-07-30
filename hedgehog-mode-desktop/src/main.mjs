@@ -105,6 +105,7 @@ function createWindow() {
 
 function createInteractionWindow(owner) {
   const interactionWindow = new BrowserWindow({
+    parent: owner,
     x: owner.getBounds().x,
     y: owner.getBounds().y,
     width: 1,
@@ -162,11 +163,15 @@ function positionInteractionWindow(owner) {
     owner.hedgehogHitAreas[0]
   );
   const contentBounds = owner.getContentBounds();
+  const left = Math.max(0, area.min.x);
+  const top = Math.max(0, area.min.y);
+  const right = Math.min(contentBounds.width, area.max.x);
+  const bottom = Math.min(contentBounds.height, area.max.y);
   interactionWindow.setBounds({
-    x: Math.round(contentBounds.x + area.min.x),
-    y: Math.round(contentBounds.y + area.min.y),
-    width: Math.max(1, Math.round(area.max.x - area.min.x)),
-    height: Math.max(1, Math.round(area.max.y - area.min.y)),
+    x: Math.round(contentBounds.x + left),
+    y: Math.round(contentBounds.y + top),
+    width: Math.max(1, Math.round(right - left)),
+    height: Math.max(1, Math.round(bottom - top)),
   });
   interactionWindow.showInactive();
 }
@@ -316,9 +321,16 @@ app.whenReady().then(() => {
   screen.on("display-metrics-changed", rebuildWindows);
   setInterval(() => {
     if (process.platform !== "darwin") return;
-    if ([...windows].some((window) => window.interactionWindow)) return;
     const cursor = screen.getCursorScreenPoint();
     for (const window of windows) {
+      if (window.interactionWindow) {
+        window.hedgehogMouseInteractive = isPointInArea(
+          cursor,
+          window.getBounds(),
+          window.hedgehogHitAreas
+        );
+        continue;
+      }
       const wasInteractive = window.hedgehogMouseInteractive;
       const interactive =
         window.hedgehogUIInteractive ||

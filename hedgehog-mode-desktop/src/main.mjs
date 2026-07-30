@@ -86,7 +86,10 @@ function createWindow() {
   window.setIgnoreMouseEvents(true, { forward: true });
   window.hedgehogHitAreas = [];
   window.hedgehogUIInteractive = false;
-  void window.loadFile(path.join(directory, "index.html"));
+  void window.loadFile(
+    path.join(directory, "index.html"),
+    e2eMode ? { query: { e2e: "1" } } : undefined
+  );
   if (e2eMode) void runMacOSE2E(window);
   window.on("closed", () => windows.delete(window));
   windows.add(window);
@@ -145,7 +148,10 @@ async function runMacOSE2E(window) {
       String(start.y - 80),
     ]);
     const dragged = await waitForRuntimeState(
-      (state) => Math.abs(state.position.x - landed.position.x) > 40
+      (state) =>
+        state.position.x - landed.position.x > 40 &&
+        landed.position.y - state.position.y > 30,
+      2000
     );
     await writeFile(
       afterPath,

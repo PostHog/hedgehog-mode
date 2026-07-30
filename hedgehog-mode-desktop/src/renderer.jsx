@@ -9,6 +9,7 @@ import {
 } from "./window-bounds.mjs";
 
 const desktop = window.hedgehogDesktop;
+const e2eMode = new URLSearchParams(window.location.search).has("e2e");
 const [assetsUrl, savedState, desktopLayout] = await Promise.all([
   desktop.assetsUrl(),
   desktop.loadState(),
@@ -62,7 +63,12 @@ function DesktopHedgehog() {
             syncFrequency: 250,
           },
           state: savedState ?? {
-            options: { id: "player", player: true, controls_enabled: true },
+            options: {
+              id: "player",
+              player: true,
+              controls_enabled: true,
+              ai_enabled: !e2eMode,
+            },
           },
           onStateChange: desktop.saveState,
         }}

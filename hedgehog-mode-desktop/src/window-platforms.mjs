@@ -3,6 +3,14 @@ import { promisify } from "node:util";
 
 const execute = promisify(execFile);
 
+const MACOS_SYSTEM_SURFACE_OWNERS = new Set([
+  "com.apple.controlcenter",
+  "com.apple.dock",
+  "com.apple.notificationcenterui",
+  "com.apple.systemuiserver",
+  "com.apple.WindowManager",
+]);
+
 const WINDOWS_SCRIPT = String.raw`
 Add-Type @"
 using System;
@@ -64,6 +72,7 @@ export function normalizeNativeWindows(windows, desktopBounds) {
     .filter(
       (window) =>
         window.owner?.processId !== process.pid &&
+        !MACOS_SYSTEM_SURFACE_OWNERS.has(window.owner?.bundleId) &&
         window.bounds?.width >= 10 &&
         window.bounds?.height > 0
     )

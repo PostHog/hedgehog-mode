@@ -59,6 +59,7 @@ jobs:
           pnpm build:macos
           "hedgehog-mode-desktop/release/mac-universal/Hedgehog Mode.app/Contents/Resources/app.asar.unpacked/dist/get-windows-macos" --no-accessibility-permission --no-screen-recording-permission --open-windows-list > /tmp/hedgehog-windows.json
           node -e "JSON.parse(require('node:fs').readFileSync('/tmp/hedgehog-windows.json', 'utf8'))"
+          HEDGEHOG_E2E=1 HEDGEHOG_E2E_BEFORE="$PWD/hedgehog-mode-desktop/e2e-before.png" HEDGEHOG_E2E_AFTER="$PWD/hedgehog-mode-desktop/e2e-after.png" "hedgehog-mode-desktop/release/mac-universal/Hedgehog Mode.app/Contents/MacOS/Hedgehog Mode"
 
       - name: Upload macOS installer
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -68,6 +69,15 @@ jobs:
             hedgehog-mode-desktop/release/*.dmg
             hedgehog-mode-desktop/MACOS-TESTING.md
           if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload macOS runtime captures
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: hedgehog-mode-macos-runtime-pr-${{ github.event.pull_request.number }}
+          path: hedgehog-mode-desktop/e2e-*.png
+          if-no-files-found: warn
           retention-days: 14
 
   build-windows-app:

@@ -134,6 +134,22 @@ function DesktopHedgehog() {
                   getSpriteHitArea(hedgehog.sprite.getBounds())
                 )
             );
+            if (player?.sprite && player.rigidBody) {
+              const bounds = player.sprite.getBounds();
+              desktop.reportRuntimeState({
+                viewport: {
+                  width: window.innerWidth,
+                  height: window.innerHeight,
+                },
+                sprite: {
+                  minX: bounds.minX,
+                  minY: bounds.minY,
+                  maxX: bounds.maxX,
+                  maxY: bounds.maxY,
+                },
+                position: { ...player.rigidBody.position },
+              });
+            }
           }, 50);
         }}
       />

@@ -9,4 +9,5 @@ contextBridge.exposeInMainWorld("hedgehogDesktop", {
   setInteractive: (interactive) =>
     ipcRenderer.send("window:set-interactive", interactive),
   updateHitAreas: (areas) => ipcRenderer.send("window:update-hit-areas", areas),
+  reportRuntimeState: (state) => ipcRenderer.send("e2e:runtime-state", state),
 });

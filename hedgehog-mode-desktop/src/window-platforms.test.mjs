@@ -48,3 +48,22 @@ test("normalizes native macOS window metadata without titles", () => {
     [{ x: 80, y: 100, width: 800 }]
   );
 });
+
+test("ignores macOS system surfaces such as the Dock", () => {
+  assert.deepEqual(
+    normalizeNativeWindows(
+      [
+        {
+          bounds: { x: 0, y: 900, width: 1728, height: 217 },
+          owner: { bundleId: "com.apple.dock", processId: 123 },
+        },
+        {
+          bounds: { x: 100, y: 200, width: 800, height: 600 },
+          owner: { bundleId: "com.apple.Safari", processId: 456 },
+        },
+      ],
+      { x: 0, y: 0, width: 1728, height: 1117 }
+    ),
+    [{ x: 100, y: 200, width: 800 }]
+  );
+});

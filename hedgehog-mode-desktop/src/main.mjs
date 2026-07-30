@@ -16,6 +16,8 @@ import { listDesktopWindowPlatforms } from "./window-platforms.mjs";
 
 const directory = path.dirname(fileURLToPath(import.meta.url));
 const windows = new Set();
+const e2eMode = process.env.HEDGEHOG_E2E === "1";
+let runtimeState;
 let tray;
 let enabled = true;
 let windowPhysicsStatus =
@@ -78,12 +80,90 @@ function createWindow() {
 
   window.setAlwaysOnTop(true, "floating");
   window.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
-  window.setIgnoreMouseEvents(true, { forward: true });
+  window.setIgnoreMouseEvents(!e2eMode, { forward: true });
   window.hedgehogHitAreas = [];
   window.hedgehogUIInteractive = false;
   void window.loadFile(path.join(directory, "index.html"));
+  if (e2eMode) void runMacOSE2E(window);
   window.on("closed", () => windows.delete(window));
   windows.add(window);
+}
+
+async function waitForRuntimeState(predicate, timeout = 10000) {
+  const startedAt = Date.now();
+  while (Date.now() - startedAt < timeout) {
+    if (runtimeState && predicate(runtimeState)) return runtimeState;
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+  throw new Error("Timed out waiting for desktop runtime state");
+}
+
+async function runMacOSE2E(window) {
+  try {
+    await new Promise((resolve) =>
+      window.webContents.once("did-finish-load", resolve)
+    );
+    await waitForRuntimeState(() => true);
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    const landed = runtimeState;
+    const settled = landed;
+    const bottomGap = settled.viewport.height - settled.sprite.maxY;
+    if (bottomGap > 12) {
+      throw new Error(
+        `Hedgehog settled ${bottomGap}px above the viewport bottom`
+      );
+    }
+
+    const beforePath = path.resolve(
+      process.env.HEDGEHOG_E2E_BEFORE ?? "e2e-before.png"
+    );
+    const afterPath = path.resolve(
+      process.env.HEDGEHOG_E2E_AFTER ?? "e2e-after.png"
+    );
+    await writeFile(
+      beforePath,
+      (await window.webContents.capturePage()).toPNG()
+    );
+    const start = {
+      x: Math.round((landed.sprite.minX + landed.sprite.maxX) / 2),
+      y: Math.round((landed.sprite.minY + landed.sprite.maxY) / 2),
+    };
+    window.webContents.sendInputEvent({ type: "mouseMove", ...start });
+    window.webContents.sendInputEvent({
+      type: "mouseDown",
+      ...start,
+      button: "left",
+      clickCount: 1,
+    });
+    for (let step = 1; step <= 8; step++) {
+      window.webContents.sendInputEvent({
+        type: "mouseMove",
+        x: start.x + step * 15,
+        y: start.y - step * 10,
+        button: "left",
+      });
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+    window.webContents.sendInputEvent({
+      type: "mouseUp",
+      x: start.x + 120,
+      y: start.y - 80,
+      button: "left",
+      clickCount: 1,
+    });
+    const dragged = await waitForRuntimeState(
+      (state) => Math.abs(state.position.x - landed.position.x) > 40
+    );
+    await writeFile(
+      afterPath,
+      (await window.webContents.capturePage()).toPNG()
+    );
+    console.log(JSON.stringify({ bottomGap, landed, dragged }));
+    app.exit(0);
+  } catch (error) {
+    console.error(error);
+    app.exit(1);
+  }
 }
 
 function rebuildWindows() {
@@ -141,6 +221,7 @@ app.whenReady().then(() => {
   screen.on("display-metrics-changed", rebuildWindows);
   setInterval(() => {
     if (process.platform !== "darwin") return;
+    if (e2eMode) return;
     const cursor = screen.getCursorScreenPoint();
     for (const window of windows) {
       const interactive =
@@ -202,6 +283,9 @@ ipcMain.on("window:set-interactive", (event, interactive) => {
 ipcMain.on("window:update-hit-areas", (event, areas) => {
   const window = BrowserWindow.fromWebContents(event.sender);
   if (window) window.hedgehogHitAreas = areas;
+});
+ipcMain.on("e2e:runtime-state", (_event, state) => {
+  runtimeState = state;
 });
 
 app.on("window-all-closed", () => {});

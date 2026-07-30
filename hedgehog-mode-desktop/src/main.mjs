@@ -8,13 +8,16 @@ import {
   Tray,
 } from "electron";
 import { readFile, writeFile } from "node:fs/promises";
+import { execFile } from "node:child_process";
 import path from "node:path";
+import { promisify } from "node:util";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { getDisplayFloors, getVirtualDesktop } from "./window-bounds.mjs";
 import { isPointInArea } from "./desktop-interaction.mjs";
 import { listDesktopWindowPlatforms } from "./window-platforms.mjs";
 
 const directory = path.dirname(fileURLToPath(import.meta.url));
+const execute = promisify(execFile);
 const windows = new Set();
 const e2eMode = process.env.HEDGEHOG_E2E === "1";
 let runtimeState;
@@ -80,7 +83,7 @@ function createWindow() {
 
   window.setAlwaysOnTop(true, "floating");
   window.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
-  window.setIgnoreMouseEvents(!e2eMode, { forward: true });
+  window.setIgnoreMouseEvents(true, { forward: true });
   window.hedgehogHitAreas = [];
   window.hedgehogUIInteractive = false;
   void window.loadFile(path.join(directory, "index.html"));
@@ -124,33 +127,23 @@ async function runMacOSE2E(window) {
       beforePath,
       (await window.webContents.capturePage()).toPNG()
     );
-    const start = {
+    const localStart = {
       x: Math.round((landed.sprite.minX + landed.sprite.maxX) / 2),
       y: Math.round((landed.sprite.minY + landed.sprite.maxY) / 2),
     };
-    window.webContents.sendInputEvent({ type: "mouseMove", ...start });
-    window.webContents.sendInputEvent({
-      type: "mouseDown",
-      ...start,
-      button: "left",
-      clickCount: 1,
-    });
-    for (let step = 1; step <= 8; step++) {
-      window.webContents.sendInputEvent({
-        type: "mouseMove",
-        x: start.x + step * 15,
-        y: start.y - step * 10,
-        button: "left",
-      });
-      await new Promise((resolve) => setTimeout(resolve, 50));
-    }
-    window.webContents.sendInputEvent({
-      type: "mouseUp",
-      x: start.x + 120,
-      y: start.y - 80,
-      button: "left",
-      clickCount: 1,
-    });
+    const contentBounds = window.getContentBounds();
+    const start = {
+      x: contentBounds.x + localStart.x,
+      y: contentBounds.y + localStart.y,
+    };
+    const dragExecutable = process.env.HEDGEHOG_E2E_DRAG_EXECUTABLE;
+    if (!dragExecutable) throw new Error("Missing native drag executable");
+    await execute(dragExecutable, [
+      String(start.x),
+      String(start.y),
+      String(start.x + 120),
+      String(start.y - 80),
+    ]);
     const dragged = await waitForRuntimeState(
       (state) => Math.abs(state.position.x - landed.position.x) > 40
     );
@@ -221,7 +214,6 @@ app.whenReady().then(() => {
   screen.on("display-metrics-changed", rebuildWindows);
   setInterval(() => {
     if (process.platform !== "darwin") return;
-    if (e2eMode) return;
     const cursor = screen.getCursorScreenPoint();
     for (const window of windows) {
       const interactive =

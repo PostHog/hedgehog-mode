@@ -35,11 +35,11 @@ async function loadState() {
 
 function desktopLayout(actualBounds) {
   const displays = screen.getAllDisplays();
-  const virtualDesktop = getVirtualDesktop(displays);
+  const virtualDesktop = getVirtualDesktop(displays, process.platform);
   const bounds = actualBounds ?? virtualDesktop.bounds;
   return {
     bounds,
-    floors: getDisplayFloors(displays, bounds),
+    floors: getDisplayFloors(displays, bounds, process.platform),
   };
 }
 
@@ -65,7 +65,8 @@ function createWindow() {
     show: enabled,
     alwaysOnTop: true,
     hasShadow: false,
-    focusable: false,
+    focusable: true,
+    acceptFirstMouse: true,
     enableLargerThanScreen: true,
     webPreferences: {
       preload: path.join(directory, "preload.cjs"),

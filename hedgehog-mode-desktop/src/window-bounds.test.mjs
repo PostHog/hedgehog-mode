@@ -10,30 +10,51 @@ import {
 
 test("uses the display work area so the hedgehog stays above the taskbar", () => {
   assert.deepEqual(
-    getDesktopBounds({
-      bounds: { x: 0, y: 0, width: 1920, height: 1080 },
-      workArea: { x: 0, y: 0, width: 1920, height: 1040 },
-    }),
+    getDesktopBounds(
+      {
+        bounds: { x: 0, y: 0, width: 1920, height: 1080 },
+        workArea: { x: 0, y: 0, width: 1920, height: 1040 },
+      },
+      "win32"
+    ),
     { x: 0, y: 0, width: 1920, height: 1040 }
   );
 });
 
+test("uses the full macOS display so an auto-hidden Dock leaves no gap", () => {
+  const display = {
+    bounds: { x: 0, y: 0, width: 1728, height: 1117 },
+    workArea: { x: 0, y: 25, width: 1728, height: 987 },
+  };
+
+  assert.deepEqual(getDesktopBounds(display, "darwin"), display.bounds);
+  assert.deepEqual(getDisplayFloors([display], display.bounds, "darwin"), [
+    { x: 0, y: 1116, width: 1728 },
+  ]);
+});
+
 test("keeps the coordinates of a display to the left of the primary display", () => {
   assert.deepEqual(
-    getDesktopBounds({
-      workArea: { x: -1280, y: 40, width: 1280, height: 984 },
-    }),
+    getDesktopBounds(
+      {
+        workArea: { x: -1280, y: 40, width: 1280, height: 984 },
+      },
+      "win32"
+    ),
     { x: -1280, y: 40, width: 1280, height: 984 }
   );
 });
 
 test("combines all displays into one desktop with a floor per screen", () => {
   assert.deepEqual(
-    getVirtualDesktop([
-      { workArea: { x: -1280, y: 56, width: 1280, height: 968 } },
-      { workArea: { x: 0, y: 0, width: 1920, height: 1040 } },
-      { workArea: { x: 1920, y: 120, width: 1440, height: 900 } },
-    ]),
+    getVirtualDesktop(
+      [
+        { workArea: { x: -1280, y: 56, width: 1280, height: 968 } },
+        { workArea: { x: 0, y: 0, width: 1920, height: 1040 } },
+        { workArea: { x: 1920, y: 120, width: 1440, height: 900 } },
+      ],
+      "win32"
+    ),
     {
       bounds: { x: -1280, y: 0, width: 4640, height: 1040 },
       floors: [
@@ -46,10 +67,13 @@ test("combines all displays into one desktop with a floor per screen", () => {
 });
 
 test("keeps every one-pixel floor inside the virtual desktop", () => {
-  const layout = getVirtualDesktop([
-    { workArea: { x: 0, y: 0, width: 1920, height: 1040 } },
-    { workArea: { x: 1920, y: 80, width: 1280, height: 900 } },
-  ]);
+  const layout = getVirtualDesktop(
+    [
+      { workArea: { x: 0, y: 0, width: 1920, height: 1040 } },
+      { workArea: { x: 1920, y: 80, width: 1280, height: 900 } },
+    ],
+    "win32"
+  );
 
   assert.equal(
     layout.floors.every(
@@ -63,7 +87,8 @@ test("positions floors relative to the actual Electron content bounds", () => {
   assert.deepEqual(
     getDisplayFloors(
       [{ workArea: { x: 0, y: 24, width: 1920, height: 1016 } }],
-      { x: 0, y: 24, width: 1920, height: 1016 }
+      { x: 0, y: 24, width: 1920, height: 1016 },
+      "win32"
     ),
     [{ x: 0, y: 1015, width: 1920 }]
   );

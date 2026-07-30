@@ -1,35 +1,44 @@
-export function getDesktopBounds(display) {
+export function getDisplayArea(display, platform = process.platform) {
+  return platform === "darwin" ? display.bounds : display.workArea;
+}
+
+export function getDesktopBounds(display, platform = process.platform) {
+  const area = getDisplayArea(display, platform);
   return {
-    x: display.workArea.x,
-    y: display.workArea.y,
-    width: display.workArea.width,
-    height: display.workArea.height,
+    x: area.x,
+    y: area.y,
+    width: area.width,
+    height: area.height,
   };
 }
 
-export function getVirtualDesktop(displays) {
-  const left = Math.min(...displays.map((display) => display.workArea.x));
-  const top = Math.min(...displays.map((display) => display.workArea.y));
-  const right = Math.max(
-    ...displays.map((display) => display.workArea.x + display.workArea.width)
-  );
-  const bottom = Math.max(
-    ...displays.map((display) => display.workArea.y + display.workArea.height)
-  );
+export function getVirtualDesktop(displays, platform = process.platform) {
+  const areas = displays.map((display) => getDisplayArea(display, platform));
+  const left = Math.min(...areas.map((area) => area.x));
+  const top = Math.min(...areas.map((area) => area.y));
+  const right = Math.max(...areas.map((area) => area.x + area.width));
+  const bottom = Math.max(...areas.map((area) => area.y + area.height));
 
   const bounds = { x: left, y: top, width: right - left, height: bottom - top };
   return {
     bounds,
-    floors: getDisplayFloors(displays, bounds),
+    floors: getDisplayFloors(displays, bounds, platform),
   };
 }
 
-export function getDisplayFloors(displays, viewportBounds) {
-  return displays.map((display) => ({
-    x: display.workArea.x - viewportBounds.x,
-    y: display.workArea.y - viewportBounds.y + display.workArea.height - 1,
-    width: display.workArea.width,
-  }));
+export function getDisplayFloors(
+  displays,
+  viewportBounds,
+  platform = process.platform
+) {
+  return displays.map((display) => {
+    const area = getDisplayArea(display, platform);
+    return {
+      x: area.x - viewportBounds.x,
+      y: area.y - viewportBounds.y + area.height - 1,
+      width: area.width,
+    };
+  });
 }
 
 export function getVisibleFloorSegments(floors, viewportWidth, viewportHeight) {

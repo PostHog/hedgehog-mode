@@ -8,9 +8,7 @@ A playful PixiJS-powered hedgehog game you can drop into any React app. Your DOM
 
 ## Desktop app
 
-Hedgehog Mode can also live on your Windows, macOS, or Linux desktop, above your wallpaper and below your patience. It stays out of the way of other apps, supports multiple displays and macOS Spaces, remembers customization, and lives in the system tray or menu bar.
-
-On Windows and macOS, the desktop app treats the top edges of visible application windows as physics platforms. Its status is shown in the system tray or menu-bar menu. Linux supports display floors but not application-window platforms.
+Hedgehog Mode can also live on your Windows or macOS desktop, above your wallpaper and below your patience. It stays out of the way of other apps, supports multiple displays and macOS Spaces, remembers customization, and lives in the system tray or menu bar.
 
 Build the installer on its target operating system:
 
@@ -18,12 +16,9 @@ Build the installer on its target operating system:
 pnpm install
 pnpm build:windows # Windows
 pnpm build:macos   # macOS
-pnpm build:linux   # Linux AppImage
 ```
 
 The installer is written to `hedgehog-mode-desktop/release/`. For local development, run `pnpm --dir hedgehog-mode-desktop dev`.
-
-Run the Linux AppImage directly. If it is not executable after downloading, run `chmod +x Hedgehog-Mode-*.AppImage` first.
 
 Pull request macOS artifacts are unsigned test builds. Follow [`MACOS-TESTING.md`](./hedgehog-mode-desktop/MACOS-TESTING.md) if Gatekeeper reports that the downloaded app is damaged. Public releases must be signed and notarized with an Apple Developer certificate.
 

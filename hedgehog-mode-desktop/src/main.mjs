@@ -86,13 +86,89 @@ function createWindow() {
   window.setIgnoreMouseEvents(true, { forward: true });
   window.hedgehogHitAreas = [];
   window.hedgehogUIInteractive = false;
+  if (process.platform === "darwin") {
+    window.interactionWindow = createInteractionWindow(window);
+  }
   void window.loadFile(
     path.join(directory, "index.html"),
     e2eMode ? { query: { e2e: "1" } } : undefined
   );
   if (e2eMode) void runMacOSE2E(window);
-  window.on("closed", () => windows.delete(window));
+  window.on("closed", () => {
+    if (window.interactionWindow && !window.interactionWindow.isDestroyed()) {
+      window.interactionWindow.destroy();
+    }
+    windows.delete(window);
+  });
   windows.add(window);
+}
+
+function createInteractionWindow(owner) {
+  const interactionWindow = new BrowserWindow({
+    x: owner.getBounds().x,
+    y: owner.getBounds().y,
+    width: 1,
+    height: 1,
+    transparent: true,
+    frame: false,
+    resizable: false,
+    skipTaskbar: true,
+    show: false,
+    alwaysOnTop: true,
+    focusable: true,
+    acceptFirstMouse: true,
+    hasShadow: false,
+    webPreferences: {
+      preload: path.join(directory, "interaction-preload.cjs"),
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true,
+    },
+  });
+  interactionWindow.ownerWindow = owner;
+  interactionWindow.loadURL(
+    "data:text/html,<style>html,body{margin:0;width:100%;height:100%;background:transparent}</style>"
+  );
+  interactionWindow.setAlwaysOnTop(true, "floating");
+  interactionWindow.setVisibleOnAllWorkspaces(true, {
+    visibleOnFullScreen: true,
+  });
+  return interactionWindow;
+}
+
+function positionInteractionWindow(owner) {
+  const interactionWindow = owner.interactionWindow;
+  if (!interactionWindow || interactionWindow.isDestroyed()) return;
+  if (owner.hedgehogUIInteractive || interactionWindow.dragging) {
+    interactionWindow.setBounds(owner.getContentBounds());
+    interactionWindow.showInactive();
+    return;
+  }
+  if (owner.hedgehogHitAreas.length === 0) {
+    interactionWindow.hide();
+    return;
+  }
+  const area = owner.hedgehogHitAreas.reduce(
+    (bounds, candidate) => ({
+      min: {
+        x: Math.min(bounds.min.x, candidate.min.x),
+        y: Math.min(bounds.min.y, candidate.min.y),
+      },
+      max: {
+        x: Math.max(bounds.max.x, candidate.max.x),
+        y: Math.max(bounds.max.y, candidate.max.y),
+      },
+    }),
+    owner.hedgehogHitAreas[0]
+  );
+  const contentBounds = owner.getContentBounds();
+  interactionWindow.setBounds({
+    x: Math.round(contentBounds.x + area.min.x),
+    y: Math.round(contentBounds.y + area.min.y),
+    width: Math.max(1, Math.round(area.max.x - area.min.x)),
+    height: Math.max(1, Math.round(area.max.y - area.min.y)),
+  });
+  interactionWindow.showInactive();
 }
 
 async function waitForRuntimeState(predicate, timeout = 10000) {
@@ -240,6 +316,7 @@ app.whenReady().then(() => {
   screen.on("display-metrics-changed", rebuildWindows);
   setInterval(() => {
     if (process.platform !== "darwin") return;
+    if ([...windows].some((window) => window.interactionWindow)) return;
     const cursor = screen.getCursorScreenPoint();
     for (const window of windows) {
       const wasInteractive = window.hedgehogMouseInteractive;
@@ -297,6 +374,7 @@ ipcMain.on("window:set-interactive", (event, interactive) => {
   const window = BrowserWindow.fromWebContents(event.sender);
   if (window) {
     window.hedgehogUIInteractive = interactive;
+    positionInteractionWindow(window);
     if (process.platform !== "darwin") {
       window.setIgnoreMouseEvents(!interactive, {
         forward: true,
@@ -306,7 +384,46 @@ ipcMain.on("window:set-interactive", (event, interactive) => {
 });
 ipcMain.on("window:update-hit-areas", (event, areas) => {
   const window = BrowserWindow.fromWebContents(event.sender);
-  if (window) window.hedgehogHitAreas = areas;
+  if (window) {
+    window.hedgehogHitAreas = areas;
+    positionInteractionWindow(window);
+  }
+});
+ipcMain.on("interaction:hover", (event, hovering) => {
+  const interactionWindow = BrowserWindow.fromWebContents(event.sender);
+  const owner = interactionWindow?.ownerWindow;
+  if (owner) owner.hedgehogMouseInteractive = hovering;
+});
+ipcMain.on("interaction:pointer", (event, pointer) => {
+  const interactionWindow = BrowserWindow.fromWebContents(event.sender);
+  const owner = interactionWindow?.ownerWindow;
+  if (!owner || !interactionWindow) return;
+  const interactionBounds = interactionWindow.getContentBounds();
+  const ownerBounds = owner.getContentBounds();
+  const input = {
+    x: interactionBounds.x + pointer.x - ownerBounds.x,
+    y: interactionBounds.y + pointer.y - ownerBounds.y,
+    button: "left",
+  };
+  if (pointer.type === "pointerdown") {
+    interactionWindow.dragging = true;
+    owner.webContents.sendInputEvent({
+      type: "mouseDown",
+      ...input,
+      clickCount: 1,
+    });
+    positionInteractionWindow(owner);
+  } else if (pointer.type === "pointermove") {
+    owner.webContents.sendInputEvent({ type: "mouseMove", ...input });
+  } else {
+    owner.webContents.sendInputEvent({
+      type: "mouseUp",
+      ...input,
+      clickCount: 1,
+    });
+    interactionWindow.dragging = false;
+    positionInteractionWindow(owner);
+  }
 });
 ipcMain.on("e2e:runtime-state", (_event, state) => {
   runtimeState = state;

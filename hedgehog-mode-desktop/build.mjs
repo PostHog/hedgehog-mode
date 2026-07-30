@@ -32,5 +32,6 @@ await Promise.all([
   }),
   copyFile("src/index.html", "dist/index.html"),
   copyFile("src/preload.cjs", "dist/preload.cjs"),
+  copyFile("src/interaction-preload.cjs", "dist/interaction-preload.cjs"),
   copyMacOSWindowHelper(),
 ]);

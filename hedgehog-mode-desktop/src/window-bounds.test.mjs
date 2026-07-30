@@ -33,6 +33,30 @@ test("uses the full macOS display so an auto-hidden Dock leaves no gap", () => {
   ]);
 });
 
+test("keeps adjacent macOS displays connected below their Dock work areas", () => {
+  const layout = getVirtualDesktop(
+    [
+      {
+        bounds: { x: 0, y: 0, width: 1728, height: 1117 },
+        workArea: { x: 0, y: 25, width: 1728, height: 987 },
+      },
+      {
+        bounds: { x: 1728, y: 0, width: 1920, height: 1080 },
+        workArea: { x: 1728, y: 25, width: 1920, height: 955 },
+      },
+    ],
+    "darwin"
+  );
+
+  assert.deepEqual(layout, {
+    bounds: { x: 0, y: 0, width: 3648, height: 1117 },
+    floors: [
+      { x: 0, y: 1116, width: 1728 },
+      { x: 1728, y: 1079, width: 1920 },
+    ],
+  });
+});
+
 test("keeps the coordinates of a display to the left of the primary display", () => {
   assert.deepEqual(
     getDesktopBounds(

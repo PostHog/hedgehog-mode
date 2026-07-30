@@ -148,7 +148,19 @@ async function runMacOSE2E(window) {
       String(start.y),
       "--move-only",
     ]);
-    await waitForRuntimeState(() => window.hedgehogMouseInteractive, 2000);
+    try {
+      await waitForRuntimeState(() => window.hedgehogMouseInteractive, 2000);
+    } catch {
+      throw new Error(
+        `Cursor missed hedgehog: ${JSON.stringify({
+          requestedCursor: start,
+          actualCursor: screen.getCursorScreenPoint(),
+          windowBounds: window.getBounds(),
+          contentBounds,
+          hitAreas: window.hedgehogHitAreas,
+        })}`
+      );
+    }
     await execute(dragExecutable, [
       String(start.x),
       String(start.y),

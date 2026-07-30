@@ -242,12 +242,33 @@ async function runMacOSE2E(window) {
         })}`
       );
     }
-    await execute(dragExecutable, [
-      String(start.x),
-      String(start.y),
-      String(start.x + 120),
-      String(start.y - 80),
-    ]);
+    const interactionWindow = window.interactionWindow;
+    if (!interactionWindow) throw new Error("Missing interaction window");
+    const sendInteractionInput = (type, point, options = {}) => {
+      const bounds = interactionWindow.getContentBounds();
+      interactionWindow.webContents.sendInputEvent({
+        type,
+        x: point.x - bounds.x,
+        y: point.y - bounds.y,
+        button: "left",
+        ...options,
+      });
+    };
+    sendInteractionInput("mouseMove", start);
+    sendInteractionInput("mouseDown", start, { clickCount: 1 });
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    for (let step = 1; step <= 8; step++) {
+      sendInteractionInput("mouseMove", {
+        x: start.x + step * 15,
+        y: start.y - step * 10,
+      });
+      await new Promise((resolve) => setTimeout(resolve, 50));
+    }
+    sendInteractionInput(
+      "mouseUp",
+      { x: start.x + 120, y: start.y - 80 },
+      { clickCount: 1 }
+    );
     const dragged = await waitForRuntimeState(
       (state) =>
         state.position.x - landed.position.x > 40 &&

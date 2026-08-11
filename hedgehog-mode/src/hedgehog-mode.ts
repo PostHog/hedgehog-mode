@@ -56,20 +56,30 @@ export class HedgeHogMode implements HedgehogModeInterface {
   gameUI!: GameUI;
   stateManager?: GameStateManager;
   syncPlatformsInterval?: NodeJS.Timeout;
+  private destroyed = false; // destroy() has been requested
 
   constructor(public options: HedgehogModeConfig) {
     this.spritesManager = new SpritesManager(options);
     this.setupDebugListeners();
   }
 
+  get isDestroyed(): boolean {
+    return this.destroyed;
+  }
+
   destroy(): void {
+    if (this.destroyed) {
+      return;
+    }
+    this.destroyed = true;
     if (this.syncPlatformsInterval) {
       clearInterval(this.syncPlatformsInterval);
     }
     Runner.stop(this.runner);
-    this.app.destroy({
-      removeView: true,
-    });
+    // Before app.init() resolves this is a no-op and render() finishes the
+    // teardown once init() settles. After init (e.g. during the sprite load)
+    // it destroys the app right here.
+    this.destroyApp();
     if (this.debugRender) {
       Render.stop(this.debugRender);
       Matter.World.clear(this.engine.world, false);
@@ -78,6 +88,19 @@ export class HedgeHogMode implements HedgehogModeInterface {
       this.debugRender.canvas = document.createElement("canvas");
       this.debugRender.context = this.debugRender.canvas.getContext("2d")!;
       this.debugRender.textures = {};
+    }
+  }
+
+  // Tears down the Pixi app at most once, and never before init() finishes.
+  // app.renderer is assigned by init() and nulled by destroy(), so a truthy
+  // renderer means "initialized and not yet torn down". Destroying earlier
+  // throws (ResizePlugin._cancelResize isn't assigned until init()), and
+  // destroying twice throws too. This guard rules out both.
+  private destroyApp(): void {
+    if (this.app?.renderer) {
+      this.app.destroy({
+        removeView: true,
+      });
     }
   }
 
@@ -156,6 +179,12 @@ export class HedgeHogMode implements HedgehogModeInterface {
   }
 
   async render(ref: HTMLDivElement): Promise<void> {
+    if (this.destroyed) {
+      // A destroyed instance is single-use. Rendering again would init a
+      // fresh Pixi app that destroy() has already run for, so nothing would
+      // ever tear it down.
+      return;
+    }
     this.ref = ref;
 
     this.setPointerEvents(false);
@@ -219,8 +248,18 @@ export class HedgeHogMode implements HedgehogModeInterface {
       antialias: false,
       roundPixels: false,
     });
+    if (this.destroyed) {
+      // The host unmounted while Pixi was still initializing, so destroy()
+      // deferred the app teardown to us. Finish it here and stop building.
+      this.destroyApp();
+      return;
+    }
 
     await this.spritesManager.load();
+    if (this.destroyed) {
+      this.destroyApp();
+      return;
+    }
     ref.appendChild(this.app.canvas);
 
     this.app.stage.eventMode = "static";

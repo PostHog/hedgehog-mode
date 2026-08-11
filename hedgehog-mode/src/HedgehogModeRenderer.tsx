@@ -68,6 +68,10 @@ export function HedgehogModeRenderer({
     const hedgeHogMode = new HedgeHogMode(config);
     setGame(hedgeHogMode);
     await hedgeHogMode.render(container);
+    if (hedgeHogMode.isDestroyed) {
+      // Unmounted while loading, so don't hand the host a dead instance
+      return;
+    }
     onGameReady?.(hedgeHogMode);
   };
 

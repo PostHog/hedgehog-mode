@@ -63,6 +63,10 @@ export class HedgeHogMode implements HedgehogModeInterface {
     this.setupDebugListeners();
   }
 
+  get isDestroyed(): boolean {
+    return this.destroyed;
+  }
+
   destroy(): void {
     if (this.destroyed) {
       return;
@@ -72,8 +76,9 @@ export class HedgeHogMode implements HedgehogModeInterface {
       clearInterval(this.syncPlatformsInterval);
     }
     Runner.stop(this.runner);
-    // If we're still initializing, destroyApp() is a no-op and render() tears
-    // the app down once init() resolves.
+    // Before app.init() resolves this is a no-op and render() finishes the
+    // teardown once init() settles. After init (e.g. during the sprite load)
+    // it destroys the app right here.
     this.destroyApp();
     if (this.debugRender) {
       Render.stop(this.debugRender);
@@ -88,7 +93,7 @@ export class HedgeHogMode implements HedgehogModeInterface {
 
   // Tears down the Pixi app at most once, and never before init() finishes.
   // app.renderer is assigned by init() and nulled by destroy(), so a truthy
-  // renderer means "initialized and not yet torn down" — destroying earlier
+  // renderer means "initialized and not yet torn down". Destroying earlier
   // throws (ResizePlugin._cancelResize isn't assigned until init()), and
   // destroying twice throws too. This guard rules out both.
   private destroyApp(): void {
@@ -174,6 +179,12 @@ export class HedgeHogMode implements HedgehogModeInterface {
   }
 
   async render(ref: HTMLDivElement): Promise<void> {
+    if (this.destroyed) {
+      // A destroyed instance is single-use. Rendering again would init a
+      // fresh Pixi app that destroy() has already run for, so nothing would
+      // ever tear it down.
+      return;
+    }
     this.ref = ref;
 
     this.setPointerEvents(false);
@@ -238,8 +249,8 @@ export class HedgeHogMode implements HedgehogModeInterface {
       roundPixels: false,
     });
     if (this.destroyed) {
-      // The host unmounted while Pixi was still initializing — destroy()
-      // deferred the app teardown to us, so finish it here and stop building.
+      // The host unmounted while Pixi was still initializing, so destroy()
+      // deferred the app teardown to us. Finish it here and stop building.
       this.destroyApp();
       return;
     }

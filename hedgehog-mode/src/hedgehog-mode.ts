@@ -56,6 +56,7 @@ export class HedgeHogMode implements HedgehogModeInterface {
   gameUI!: GameUI;
   stateManager?: GameStateManager;
   syncPlatformsInterval?: NodeJS.Timeout;
+  private destroyed = false; // destroy() has been requested
 
   constructor(public options: HedgehogModeConfig) {
     this.spritesManager = new SpritesManager(options);
@@ -63,13 +64,17 @@ export class HedgeHogMode implements HedgehogModeInterface {
   }
 
   destroy(): void {
+    if (this.destroyed) {
+      return;
+    }
+    this.destroyed = true;
     if (this.syncPlatformsInterval) {
       clearInterval(this.syncPlatformsInterval);
     }
     Runner.stop(this.runner);
-    this.app.destroy({
-      removeView: true,
-    });
+    // If we're still initializing, destroyApp() is a no-op and render() tears
+    // the app down once init() resolves.
+    this.destroyApp();
     if (this.debugRender) {
       Render.stop(this.debugRender);
       Matter.World.clear(this.engine.world, false);
@@ -78,6 +83,19 @@ export class HedgeHogMode implements HedgehogModeInterface {
       this.debugRender.canvas = document.createElement("canvas");
       this.debugRender.context = this.debugRender.canvas.getContext("2d")!;
       this.debugRender.textures = {};
+    }
+  }
+
+  // Tears down the Pixi app at most once, and never before init() finishes.
+  // app.renderer is assigned by init() and nulled by destroy(), so a truthy
+  // renderer means "initialized and not yet torn down" — destroying earlier
+  // throws (ResizePlugin._cancelResize isn't assigned until init()), and
+  // destroying twice throws too. This guard rules out both.
+  private destroyApp(): void {
+    if (this.app?.renderer) {
+      this.app.destroy({
+        removeView: true,
+      });
     }
   }
 
@@ -219,8 +237,18 @@ export class HedgeHogMode implements HedgehogModeInterface {
       antialias: false,
       roundPixels: false,
     });
+    if (this.destroyed) {
+      // The host unmounted while Pixi was still initializing — destroy()
+      // deferred the app teardown to us, so finish it here and stop building.
+      this.destroyApp();
+      return;
+    }
 
     await this.spritesManager.load();
+    if (this.destroyed) {
+      this.destroyApp();
+      return;
+    }
     ref.appendChild(this.app.canvas);
 
     this.app.stage.eventMode = "static";

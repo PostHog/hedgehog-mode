@@ -75,6 +75,13 @@ export class HedgeHogMode implements HedgehogModeInterface {
     if (this.syncPlatformsInterval) {
       clearInterval(this.syncPlatformsInterval);
     }
+    // Unload every element while the stage is still alive so listener-owning
+    // abilities detach — notably the spiderhog skin's global pointerdown, which
+    // would otherwise survive teardown and spawn a web onto a destroyed app.
+    for (const element of [...this.elements]) {
+      element.beforeUnload?.();
+    }
+    this.elements = [];
     Runner.stop(this.runner);
     // Before app.init() resolves this is a no-op and render() finishes the
     // teardown once init() settles. After init (e.g. during the sprite load)
@@ -378,7 +385,7 @@ export class HedgeHogMode implements HedgehogModeInterface {
     if (element.rigidBody) {
       Matter.Composite.remove(this.engine.world, element.rigidBody);
     }
-    if (element.sprite) {
+    if (element.sprite && this.app?.stage) {
       this.app.stage.removeChild(element.sprite);
     }
     this.elements = this.elements.filter((el) => el != element);

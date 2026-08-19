@@ -38,6 +38,15 @@ const cheatSheetMessages: GameUIProps["messages"] = [
   },
   {
     words: [
+      "go",
+      { text: "rampage", style: { color: "red", fontWeight: "bold" } },
+      "and everything i land on falls off your page.",
+      { text: "earthquake", style: { color: "orange" } },
+      "does the lot at once",
+    ],
+  },
+  {
+    words: [
       "become",
       { text: "spiderhog", style: { color: "red" } },
       "or go",
@@ -301,10 +310,54 @@ export class HedgehogActorInterface {
     cheatSheetMessages,
   ];
 
+  // Said once, at the top of a rampage, by way of justification.
+  private rampageMessages: GameUIProps["messages"][] = [
+    [
+      {
+        words: [
+          "move fast and",
+          { text: "break things", style: { fontWeight: "bold", color: "red" } },
+        ],
+      },
+    ],
+    [
+      {
+        words: [
+          "i'm not breaking your site, i'm",
+          { text: "a/b testing gravity", style: { fontStyle: "italic" } },
+        ],
+      },
+    ],
+    [{ words: ["this button wasn't converting anyway"] }],
+    [
+      {
+        words: [
+          "shipping a",
+          { text: "bold new layout", style: { fontStyle: "italic" } },
+          "in production. no rollback plan",
+        ],
+      },
+    ],
+    [{ words: ["ben said the design was final. ben was wrong"] }],
+  ];
+
   constructor(
     private game: HedgehogModeInterface,
     private actor: HedgehogActor
   ) {}
+
+  /** One line of self-justification as a rampage kicks off. */
+  announceRampage(): void {
+    const messages = sample(this.rampageMessages);
+
+    if (messages?.[0]) {
+      this.game.gameUI?.flash({
+        words: messages[0].words,
+        actor: this.actor,
+        duration: 4000,
+      });
+    }
+  }
 
   onClick(): void {
     const selectedMessages = sample(this.messages);

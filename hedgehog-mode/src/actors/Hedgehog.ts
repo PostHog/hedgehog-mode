@@ -6,6 +6,7 @@ import {
 import { HedgehogModeInterface, GameElement, UpdateTicker } from "../types";
 import Matter, { Pair } from "matter-js";
 import { SyncedPlatform } from "../items/SyncedPlatform";
+import { ShovedElement } from "../items/ShovedElement";
 import { AnimatedSprite, ColorMatrixFilter, Sprite } from "pixi.js";
 import { FlameActor } from "../items/Flame";
 import gsap from "gsap";
@@ -24,6 +25,13 @@ import type { SpiderWebActor } from "../items/SpiderWebActor";
 // zero velocities at the bottom and apexes of a swing don't make him flicker.
 const SWING_FACING_VELOCITY = 2;
 
+// How long a rampage lasts before he calms down and pretends it never happened.
+const RAMPAGE_DURATION_MS = 20000;
+// Beat of standing still at the start, so the headband flourish is visible.
+const RAMPAGE_INTRO_MS = 1200;
+// Minimum landing speed that counts as a stomp rather than a gentle arrival.
+const STOMP_VELOCITY = 4;
+
 export class HedgehogActor extends Actor {
   jumps = 0;
   walkSpeed = 0;
@@ -33,6 +41,9 @@ export class HedgehogActor extends Actor {
   // Climb intent while web-slinging: 1 = up the web, -1 = down, 0 = hold. Set by
   // the controls and read by the attached SpiderWebActor.
   webClimbDirection: -1 | 0 | 1 = 0;
+  private rampageTimer?: NodeJS.Timeout;
+  // Holds the rampage flourish on screen; see the animation block in update().
+  private posing = false;
   private ability?: HedgehogSkinAbility;
   // The skin `ability` was built for, so we only rebuild on real skin changes.
   private abilitySkin?: HedgehogActorOptions["skin"];
@@ -266,6 +277,63 @@ export class HedgehogActor extends Actor {
     });
   }
 
+  /** Whether he's currently treating your layout as a bouncy castle. */
+  get isRampaging(): boolean {
+    return !!this.rampageTimer;
+  }
+
+  /**
+   * Send him on a rampage: for the next little while, anything he lands on gets
+   * knocked off the page. Calling it again while one is running just extends it.
+   */
+  startRampage(duration: number = RAMPAGE_DURATION_MS): void {
+    if (this.isDead) {
+      return;
+    }
+
+    const alreadyRampaging = this.isRampaging;
+    clearTimeout(this.rampageTimer);
+    this.rampageTimer = setTimeout(() => {
+      this.rampageTimer = undefined;
+    }, duration);
+
+    if (!alreadyRampaging) {
+      // Stand still for the flourish, the way the AI does for a wave, and hold
+      // the pose: update() reasserts walk/fall every frame, so without both of
+      // these the headband is gone before anyone sees it.
+      this.walkSpeed = 0;
+      this.ai.pause(RAMPAGE_INTRO_MS);
+      this.posing = true;
+      // The headband animation has been sitting in the spritesheet this whole
+      // time waiting for exactly one occasion, and this is it.
+      this.updateSprite("action", {
+        reset: true,
+        loop: false,
+        onComplete: () => {
+          this.posing = false;
+          this.updateSprite("idle");
+        },
+      });
+      this.interface.announceRampage();
+    }
+  }
+
+  /** Knock a platform's element off the page, in the direction he's heading. */
+  private stomp(platform: SyncedPlatform): void {
+    const impact = Math.max(STOMP_VELOCITY, this.rigidBody!.velocity.y);
+    const sideways = this.getDirection() === "left" ? -1 : 1;
+
+    ShovedElement.shove(
+      this.game,
+      platform.ref,
+      {
+        x: sideways * (2 + Math.random() * 4),
+        y: impact * 0.8,
+      },
+      sideways * (0.1 + Math.random() * 0.2)
+    );
+  }
+
   jump(): void {
     if (this.isWebSlinging) {
       return;
@@ -352,7 +420,11 @@ export class HedgehogActor extends Actor {
 
     // Set the appropriate animation
     if (!this.getGround()) {
+      // Falling outranks everything, including a dramatic pose.
+      this.posing = false;
       this.updateSprite("fall");
+    } else if (this.posing) {
+      // Hold the current frame until the flourish finishes.
     } else if (Math.abs(this.rigidBody!.velocity.x) > 0.1) {
       // If horizontal movement is noticeable then walk
       this.updateSprite("walk");
@@ -438,6 +510,10 @@ export class HedgehogActor extends Actor {
     if (element.rigidBody!.bounds.min.y > this.rigidBody!.bounds.min.y) {
       this.game.log("Hit something below");
       this.jumps = 0;
+
+      if (this.isRampaging && element instanceof SyncedPlatform) {
+        this.stomp(element);
+      }
 
       if (element instanceof HedgehogActor) {
         const velocity = this.rigidBody!.velocity.y;
@@ -542,6 +618,7 @@ export class HedgehogActor extends Actor {
   }
 
   beforeUnload(): void {
+    clearTimeout(this.rampageTimer);
     this.ability?.destroy();
     this.ai.enable(false);
     Object.values(this.accessorySprites).forEach((sprite) => {

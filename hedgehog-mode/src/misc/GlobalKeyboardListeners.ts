@@ -4,6 +4,7 @@ import {
   getRandomAccessoryCombo,
   HedgehogActorColorOptions,
 } from "../actors/hedgehog/config";
+import { ShovedElement } from "../items/ShovedElement";
 
 export class GlobalKeyboardListeners {
   constructor(private game: HedgehogModeInterface) {
@@ -88,6 +89,16 @@ export class GlobalKeyboardListeners {
             skin: "robohog",
           });
         },
+      },
+      {
+        keys: ["r", "a", "m", "p", "a", "g", "e"],
+        action: () => {
+          this.game.getPlayableHedgehog()?.startRampage();
+        },
+      },
+      {
+        keys: ["e", "a", "r", "t", "h", "q", "u", "a", "k", "e"],
+        action: () => ShovedElement.earthquake(this.game),
       },
       {
         keys: ["c", "h", "e", "a", "t", "c", "o", "d", "e", "s"],

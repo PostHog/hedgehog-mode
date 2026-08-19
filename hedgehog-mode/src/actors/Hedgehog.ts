@@ -543,6 +543,7 @@ export class HedgehogActor extends Actor {
 
   beforeUnload(): void {
     this.ability?.destroy();
+    this.controls.destroy();
     this.ai.enable(false);
     Object.values(this.accessorySprites).forEach((sprite) => {
       this.game.app.stage.removeChild(sprite);

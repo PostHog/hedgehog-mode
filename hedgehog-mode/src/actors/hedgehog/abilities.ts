@@ -140,6 +140,8 @@ export class HogzillaAbility implements HedgehogSkinAbility {
 const BURN_DURATION_S = 3;
 const SPIN_ROTATIONS = 2;
 const SPARKS_PER_SECOND = 20;
+const SPIN_ANGLE = SPIN_ROTATIONS * Math.PI * 2;
+const SPARKS_PER_BURN = BURN_DURATION_S * SPARKS_PER_SECOND;
 const SPARK_SPEED = 8;
 // Fraction either side of SPARK_SPEED, so the ring of sparks isn't uniform.
 const SPARK_SPEED_JITTER = 0.25;
@@ -147,11 +149,11 @@ const SPARK_SPEED_JITTER = 0.25;
 const RIM_OFFSET = 0.3;
 
 export class CatherineWheelAbility implements HedgehogSkinAbility {
-  // Tweened 0 -> SPIN_ROTATIONS * 2PI by gsap and written onto the actor, which
+  // Tweened 0 -> SPIN_ANGLE by gsap and written onto the actor, which
   // is what actually rotates him (Actor.update copies forceAngle onto the body).
   private angle = 0;
   private burning = false;
-  private sparkInterval?: NodeJS.Timeout;
+  private sparksEmitted = 0;
 
   constructor(
     private actor: HedgehogActor,
@@ -167,21 +169,35 @@ export class CatherineWheelAbility implements HedgehogSkinAbility {
 
     this.burning = true;
     this.angle = 0;
+    this.sparksEmitted = 0;
 
     gsap.to(this, {
-      angle: SPIN_ROTATIONS * Math.PI * 2,
+      angle: SPIN_ANGLE,
       duration: BURN_DURATION_S,
       ease: "none",
       onUpdate: () => {
         this.actor.forceAngle = this.angle;
+        this.emitSparksDue();
       },
       onComplete: () => this.extinguish(),
     });
+  }
 
-    this.sparkInterval = setInterval(
-      () => this.emitSpark(),
-      1000 / SPARKS_PER_SECOND
-    );
+  /**
+   * Sparks are spread evenly over the burn and thrown along whatever angle the
+   * wheel has reached, so how many are owed is just how far the spin has got.
+   * Driving them off the tween rather than a timer of their own keeps the whole
+   * firework on the game's clock: they stop dead when the engine stops (which a
+   * torn-down game never restarts) and they stretch and shrink with setSpeed,
+   * exactly as the spin does.
+   */
+  private emitSparksDue(): void {
+    const due = Math.floor((this.angle / SPIN_ANGLE) * SPARKS_PER_BURN);
+
+    while (this.sparksEmitted < due) {
+      this.sparksEmitted++;
+      this.emitSpark();
+    }
   }
 
   private emitSpark(): void {
@@ -204,10 +220,6 @@ export class CatherineWheelAbility implements HedgehogSkinAbility {
   }
 
   private extinguish(): void {
-    if (this.sparkInterval) {
-      clearInterval(this.sparkInterval);
-      this.sparkInterval = undefined;
-    }
     this.actor.forceAngle = 0;
     this.angle = 0;
     this.burning = false;

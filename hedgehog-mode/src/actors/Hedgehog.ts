@@ -13,6 +13,7 @@ import gsap from "gsap";
 import { COLLISIONS } from "../misc/collisions";
 import { HedgehogActorAI } from "./hedgehog/ai";
 import { HedgehogActorControls } from "./hedgehog/controls";
+import { HedgehogAccessoryAbilities } from "./hedgehog/accessory-abilities";
 import { HedgehogActorOptions } from "./hedgehog/config";
 import { HedgehogActorInterface } from "./hedgehog/interface";
 import { applyStaticColor } from "./hedgehog/colors";
@@ -60,6 +61,7 @@ export class HedgehogActor extends Actor {
   controls: HedgehogActorControls;
   private filter = new ColorMatrixFilter();
   interface: HedgehogActorInterface;
+  accessoryAbilities: HedgehogAccessoryAbilities;
 
   hitBoxModifier = {
     left: 0.24,
@@ -80,6 +82,7 @@ export class HedgehogActor extends Actor {
     this.ai = new HedgehogActorAI(this);
     this.controls = new HedgehogActorControls(this);
     this.interface = new HedgehogActorInterface(game, this);
+    this.accessoryAbilities = new HedgehogAccessoryAbilities(this, game);
     this.setPosition({
       x: window.innerWidth * Math.random(),
       y: Math.random() * 200,
@@ -225,6 +228,7 @@ export class HedgehogActor extends Actor {
     this.syncAccessories();
     this.syncRigidBody();
     this.syncSkinAbility();
+    this.accessoryAbilities.sync();
   }
 
   public override setScale(scale: number): void {
@@ -513,6 +517,7 @@ export class HedgehogActor extends Actor {
   // Triggered by the `f` key; delegates to the skin's ability (hogzilla only).
   maybeSpawnFireball(): void {
     this.ability?.fire?.();
+    this.accessoryAbilities.fire();
   }
 
   onCollisionStart(element: GameElement, pair: Matter.Pair): void {
@@ -633,6 +638,7 @@ export class HedgehogActor extends Actor {
     clearTimeout(this.rampageTimer);
     this.ability?.destroy();
     this.controls.destroy();
+    this.accessoryAbilities.destroy();
     this.ai.enable(false);
     Object.values(this.accessorySprites).forEach((sprite) => {
       this.game.app.stage.removeChild(sprite);

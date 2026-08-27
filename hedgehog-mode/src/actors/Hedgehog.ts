@@ -514,7 +514,8 @@ export class HedgehogActor extends Actor {
     FlameActor.fireBurst(this.game, contact);
   }
 
-  // Triggered by the `f` key; delegates to the skin's ability (hogzilla only).
+  // Triggered by the `f` key; delegates to the skin's ability and to any
+  // abilities granted by worn accessories.
   maybeSpawnFireball(): void {
     this.ability?.fire?.();
     this.accessoryAbilities.fire();
@@ -606,6 +607,7 @@ export class HedgehogActor extends Actor {
     const accessories = this.options.accessories;
     this.options.accessories = [];
     this.syncAccessories();
+    this.accessoryAbilities.sync();
 
     accessories?.forEach((accessory) => {
       this.game.spawnAccessory(accessory, this.rigidBody!.position);

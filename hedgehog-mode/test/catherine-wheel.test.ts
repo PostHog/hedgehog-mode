@@ -6,8 +6,15 @@ import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 // still in their temporal dead zone at hoist time.
 const { tweens, spawnFireball, killTweensOf } = vi.hoisted(() => ({
   tweens: [] as Array<Record<string, any>>,
-  spawnFireball: vi.fn(),
-  killTweensOf: vi.fn(),
+  spawnFireball:
+    vi.fn<
+      (
+        game: unknown,
+        position: { x: number; y: number },
+        velocity: { x: number; y: number }
+      ) => void
+    >(),
+  killTweensOf: vi.fn<(target: unknown) => void>(),
 }));
 
 vi.mock("gsap", () => ({
@@ -78,7 +85,9 @@ describe("CatherineWheelAbility", () => {
     ability.fire();
     advance(1, true);
 
-    expect(spawnFireball).toHaveBeenCalledTimes(BURN_DURATION_S * SPARKS_PER_SECOND);
+    expect(spawnFireball).toHaveBeenCalledTimes(
+      BURN_DURATION_S * SPARKS_PER_SECOND
+    );
   });
 
   it("throws sparks outward from the hog", () => {
@@ -138,7 +147,9 @@ describe("CatherineWheelAbility", () => {
     advance(0.75, true);
 
     expect(tweens).toHaveLength(1);
-    expect(spawnFireball).toHaveBeenCalledTimes(BURN_DURATION_S * SPARKS_PER_SECOND);
+    expect(spawnFireball).toHaveBeenCalledTimes(
+      BURN_DURATION_S * SPARKS_PER_SECOND
+    );
   });
 
   it("can be lit again once it has burned out", () => {
@@ -149,7 +160,9 @@ describe("CatherineWheelAbility", () => {
     ability.fire();
     advance(1, true);
 
-    expect(spawnFireball).toHaveBeenCalledTimes(BURN_DURATION_S * SPARKS_PER_SECOND);
+    expect(spawnFireball).toHaveBeenCalledTimes(
+      BURN_DURATION_S * SPARKS_PER_SECOND
+    );
   });
 
   it("stops cleanly and can be destroyed twice", () => {

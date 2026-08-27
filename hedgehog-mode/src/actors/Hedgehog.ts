@@ -519,6 +519,9 @@ export class HedgehogActor extends Actor {
     const accessories = this.options.accessories;
     this.options.accessories = [];
     this.syncAccessories();
+    // Not the same call as the one updateOptions() made above: that one ran
+    // while the accessories were still on, so it had nothing to tear down. This
+    // is what stops a granted ability outliving the hog that was wearing it.
     this.accessoryAbilities.sync();
 
     accessories?.forEach((accessory) => {

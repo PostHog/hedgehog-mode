@@ -110,14 +110,19 @@ export const HedgehogActorAccessoryOptions = Object.keys(
 /**
  * The ability factory a given accessory grants, if any. The registry is left
  * un-annotated so `AccessoryKey` stays a literal union, which means indexing it
- * gives a union where only some members declare `createAbility`. Narrowing with
- * `in` gets at it without widening the registry or casting.
+ * gives a union where only some members declare `createAbility`. Reading it
+ * through a partial view gets at that member without widening the registry, and
+ * copes with a key that isn't in it at all: accessories are restored from
+ * unvalidated storage, so an unknown one must yield no ability rather than
+ * throw out of the actor constructor.
  */
 export const getAccessoryAbilityFactory = (
   accessory: HedgehogActorAccessoryOption
 ): HedgehogActorAccessoryInfo["createAbility"] => {
-  const info = HedgehogActorAccessories[accessory];
-  return "createAbility" in info ? info.createAbility : undefined;
+  const info = HedgehogActorAccessories[accessory] as
+    | Partial<HedgehogActorAccessoryInfo>
+    | undefined;
+  return info?.createAbility;
 };
 
 export const getRandomAccessoryCombo = (): HedgehogActorAccessoryOption[] => {

@@ -46,13 +46,14 @@ const makeActor = () => ({
   sprite: { width: 60 },
 });
 
-// Runs the burn the way gsap would: drive the recorded tween to `progress`,
-// then optionally complete it.
+// Runs the burn the way gsap would: drive the recorded tween to `progress` (an
+// absolute point in the burn, 0 -> 1) and tick it, then optionally complete it.
+// The tween is the ability's only clock — sparks included — so nothing here
+// touches the wall clock.
 const advance = (progress: number, complete = false) => {
   const tween = tweens[tweens.length - 1];
   tween.target.angle = tween.vars.angle * progress;
   tween.vars.onUpdate?.();
-  vi.advanceTimersByTime(BURN_DURATION_S * 1000 * progress);
   if (complete) {
     tween.vars.onComplete?.();
   }
@@ -82,9 +83,22 @@ describe("CatherineWheelAbility", () => {
   });
 
   it("emits a spark for every tick of the burn", () => {
+    // Driven frame by frame, as the engine drives it, rather than in one jump:
+    // the sparks have to come out steadily across the burn and the total must
+    // not drift over the ~180 updates a 3 second burn gets at 60fps.
+    const FRAMES = BURN_DURATION_S * 60;
     ability.fire();
-    advance(1, true);
 
+    for (let frame = 1; frame <= FRAMES / 2; frame++) {
+      advance(frame / FRAMES);
+    }
+    expect(spawnFireball).toHaveBeenCalledTimes(
+      (BURN_DURATION_S * SPARKS_PER_SECOND) / 2
+    );
+
+    for (let frame = FRAMES / 2 + 1; frame <= FRAMES; frame++) {
+      advance(frame / FRAMES, frame === FRAMES);
+    }
     expect(spawnFireball).toHaveBeenCalledTimes(
       BURN_DURATION_S * SPARKS_PER_SECOND
     );
@@ -144,7 +158,7 @@ describe("CatherineWheelAbility", () => {
     ability.fire();
     advance(0.25);
     ability.fire();
-    advance(0.75, true);
+    advance(1, true);
 
     expect(tweens).toHaveLength(1);
     expect(spawnFireball).toHaveBeenCalledTimes(
@@ -163,6 +177,23 @@ describe("CatherineWheelAbility", () => {
     expect(spawnFireball).toHaveBeenCalledTimes(
       BURN_DURATION_S * SPARKS_PER_SECOND
     );
+  });
+
+  it("emits nothing while the game is not driving it", () => {
+    // HedgeHogMode.destroy() stops the Matter runner and destroys the Pixi app
+    // without calling beforeUnload() on live elements, so a burning wheel is
+    // never torn down — the tween simply stops being ticked. Sparks must ride
+    // that same clock, or they spawn into a destroyed stage forever. This is
+    // also why `slow`/`fast` scale the burn: the tween is the only timebase.
+    ability.fire();
+    advance(0.5);
+    const emitted = spawnFireball.mock.calls.length;
+    expect(emitted).toBeGreaterThan(0);
+
+    // No destroy(), no extinguish — just a clock that stopped ticking.
+    vi.advanceTimersByTime(10 * BURN_DURATION_S * 1000);
+
+    expect(spawnFireball).toHaveBeenCalledTimes(emitted);
   });
 
   it("stops cleanly and can be destroyed twice", () => {

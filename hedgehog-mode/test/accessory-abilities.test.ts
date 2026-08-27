@@ -5,14 +5,20 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // `const` binding — otherwise the factory closes over a binding that is still in
 // its temporal dead zone at hoist time (Task 3 hit this exact trap with gsap).
 const { created } = vi.hoisted(() => ({
-  created: [] as Array<{ fire: ReturnType<typeof vi.fn>; destroy: ReturnType<typeof vi.fn> }>,
+  created: [] as Array<{
+    fire: ReturnType<typeof vi.fn>;
+    destroy: ReturnType<typeof vi.fn>;
+  }>,
 }));
 
 vi.mock("../src/actors/hedgehog/config", () => ({
   getAccessoryAbilityFactory: (accessory: string) =>
     accessory === "catherine-wheel"
       ? () => {
-          const ability = { fire: vi.fn(), destroy: vi.fn() };
+          const ability = {
+            fire: vi.fn<() => void>(),
+            destroy: vi.fn<() => void>(),
+          };
           created.push(ability);
           return ability;
         }
@@ -46,7 +52,10 @@ describe("HedgehogAccessoryAbilities", () => {
     // updateOptions() runs sync() on every change — colour, AI toggle, drag.
     // Rebuilding here would kill a firework mid-burn.
     const actor = makeActor(["catherine-wheel"]);
-    const abilities = new HedgehogAccessoryAbilities(actor as never, {} as never);
+    const abilities = new HedgehogAccessoryAbilities(
+      actor as never,
+      {} as never
+    );
 
     abilities.sync();
     abilities.sync();
@@ -58,7 +67,10 @@ describe("HedgehogAccessoryAbilities", () => {
 
   it("tears the ability down when the accessory comes off", () => {
     const actor = makeActor(["catherine-wheel"]);
-    const abilities = new HedgehogAccessoryAbilities(actor as never, {} as never);
+    const abilities = new HedgehogAccessoryAbilities(
+      actor as never,
+      {} as never
+    );
     abilities.sync();
 
     actor.options.accessories = [];
@@ -69,7 +81,10 @@ describe("HedgehogAccessoryAbilities", () => {
 
   it("fans fire out to every live ability", () => {
     const actor = makeActor(["catherine-wheel"]);
-    const abilities = new HedgehogAccessoryAbilities(actor as never, {} as never);
+    const abilities = new HedgehogAccessoryAbilities(
+      actor as never,
+      {} as never
+    );
     abilities.sync();
 
     abilities.fire();
@@ -79,7 +94,10 @@ describe("HedgehogAccessoryAbilities", () => {
 
   it("is a no-op when nothing grants an ability", () => {
     const actor = makeActor(["tophat"]);
-    const abilities = new HedgehogAccessoryAbilities(actor as never, {} as never);
+    const abilities = new HedgehogAccessoryAbilities(
+      actor as never,
+      {} as never
+    );
     abilities.sync();
 
     expect(() => abilities.fire()).not.toThrow();
@@ -88,7 +106,10 @@ describe("HedgehogAccessoryAbilities", () => {
 
   it("destroys everything and can be destroyed twice", () => {
     const actor = makeActor(["catherine-wheel"]);
-    const abilities = new HedgehogAccessoryAbilities(actor as never, {} as never);
+    const abilities = new HedgehogAccessoryAbilities(
+      actor as never,
+      {} as never
+    );
     abilities.sync();
 
     abilities.destroy();
@@ -98,7 +119,10 @@ describe("HedgehogAccessoryAbilities", () => {
   });
 
   it("copes with a hedgehog wearing nothing", () => {
-    const abilities = new HedgehogAccessoryAbilities({ options: {} } as never, {} as never);
+    const abilities = new HedgehogAccessoryAbilities(
+      { options: {} } as never,
+      {} as never
+    );
 
     expect(() => abilities.sync()).not.toThrow();
     expect(created).toHaveLength(0);

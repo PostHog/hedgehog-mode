@@ -4,9 +4,10 @@ import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 // inside them must be declared via vi.hoisted() rather than plain module-scope
 // `const` bindings — otherwise the factories close over bindings that are
 // still in their temporal dead zone at hoist time.
-const { tweens, spawnFireball } = vi.hoisted(() => ({
+const { tweens, spawnFireball, killTweensOf } = vi.hoisted(() => ({
   tweens: [] as Array<Record<string, any>>,
   spawnFireball: vi.fn(),
+  killTweensOf: vi.fn(),
 }));
 
 vi.mock("gsap", () => ({
@@ -15,7 +16,7 @@ vi.mock("gsap", () => ({
       tweens.push({ target, vars });
       return { kill: () => {} };
     },
-    killTweensOf: () => {},
+    killTweensOf: (...args: unknown[]) => killTweensOf(...args),
   },
 }));
 
@@ -28,7 +29,9 @@ vi.mock("../src/items/Flame", () => ({
 import { CatherineWheelAbility } from "../src/actors/hedgehog/abilities";
 
 const BURN_DURATION_S = 3;
+const SPIN_ROTATIONS = 2;
 const SPARKS_PER_SECOND = 20;
+const SPARK_SPEED = 8;
 
 const makeActor = () => ({
   forceAngle: 0,
@@ -56,6 +59,7 @@ describe("CatherineWheelAbility", () => {
     vi.useFakeTimers();
     tweens.length = 0;
     spawnFireball.mockClear();
+    killTweensOf.mockClear();
     actor = makeActor();
     ability = new CatherineWheelAbility(actor as never, {} as never);
   });
@@ -79,18 +83,44 @@ describe("CatherineWheelAbility", () => {
 
   it("throws sparks outward from the hog", () => {
     ability.fire();
-    advance(0.5);
+    // 0.0625 of the burn puts the tween angle at pi/4 (SPIN_ROTATIONS turns is
+    // 4pi total), where both cos and sin are meaningfully non-zero. Sampling
+    // at 0.5 lands exactly on a multiple of 2pi, where sin collapses to ~0 and
+    // the radial direction degenerates to the x-axis alone.
+    advance(0.0625);
 
     const [, position, velocity] = spawnFireball.mock.calls[0];
     // Muzzle sits off the body centre, on the rim.
     expect(position.x).not.toBe(100);
-    // Velocity points the same way as the offset: radially outward.
-    expect(Math.sign(velocity.x)).toBe(Math.sign(position.x - 100));
-    expect(Math.hypot(velocity.x, velocity.y)).toBeGreaterThan(0);
+
+    const ox = position.x - 100;
+    const oy = position.y - 200;
+    // Velocity is collinear with the muzzle offset (2D cross product ~ 0)...
+    expect(ox * velocity.y - oy * velocity.x).toBeCloseTo(0);
+    // ...and points the same way as the offset, not back at the hog (dot > 0).
+    expect(ox * velocity.x + oy * velocity.y).toBeGreaterThan(0);
+    // Speed sits within the jitter band around SPARK_SPEED, not just "> 0".
+    const speed = Math.hypot(velocity.x, velocity.y);
+    expect(speed).toBeGreaterThan(SPARK_SPEED * 0.75);
+    expect(speed).toBeLessThan(SPARK_SPEED * 1.25);
+
+    // The heading sweeps as the burn progresses (spec: spark velocity angle
+    // advances monotonically and covers SPIN_ROTATIONS turns across the burn).
+    const headingBefore = Math.atan2(velocity.y, velocity.x);
+    spawnFireball.mockClear();
+    advance(0.1875); // a further pi/4 -> 3pi/4 turns the heading by 90 degrees.
+    const [, , laterVelocity] = spawnFireball.mock.calls[0];
+    const headingAfter = Math.atan2(laterVelocity.y, laterVelocity.x);
+    expect(headingAfter).not.toBeCloseTo(headingBefore);
   });
 
   it("spins the hog and puts it back upright when the burn ends", () => {
     ability.fire();
+    // The tween is what actually drives the spin: two full rotations over the
+    // whole burn, not e.g. a longer/shorter or differently-scaled animation.
+    expect(tweens[0].vars.duration).toBe(BURN_DURATION_S);
+    expect(tweens[0].vars.angle).toBeCloseTo(SPIN_ROTATIONS * Math.PI * 2);
+
     advance(0.5);
     expect(actor.forceAngle).toBeGreaterThan(0);
 
@@ -100,10 +130,12 @@ describe("CatherineWheelAbility", () => {
 
   it("ignores the repeat fire from a held key", () => {
     // controls.ts calls maybeSpawnFireball() every 100ms while `f` is down.
+    // Re-fire mid-burn (not just at t=0, where the angle is still trivially
+    // zero) must still be a no-op.
     ability.fire();
+    advance(0.25);
     ability.fire();
-    ability.fire();
-    advance(1, true);
+    advance(0.75, true);
 
     expect(tweens).toHaveLength(1);
     expect(spawnFireball).toHaveBeenCalledTimes(BURN_DURATION_S * SPARKS_PER_SECOND);
@@ -125,6 +157,11 @@ describe("CatherineWheelAbility", () => {
     advance(0.5);
     ability.destroy();
     const after = spawnFireball.mock.calls.length;
+
+    // The gsap tween must actually be killed, not just locally forgotten —
+    // otherwise it keeps writing forceAngle (and eventually fires onComplete)
+    // on an ability that's already torn down.
+    expect(killTweensOf).toHaveBeenCalledWith(ability);
 
     vi.advanceTimersByTime(5000);
 

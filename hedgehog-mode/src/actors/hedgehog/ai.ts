@@ -46,6 +46,14 @@ export class HedgehogActorAI {
         });
       },
     },
+    firework: {
+      frequency: 1,
+      act: () => {
+        // No-op for a hog wearing nothing that grants an ability, which is
+        // almost all of them.
+        this.actor.maybeSpawnFireball();
+      },
+    },
     walk: {
       frequency: 10,
       act: () => {

@@ -1,3 +1,4 @@
+import gsap from "gsap";
 import type { HedgehogModeInterface } from "../../types";
 import type { HedgehogActor } from "../Hedgehog";
 import { SpiderWebActor } from "../../items/SpiderWebActor";
@@ -130,4 +131,90 @@ export class HogzillaAbility implements HedgehogSkinAbility {
   }
 
   destroy(): void {}
+}
+
+// Catherine wheel: a firework pinned to the hog. Lighting it spins him through
+// a couple of full turns while sparks fly off the rim, thrown outward along
+// whatever angle the wheel has reached. Reusable — once it burns out he can
+// light it again.
+const BURN_DURATION_S = 3;
+const SPIN_ROTATIONS = 2;
+const SPARKS_PER_SECOND = 20;
+const SPARK_SPEED = 8;
+// Fraction either side of SPARK_SPEED, so the ring of sparks isn't uniform.
+const SPARK_SPEED_JITTER = 0.25;
+// Where on the hog the sparks leave from, as a fraction of sprite width.
+const RIM_OFFSET = 0.3;
+
+export class CatherineWheelAbility implements HedgehogSkinAbility {
+  // Tweened 0 -> SPIN_ROTATIONS * 2PI by gsap and written onto the actor, which
+  // is what actually rotates him (Actor.update copies forceAngle onto the body).
+  private angle = 0;
+  private burning = false;
+  private sparkInterval?: NodeJS.Timeout;
+
+  constructor(
+    private actor: HedgehogActor,
+    private game: HedgehogModeInterface
+  ) {}
+
+  fire(): void {
+    // controls.ts re-fires every 100ms while `f` is held. Without this guard the
+    // tween restarts ten times a second and the wheel never finishes a turn.
+    if (this.burning) {
+      return;
+    }
+
+    this.burning = true;
+    this.angle = 0;
+
+    gsap.to(this, {
+      angle: SPIN_ROTATIONS * Math.PI * 2,
+      duration: BURN_DURATION_S,
+      ease: "none",
+      onUpdate: () => {
+        this.actor.forceAngle = this.angle;
+      },
+      onComplete: () => this.extinguish(),
+    });
+
+    this.sparkInterval = setInterval(
+      () => this.emitSpark(),
+      1000 / SPARKS_PER_SECOND
+    );
+  }
+
+  private emitSpark(): void {
+    const body = this.actor.rigidBody;
+    if (!body) {
+      return;
+    }
+
+    const reach = Math.abs(this.actor.sprite?.width ?? 0) * RIM_OFFSET;
+    const jitter = 1 + (Math.random() - 0.5) * 2 * SPARK_SPEED_JITTER;
+    const speed = SPARK_SPEED * jitter;
+    const cos = Math.cos(this.angle);
+    const sin = Math.sin(this.angle);
+
+    FlameActor.spawnFireball(
+      this.game,
+      { x: body.position.x + cos * reach, y: body.position.y + sin * reach },
+      { x: cos * speed, y: sin * speed }
+    );
+  }
+
+  private extinguish(): void {
+    if (this.sparkInterval) {
+      clearInterval(this.sparkInterval);
+      this.sparkInterval = undefined;
+    }
+    this.actor.forceAngle = 0;
+    this.angle = 0;
+    this.burning = false;
+  }
+
+  destroy(): void {
+    gsap.killTweensOf(this);
+    this.extinguish();
+  }
 }

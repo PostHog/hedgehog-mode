@@ -1,5 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+const loadCspSafePixiRenderer = vi.hoisted(() => vi.fn());
+
+vi.mock("pixi.js/unsafe-eval", () => {
+  loadCspSafePixiRenderer();
+  return {};
+});
+
 import { HedgeHogMode } from "../src/hedgehog-mode";
 
 // Mirrors the Pixi v8 behavior this library has to defend against:
@@ -82,6 +89,10 @@ describe("HedgeHogMode lifecycle", () => {
   afterEach(() => {
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
+  });
+
+  it("loads Pixi's CSP-safe renderer", () => {
+    expect(loadCspSafePixiRenderer).toHaveBeenCalledOnce();
   });
 
   it("defers app teardown when destroyed before Pixi init resolves", async () => {

@@ -1,31 +1,18 @@
 import { NO_PLATFORM_COLLISION_FILTER } from "../Actor";
 import { HedgehogActor } from "../Hedgehog";
+import { ControlKey, resolveControlKey } from "../../misc/keyboard";
 
 export class HedgehogActorControls {
+  private teardown: () => void;
+
   constructor(private actor: HedgehogActor) {
-    this.setupKeyboardListeners();
+    this.teardown = this.setupKeyboardListeners();
   }
 
   setupKeyboardListeners(): () => void {
-    const heldKeys = new Set<string>();
+    const heldKeys = new Set<ControlKey>();
 
-    const keyMapping = {
-      ArrowLeft: "left",
-      a: "left",
-      ArrowRight: "right",
-      d: "right",
-      ArrowUp: "up",
-      w: "up",
-      " ": "up",
-      ArrowDown: "down",
-      s: "down",
-      Shift: "shift",
-      Alt: "alt",
-      f: "f",
-      F: "f",
-    };
-
-    const horizontalHandler = (_e: KeyboardEvent) => {
+    const horizontalHandler = () => {
       const left = heldKeys.has("left");
       const right = heldKeys.has("right");
 
@@ -73,10 +60,10 @@ export class HedgehogActorControls {
     let jumpCancelTimeout: NodeJS.Timeout | undefined = undefined;
 
     const keyHandlers: Record<
-      string,
+      ControlKey,
       {
-        on: (e: KeyboardEvent) => void;
-        off: (e: KeyboardEvent) => void;
+        on: () => void;
+        off: () => void;
       }
     > = {
       down: {
@@ -115,20 +102,20 @@ export class HedgehogActorControls {
         },
       },
       left: {
-        on: (e) => horizontalHandler(e),
-        off: (e) => horizontalHandler(e),
+        on: horizontalHandler,
+        off: horizontalHandler,
       },
       right: {
-        on: (e) => horizontalHandler(e),
-        off: (e) => horizontalHandler(e),
+        on: horizontalHandler,
+        off: horizontalHandler,
       },
       shift: {
-        on: (e) => horizontalHandler(e),
-        off: (e) => horizontalHandler(e),
+        on: horizontalHandler,
+        off: horizontalHandler,
       },
       alt: {
-        on: (e) => horizontalHandler(e),
-        off: (e) => horizontalHandler(e),
+        on: horizontalHandler,
+        off: horizontalHandler,
       },
       f: {
         on: () => {
@@ -149,33 +136,63 @@ export class HedgehogActorControls {
       },
     };
 
+    const releaseKey = (key: ControlKey): void => {
+      if (heldKeys.delete(key)) {
+        keyHandlers[key].off();
+      }
+    };
+
+    // Browsers don't deliver keyup for keys that were still down when the
+    // window lost focus, so without this, alt-tabbing mid-stride leaves the hog
+    // walking with no way to stop him.
+    const releaseAllKeys = (): void => {
+      heldKeys.forEach((key) => releaseKey(key));
+    };
+
     const keyDownListener = (e: KeyboardEvent): void => {
       if (!this.actor.options.controls_enabled) {
         return;
       }
-      const key = keyMapping[e.key as keyof typeof keyMapping] ?? e.key;
 
-      if (!heldKeys.has(key)) {
+      // ⌘/ctrl combos belong to the browser and to the debug renderer
+      // (ctrl+d), not to us. macOS also swallows the keyup while ⌘ is held, so
+      // claiming ⌘+d would leave him running right until the next blur.
+      if (e.metaKey || e.ctrlKey) {
+        return;
+      }
+
+      const key = resolveControlKey(e);
+
+      if (key && !heldKeys.has(key)) {
         heldKeys.add(key);
-        keyHandlers[key]?.on(e);
+        keyHandlers[key].on();
       }
     };
 
     const keyUpListener = (e: KeyboardEvent): void => {
-      const key = keyMapping[e.key as keyof typeof keyMapping] ?? e.key;
+      const key = resolveControlKey(e);
 
-      if (heldKeys.has(key)) {
-        heldKeys.delete(key);
-        keyHandlers[key]?.off(e);
+      if (key) {
+        releaseKey(key);
       }
     };
 
     window.addEventListener("keydown", keyDownListener);
     window.addEventListener("keyup", keyUpListener);
+    window.addEventListener("blur", releaseAllKeys);
 
     return () => {
+      releaseAllKeys();
+      clearInterval(fireInterval);
+      clearTimeout(jumpCancelTimeout);
       window.removeEventListener("keydown", keyDownListener);
       window.removeEventListener("keyup", keyUpListener);
+      window.removeEventListener("blur", releaseAllKeys);
     };
+  }
+
+  /** Detach the global listeners. Called when the actor is unloaded. */
+  destroy(): void {
+    this.teardown();
   }
 }

@@ -1,4 +1,5 @@
 import { sample } from "../../misc/utils";
+import { altKeyLabel } from "../../misc/platform";
 import type { HedgehogActor } from "../Hedgehog";
 import { HedgehogModeInterface, GameUIProps } from "../../types";
 
@@ -64,6 +65,21 @@ const cheatSheetMessages: GameUIProps["messages"] = [
       "or",
       { text: "fast", style: { fontWeight: "bold" } },
       "- it's up to you!",
+    ],
+  },
+  {
+    words: [
+      "walk with",
+      { text: "wasd", style: { fontWeight: "bold" } },
+      "or the arrows, hold",
+      { text: "shift", style: { fontWeight: "bold" } },
+      "to run and",
+      { text: altKeyLabel(), style: { fontWeight: "bold" } },
+      "to moonwalk",
+      {
+        text: "(it's slower. moonwalking is hard)",
+        style: { fontSize: "0.8em", fontStyle: "italic" },
+      },
     ],
   },
   {

@@ -82,6 +82,26 @@ import { HedgehogCustomization } from "@posthog/hedgehog-mode";
 
 ---
 
+## Controls
+
+The hedgehog with `player: true` takes keyboard input. Everyone else wanders on
+their own.
+
+| Action                         | Keys                                           |
+| ------------------------------ | ---------------------------------------------- |
+| Walk                           | `W` `A` `S` `D` or the arrow keys              |
+| Jump (twice for a double jump) | `W` / `↑` / `space`                            |
+| Drop through a platform        | `S` / `↓`                                      |
+| Run                            | hold `shift` while walking                     |
+| Moonwalk                       | hold `alt` (`⌥ option` on a mac) while walking |
+| Breathe fire (hogzilla only)   | `F`                                            |
+| Climb a web (spiderhog only)   | `W` / `S` while slung                          |
+
+> 💡 **Tip:** type `cheatcodes` at the page and the hedgehog will recite this
+> list himself — along with all the easter eggs.
+
+---
+
 ## Just want a static one?
 
 For avatars, lists, or anywhere you don't need a full game loop, use `StaticHedgehog`:

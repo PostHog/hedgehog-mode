@@ -8,6 +8,7 @@ vi.mock("pixi.js/unsafe-eval", () => {
   return {};
 });
 
+import { HedgehogActor } from "../src/actors/Hedgehog";
 import { HedgeHogMode } from "../src/hedgehog-mode";
 
 // Mirrors the Pixi v8 behavior this library has to defend against:
@@ -107,6 +108,13 @@ describe("HedgeHogMode lifecycle", () => {
     expect(first.beforeUnload).toHaveBeenCalledOnce();
     expect(second.beforeUnload).toHaveBeenCalledOnce();
     expect(game.elements).toEqual([]);
+  });
+
+  it("keeps giant hedgehogs rampaging", () => {
+    const actor = Object.create(HedgehogActor.prototype) as HedgehogActor;
+    actor.sprite = { scale: { y: 2 } } as never;
+
+    expect(actor.isRampaging).toBe(true);
   });
 
   it("defers app teardown when destroyed before Pixi init resolves", async () => {

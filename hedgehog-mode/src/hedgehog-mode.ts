@@ -1,3 +1,13 @@
+// Pixi generates its shader and uniform sync code with `new Function`, and its renderer
+// constructor throws outright when a Content-Security-Policy forbids that. This side-effect
+// import swaps those paths for hand-written equivalents, so the hedgehog renders on a host that
+// bans `unsafe-eval` — PostHog's own app once it enforces its policy, and any MV3 extension,
+// where the ban is unconditional.
+//
+// It belongs here rather than in `index.ts` so that `StaticHedgehog`, which draws with CSS and
+// touches no Pixi, keeps its consumers free of Pixi entirely.
+import "pixi.js/unsafe-eval";
+
 import gsap from "gsap";
 
 import Matter, { Render, Runner } from "matter-js";

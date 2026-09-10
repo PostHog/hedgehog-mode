@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { Runner } from "matter-js";
 
 const loadCspSafePixiRenderer = vi.hoisted(() => vi.fn());
 
@@ -7,6 +8,7 @@ vi.mock("pixi.js/unsafe-eval", () => {
   return {};
 });
 
+import { HedgehogActor } from "../src/actors/Hedgehog";
 import { HedgeHogMode } from "../src/hedgehog-mode";
 
 // Mirrors the Pixi v8 behavior this library has to defend against:
@@ -93,6 +95,26 @@ describe("HedgeHogMode lifecycle", () => {
 
   it("loads Pixi's CSP-safe renderer", () => {
     expect(loadCspSafePixiRenderer).toHaveBeenCalledOnce();
+  });
+
+  it("unloads every element when the game is destroyed", () => {
+    const game = Object.create(HedgeHogMode.prototype) as HedgeHogMode;
+    const first = { beforeUnload: vi.fn() };
+    const second = { beforeUnload: vi.fn() };
+    Object.assign(game, { elements: [first, second], runner: Runner.create() });
+
+    game.destroy();
+
+    expect(first.beforeUnload).toHaveBeenCalledOnce();
+    expect(second.beforeUnload).toHaveBeenCalledOnce();
+    expect(game.elements).toEqual([]);
+  });
+
+  it("keeps giant hedgehogs rampaging", () => {
+    const actor = Object.create(HedgehogActor.prototype) as HedgehogActor;
+    actor.sprite = { scale: { y: 2 } } as never;
+
+    expect(actor.isRampaging).toBe(true);
   });
 
   it("defers app teardown when destroyed before Pixi init resolves", async () => {

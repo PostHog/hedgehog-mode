@@ -86,6 +86,9 @@ export class HedgeHogMode implements HedgehogModeInterface {
       clearInterval(this.syncPlatformsInterval);
     }
     Runner.stop(this.runner);
+    // Elements may own host-page state (for example, a rampaging element's
+    // temporary CSS properties), so release them before tearing Pixi down.
+    [...this.elements].forEach((element) => this.removeElement(element));
     // Before app.init() resolves this is a no-op and render() finishes the
     // teardown once init() settles. After init (e.g. during the sprite load)
     // it destroys the app right here.

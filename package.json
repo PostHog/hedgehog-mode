@@ -11,6 +11,7 @@
     "dev": "pnpm -r --parallel --no-bail run dev",
     "build": "pnpm --dir ./playground build && pnpm --dir ./hedgehog-mode-anywhere build",
     "test": "pnpm --dir ./hedgehog-mode test",
+    "test:e2e": "pnpm --dir ./e2e test",
     "lint": "oxlint .",
     "lint:fix": "oxlint --fix .",
     "format": "oxfmt .",

@@ -1,0 +1,25 @@
+{
+  "name": "e2e",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Browser tests that run the engine under a Content-Security-Policy with no unsafe-eval",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "pnpm --dir ../hedgehog-mode build && tsc --noEmit && node build.mjs",
+    "test": "pnpm run build && playwright test",
+    "test:install": "playwright install --with-deps chromium"
+  },
+  "dependencies": {
+    "@posthog/hedgehog-mode": "workspace:*",
+    "pixi.js": "^8.20.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.50.0",
+    "@types/node": "^24.13.3",
+    "esbuild": "^0.25.12",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "typescript": "~5.5.3"
+  }
+}

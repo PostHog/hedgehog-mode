@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>hedgehog-mode CSP fixture</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: #eeefe9;
+      }
+      #app {
+        position: fixed;
+        inset: 0;
+      }
+      /* Something for the hedgehog to stand on, and a stable render target. */
+      .platform {
+        position: absolute;
+        left: 20%;
+        top: 60%;
+        width: 60%;
+        height: 12px;
+        background: #f54e00;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <div class="platform"></div>
+    <!-- probe first: it must record its verdict before anything else can fail. -->
+    <script src="/probe.js"></script>
+    <script type="module" src="/__BUNDLE__"></script>
+  </body>
+</html>

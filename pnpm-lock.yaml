@@ -23,6 +23,34 @@ importers:
         specifier: 1.73.0
         version: 1.73.0
 
+  e2e:
+    dependencies:
+      '@posthog/hedgehog-mode':
+        specifier: workspace:*
+        version: link:../hedgehog-mode
+      pixi.js:
+        specifier: ^8.20.1
+        version: 8.20.1
+    devDependencies:
+      '@playwright/test':
+        specifier: ^1.50.0
+        version: 1.62.1
+      '@types/node':
+        specifier: ^24.13.3
+        version: 24.13.3
+      esbuild:
+        specifier: ^0.25.12
+        version: 0.25.12
+      react:
+        specifier: 19.3.0-canary-3f0b9e61-20260317
+        version: 19.3.0-canary-3f0b9e61-20260317
+      react-dom:
+        specifier: 19.3.0-canary-3f0b9e61-20260317
+        version: 19.3.0-canary-3f0b9e61-20260317(react@19.3.0-canary-3f0b9e61-20260317)
+      typescript:
+        specifier: ~5.5.3
+        version: 5.5.4
+
   hedgehog-mode:
     dependencies:
       gsap:
@@ -110,7 +138,7 @@ importers:
         version: 4.18.1
       next:
         specifier: ^16.2.10
-        version: 16.2.10(react-dom@19.3.0-canary-3f0b9e61-20260317(react@19.3.0-canary-3f0b9e61-20260317))(react@19.3.0-canary-3f0b9e61-20260317)
+        version: 16.2.10(@playwright/test@1.62.1)(react-dom@19.3.0-canary-3f0b9e61-20260317(react@19.3.0-canary-3f0b9e61-20260317))(react@19.3.0-canary-3f0b9e61-20260317)
       react:
         specifier: 19.3.0-canary-3f0b9e61-20260317
         version: 19.3.0-canary-3f0b9e61-20260317
@@ -1048,6 +1076,11 @@ packages:
   '@pixi/colord@2.9.6':
     resolution: {integrity: sha512-nezytU2pw587fQstUu1AsJZDVEynjskwOL+kibwcdxsMBFqPsFFNA7xl0ii/gXuDi6M0xj3mfRJj8pBSc2jCfA==}
 
+  '@playwright/test@1.62.1':
+    resolution: {integrity: sha512-DTcUc8qii+cpHvtOwggMtBRMjKZHXYWdw8syRYu2vtzuq4Wxphqq4NfCs5Zt44L6mA8rfDfj+PHnxFc/FeK6mQ==}
+    engines: {node: '>=20'}
+    hasBin: true
+
   '@pnpm/config.env-replace@1.1.0':
     resolution: {integrity: sha512-htyl8TWnKL7K/ESFa1oW2UB5lVDxuF5DpM7tBi6Hu2LNL3mWkIzNLG6N4zoCUP1lCKNxWy/3iu8mS8MvToGd6w==}
     engines: {node: '>=12.22.0'}
@@ -1890,6 +1923,11 @@ packages:
     resolution: {integrity: sha512-YJDaCJZEnBmcbw13fvdAM9AwNOJwOzrE4pqMqBq5nFiEqXUqHwlK4B+3pUw6JNvfSPtX05xFHtYy/1ni01eGCw==}
     engines: {node: '>=6 <7 || >=8'}
 
+  fsevents@2.3.2:
+    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
+    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
+    os: [darwin]
+
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
@@ -2453,6 +2491,16 @@ packages:
 
   pixi.js@8.20.1:
     resolution: {integrity: sha512-akLVBMLvQbaEViqsmVraK0Njer1q4Q4lm4iNKuzvBiFrV8q+6/+HluJN3sWIwO663IBeQtUUS/CaXFJZs6ffXQ==}
+
+  playwright-core@1.62.1:
+    resolution: {integrity: sha512-wPYSwEBJY9GHraISXqyqtx0na0LpO3XEX7jNDhntbex7tzUS7kLnZsOlFruFJB4Hi/rhDMjXGqHewDZ68nYZVw==}
+    engines: {node: '>=20'}
+    hasBin: true
+
+  playwright@1.62.1:
+    resolution: {integrity: sha512-0M+L3LAD8/nm554LOla9Ayx0j0tmFZ0FBcoQ7F1VuVHpM/XpiC8RcDzBQB8W5+hA8L22THxELzeF+2WcUzvcLg==}
+    engines: {node: '>=20'}
+    hasBin: true
 
   postcss-import@15.1.0:
     resolution: {integrity: sha512-hpr+J05B2FVYUAXHeK1YyI267J/dDDhMU6B6civm8hSY1jYJnBXxzKDKDswzJmtLHryrjhnDjqqp/49t8FALew==}
@@ -3683,6 +3731,10 @@ snapshots:
 
   '@pixi/colord@2.9.6': {}
 
+  '@playwright/test@1.62.1':
+    dependencies:
+      playwright: 1.62.1
+
   '@pnpm/config.env-replace@1.1.0': {}
 
   '@pnpm/network.ca-file@1.0.2':
@@ -4547,6 +4599,9 @@ snapshots:
       jsonfile: 4.0.0
       universalify: 0.1.2
 
+  fsevents@2.3.2:
+    optional: true
+
   fsevents@2.3.3:
     optional: true
 
@@ -4888,7 +4943,7 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
-  next@16.2.10(react-dom@19.3.0-canary-3f0b9e61-20260317(react@19.3.0-canary-3f0b9e61-20260317))(react@19.3.0-canary-3f0b9e61-20260317):
+  next@16.2.10(@playwright/test@1.62.1)(react-dom@19.3.0-canary-3f0b9e61-20260317(react@19.3.0-canary-3f0b9e61-20260317))(react@19.3.0-canary-3f0b9e61-20260317):
     dependencies:
       '@next/env': 16.2.10
       '@swc/helpers': 0.5.15
@@ -4907,6 +4962,7 @@ snapshots:
       '@next/swc-linux-x64-musl': 16.2.10
       '@next/swc-win32-arm64-msvc': 16.2.10
       '@next/swc-win32-x64-msvc': 16.2.10
+      '@playwright/test': 1.62.1
       sharp: 0.34.5
     transitivePeerDependencies:
       - '@babel/core'
@@ -5088,6 +5144,14 @@ snapshots:
       ismobilejs: 1.1.1
       parse-svg-path: 0.2.0
       tiny-lru: 11.4.7
+
+  playwright-core@1.62.1: {}
+
+  playwright@1.62.1:
+    dependencies:
+      playwright-core: 1.62.1
+    optionalDependencies:
+      fsevents: 2.3.2
 
   postcss-import@15.1.0(postcss@8.5.18):
     dependencies:

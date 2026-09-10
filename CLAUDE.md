@@ -16,6 +16,8 @@ pnpm monorepo:
 - `hedgehog-mode-anywhere/` — MV3 browser extension that drops the hedgehog
   onto any website. Private; consumes the library via `workspace:*` (esbuild, not vite).
 - `texturepacker/` — source sprite frames, packed into `hedgehog-mode/assets/sprites.{png,json}`.
+- `e2e/` — Playwright tests that run the engine in a real browser under a strict CSP.
+  Private; see "The CSP tests" below.
 
 ## Dev workflow
 
@@ -42,6 +44,7 @@ Other commands:
 pnpm lint                          # oxlint, from the repo root
 pnpm format                        # oxfmt, from the repo root
 pnpm test                          # vitest, from the repo root
+pnpm test:e2e                      # Playwright CSP tests (needs `pnpm --dir e2e run test:install` once)
 pnpm --dir hedgehog-mode build     # vite build
 ```
 
@@ -66,6 +69,45 @@ The extension's `.jsx` is untyped and esbuild doesn't type-check, so
 `hedgehog-mode-anywhere/api-contract.ts` pins the slice of the library API the
 extension consumes; `tsc --noEmit` (part of its `build`) fails if a `workspace:*`
 engine change drifts that surface. Keep the contract in sync with actual usage.
+
+### The CSP tests
+
+`e2e/` guards the one failure mode the unit tests structurally cannot reach: pixi compiling
+shaders, uniform setters, UBO sync or particle updates with `new Function`. That only happens
+against a real WebGL context, so it needs a real browser.
+
+```bash
+pnpm --dir e2e run test:install   # once — downloads Playwright's chromium
+pnpm test:e2e
+```
+
+Three routes, all served by `e2e/server.mjs` with the CSP set on the wire:
+
+| Route               | Bundle                   | Policy                                       |
+| ------------------- | ------------------------ | -------------------------------------------- |
+| `/`                 | plain library            | `script-src 'self'; worker-src 'self' blob:` |
+| `/extension`        | `pixi-eval-free` patches | `script-src 'self'; worker-src 'self' blob:` |
+| `/extension-strict` | `pixi-eval-free` patches | `script-src 'self'`                          |
+
+Two things about this are load-bearing, so don't "simplify" them away:
+
+- **The eval probe (`e2e/fixtures/probe.js`) must stay a page-authored external file.** CDP's
+  `Runtime.evaluate` is exempt from CSP, so a probe injected by the test reports "allowed"
+  even when the header is live — and then every other assertion passes against a page with no
+  CSP at all. The spec asserts the probe was blocked _before_ it asserts anything about pixi.
+- **`worker-src` falls back to `script-src`, not `default-src`.** A bare `script-src 'self'`
+  therefore also blocks pixi's blob-URL texture worker, and the engine then hangs in
+  `render()` with no error at all. That's why the first two routes grant the worker: it keeps
+  a worker problem from masquerading as an eval problem. `/extension-strict` takes it away on
+  purpose, because that is what MV3 does — the extension survives it by setting
+  `loadTextures.config.preferWorkers = false`.
+
+The eval-stripping patch list lives in `hedgehog-mode-anywhere/pixi-eval-free.mjs`, shared by
+the extension build and the e2e fixtures. Each patch matches a pixi file **by path**, so a
+pixi upgrade that renames one makes it silently stop applying. The plugin therefore fails the
+build when any patch matched nothing — pixi 8.20.1 renamed `createUboSyncFunction.mjs` to
+`compileBufferSync.mjs` and that guard is what caught it. If it fires, check whether the
+`new Function` is really gone in the new version before deleting a patch.
 
 ## Architecture
 

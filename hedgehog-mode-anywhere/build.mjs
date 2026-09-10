@@ -2,6 +2,7 @@ import { build, context } from "esbuild";
 import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { pixiEvalFree } from "./pixi-eval-free.mjs";
 
 const root = dirname(fileURLToPath(import.meta.url));
 const watch = process.argv.includes("--watch");
@@ -24,42 +25,7 @@ const options = {
   define: { "process.env.NODE_ENV": '"production"' },
   logLevel: "info",
   plugins: [
-    {
-      name: "pixi-eval-free",
-      setup: (build) => {
-        const replacements = [
-          [
-            /unsafeEvalSupported\.mjs$/,
-            "export const unsafeEvalSupported = () => false;",
-          ],
-          [
-            /generateParticleUpdateFunction\.mjs$/,
-            'export const generateParticleUpdateFunction = () => { throw new Error("Pixi eval-free particle patch was not installed"); };',
-          ],
-          [
-            /GenerateShaderSyncCode\.mjs$/,
-            'export const generateShaderSyncCode = () => { throw new Error("Pixi eval-free shader patch was not installed"); };',
-          ],
-          [
-            /createUboSyncFunction\.mjs$/,
-            'export const createUboSyncFunction = () => { throw new Error("Pixi eval-free UBO patch was not installed"); };',
-          ],
-          [
-            /generateUniformsSync\.mjs$/,
-            'export const generateUniformsSync = () => { throw new Error("Pixi eval-free uniform patch was not installed"); };',
-          ],
-        ];
-
-        build.onLoad({ filter: /pixi\.js.*\.mjs$/ }, (args) => {
-          const replacement = replacements.find(([pattern]) =>
-            pattern.test(args.path)
-          );
-          return replacement
-            ? { contents: replacement[1], loader: "js" }
-            : undefined;
-        });
-      },
-    },
+    pixiEvalFree(),
     {
       name: "package-extensions",
       setup: (b) => b.onEnd(packageExtensions),

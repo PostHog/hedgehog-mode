@@ -29,3 +29,12 @@ jobs:
           pnpm format:check
           pnpm build
           pnpm test
+
+      # Chromium only, and only the browser this suite launches.
+      - name: Install Playwright chromium
+        run: pnpm --dir e2e run test:install
+
+      # Runs the engine in a real browser under a CSP with no unsafe-eval. Nothing else in
+      # this pipeline can catch pixi reaching for `new Function` at shader-compile time.
+      - name: Run CSP browser tests
+        run: pnpm test:e2e

@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@posthog/hedgehog-mode": "workspace:*",
-    "pixi.js": "^8.19.0",
+    "pixi.js": "^8.20.1",
     "react": "^18.3.1 || ^19",
     "react-dom": "^18.3.1 || ^19"
   },

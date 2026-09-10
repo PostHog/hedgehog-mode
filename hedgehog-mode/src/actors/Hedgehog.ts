@@ -12,6 +12,7 @@ import gsap from "gsap";
 import { COLLISIONS } from "../misc/collisions";
 import { HedgehogActorAI } from "./hedgehog/ai";
 import { HedgehogActorControls } from "./hedgehog/controls";
+import { HedgehogAccessoryAbilities } from "./hedgehog/accessory-abilities";
 import { HedgehogActorOptions } from "./hedgehog/config";
 import { HedgehogActorInterface } from "./hedgehog/interface";
 import { applyStaticColor } from "./hedgehog/colors";
@@ -46,6 +47,7 @@ export class HedgehogActor extends Actor {
   controls: HedgehogActorControls;
   private filter = new ColorMatrixFilter();
   interface: HedgehogActorInterface;
+  accessoryAbilities: HedgehogAccessoryAbilities;
 
   hitBoxModifier = {
     left: 0.24,
@@ -66,6 +68,7 @@ export class HedgehogActor extends Actor {
     this.ai = new HedgehogActorAI(this);
     this.controls = new HedgehogActorControls(this);
     this.interface = new HedgehogActorInterface(game, this);
+    this.accessoryAbilities = new HedgehogAccessoryAbilities(this, game);
     this.setPosition({
       x: window.innerWidth * Math.random(),
       y: Math.random() * 200,
@@ -210,6 +213,7 @@ export class HedgehogActor extends Actor {
     this.syncAccessories();
     this.syncRigidBody();
     this.syncSkinAbility();
+    this.accessoryAbilities.sync();
   }
 
   // Skin can change at runtime (e.g. "become spiderhog"), so keep the skin
@@ -426,9 +430,11 @@ export class HedgehogActor extends Actor {
     FlameActor.fireBurst(this.game, contact);
   }
 
-  // Triggered by the `f` key; delegates to the skin's ability (hogzilla only).
+  // Triggered by the `f` key; delegates to the skin's ability and to any
+  // abilities granted by worn accessories.
   maybeSpawnFireball(): void {
     this.ability?.fire?.();
+    this.accessoryAbilities.fire();
   }
 
   onCollisionStart(element: GameElement, pair: Matter.Pair): void {
@@ -513,6 +519,10 @@ export class HedgehogActor extends Actor {
     const accessories = this.options.accessories;
     this.options.accessories = [];
     this.syncAccessories();
+    // Not the same call as the one updateOptions() made above: that one ran
+    // while the accessories were still on, so it had nothing to tear down. This
+    // is what stops a granted ability outliving the hog that was wearing it.
+    this.accessoryAbilities.sync();
 
     accessories?.forEach((accessory) => {
       this.game.spawnAccessory(accessory, this.rigidBody!.position);
@@ -543,6 +553,7 @@ export class HedgehogActor extends Actor {
 
   beforeUnload(): void {
     this.ability?.destroy();
+    this.accessoryAbilities.destroy();
     this.ai.enable(false);
     Object.values(this.accessorySprites).forEach((sprite) => {
       this.game.app.stage.removeChild(sprite);

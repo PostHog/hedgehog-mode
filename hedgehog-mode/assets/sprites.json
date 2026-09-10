@@ -16,6 +16,14 @@
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
 },
+"accessories/catherine-wheel.png":
+{
+	"frame": {"x":0,"y":1440,"w":80,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
+	"sourceSize": {"w":80,"h":80}
+},
 "accessories/chef.png":
 {
 	"frame": {"x":160,"y":0,"w":80,"h":80},
@@ -3616,7 +3624,7 @@
 	"version": "1.1",
 	"image": "sprites.png",
 	"format": "RGBA8888",
-	"size": {"w":2000,"h":1440},
+	"size": {"w":2000,"h":1520},
 	"scale": "1",
 	"smartupdate": "$TexturePacker:SmartUpdate:eaf580dc95d1dee3bff0f7f346f23dd7:80ac418b0a7cda1be46867d2d5737449:1eabdf11f75e3a4fe3147baf7b5be24b$"
 }

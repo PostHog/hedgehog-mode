@@ -27,12 +27,3 @@ export function shoveOffset(
     dy: body.y - (anchor.y - (scroll.y - anchor.scrollY)),
   };
 }
-
-/** The CSS a shoved element wears while it's airborne. */
-export function shoveTransform(
-  dx: number,
-  dy: number,
-  angleRadians: number
-): string {
-  return `translate(${dx.toFixed(2)}px, ${dy.toFixed(2)}px) rotate(${angleRadians.toFixed(4)}rad)`;
-}

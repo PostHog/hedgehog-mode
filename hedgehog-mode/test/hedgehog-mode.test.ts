@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { Runner } from "matter-js";
 
 const loadCspSafePixiRenderer = vi.hoisted(() => vi.fn());
 
@@ -93,6 +94,19 @@ describe("HedgeHogMode lifecycle", () => {
 
   it("loads Pixi's CSP-safe renderer", () => {
     expect(loadCspSafePixiRenderer).toHaveBeenCalledOnce();
+  });
+
+  it("unloads every element when the game is destroyed", () => {
+    const game = Object.create(HedgeHogMode.prototype) as HedgeHogMode;
+    const first = { beforeUnload: vi.fn() };
+    const second = { beforeUnload: vi.fn() };
+    Object.assign(game, { elements: [first, second], runner: Runner.create() });
+
+    game.destroy();
+
+    expect(first.beforeUnload).toHaveBeenCalledOnce();
+    expect(second.beforeUnload).toHaveBeenCalledOnce();
+    expect(game.elements).toEqual([]);
   });
 
   it("defers app teardown when destroyed before Pixi init resolves", async () => {

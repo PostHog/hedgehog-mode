@@ -1,7 +1,7 @@
 import Matter from "matter-js";
 import gsap from "gsap";
 import { COLLISIONS } from "../misc/collisions";
-import { shoveOffset, shoveTransform, ShoveAnchor } from "../misc/transform";
+import { shoveOffset, ShoveAnchor } from "../misc/transform";
 import { HedgehogModeInterface, GameElement, UpdateTicker } from "../types";
 import { SyncedPlatform } from "./SyncedPlatform";
 import { shuffle } from "../misc/utils";
@@ -78,7 +78,8 @@ export class ShovedElement implements GameElement {
   private elapsed = 0;
   // Inline styles as we found them, so we can hand the element back untouched.
   private originalStyles: {
-    transform: string;
+    translate: string;
+    rotate: string;
     transition: string;
     willChange: string;
   };
@@ -158,13 +159,14 @@ export class ShovedElement implements GameElement {
     };
 
     this.originalStyles = {
-      transform: ref.style.transform,
+      translate: ref.style.translate,
+      rotate: ref.style.rotate,
       transition: ref.style.transition,
       willChange: ref.style.willChange,
     };
-    // Host transitions would fight us for the transform property every frame.
+    // Host transitions would fight our movement properties every frame.
     ref.style.transition = "none";
-    ref.style.willChange = "transform";
+    ref.style.willChange = "translate, rotate";
 
     this.rigidBody = Matter.Bodies.rectangle(
       this.anchor.x,
@@ -209,11 +211,9 @@ export class ShovedElement implements GameElement {
   }
 
   private applyTransform(): void {
-    this.ref.style.transform = shoveTransform(
-      this.offset.dx,
-      this.offset.dy,
-      this.offset.angle
-    );
+    // Individual transform properties compose with the host's `transform`.
+    this.ref.style.translate = `${this.offset.dx.toFixed(2)}px ${this.offset.dy.toFixed(2)}px`;
+    this.ref.style.rotate = `${this.offset.angle.toFixed(4)}rad`;
   }
 
   update(ticker: UpdateTicker): void {
@@ -260,7 +260,8 @@ export class ShovedElement implements GameElement {
 
   beforeUnload(): void {
     // However we got here, the page gets its element back exactly as it was.
-    this.ref.style.transform = this.originalStyles.transform;
+    this.ref.style.translate = this.originalStyles.translate;
+    this.ref.style.rotate = this.originalStyles.rotate;
     this.ref.style.transition = this.originalStyles.transition;
     this.ref.style.willChange = this.originalStyles.willChange;
     SHOVED_BY_ELEMENT.delete(this.ref);

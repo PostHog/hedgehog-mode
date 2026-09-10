@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { shoveOffset, shoveTransform } from "../src/misc/transform";
+import { shoveOffset } from "../src/misc/transform";
 
 const anchor = { x: 100, y: 200, scrollX: 0, scrollY: 0 };
 
@@ -35,13 +35,5 @@ describe("shoveOffset", () => {
       dx: 0,
       dy: 0,
     });
-  });
-});
-
-describe("shoveTransform", () => {
-  it("writes a translate and a rotate", () => {
-    expect(shoveTransform(12.3456, -7, 0.5)).toBe(
-      "translate(12.35px, -7.00px) rotate(0.5000rad)"
-    );
   });
 });

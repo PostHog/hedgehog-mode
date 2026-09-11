@@ -141,6 +141,12 @@ describe("HedgeHogMode lifecycle", () => {
   it("destroys the app immediately when destroyed during the sprite load", async () => {
     const game = new HedgeHogMode(config);
     const { ref, appendChild } = createHostRef();
+    const cleanup = vi.fn<() => void>();
+    game.elements.push({
+      isInteractive: false,
+      update: () => {},
+      beforeUnload: cleanup,
+    });
     let resolveLoad!: () => void;
     const load = vi.spyOn(game.spritesManager, "load").mockImplementation(
       () =>
@@ -156,6 +162,7 @@ describe("HedgeHogMode lifecycle", () => {
 
     game.destroy();
     expect(app.destroyCalls).toBe(1);
+    expect(cleanup).toHaveBeenCalledTimes(1);
 
     resolveLoad();
     await rendering;

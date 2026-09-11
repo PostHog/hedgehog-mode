@@ -11,9 +11,10 @@ describe("HedgehogActorControls", () => {
   beforeEach(() => {
     vi.useFakeTimers();
     vi.stubGlobal("window", {
-      addEventListener: vi.fn<(event: string, listener: KeyboardListener) => void>(
-        (event: string, listener: KeyboardListener) =>
-          listeners.set(event, listener)
+      addEventListener: vi.fn<
+        (event: string, listener: KeyboardListener) => void
+      >((event: string, listener: KeyboardListener) =>
+        listeners.set(event, listener)
       ),
       removeEventListener: vi.fn<(event: string) => void>((event: string) =>
         listeners.delete(event)

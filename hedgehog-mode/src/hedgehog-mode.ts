@@ -67,10 +67,11 @@ export class HedgeHogMode implements HedgehogModeInterface {
   stateManager?: GameStateManager;
   syncPlatformsInterval?: NodeJS.Timeout;
   private destroyed = false; // destroy() has been requested
+  private teardownListeners: (() => void)[] = [];
 
   constructor(public options: HedgehogModeConfig) {
     this.spritesManager = new SpritesManager(options);
-    this.setupDebugListeners();
+    this.teardownListeners.push(this.setupDebugListeners());
   }
 
   get isDestroyed(): boolean {
@@ -85,6 +86,8 @@ export class HedgeHogMode implements HedgehogModeInterface {
     if (this.syncPlatformsInterval) {
       clearInterval(this.syncPlatformsInterval);
     }
+    this.teardownListeners.forEach((teardown) => teardown());
+    this.teardownListeners = [];
     Runner.stop(this.runner);
     [...this.elements].forEach((element) => this.removeElement(element));
     // Before app.init() resolves this is a no-op and render() finishes the
@@ -115,9 +118,9 @@ export class HedgeHogMode implements HedgehogModeInterface {
     }
   }
 
-  setupDebugListeners(): void {
+  setupDebugListeners(): () => void {
     let dCount = 0;
-    window.addEventListener("keydown", (e) => {
+    const keyDownListener = (e: KeyboardEvent): void => {
       if (e.key === "d" && e.ctrlKey) {
         dCount++;
         if (dCount === 5) {
@@ -132,7 +135,9 @@ export class HedgeHogMode implements HedgehogModeInterface {
       } else {
         dCount = 0;
       }
-    });
+    };
+    window.addEventListener("keydown", keyDownListener);
+    return () => window.removeEventListener("keydown", keyDownListener);
   }
 
   setUI(ui: GameUI): void {
@@ -276,7 +281,11 @@ export class HedgeHogMode implements HedgehogModeInterface {
     this.app.stage.eventMode = "static";
     this.app.stage.hitArea = this.app.screen;
 
-    window.addEventListener("resize", () => this.resize());
+    const resizeListener = (): void => this.resize();
+    window.addEventListener("resize", resizeListener);
+    this.teardownListeners.push(() =>
+      window.removeEventListener("resize", resizeListener)
+    );
 
     if (this.options.platforms) {
       this.syncPlatformsInterval = setInterval(
@@ -315,29 +324,36 @@ export class HedgeHogMode implements HedgehogModeInterface {
     // Start the debug renderer
     Render.run(this.debugRender);
 
-    document.addEventListener("mousemove", (event) => {
+    const mouseMoveListener = (event: MouseEvent): void => {
       this.mousePosition = { x: event.clientX, y: event.clientY };
-    });
+    };
+    document.addEventListener("mousemove", mouseMoveListener);
+    this.teardownListeners.push(() =>
+      document.removeEventListener("mousemove", mouseMoveListener)
+    );
 
     // Window-level pointerdown hit-test so taps on hedgehogs land on touch
     // devices (no hover-driven canvas pointer-events toggle to rely on)
-    window.addEventListener(
-      "pointerdown",
-      (event) => {
-        const point = { x: event.clientX, y: event.clientY };
-        for (const el of this.elements) {
-          if (el instanceof Actor && el.hitTest(point)) {
-            el.startDrag(event);
-            event.preventDefault();
-            event.stopPropagation();
-            break;
-          }
+    const pointerDownListener = (event: PointerEvent): void => {
+      const point = { x: event.clientX, y: event.clientY };
+      for (const el of this.elements) {
+        if (el instanceof Actor && el.hitTest(point)) {
+          el.startDrag(event);
+          event.preventDefault();
+          event.stopPropagation();
+          break;
         }
-      },
-      { capture: true }
+      }
+    };
+    window.addEventListener("pointerdown", pointerDownListener, {
+      capture: true,
+    });
+    this.teardownListeners.push(() =>
+      window.removeEventListener("pointerdown", pointerDownListener, true)
     );
 
-    new GlobalKeyboardListeners(this);
+    const globalKeyboardListeners = new GlobalKeyboardListeners(this);
+    this.teardownListeners.push(() => globalKeyboardListeners.destroy());
     gsap.ticker.remove(gsap.updateRoot);
     this.elements.push(new Ground(this));
     this.stateManager = new GameStateManager(this, this.options);
@@ -385,6 +401,9 @@ export class HedgeHogMode implements HedgehogModeInterface {
   }
 
   removeElement(element: GameElement): void {
+    if (!this.elements.includes(element)) {
+      return;
+    }
     element.beforeUnload?.();
     if (element.rigidBody) {
       Matter.Composite.remove(this.engine.world, element.rigidBody);

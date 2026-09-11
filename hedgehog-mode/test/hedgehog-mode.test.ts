@@ -102,7 +102,11 @@ describe("HedgeHogMode lifecycle", () => {
     const game = Object.create(HedgeHogMode.prototype) as HedgeHogMode;
     const first = { beforeUnload: vi.fn() };
     const second = { beforeUnload: vi.fn() };
-    Object.assign(game, { elements: [first, second], runner: Runner.create() });
+    Object.assign(game, {
+      elements: [first, second],
+      runner: Runner.create(),
+      teardownListeners: [],
+    });
 
     game.destroy();
 

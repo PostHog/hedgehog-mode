@@ -45,6 +45,6 @@ describe("HedgehogActorControls", () => {
     listeners.get("keydown")?.({ key: "f" } as KeyboardEvent);
 
     expect(maybeSpawnFireball).toHaveBeenCalledTimes(2);
-    expect(window.removeEventListener).toHaveBeenCalledTimes(2);
+    expect(listeners.size).toBe(0);
   });
 });

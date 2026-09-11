@@ -22,6 +22,7 @@ import { SpritesManager } from "./sprites/sprites";
 import { HedgehogActor } from "./actors/Hedgehog";
 import { Ground } from "./items/Ground";
 import { SyncedPlatform } from "./items/SyncedPlatform";
+import { WorldFx } from "./items/WorldFx";
 import { Actor } from "./actors/Actor";
 import { GlobalKeyboardListeners } from "./misc/GlobalKeyboardListeners";
 import {
@@ -64,6 +65,7 @@ export class HedgeHogMode implements HedgehogModeInterface {
   mousePosition?: Matter.Vector;
   lastTime?: number;
   gameUI!: GameUI;
+  worldFx!: WorldFx;
   stateManager?: GameStateManager;
   syncPlatformsInterval?: NodeJS.Timeout;
   private destroyed = false; // destroy() has been requested
@@ -274,6 +276,10 @@ export class HedgeHogMode implements HedgehogModeInterface {
       return;
     }
     ref.appendChild(this.app.canvas);
+
+    // Stage-level effect layers (scorch below everything, fx above).
+    this.worldFx = new WorldFx(this);
+    this.elements.push(this.worldFx);
 
     this.app.stage.eventMode = "static";
     this.app.stage.hitArea = this.app.screen;

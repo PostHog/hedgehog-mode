@@ -31,7 +31,10 @@ if (process.env.HEDGEHOG_FIXTURE === "extension") {
 
 async function main(): Promise<void> {
   const container = document.getElementById("app") as HTMLDivElement;
-  const game = new HedgeHogMode({ assetsUrl: "/assets" });
+  const game = new HedgeHogMode({
+    assetsUrl: "/assets",
+    platforms: { selector: ".platform" },
+  });
   window.__game = game;
   await game.render(container);
   window.__ready = true;

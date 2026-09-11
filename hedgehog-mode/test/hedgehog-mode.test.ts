@@ -201,3 +201,46 @@ describe("HedgeHogMode lifecycle", () => {
     expect(load).not.toHaveBeenCalled();
   });
 });
+
+describe("HedgehogActor pyro", () => {
+  function makeActor(overrides: Record<string, unknown> = {}) {
+    return Object.assign(Object.create(HedgehogActor.prototype), {
+      pyro: {
+        isActive: false,
+        pullTrigger: vi.fn(),
+        update: vi.fn(),
+        destroy: vi.fn(),
+      },
+      ability: { fire: vi.fn(), destroy: vi.fn() },
+      controls: { destroy: vi.fn() },
+      ai: { enable: vi.fn() },
+      accessorySprites: {},
+      ...overrides,
+    }) as unknown as HedgehogActor;
+  }
+
+  it("routes the f key to pyro while armed, else to the skin ability", () => {
+    const armed = makeActor({
+      pyro: {
+        isActive: true,
+        pullTrigger: vi.fn(),
+        update: vi.fn(),
+        destroy: vi.fn(),
+      },
+    });
+    armed.maybeSpawnFireball();
+    expect(armed.pyro.pullTrigger).toHaveBeenCalledOnce();
+    expect(armed.ability?.fire).not.toHaveBeenCalled();
+
+    const idle = makeActor();
+    idle.maybeSpawnFireball();
+    expect(idle.pyro.pullTrigger).not.toHaveBeenCalled();
+    expect(idle.ability?.fire).toHaveBeenCalledOnce();
+  });
+
+  it("tears pyro down with the actor", () => {
+    const actor = makeActor();
+    actor.beforeUnload();
+    expect(actor.pyro.destroy).toHaveBeenCalledOnce();
+  });
+});

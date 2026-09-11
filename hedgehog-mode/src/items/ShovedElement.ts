@@ -23,7 +23,7 @@ const MAX_VIEWPORT_SHARE = 0.4;
  * it lives in, and plenty of apps (this project's own playground included) put
  * their content in a scrolling panel rather than scrolling the document.
  */
-function scrollParentOf(el: HTMLElement): HTMLElement | null {
+export function scrollParentOf(el: HTMLElement): HTMLElement | null {
   let node = el.parentElement;
 
   while (node) {
@@ -45,7 +45,10 @@ function scrollParentOf(el: HTMLElement): HTMLElement | null {
   return null;
 }
 
-function scrollOffsetOf(node: HTMLElement | null): { x: number; y: number } {
+export function scrollOffsetOf(node: HTMLElement | null): {
+  x: number;
+  y: number;
+} {
   return node
     ? { x: node.scrollLeft, y: node.scrollTop }
     : { x: window.scrollX, y: window.scrollY };
@@ -140,6 +143,11 @@ export class ShovedElement implements GameElement {
         (Math.random() - 0.5) * 0.4
       );
     });
+  }
+
+  /** True while an element is tumbling through the air. */
+  static isShoved(ref: HTMLElement): boolean {
+    return SHOVED_BY_ELEMENT.has(ref);
   }
 
   private constructor(

@@ -10,6 +10,7 @@ import {
 import type { GameStateManager } from "./state";
 import { HedgehogGhostActor } from "./actors/Ghost";
 import { Accessory } from "./items/Accessory";
+import type { WorldFx } from "./items/WorldFx";
 
 export type { HedgehogActor, HedgehogActorOptions };
 
@@ -71,6 +72,7 @@ export type HedgehogModeInterface = {
   spritesManager: SpritesManager;
   elapsed?: number;
   elements: GameElement[];
+  worldFx: WorldFx;
   spawnHedgehog: (options?: HedgehogActorOptions) => HedgehogActor;
   spawnHedgehogGhost: (position: Matter.Vector) => HedgehogGhostActor;
   spawnAccessory: (

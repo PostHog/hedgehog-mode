@@ -81,6 +81,7 @@ describe("HedgeHogMode lifecycle", () => {
   beforeEach(() => {
     vi.stubGlobal("window", {
       addEventListener: vi.fn<() => void>(),
+      removeEventListener: vi.fn<() => void>(),
       devicePixelRatio: 1,
       // matter-js Runner.stop() reaches for these on destroy
       requestAnimationFrame: vi.fn<() => void>(),
@@ -101,7 +102,11 @@ describe("HedgeHogMode lifecycle", () => {
     const game = Object.create(HedgeHogMode.prototype) as HedgeHogMode;
     const first = { beforeUnload: vi.fn() };
     const second = { beforeUnload: vi.fn() };
-    Object.assign(game, { elements: [first, second], runner: Runner.create() });
+    Object.assign(game, {
+      elements: [first, second],
+      runner: Runner.create(),
+      teardownListeners: [],
+    });
 
     game.destroy();
 
@@ -141,6 +146,13 @@ describe("HedgeHogMode lifecycle", () => {
   it("destroys the app immediately when destroyed during the sprite load", async () => {
     const game = new HedgeHogMode(config);
     const { ref, appendChild } = createHostRef();
+    const cleanup = vi.fn<() => void>();
+    const element = {
+      isInteractive: false,
+      update: () => {},
+      beforeUnload: cleanup,
+    };
+    game.elements.push(element);
     let resolveLoad!: () => void;
     const load = vi.spyOn(game.spritesManager, "load").mockImplementation(
       () =>
@@ -156,6 +168,10 @@ describe("HedgeHogMode lifecycle", () => {
 
     game.destroy();
     expect(app.destroyCalls).toBe(1);
+    expect(cleanup).toHaveBeenCalledTimes(1);
+    expect(game.elements).toHaveLength(0);
+    game.removeElement(element);
+    expect(cleanup).toHaveBeenCalledTimes(1);
 
     resolveLoad();
     await rendering;

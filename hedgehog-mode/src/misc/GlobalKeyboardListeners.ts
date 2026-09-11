@@ -7,8 +7,14 @@ import {
 import { ShovedElement } from "../items/ShovedElement";
 
 export class GlobalKeyboardListeners {
+  private teardownKeyboardListeners: () => void;
+
   constructor(private game: HedgehogModeInterface) {
-    this.setupKeyboardListeners();
+    this.teardownKeyboardListeners = this.setupKeyboardListeners();
+  }
+
+  destroy(): void {
+    this.teardownKeyboardListeners();
   }
 
   setupKeyboardListeners(): () => void {

@@ -17,6 +17,7 @@ import { HedgehogActorOptions } from "./hedgehog/config";
 import { HedgehogActorInterface } from "./hedgehog/interface";
 import { applyStaticColor } from "./hedgehog/colors";
 import type { HedgehogSkinAbility } from "./hedgehog/abilities";
+import { HedgehogPyro } from "./hedgehog/pyro";
 import { getSkinDefinition, HedgehogSkinDefinition } from "./hedgehog/skins";
 import type { SpiderWebActor } from "../items/SpiderWebActor";
 
@@ -57,6 +58,7 @@ export class HedgehogActor extends Actor {
   controls: HedgehogActorControls;
   private filter = new ColorMatrixFilter();
   interface: HedgehogActorInterface;
+  pyro: HedgehogPyro;
 
   hitBoxModifier = {
     left: 0.24,
@@ -77,6 +79,7 @@ export class HedgehogActor extends Actor {
     this.ai = new HedgehogActorAI(this);
     this.controls = new HedgehogActorControls(this);
     this.interface = new HedgehogActorInterface(game, this);
+    this.pyro = new HedgehogPyro(this, game);
     this.setPosition({
       x: window.innerWidth * Math.random(),
       y: Math.random() * 200,
@@ -286,6 +289,29 @@ export class HedgehogActor extends Actor {
    * Send him on a rampage: for the next little while, anything he lands on gets
    * knocked off the page. Calling it again while one is running just extends it.
    */
+  /**
+   * Stand still and hold an animation to the end: update() reasserts
+   * walk/fall every frame, so without `posing` the flourish is gone before
+   * anyone sees it. Shared by rampage and pyro.
+   */
+  holdPose(animation: "action" | "wave"): void {
+    this.walkSpeed = 0;
+    this.posing = true;
+    this.updateSprite(animation, {
+      reset: true,
+      loop: false,
+      onComplete: () => {
+        this.posing = false;
+        this.updateSprite("idle");
+      },
+    });
+  }
+
+  /** Arm the flamethrower. Details live in ./hedgehog/pyro. */
+  startPyro(duration?: number): void {
+    this.pyro.start(duration);
+  }
+
   startRampage(duration: number = RAMPAGE_DURATION_MS): void {
     if (this.isDead) {
       return;
@@ -298,22 +324,10 @@ export class HedgehogActor extends Actor {
     }, duration);
 
     if (!alreadyRampaging) {
-      // Stand still for the flourish, the way the AI does for a wave, and hold
-      // the pose: update() reasserts walk/fall every frame, so without both of
-      // these the headband is gone before anyone sees it.
-      this.walkSpeed = 0;
       this.ai.pause(RAMPAGE_INTRO_MS);
-      this.posing = true;
       // The headband animation has been sitting in the spritesheet this whole
       // time waiting for exactly one occasion, and this is it.
-      this.updateSprite("action", {
-        reset: true,
-        loop: false,
-        onComplete: () => {
-          this.posing = false;
-          this.updateSprite("idle");
-        },
-      });
+      this.holdPose("action");
       this.interface.announceRampage();
     }
   }
@@ -395,6 +409,8 @@ export class HedgehogActor extends Actor {
     if (this.isDead) {
       return;
     }
+
+    this.pyro.update(ticker);
 
     const xForce = this.walkSpeed;
 
@@ -498,8 +514,13 @@ export class HedgehogActor extends Actor {
     FlameActor.fireBurst(this.game, contact);
   }
 
-  // Triggered by the `f` key; delegates to the skin's ability (hogzilla only).
+  // Triggered by the `f` key; pyro mode claims it while armed, otherwise it
+  // delegates to the skin's ability (hogzilla only).
   maybeSpawnFireball(): void {
+    if (this.pyro.isActive) {
+      this.pyro.pullTrigger();
+      return;
+    }
     this.ability?.fire?.();
   }
 
@@ -619,6 +640,7 @@ export class HedgehogActor extends Actor {
 
   beforeUnload(): void {
     clearTimeout(this.rampageTimer);
+    this.pyro.destroy();
     this.ability?.destroy();
     this.controls.destroy();
     this.ai.enable(false);

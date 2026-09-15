@@ -2,18 +2,11 @@ import type { HedgehogModeInterface } from "../../types";
 import type { HedgehogActor } from "../Hedgehog";
 import type { HedgehogSkinAbility } from "./abilities";
 import type { HedgehogActorAccessoryOption } from "./config";
-// Split from the type import above on purpose: the test mocks this module, and
-// a mixed value/type import can leave the type binding dangling at runtime.
-import { getAccessoryAbilityFactory } from "./config";
+import { getAccessoryInfo } from "./config";
 
 /**
- * Owns the abilities granted by whatever a hedgehog is currently wearing.
- *
- * Mirrors the guard `syncSkinAbility()` uses for skins. `updateOptions()` runs
- * on every option change, including ones with nothing to do with accessories
- * (colour, AI toggle, drag), so a naive rebuild would tear down a firework
- * mid-burn. {@link sync} therefore diffs the worn set against what is already
- * built and leaves anything unchanged alone.
+ * Owns the abilities granted by whatever a hedgehog is wearing. Diffs rather
+ * than rebuilds, so an unrelated option change can't kill a firework mid-burn.
  */
 export class HedgehogAccessoryAbilities {
   private abilities = new Map<
@@ -41,11 +34,14 @@ export class HedgehogAccessoryAbilities {
       if (this.abilities.has(accessory)) {
         return;
       }
-      const createAbility = getAccessoryAbilityFactory(accessory);
+      const createAbility = getAccessoryInfo(accessory).createAbility;
       if (!createAbility) {
         return;
       }
-      this.abilities.set(accessory, createAbility(this.actor, this.game));
+      this.abilities.set(
+        accessory,
+        createAbility(this.actor, this.game, accessory)
+      );
     });
   }
 

@@ -14,10 +14,7 @@ import { COLLISIONS } from "../misc/collisions";
 import { HedgehogActorAI } from "./hedgehog/ai";
 import { HedgehogActorControls } from "./hedgehog/controls";
 import { HedgehogAccessoryAbilities } from "./hedgehog/accessory-abilities";
-import {
-  getAccessorySpinAnchor,
-  HedgehogActorOptions,
-} from "./hedgehog/config";
+import { getAccessoryInfo, HedgehogActorOptions } from "./hedgehog/config";
 import { HedgehogActorInterface } from "./hedgehog/interface";
 import { applyStaticColor } from "./hedgehog/colors";
 import type { HedgehogSkinAbility } from "./hedgehog/abilities";
@@ -55,10 +52,8 @@ export class HedgehogActor extends Actor {
   // The skin `ability` was built for, so we only rebuild on real skin changes.
   private abilitySkin?: HedgehogActorOptions["skin"];
   accessorySprites: { [key: string]: Sprite } = {};
-  // Where each accessory sprite sits before the falling nudge below is
-  // applied. Non-zero only for a spinning accessory, which trades its
-  // anchor for a position offset (see syncAccessories).
-  private accessoryOffsets: { [key: string]: { x: number; y: number } } = {};
+  // Resting y of each accessory sprite, before the falling nudge in update().
+  private accessoryOffsetY: { [key: string]: number } = {};
   overlayAnimation?: AnimatedSprite;
   isFlammable = true;
   isDead = false;
@@ -467,10 +462,8 @@ export class HedgehogActor extends Actor {
       this.rigidBody!.velocity.y > 0.1
         ? Math.max(-10, Math.min(0, -this.rigidBody!.velocity.y))
         : 0;
-    // Added to the sprite's resting offset rather than replacing it, so a
-    // spinning accessory keeps the offset that holds it over its own centre.
     Object.entries(this.accessorySprites).forEach(([accessory, sprite]) => {
-      sprite.y = (this.accessoryOffsets[accessory]?.y ?? 0) + yOffsetDiff;
+      sprite.y = (this.accessoryOffsetY[accessory] ?? 0) + yOffsetDiff;
     });
 
     // Check if below screen and if so then move up (but not while tethered to a
@@ -571,7 +564,7 @@ export class HedgehogActor extends Actor {
     });
 
     this.accessorySprites = {};
-    this.accessoryOffsets = {};
+    this.accessoryOffsetY = {};
 
     this.options.accessories?.forEach((accessory) => {
       const frame = this.game.spritesManager.getSpriteFrames(
@@ -588,29 +581,23 @@ export class HedgehogActor extends Actor {
       sprite.eventMode = "static";
       this.sprite!.addChild(sprite);
 
-      // Accessory art is drawn in the hedgehog's own frame, so anchoring both
-      // sprites the same way lays one over the other and the art lands where it
-      // was drawn. The skin anchor shifts that overlay for skins whose body sits
-      // off-centre in the frame.
       const anchor = this.skinDefinition.accessoryAnchor ?? { x: 0.5, y: 0.5 };
 
-      // A spinning accessory can't use that anchor: rotation turns about it, and
-      // it is nowhere near the art. Anchor it on its own centre instead, then
-      // push it back by exactly the difference so it still overlays where the
-      // skin anchor would have put it — same pixels on screen, honest pivot.
-      const spinAnchor = getAccessorySpinAnchor(accessory);
+      // A spinning accessory pivots on its own centre, then shifts back by the
+      // difference so it still lands where the skin anchor would have put it.
+      const spinAnchor = getAccessoryInfo(accessory).spinAnchor;
       if (!spinAnchor) {
         sprite.anchor.set(anchor.x, anchor.y);
         return;
       }
 
       sprite.anchor.set(spinAnchor.x, spinAnchor.y);
-      const offset = {
-        x: (spinAnchor.x - anchor.x) * frame.width,
-        y: (spinAnchor.y - anchor.y) * frame.height,
-      };
-      this.accessoryOffsets[accessory] = offset;
-      sprite.position.set(offset.x, offset.y);
+      this.accessoryOffsetY[accessory] =
+        (spinAnchor.y - anchor.y) * frame.height;
+      sprite.position.set(
+        (spinAnchor.x - anchor.x) * frame.width,
+        this.accessoryOffsetY[accessory]
+      );
     });
   }
 
@@ -629,9 +616,8 @@ export class HedgehogActor extends Actor {
     const accessories = this.options.accessories;
     this.options.accessories = [];
     this.syncAccessories();
-    // Not the same call as the one updateOptions() made above: that one ran
-    // while the accessories were still on, so it had nothing to tear down. This
-    // is what stops a granted ability outliving the hog that was wearing it.
+    // The accessories were still on when updateOptions() synced above, so this
+    // is the call that actually tears the granted ability down.
     this.accessoryAbilities.sync();
 
     accessories?.forEach((accessory) => {

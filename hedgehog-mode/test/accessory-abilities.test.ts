@@ -8,21 +8,29 @@ const { created } = vi.hoisted(() => ({
   created: [] as Array<{
     fire: ReturnType<typeof vi.fn>;
     destroy: ReturnType<typeof vi.fn>;
+    builtFor: string;
   }>,
 }));
 
 vi.mock("../src/actors/hedgehog/config", () => ({
-  getAccessoryAbilityFactory: (accessory: string) =>
+  getAccessoryInfo: (accessory: string) =>
     accessory === "catherine-wheel"
-      ? () => {
-          const ability = {
-            fire: vi.fn<() => void>(),
-            destroy: vi.fn<() => void>(),
-          };
-          created.push(ability);
-          return ability;
+      ? {
+          createAbility: (
+            _actor: unknown,
+            _game: unknown,
+            builtFor: string
+          ) => {
+            const ability = {
+              fire: vi.fn<() => void>(),
+              destroy: vi.fn<() => void>(),
+              builtFor,
+            };
+            created.push(ability);
+            return ability;
+          },
         }
-      : undefined,
+      : {},
 }));
 
 import { HedgehogAccessoryAbilities } from "../src/actors/hedgehog/accessory-abilities";
@@ -39,6 +47,15 @@ describe("HedgehogAccessoryAbilities", () => {
     new HedgehogAccessoryAbilities(actor as never, {} as never).sync();
 
     expect(created).toHaveLength(1);
+  });
+
+  it("tells the ability which accessory it was built for", () => {
+    // The ability looks its own sprite up by this key, so a wrong one silently
+    // spins nothing.
+    const actor = makeActor(["catherine-wheel"]);
+    new HedgehogAccessoryAbilities(actor as never, {} as never).sync();
+
+    expect(created[0].builtFor).toBe("catherine-wheel");
   });
 
   it("ignores purely cosmetic accessories", () => {

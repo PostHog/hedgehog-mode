@@ -34,6 +34,9 @@ export class FlameActor extends Actor {
     position: Matter.Vector,
     velocity: Matter.Vector
   ): void {
+    if (TOTAL_NUM_FLAMES > 200) {
+      return;
+    }
     const flame = new FlameActor(game);
     flame.setPosition({
       x: position.x,

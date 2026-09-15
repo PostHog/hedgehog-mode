@@ -33,25 +33,18 @@ export type HedgehogActorColorOption =
 export type HedgehogActorAccessoryInfo = {
   group: "headwear" | "eyewear" | "other";
   /**
-   * Where this accessory's art actually sits in its frame, as a fraction of the
-   * frame, for accessories that rotate.
-   *
-   * Accessory art is drawn in the hedgehog's own 80x80 frame so that overlaying
-   * the two lands it in the right spot on him, which leaves most of the frame
-   * empty. That is invisible until something spins: the frame centre is nowhere
-   * near the art, so rotating about it swings the art round in an arc instead of
-   * turning it on the spot. An accessory that spins names its own centre here
-   * and {@link HedgehogActor.syncAccessories} pins the rotation to that instead.
+   * Rotation pivot, as a fraction of the frame. Accessory art is drawn in the
+   * hedgehog's own frame so the two overlay, which leaves the frame mostly
+   * empty — so anything that spins has to name where its art actually is.
    */
   spinAnchor?: { x: number; y: number };
-  /**
-   * Accessories are cosmetic by default. One that supplies this grants its
-   * wearer an active ability, built and torn down by
-   * {@link HedgehogAccessoryAbilities} as it is equipped and removed.
-   */
+  /** Builds the ability this accessory grants its wearer, if any. */
   createAbility?: (
     actor: HedgehogActor,
-    game: HedgehogModeInterface
+    game: HedgehogModeInterface,
+    // Not the key union: that's derived from this registry, so naming it here
+    // makes the type circular.
+    accessory: string
   ) => HedgehogSkinAbility;
 };
 
@@ -66,8 +59,8 @@ export const HedgehogActorAccessories = {
     group: "other",
     // The wheel is a 24px disc centred on (30, 44) of the 80px frame.
     spinAnchor: { x: 30 / 80, y: 44 / 80 },
-    createAbility: (actor: HedgehogActor, game: HedgehogModeInterface) =>
-      new CatherineWheelAbility(actor, game),
+    createAbility: (actor, game, accessory) =>
+      new CatherineWheelAbility(actor, game, accessory),
   },
   chef: {
     group: "headwear",
@@ -112,42 +105,25 @@ export const HedgehogActorAccessories = {
   "xmas-scarf": {
     group: "other",
   },
-};
+} satisfies Record<string, HedgehogActorAccessoryInfo>;
 
 type AccessoryKey = keyof typeof HedgehogActorAccessories;
+
+/**
+ * Accessories are restored from unvalidated storage, so an unknown key has to
+ * read as empty rather than throw out of the actor constructor.
+ */
+export const getAccessoryInfo = (
+  accessory: HedgehogActorAccessoryOption
+): Partial<HedgehogActorAccessoryInfo> =>
+  (HedgehogActorAccessories as Record<string, HedgehogActorAccessoryInfo>)[
+    accessory
+  ] ?? {};
 
 export type HedgehogActorAccessoryOption = AccessoryKey;
 export const HedgehogActorAccessoryOptions = Object.keys(
   HedgehogActorAccessories
 ) as HedgehogActorAccessoryOption[];
-
-/**
- * A registry entry viewed as a bag of optional fields. The registry is left
- * un-annotated so `AccessoryKey` stays a literal union, which means indexing it
- * gives a union where only some members declare the optional extras. Reading it
- * through a partial view gets at those members without widening the registry,
- * and copes with a key that isn't in it at all: accessories are restored from
- * unvalidated storage, so an unknown one must come back empty rather than throw
- * out of the actor constructor.
- */
-const getAccessoryInfo = (
-  accessory: HedgehogActorAccessoryOption
-): Partial<HedgehogActorAccessoryInfo> =>
-  (HedgehogActorAccessories[accessory] as
-    | Partial<HedgehogActorAccessoryInfo>
-    | undefined) ?? {};
-
-/** The ability factory a given accessory grants, if any. */
-export const getAccessoryAbilityFactory = (
-  accessory: HedgehogActorAccessoryOption
-): HedgehogActorAccessoryInfo["createAbility"] =>
-  getAccessoryInfo(accessory).createAbility;
-
-/** The point a given accessory rotates about, if it rotates at all. */
-export const getAccessorySpinAnchor = (
-  accessory: HedgehogActorAccessoryOption
-): HedgehogActorAccessoryInfo["spinAnchor"] =>
-  getAccessoryInfo(accessory).spinAnchor;
 
 export const getRandomAccessoryCombo = (): HedgehogActorAccessoryOption[] => {
   return [

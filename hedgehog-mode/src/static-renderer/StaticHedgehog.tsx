@@ -44,8 +44,6 @@ interface StaticHedgehogProps {
   style?: CSSProperties;
 }
 
-// Exported for tests: the sheet dimensions used here have to track the atlas, and
-// a hardcoded copy of them is silent when it drifts.
 export function getSpriteStyle(
   spriteName: string,
   assetsUrl: string
@@ -55,11 +53,7 @@ export function getSpriteStyle(
     return {};
   }
 
-  // Sprite sheet dimensions, read from the atlas rather than copied out of it.
-  // These were hardcoded, which silently rots the moment the sheet grows a row:
-  // every frame is then cropped against the wrong scale and the picker shows its
-  // neighbour instead. Adding the catherine wheel took the sheet 1440 -> 1520 and
-  // did exactly that.
+  // Read from the atlas: hardcoding these mis-crops every frame once it grows.
   const { w: sheetWidth, h: sheetHeight } = sprites.meta.size;
 
   // Responsive mode: scale to parent using percentages

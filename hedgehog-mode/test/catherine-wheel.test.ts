@@ -53,6 +53,9 @@ const makeActor = () => ({
   forceAngle: 0,
   rigidBody: { position: { x: 100, y: 200 } },
   sprite: { width: 60, scale: { x: 1, y: 1 } },
+  getDirection(): "left" | "right" {
+    return this.sprite.scale.x < 0 ? "left" : "right";
+  },
   accessorySprites: { "catherine-wheel": makeWheel() } as Record<
     string,
     ReturnType<typeof makeWheel>
@@ -85,7 +88,11 @@ describe("CatherineWheelAbility", () => {
     spawnFireball.mockClear();
     killTweensOf.mockClear();
     actor = makeActor();
-    ability = new CatherineWheelAbility(actor as never, {} as never);
+    ability = new CatherineWheelAbility(
+      actor as never,
+      {} as never,
+      "catherine-wheel"
+    );
   });
 
   afterEach(() => {
@@ -215,7 +222,11 @@ describe("CatherineWheelAbility", () => {
     spawnFireball.mockClear();
     actor.sprite.scale.x = -1;
     ability.destroy();
-    ability = new CatherineWheelAbility(actor as never, {} as never);
+    ability = new CatherineWheelAbility(
+      actor as never,
+      {} as never,
+      "catherine-wheel"
+    );
     ability.fire();
     advance(0.025);
     const [, , facingLeft] = spawnFireball.mock.calls[0];

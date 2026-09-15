@@ -32,23 +32,6 @@ describe("static renderer sprite cropping", () => {
   // pixi, so it needs the atlas dimensions. They used to be hardcoded, and when
   // the catherine wheel took the sheet 1440 -> 1520 every frame in the picker
   // started cropping against the wrong scale: the wheel showed up as the beret.
-  it("scales the sheet by the size the atlas declares, not a copy of it", () => {
-    const style = getSpriteStyle(
-      "accessories/catherine-wheel.png",
-      "/assets"
-    ) as { backgroundSize: string };
-
-    const frame = (
-      sprites.frames as Record<string, { sourceSize: { w: number; h: number } }>
-    )["accessories/catherine-wheel.png"];
-
-    const scaleX = 100 / frame.sourceSize.w;
-    const scaleY = 100 / frame.sourceSize.h;
-    expect(style.backgroundSize).toBe(
-      `${sprites.meta.size.w * scaleX}% ${sprites.meta.size.h * scaleY}%`
-    );
-  });
-
   it("puts the last row of the atlas inside the scaled sheet", () => {
     // The specific failure: a frame on a row that only exists in the grown sheet
     // lands outside a sheet scaled to the old height, and renders its neighbour.

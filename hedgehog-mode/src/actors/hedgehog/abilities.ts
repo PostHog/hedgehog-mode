@@ -134,50 +134,34 @@ export class HogzillaAbility implements HedgehogSkinAbility {
   destroy(): void {}
 }
 
-// Catherine wheel: a firework pinned to the hog. Lighting it spins the wheel
-// through a couple of full turns while sparks fly off its rim, thrown outward
-// along whatever angle it has reached. Reusable — once it burns out he can light
-// it again.
-//
-// The wheel spins; the hog does not. An earlier cut turned the hog himself
-// (Actor.forceAngle), which rotated his whole sprite and his hitbox with it, and
-// read as a rendering glitch rather than a firework. The spin now lives on the
-// accessory sprite alone — see `spinAnchor` in config.ts for why it turns on the
-// spot rather than swinging round the frame centre.
-const CATHERINE_WHEEL = "catherine-wheel";
 const BURN_DURATION_S = 5;
-const SPIN_ROTATIONS = 5;
-const SPARKS_PER_SECOND = 20;
-const SPIN_ANGLE = SPIN_ROTATIONS * Math.PI * 2;
-const SPARKS_PER_BURN = BURN_DURATION_S * SPARKS_PER_SECOND;
+const SPIN_ANGLE = 5 * Math.PI * 2;
+const SPARKS_PER_BURN = BURN_DURATION_S * 20;
 const SPARK_SPEED = 13;
-// Fraction either side of SPARK_SPEED, so the ring of sparks isn't uniform.
 const SPARK_SPEED_JITTER = 0.25;
-// The rim the sparks leave from, as a fraction of sprite width. The wheel art is
-// a 24px disc in the same 80px frame the hog is drawn in, so measuring against
-// his sprite keeps the rim in step with his scale, as it was when he was the
-// thing spinning.
+// Rim radius, as a fraction of the hog's sprite width — the wheel art is a 24px
+// disc drawn in the same 80px frame he is, so his width scales it correctly.
 const RIM_OFFSET = 0.15;
 
+/**
+ * Catherine wheel: a firework pinned to the hog. Lighting it spins the wheel
+ * sprite — not the hog, which would turn his hitbox too — and throws sparks off
+ * the rim along the angle it has reached. Relightable once it burns out.
+ */
 export class CatherineWheelAbility implements HedgehogSkinAbility {
-  // Tweened 0 -> SPIN_ANGLE by gsap and written onto the wheel sprite's
-  // rotation, which is what actually turns it.
   private angle = 0;
   private burning = false;
   private sparksEmitted = 0;
 
   constructor(
     private actor: HedgehogActor,
-    private game: HedgehogModeInterface
+    private game: HedgehogModeInterface,
+    private accessory: string
   ) {}
 
-  /**
-   * The worn wheel, looked up per tick rather than held onto: `syncAccessories()`
-   * rebuilds the sprite map on every option change, so a reference taken at
-   * `fire()` would be spinning a sprite that is no longer on screen.
-   */
+  /** Looked up per tick: syncAccessories() rebuilds the map on any option change. */
   private get wheel(): Sprite | undefined {
-    return this.actor.accessorySprites[CATHERINE_WHEEL];
+    return this.actor.accessorySprites[this.accessory];
   }
 
   fire(): void {
@@ -206,14 +190,7 @@ export class CatherineWheelAbility implements HedgehogSkinAbility {
     });
   }
 
-  /**
-   * Sparks are spread evenly over the burn and thrown along whatever angle the
-   * wheel has reached, so how many are owed is just how far the spin has got.
-   * Driving them off the tween rather than a timer of their own keeps the whole
-   * firework on the game's clock: they stop dead when the engine stops (which a
-   * torn-down game never restarts) and they stretch and shrink with setSpeed,
-   * exactly as the spin does.
-   */
+  /** Sparks ride the tween, not a timer, so they stop with the engine and scale with setSpeed. */
   private emitSparksDue(): void {
     const due = Math.floor((this.angle / SPIN_ANGLE) * SPARKS_PER_BURN);
 
@@ -229,18 +206,13 @@ export class CatherineWheelAbility implements HedgehogSkinAbility {
       return;
     }
 
-    // The wheel is anchored on its own centre, so its origin in stage space is
-    // the hub the sparks orbit. Stage space is world space here, so this drops
-    // straight into Matter.
+    // The wheel is anchored on its own centre, and stage space is world space.
     const hub = wheel.getGlobalPosition();
     const reach = Math.abs(this.actor.sprite?.width ?? 0) * RIM_OFFSET;
     const jitter = 1 + (Math.random() - 0.5) * 2 * SPARK_SPEED_JITTER;
     const speed = SPARK_SPEED * jitter;
-    // The hog's sprite mirrors when he faces left and the wheel mirrors with it,
-    // so the spin reads as running the other way. Mirror the spark heading to
-    // match, or sparks peel off the opposite side of the rim from the one the
-    // wheel is visibly throwing them from.
-    const facing = (this.actor.sprite?.scale.x ?? 1) < 0 ? -1 : 1;
+    // The wheel mirrors with the hog's sprite, so mirror the heading too.
+    const facing = this.actor.getDirection() === "left" ? -1 : 1;
     const cos = Math.cos(this.angle) * facing;
     const sin = Math.sin(this.angle);
 

@@ -48,6 +48,15 @@ const cheatSheetMessages: GameUIProps["messages"] = [
   },
   {
     words: [
+      "type",
+      { text: "pyro", style: { color: "orangered", fontWeight: "bold" } },
+      "and hold",
+      { text: "f", style: { fontWeight: "bold" } },
+      "and i'll handle the rest. your layout will not.",
+    ],
+  },
+  {
+    words: [
       "become",
       { text: "spiderhog", style: { color: "red" } },
       "or go",
@@ -357,6 +366,46 @@ export class HedgehogActorInterface {
     [{ words: ["ben said the design was final. ben was wrong"] }],
   ];
 
+  // Said once, when the flamethrower comes out.
+  private pyroMessages: GameUIProps["messages"][] = [
+    [
+      {
+        words: [
+          "good news: our",
+          {
+            text: "burn rate",
+            style: { color: "orangered", fontWeight: "bold" },
+          },
+          "is about to go way up",
+        ],
+      },
+    ],
+    [
+      {
+        words: [
+          "this button wasn't converting anyway. now it's converting into smoke",
+        ],
+      },
+    ],
+    [
+      {
+        words: [
+          "don't worry, it's",
+          { text: "posthog-compliant fire", style: { fontStyle: "italic" } },
+          ". fully reversible. probably",
+        ],
+      },
+    ],
+    [{ words: ["some pages need a redesign. some need a controlled burn"] }],
+    [
+      {
+        words: [
+          "ben said the design was final. ben didn't say anything about ashes",
+        ],
+      },
+    ],
+  ];
+
   constructor(
     private game: HedgehogModeInterface,
     private actor: HedgehogActor
@@ -365,6 +414,19 @@ export class HedgehogActorInterface {
   /** One line of self-justification as a rampage kicks off. */
   announceRampage(): void {
     const messages = sample(this.rampageMessages);
+
+    if (messages?.[0]) {
+      this.game.gameUI?.flash({
+        words: messages[0].words,
+        actor: this.actor,
+        duration: 4000,
+      });
+    }
+  }
+
+  /** One line of self-justification as the flamethrower comes out. */
+  announcePyro(): void {
+    const messages = sample(this.pyroMessages);
 
     if (messages?.[0]) {
       this.game.gameUI?.flash({

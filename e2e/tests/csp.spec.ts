@@ -164,5 +164,87 @@ for (const route of ROUTES) {
       ).toEqual([]);
       expect(failures.errors, "uncaught page errors").toEqual([]);
     });
+
+    test("pyro mode renders flame without eval", async ({ page }) => {
+      const failures = collectFailures(page);
+      await page.goto(route.path);
+
+      const probe = await page.evaluate(() => window.__cspProbe);
+      expect(
+        probe,
+        "CSP was not enforced, so this run proves nothing about eval"
+      ).toMatch(/^blocked:/);
+      expect(await waitForBoot(page, failures)).toBe("ready");
+
+      // Trigger pyro on the playable hog and hold the trigger for two seconds.
+      // The pyro path is the shader/filter-heavy one: ColorMatrixFilter grade on
+      // the stage, DisplacementFilter shimmer on the flame stream, generated
+      // textures, animated fire overlays on burning elements.
+      await page.evaluate(() => {
+        window.__game!.getPlayableHedgehog()?.startPyro();
+      });
+      await expect
+        .poll(() =>
+          page.evaluate(() =>
+            window.__game!.elements.some(
+              (e) => (e as { isFlameStream?: boolean }).isFlameStream
+            )
+          )
+        )
+        .toBe(true);
+
+      await page.evaluate(() => {
+        const hog = window.__game!.getPlayableHedgehog();
+        hog?.pyro.pullTrigger();
+      });
+      // Hold the trigger: the controls tick every 100 ms, the hold window is 160 ms.
+      for (let i = 0; i < 20; i++) {
+        await page.waitForTimeout(100);
+        await page.evaluate(() => {
+          window.__game!.getPlayableHedgehog()?.pyro.pullTrigger();
+        });
+      }
+
+      // The stage got the fx layers. The colour grade tweens in via gsap, which the
+      // engine drives; in headless the rAF loop can be slow, so poll for the filter
+      // rather than assert a fixed wait.
+      const fxState = await page.evaluate(() => {
+        const game = window.__game!;
+        const worldFx = game.elements.find(
+          (e) => (e as { isWorldFx?: boolean }).isWorldFx
+        ) as { fx?: unknown } | undefined;
+        return { hasFxLayer: !!worldFx?.fx };
+      });
+      expect(fxState.hasFxLayer, "world fx layers missing").toBe(true);
+      await expect
+        .poll(
+          () =>
+            page.evaluate(
+              () => (window.__game!.app.stage.filters ?? []).length
+            ),
+          { timeout: 5000, message: "colour grade filter never applied" }
+        )
+        .toBeGreaterThan(0);
+
+      // The render loop is still ticking under the full pyro load.
+      const first = await page.screenshot();
+      await page.waitForTimeout(600);
+      const second = await page.screenshot();
+      expect(
+        Buffer.compare(first, second),
+        "frames are identical, so the render loop stalled under pyro"
+      ).not.toBe(0);
+
+      // No eval violations, no escaped patches, no uncaught errors — under full pyro load.
+      expect(
+        matching(failures, EVAL_VIOLATION),
+        "pyro mode tried to compile code at runtime"
+      ).toEqual([]);
+      expect(
+        matching(failures, MISSING_PATCH),
+        "a pixi eval path escaped the polyfill during pyro"
+      ).toEqual([]);
+      expect(failures.errors, "uncaught page errors during pyro").toEqual([]);
+    });
   });
 }

@@ -95,7 +95,21 @@ their own.
 | Run                            | hold `shift` while walking                     |
 | Moonwalk                       | hold `alt` (`⌥ option` on a mac) while walking |
 | Breathe fire (hogzilla only)   | `F`                                            |
+| Flamethrower (pyro mode)       | hold `F` after typing `pyro`                   |
 | Climb a web (spiderhog only)   | `W` / `S` while slung                          |
+
+### Pyro mode
+
+Type `pyro` and the player hedgehog draws a flamethrower. Hold `F` to fire a
+cone of flame across the page: elements it touches catch, char, erode along a
+glowing burn line, throw off embers and smoke, leave scorch marks, then the
+charred husk tips over and falls — before springing back and healing, so your
+layout always survives.
+
+Fire spreads between elements that touch, with hard caps so it can't take the
+whole page down. It respects `prefers-reduced-motion` (no screen shake, heat
+shimmer, or colour grade). Add `data-hedgehog-no-burn` to any element you want
+to keep off-limits.
 
 > 💡 **Tip:** type `cheatcodes` at the page and the hedgehog will recite this
 > list himself — along with all the easter eggs.

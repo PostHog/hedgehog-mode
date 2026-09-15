@@ -97,6 +97,12 @@ export class GlobalKeyboardListeners {
         },
       },
       {
+        keys: ["p", "y", "r", "o"],
+        action: () => {
+          this.game.getPlayableHedgehog()?.startPyro();
+        },
+      },
+      {
         keys: ["e", "a", "r", "t", "h", "q", "u", "a", "k", "e"],
         action: () => ShovedElement.earthquake(this.game),
       },

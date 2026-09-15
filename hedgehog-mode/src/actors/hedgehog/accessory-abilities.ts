@@ -54,11 +54,6 @@ export class HedgehogAccessoryAbilities {
     this.abilities.forEach((ability) => ability.fire?.());
   }
 
-  /** Whether anything worn actually answers to `f`. */
-  get hasFireAbility(): boolean {
-    return [...this.abilities.values()].some((ability) => !!ability.fire);
-  }
-
   destroy(): void {
     this.abilities.forEach((ability) => ability.destroy());
     this.abilities.clear();

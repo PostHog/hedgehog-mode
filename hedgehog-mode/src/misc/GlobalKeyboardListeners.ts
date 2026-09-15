@@ -48,11 +48,7 @@ export class GlobalKeyboardListeners {
         action: () => {
           const hedgehog = this.game.getPlayableHedgehog();
 
-          // Used to exclude hogzilla by name, because he's the one who holds `f`
-          // to breathe fire and kept setting himself alight. Accessories can bind
-          // `f` too now, so ask what the key is actually wired to rather than
-          // guessing from the skin.
-          if (!hedgehog?.usesFireKey) {
+          if (hedgehog?.options.skin !== "hogzilla") {
             hedgehog?.setOnFire();
           }
         },

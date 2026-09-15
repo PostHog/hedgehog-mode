@@ -524,6 +524,16 @@ export class HedgehogActor extends Actor {
     this.accessoryAbilities.fire();
   }
 
+  /**
+   * Whether `f` does something for this hedgehog, from either his skin or what
+   * he's wearing. The `fff` cheat asks before torching him: browsers repeat
+   * keydown while a key is held, so anyone holding `f` to use an ability spells
+   * the cheat out by accident within a few hundred milliseconds.
+   */
+  get usesFireKey(): boolean {
+    return !!this.ability?.fire || this.accessoryAbilities.hasFireAbility;
+  }
+
   onCollisionStart(element: GameElement, pair: Matter.Pair): void {
     super.onCollisionStart(element, pair);
     this.maybeSetElementOnFire(element, pair);

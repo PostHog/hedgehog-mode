@@ -128,3 +128,46 @@ describe("HedgehogAccessoryAbilities", () => {
     expect(created).toHaveLength(0);
   });
 });
+
+describe("HedgehogAccessoryAbilities.hasFireAbility", () => {
+  beforeEach(() => {
+    created.length = 0;
+  });
+
+  it("is false with nothing worn that answers to f", () => {
+    const abilities = new HedgehogAccessoryAbilities(
+      makeActor(["tophat"]) as never,
+      {} as never
+    );
+    abilities.sync();
+
+    expect(abilities.hasFireAbility).toBe(false);
+  });
+
+  it("is true while wearing something that does", () => {
+    // Guards the `fff` cheat: browsers repeat keydown while a key is held, so
+    // holding `f` to light the wheel spells the cheat out by accident and used
+    // to set the hog on fire mid-burn.
+    const abilities = new HedgehogAccessoryAbilities(
+      makeActor(["catherine-wheel"]) as never,
+      {} as never
+    );
+    abilities.sync();
+
+    expect(abilities.hasFireAbility).toBe(true);
+  });
+
+  it("goes back to false once it is taken off", () => {
+    const actor = makeActor(["catherine-wheel"]);
+    const abilities = new HedgehogAccessoryAbilities(
+      actor as never,
+      {} as never
+    );
+    abilities.sync();
+
+    actor.options.accessories = [];
+    abilities.sync();
+
+    expect(abilities.hasFireAbility).toBe(false);
+  });
+});

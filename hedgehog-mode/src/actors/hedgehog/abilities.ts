@@ -146,11 +146,11 @@ export class HogzillaAbility implements HedgehogSkinAbility {
 // spot rather than swinging round the frame centre.
 const CATHERINE_WHEEL = "catherine-wheel";
 const BURN_DURATION_S = 5;
-const SPIN_ROTATIONS = 4;
+const SPIN_ROTATIONS = 5;
 const SPARKS_PER_SECOND = 20;
 const SPIN_ANGLE = SPIN_ROTATIONS * Math.PI * 2;
 const SPARKS_PER_BURN = BURN_DURATION_S * SPARKS_PER_SECOND;
-const SPARK_SPEED = 11;
+const SPARK_SPEED = 13;
 // Fraction either side of SPARK_SPEED, so the ring of sparks isn't uniform.
 const SPARK_SPEED_JITTER = 0.25;
 // The rim the sparks leave from, as a fraction of sprite width. The wheel art is

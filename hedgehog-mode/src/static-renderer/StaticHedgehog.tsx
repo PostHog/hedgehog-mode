@@ -13,6 +13,7 @@ type SpriteFrame = {
 
 type SpritesJSON = {
   frames: Record<string, SpriteFrame>;
+  meta: { size: { w: number; h: number } };
 };
 
 const sprites = spritesData as SpritesJSON;
@@ -43,15 +44,23 @@ interface StaticHedgehogProps {
   style?: CSSProperties;
 }
 
-function getSpriteStyle(spriteName: string, assetsUrl: string): CSSProperties {
+// Exported for tests: the sheet dimensions used here have to track the atlas, and
+// a hardcoded copy of them is silent when it drifts.
+export function getSpriteStyle(
+  spriteName: string,
+  assetsUrl: string
+): CSSProperties {
   const frame = sprites.frames[spriteName];
   if (!frame) {
     return {};
   }
 
-  // Sprite sheet dimensions from sprites.json meta
-  const sheetWidth = 2000;
-  const sheetHeight = 1440;
+  // Sprite sheet dimensions, read from the atlas rather than copied out of it.
+  // These were hardcoded, which silently rots the moment the sheet grows a row:
+  // every frame is then cropped against the wrong scale and the picker shows its
+  // neighbour instead. Adding the catherine wheel took the sheet 1440 -> 1520 and
+  // did exactly that.
+  const { w: sheetWidth, h: sheetHeight } = sprites.meta.size;
 
   // Responsive mode: scale to parent using percentages
   const scaleX = 100 / frame.sourceSize.w;

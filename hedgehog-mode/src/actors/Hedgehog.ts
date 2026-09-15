@@ -228,6 +228,9 @@ export class HedgehogActor extends Actor {
   }
 
   public override setScale(scale: number): void {
+    // An explicit size command owns the scale from this point on. Otherwise the
+    // entrance tween can finish later and restore a giant hedgehog to size 1.
+    gsap.killTweensOf(this.sprite!.scale);
     super.setScale(scale);
     this.isGiant = scale > 1;
   }

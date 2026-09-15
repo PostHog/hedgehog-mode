@@ -42,6 +42,9 @@ export class HedgehogActor extends Actor {
   // the controls and read by the attached SpiderWebActor.
   webClimbDirection: -1 | 0 | 1 = 0;
   private rampageTimer?: NodeJS.Timeout;
+  // Size effects can temporarily overshoot their target. Only an explicit size command
+  // should make the hedgehog destructive.
+  private isGiant = false;
   // Holds the rampage flourish on screen; see the animation block in update().
   private posing = false;
   private ability?: HedgehogSkinAbility;
@@ -95,7 +98,8 @@ export class HedgehogActor extends Actor {
       x: 1,
       y: 1,
       duration: 0.5,
-      ease: "elastic.out",
+      // Keep the entrance bouncy without briefly making the hedgehog giant.
+      ease: "bounce.out",
     });
 
     // Wires up the skin ability via syncSkinAbility().
@@ -223,6 +227,14 @@ export class HedgehogActor extends Actor {
     this.syncSkinAbility();
   }
 
+  public override setScale(scale: number): void {
+    // An explicit size command owns the scale from this point on. Otherwise the
+    // entrance tween can finish later and restore a giant hedgehog to size 1.
+    gsap.killTweensOf(this.sprite!.scale);
+    super.setScale(scale);
+    this.isGiant = scale > 1;
+  }
+
   // Skin can change at runtime (e.g. "become spiderhog"), so keep the skin
   // ability in sync. Only rebuilds when the skin actually changes, so unrelated
   // option updates (colour, accessories, ...) don't tear down an active sling.
@@ -279,7 +291,7 @@ export class HedgehogActor extends Actor {
 
   /** Whether he's currently treating your layout as a bouncy castle. */
   get isRampaging(): boolean {
-    return this.sprite!.scale.y > 1 || !!this.rampageTimer;
+    return this.isGiant || !!this.rampageTimer;
   }
 
   /**

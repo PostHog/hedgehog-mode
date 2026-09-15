@@ -110,9 +110,19 @@ describe("HedgeHogMode lifecycle", () => {
     expect(game.elements).toEqual([]);
   });
 
-  it("keeps giant hedgehogs rampaging", () => {
+  it("does not mistake visual scale overshoot for a rampage", () => {
     const actor = Object.create(HedgehogActor.prototype) as HedgehogActor;
     actor.sprite = { scale: { y: 2 } } as never;
+
+    expect(actor.isRampaging).toBe(false);
+  });
+
+  it("keeps explicitly giant hedgehogs rampaging", () => {
+    const actor = Object.create(HedgehogActor.prototype) as HedgehogActor;
+    actor.sprite = { scale: { set: vi.fn() } } as never;
+    (actor as unknown as { loadRigidBody: () => void }).loadRigidBody = vi.fn();
+
+    actor.setScale(2);
 
     expect(actor.isRampaging).toBe(true);
   });

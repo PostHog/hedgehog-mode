@@ -98,7 +98,8 @@ export class HedgehogActor extends Actor {
       x: 1,
       y: 1,
       duration: 0.5,
-      ease: "elastic.out",
+      // Keep the entrance bouncy without briefly making the hedgehog giant.
+      ease: "bounce.out",
     });
 
     // Wires up the skin ability via syncSkinAbility().

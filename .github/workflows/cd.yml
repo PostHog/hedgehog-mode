@@ -38,6 +38,7 @@ jobs:
           cache: "pnpm"
 
       - name: Ensure latest npm with OIDC support (npm 11.5.1+)
+        if: steps.check-package-version.outputs.is-new-version == 'true'
         shell: bash
         run: npm install -g npm@11.6.4
 

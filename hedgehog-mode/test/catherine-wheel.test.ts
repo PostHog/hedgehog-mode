@@ -35,10 +35,10 @@ vi.mock("../src/items/Flame", () => ({
 
 import { CatherineWheelAbility } from "../src/actors/hedgehog/abilities";
 
-const BURN_DURATION_S = 3;
-const SPIN_ROTATIONS = 2;
+const BURN_DURATION_S = 6;
+const SPIN_ROTATIONS = 5;
 const SPARKS_PER_SECOND = 20;
-const SPARK_SPEED = 8;
+const SPARK_SPEED = 16;
 
 const HUB = { x: 100, y: 200 };
 
@@ -122,11 +122,11 @@ describe("CatherineWheelAbility", () => {
 
   it("throws sparks outward from the wheel's hub", () => {
     ability.fire();
-    // 0.0625 of the burn puts the tween angle at pi/4 (SPIN_ROTATIONS turns is
-    // 4pi total), where both cos and sin are meaningfully non-zero. Sampling
-    // at 0.5 lands exactly on a multiple of 2pi, where sin collapses to ~0 and
+    // 0.025 of the burn puts the tween angle at pi/4 (SPIN_ROTATIONS turns is
+    // 10pi total), where both cos and sin are meaningfully non-zero. Sampling
+    // at 0.5 lands exactly on a multiple of pi, where sin collapses to ~0 and
     // the radial direction degenerates to the x-axis alone.
-    advance(0.0625);
+    advance(0.025);
 
     const [, position, velocity] = spawnFireball.mock.calls[0];
     // Muzzle sits off the hub, on the rim.
@@ -147,7 +147,7 @@ describe("CatherineWheelAbility", () => {
     // advances monotonically and covers SPIN_ROTATIONS turns across the burn).
     const headingBefore = Math.atan2(velocity.y, velocity.x);
     spawnFireball.mockClear();
-    advance(0.1875); // a further pi/4 -> 3pi/4 turns the heading by 90 degrees.
+    advance(0.075); // a further pi/2 -> 3pi/4 turns the heading by 90 degrees.
     const [, , laterVelocity] = spawnFireball.mock.calls[0];
     const headingAfter = Math.atan2(laterVelocity.y, laterVelocity.x);
     expect(headingAfter).not.toBeCloseTo(headingBefore);
@@ -209,7 +209,7 @@ describe("CatherineWheelAbility", () => {
     // The hog's sprite flips on scale.x and the wheel flips with it, so the
     // visible spin runs the other way. Sparks have to follow the picture.
     ability.fire();
-    advance(0.0625);
+    advance(0.025);
     const [, , facingRight] = spawnFireball.mock.calls[0];
 
     spawnFireball.mockClear();
@@ -217,7 +217,7 @@ describe("CatherineWheelAbility", () => {
     ability.destroy();
     ability = new CatherineWheelAbility(actor as never, {} as never);
     ability.fire();
-    advance(0.0625);
+    advance(0.025);
     const [, , facingLeft] = spawnFireball.mock.calls[0];
 
     // Mirrored about the vertical axis: x flips sign, y is untouched.

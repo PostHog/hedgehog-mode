@@ -14,7 +14,10 @@ import { COLLISIONS } from "../misc/collisions";
 import { HedgehogActorAI } from "./hedgehog/ai";
 import { HedgehogActorControls } from "./hedgehog/controls";
 import { HedgehogAccessoryAbilities } from "./hedgehog/accessory-abilities";
-import { HedgehogActorOptions } from "./hedgehog/config";
+import {
+  getAccessorySpinAnchor,
+  HedgehogActorOptions,
+} from "./hedgehog/config";
 import { HedgehogActorInterface } from "./hedgehog/interface";
 import { applyStaticColor } from "./hedgehog/colors";
 import type { HedgehogSkinAbility } from "./hedgehog/abilities";
@@ -52,6 +55,10 @@ export class HedgehogActor extends Actor {
   // The skin `ability` was built for, so we only rebuild on real skin changes.
   private abilitySkin?: HedgehogActorOptions["skin"];
   accessorySprites: { [key: string]: Sprite } = {};
+  // Where each accessory sprite sits before the falling nudge below is
+  // applied. Non-zero only for a spinning accessory, which trades its
+  // anchor for a position offset (see syncAccessories).
+  private accessoryOffsets: { [key: string]: { x: number; y: number } } = {};
   overlayAnimation?: AnimatedSprite;
   isFlammable = true;
   isDead = false;
@@ -456,19 +463,15 @@ export class HedgehogActor extends Actor {
     }
 
     // We want to make it look like the hedgehog's accessories are disconnected. If we are falling then we position them slightly above
-    if (this.rigidBody!.velocity.y > 0.1) {
-      const yOffsetDiff = Math.max(
-        -10,
-        Math.min(0, -this.rigidBody!.velocity.y)
-      );
-      Object.values(this.accessorySprites).forEach((sprite) => {
-        sprite.y = yOffsetDiff;
-      });
-    } else {
-      Object.values(this.accessorySprites).forEach((sprite) => {
-        sprite.y = 0;
-      });
-    }
+    const yOffsetDiff =
+      this.rigidBody!.velocity.y > 0.1
+        ? Math.max(-10, Math.min(0, -this.rigidBody!.velocity.y))
+        : 0;
+    // Added to the sprite's resting offset rather than replacing it, so a
+    // spinning accessory keeps the offset that holds it over its own centre.
+    Object.entries(this.accessorySprites).forEach(([accessory, sprite]) => {
+      sprite.y = (this.accessoryOffsets[accessory]?.y ?? 0) + yOffsetDiff;
+    });
 
     // Check if below screen and if so then move up (but not while tethered to a
     // web — teleporting across the screen would explode the constraint tension).
@@ -568,6 +571,7 @@ export class HedgehogActor extends Actor {
     });
 
     this.accessorySprites = {};
+    this.accessoryOffsets = {};
 
     this.options.accessories?.forEach((accessory) => {
       const frame = this.game.spritesManager.getSpriteFrames(
@@ -582,13 +586,31 @@ export class HedgehogActor extends Actor {
       const sprite = new Sprite(frame);
       this.accessorySprites[accessory] = sprite;
       sprite.eventMode = "static";
-      sprite.anchor.set(0.5);
       this.sprite!.addChild(sprite);
 
-      const anchor = this.skinDefinition.accessoryAnchor;
-      if (anchor) {
+      // Accessory art is drawn in the hedgehog's own frame, so anchoring both
+      // sprites the same way lays one over the other and the art lands where it
+      // was drawn. The skin anchor shifts that overlay for skins whose body sits
+      // off-centre in the frame.
+      const anchor = this.skinDefinition.accessoryAnchor ?? { x: 0.5, y: 0.5 };
+
+      // A spinning accessory can't use that anchor: rotation turns about it, and
+      // it is nowhere near the art. Anchor it on its own centre instead, then
+      // push it back by exactly the difference so it still overlays where the
+      // skin anchor would have put it — same pixels on screen, honest pivot.
+      const spinAnchor = getAccessorySpinAnchor(accessory);
+      if (!spinAnchor) {
         sprite.anchor.set(anchor.x, anchor.y);
+        return;
       }
+
+      sprite.anchor.set(spinAnchor.x, spinAnchor.y);
+      const offset = {
+        x: (spinAnchor.x - anchor.x) * frame.width,
+        y: (spinAnchor.y - anchor.y) * frame.height,
+      };
+      this.accessoryOffsets[accessory] = offset;
+      sprite.position.set(offset.x, offset.y);
     });
   }
 

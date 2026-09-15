@@ -33,6 +33,18 @@ export type HedgehogActorColorOption =
 export type HedgehogActorAccessoryInfo = {
   group: "headwear" | "eyewear" | "other";
   /**
+   * Where this accessory's art actually sits in its frame, as a fraction of the
+   * frame, for accessories that rotate.
+   *
+   * Accessory art is drawn in the hedgehog's own 80x80 frame so that overlaying
+   * the two lands it in the right spot on him, which leaves most of the frame
+   * empty. That is invisible until something spins: the frame centre is nowhere
+   * near the art, so rotating about it swings the art round in an arc instead of
+   * turning it on the spot. An accessory that spins names its own centre here
+   * and {@link HedgehogActor.syncAccessories} pins the rotation to that instead.
+   */
+  spinAnchor?: { x: number; y: number };
+  /**
    * Accessories are cosmetic by default. One that supplies this grants its
    * wearer an active ability, built and torn down by
    * {@link HedgehogAccessoryAbilities} as it is equipped and removed.
@@ -52,6 +64,8 @@ export const HedgehogActorAccessories = {
   },
   "catherine-wheel": {
     group: "other",
+    // The wheel is a 24px disc centred on (30, 44) of the 80px frame.
+    spinAnchor: { x: 30 / 80, y: 44 / 80 },
     createAbility: (actor: HedgehogActor, game: HedgehogModeInterface) =>
       new CatherineWheelAbility(actor, game),
   },
@@ -108,22 +122,32 @@ export const HedgehogActorAccessoryOptions = Object.keys(
 ) as HedgehogActorAccessoryOption[];
 
 /**
- * The ability factory a given accessory grants, if any. The registry is left
+ * A registry entry viewed as a bag of optional fields. The registry is left
  * un-annotated so `AccessoryKey` stays a literal union, which means indexing it
- * gives a union where only some members declare `createAbility`. Reading it
- * through a partial view gets at that member without widening the registry, and
- * copes with a key that isn't in it at all: accessories are restored from
- * unvalidated storage, so an unknown one must yield no ability rather than
- * throw out of the actor constructor.
+ * gives a union where only some members declare the optional extras. Reading it
+ * through a partial view gets at those members without widening the registry,
+ * and copes with a key that isn't in it at all: accessories are restored from
+ * unvalidated storage, so an unknown one must come back empty rather than throw
+ * out of the actor constructor.
  */
+const getAccessoryInfo = (
+  accessory: HedgehogActorAccessoryOption
+): Partial<HedgehogActorAccessoryInfo> =>
+  (HedgehogActorAccessories[accessory] as
+    | Partial<HedgehogActorAccessoryInfo>
+    | undefined) ?? {};
+
+/** The ability factory a given accessory grants, if any. */
 export const getAccessoryAbilityFactory = (
   accessory: HedgehogActorAccessoryOption
-): HedgehogActorAccessoryInfo["createAbility"] => {
-  const info = HedgehogActorAccessories[accessory] as
-    | Partial<HedgehogActorAccessoryInfo>
-    | undefined;
-  return info?.createAbility;
-};
+): HedgehogActorAccessoryInfo["createAbility"] =>
+  getAccessoryInfo(accessory).createAbility;
+
+/** The point a given accessory rotates about, if it rotates at all. */
+export const getAccessorySpinAnchor = (
+  accessory: HedgehogActorAccessoryOption
+): HedgehogActorAccessoryInfo["spinAnchor"] =>
+  getAccessoryInfo(accessory).spinAnchor;
 
 export const getRandomAccessoryCombo = (): HedgehogActorAccessoryOption[] => {
   return [

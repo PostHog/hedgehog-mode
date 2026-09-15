@@ -40,11 +40,27 @@ const SPIN_ROTATIONS = 2;
 const SPARKS_PER_SECOND = 20;
 const SPARK_SPEED = 8;
 
+const HUB = { x: 100, y: 200 };
+
+const makeWheel = () => ({
+  rotation: 0,
+  // The wheel is anchored on its own centre, so its global position is the hub
+  // the sparks orbit. Fixed here; the real one rides the hog.
+  getGlobalPosition: () => ({ ...HUB }),
+});
+
 const makeActor = () => ({
   forceAngle: 0,
   rigidBody: { position: { x: 100, y: 200 } },
-  sprite: { width: 60 },
+  sprite: { width: 60, scale: { x: 1, y: 1 } },
+  accessorySprites: { "catherine-wheel": makeWheel() } as Record<
+    string,
+    ReturnType<typeof makeWheel>
+  >,
 });
+
+const wheelOf = (actor: ReturnType<typeof makeActor>) =>
+  actor.accessorySprites["catherine-wheel"];
 
 // Runs the burn the way gsap would: drive the recorded tween to `progress` (an
 // absolute point in the burn, 0 -> 1) and tick it, then optionally complete it.
@@ -79,7 +95,7 @@ describe("CatherineWheelAbility", () => {
 
   it("does nothing until it is fired", () => {
     expect(spawnFireball).not.toHaveBeenCalled();
-    expect(actor.forceAngle).toBe(0);
+    expect(wheelOf(actor).rotation).toBe(0);
   });
 
   it("emits a spark for every tick of the burn", () => {
@@ -104,7 +120,7 @@ describe("CatherineWheelAbility", () => {
     );
   });
 
-  it("throws sparks outward from the hog", () => {
+  it("throws sparks outward from the wheel's hub", () => {
     ability.fire();
     // 0.0625 of the burn puts the tween angle at pi/4 (SPIN_ROTATIONS turns is
     // 4pi total), where both cos and sin are meaningfully non-zero. Sampling
@@ -113,14 +129,14 @@ describe("CatherineWheelAbility", () => {
     advance(0.0625);
 
     const [, position, velocity] = spawnFireball.mock.calls[0];
-    // Muzzle sits off the body centre, on the rim.
-    expect(position.x).not.toBe(100);
+    // Muzzle sits off the hub, on the rim.
+    expect(position.x).not.toBe(HUB.x);
 
-    const ox = position.x - 100;
-    const oy = position.y - 200;
+    const ox = position.x - HUB.x;
+    const oy = position.y - HUB.y;
     // Velocity is collinear with the muzzle offset (2D cross product ~ 0)...
     expect(ox * velocity.y - oy * velocity.x).toBeCloseTo(0);
-    // ...and points the same way as the offset, not back at the hog (dot > 0).
+    // ...and points the same way as the offset, not back at the hub (dot > 0).
     expect(ox * velocity.x + oy * velocity.y).toBeGreaterThan(0);
     // Speed sits within the jitter band around SPARK_SPEED, not just "> 0".
     const speed = Math.hypot(velocity.x, velocity.y);
@@ -137,7 +153,7 @@ describe("CatherineWheelAbility", () => {
     expect(headingAfter).not.toBeCloseTo(headingBefore);
   });
 
-  it("spins the hog and puts it back upright when the burn ends", () => {
+  it("spins the wheel and leaves it still when the burn ends", () => {
     ability.fire();
     // The tween is what actually drives the spin: two full rotations over the
     // whole burn, not e.g. a longer/shorter or differently-scaled animation.
@@ -145,10 +161,68 @@ describe("CatherineWheelAbility", () => {
     expect(tweens[0].vars.angle).toBeCloseTo(SPIN_ROTATIONS * Math.PI * 2);
 
     advance(0.5);
-    expect(actor.forceAngle).toBeGreaterThan(0);
+    expect(wheelOf(actor).rotation).toBeGreaterThan(0);
 
     advance(1, true);
-    expect(actor.forceAngle).toBe(0);
+    expect(wheelOf(actor).rotation).toBe(0);
+  });
+
+  it("never turns the hog himself", () => {
+    // The whole point of the rework. Rotating the actor turned his sprite and
+    // his hitbox with it, which read as a broken render rather than a firework,
+    // so the spin has to stay on the accessory for the entire burn.
+    ability.fire();
+
+    for (let frame = 1; frame <= 60; frame++) {
+      advance(frame / 60, frame === 60);
+      expect(actor.forceAngle).toBe(0);
+    }
+  });
+
+  it("spins whichever wheel the hog is wearing right now", () => {
+    // updateOptions() rebuilds accessorySprites wholesale, so a colour change
+    // mid-burn swaps the sprite out from under the ability. Holding a reference
+    // from fire() would leave it spinning a sprite that is no longer on screen.
+    ability.fire();
+    advance(0.25);
+
+    const replacement = makeWheel();
+    actor.accessorySprites["catherine-wheel"] = replacement;
+    advance(0.5);
+
+    expect(replacement.rotation).toBeGreaterThan(0);
+  });
+
+  it("survives the wheel being taken off mid-burn", () => {
+    ability.fire();
+    advance(0.25);
+    const emitted = spawnFireball.mock.calls.length;
+
+    delete actor.accessorySprites["catherine-wheel"];
+
+    expect(() => advance(1, true)).not.toThrow();
+    // Sparks come off the rim, so no wheel means no sparks.
+    expect(spawnFireball).toHaveBeenCalledTimes(emitted);
+  });
+
+  it("mirrors the sparks when the hog faces left", () => {
+    // The hog's sprite flips on scale.x and the wheel flips with it, so the
+    // visible spin runs the other way. Sparks have to follow the picture.
+    ability.fire();
+    advance(0.0625);
+    const [, , facingRight] = spawnFireball.mock.calls[0];
+
+    spawnFireball.mockClear();
+    actor.sprite.scale.x = -1;
+    ability.destroy();
+    ability = new CatherineWheelAbility(actor as never, {} as never);
+    ability.fire();
+    advance(0.0625);
+    const [, , facingLeft] = spawnFireball.mock.calls[0];
+
+    // Mirrored about the vertical axis: x flips sign, y is untouched.
+    expect(Math.sign(facingLeft.x)).toBe(-Math.sign(facingRight.x));
+    expect(Math.sign(facingLeft.y)).toBe(Math.sign(facingRight.y));
   });
 
   it("ignores the repeat fire from a held key", () => {
@@ -203,14 +277,14 @@ describe("CatherineWheelAbility", () => {
     const after = spawnFireball.mock.calls.length;
 
     // The gsap tween must actually be killed, not just locally forgotten —
-    // otherwise it keeps writing forceAngle (and eventually fires onComplete)
+    // otherwise it keeps spinning the wheel (and eventually fires onComplete)
     // on an ability that's already torn down.
     expect(killTweensOf).toHaveBeenCalledWith(ability);
 
     vi.advanceTimersByTime(5000);
 
     expect(spawnFireball).toHaveBeenCalledTimes(after);
-    expect(actor.forceAngle).toBe(0);
+    expect(wheelOf(actor).rotation).toBe(0);
     expect(() => ability.destroy()).not.toThrow();
   });
 });

@@ -13,6 +13,7 @@ type SpriteFrame = {
 
 type SpritesJSON = {
   frames: Record<string, SpriteFrame>;
+  meta: { size: { w: number; h: number } };
 };
 
 const sprites = spritesData as SpritesJSON;
@@ -43,15 +44,17 @@ interface StaticHedgehogProps {
   style?: CSSProperties;
 }
 
-function getSpriteStyle(spriteName: string, assetsUrl: string): CSSProperties {
+export function getSpriteStyle(
+  spriteName: string,
+  assetsUrl: string
+): CSSProperties {
   const frame = sprites.frames[spriteName];
   if (!frame) {
     return {};
   }
 
-  // Sprite sheet dimensions from sprites.json meta
-  const sheetWidth = 2000;
-  const sheetHeight = 1440;
+  // Read from the atlas: hardcoding these mis-crops every frame once it grows.
+  const { w: sheetWidth, h: sheetHeight } = sprites.meta.size;
 
   // Responsive mode: scale to parent using percentages
   const scaleX = 100 / frame.sourceSize.w;

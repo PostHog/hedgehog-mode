@@ -1,3 +1,5 @@
+import gsap from "gsap";
+import type { Sprite } from "pixi.js";
 import type { HedgehogModeInterface } from "../../types";
 import type { HedgehogActor } from "../Hedgehog";
 import { SpiderWebActor } from "../../items/SpiderWebActor";
@@ -130,4 +132,108 @@ export class HogzillaAbility implements HedgehogSkinAbility {
   }
 
   destroy(): void {}
+}
+
+const BURN_DURATION_S = 5;
+const SPIN_ANGLE = 5 * Math.PI * 2;
+const SPARKS_PER_BURN = BURN_DURATION_S * 20;
+const SPARK_SPEED = 13;
+const SPARK_SPEED_JITTER = 0.25;
+// Rim radius, as a fraction of the hog's sprite width — the wheel art is a 24px
+// disc drawn in the same 80px frame he is, so his width scales it correctly.
+const RIM_OFFSET = 0.15;
+
+/**
+ * Catherine wheel: a firework pinned to the hog. Lighting it spins the wheel
+ * sprite — not the hog, which would turn his hitbox too — and throws sparks off
+ * the rim along the angle it has reached. Relightable once it burns out.
+ */
+export class CatherineWheelAbility implements HedgehogSkinAbility {
+  private angle = 0;
+  private burning = false;
+  private sparksEmitted = 0;
+
+  constructor(
+    private actor: HedgehogActor,
+    private game: HedgehogModeInterface,
+    private accessory: string
+  ) {}
+
+  /** Looked up per tick: syncAccessories() rebuilds the map on any option change. */
+  private get wheel(): Sprite | undefined {
+    return this.actor.accessorySprites[this.accessory];
+  }
+
+  fire(): void {
+    // controls.ts re-fires every 100ms while `f` is held. Without this guard the
+    // tween restarts ten times a second and the wheel never finishes a turn.
+    if (this.burning) {
+      return;
+    }
+
+    this.burning = true;
+    this.angle = 0;
+    this.sparksEmitted = 0;
+
+    gsap.to(this, {
+      angle: SPIN_ANGLE,
+      duration: BURN_DURATION_S,
+      ease: "none",
+      onUpdate: () => {
+        const wheel = this.wheel;
+        if (wheel) {
+          wheel.rotation = this.angle;
+        }
+        this.emitSparksDue();
+      },
+      onComplete: () => this.extinguish(),
+    });
+  }
+
+  /** Sparks ride the tween, not a timer, so they stop with the engine and scale with setSpeed. */
+  private emitSparksDue(): void {
+    const due = Math.floor((this.angle / SPIN_ANGLE) * SPARKS_PER_BURN);
+
+    while (this.sparksEmitted < due) {
+      this.sparksEmitted++;
+      this.emitSpark();
+    }
+  }
+
+  private emitSpark(): void {
+    const wheel = this.wheel;
+    if (!wheel) {
+      return;
+    }
+
+    // The wheel is anchored on its own centre, and stage space is world space.
+    const hub = wheel.getGlobalPosition();
+    const reach = Math.abs(this.actor.sprite?.width ?? 0) * RIM_OFFSET;
+    const jitter = 1 + (Math.random() - 0.5) * 2 * SPARK_SPEED_JITTER;
+    const speed = SPARK_SPEED * jitter;
+    // The wheel mirrors with the hog's sprite, so mirror the heading too.
+    const facing = this.actor.getDirection() === "left" ? -1 : 1;
+    const cos = Math.cos(this.angle) * facing;
+    const sin = Math.sin(this.angle);
+
+    FlameActor.spawnFireball(
+      this.game,
+      { x: hub.x + cos * reach, y: hub.y + sin * reach },
+      { x: cos * speed, y: sin * speed }
+    );
+  }
+
+  private extinguish(): void {
+    const wheel = this.wheel;
+    if (wheel) {
+      wheel.rotation = 0;
+    }
+    this.angle = 0;
+    this.burning = false;
+  }
+
+  destroy(): void {
+    gsap.killTweensOf(this);
+    this.extinguish();
+  }
 }

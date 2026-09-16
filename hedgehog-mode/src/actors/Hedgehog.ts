@@ -13,7 +13,8 @@ import gsap from "gsap";
 import { COLLISIONS } from "../misc/collisions";
 import { HedgehogActorAI } from "./hedgehog/ai";
 import { HedgehogActorControls } from "./hedgehog/controls";
-import { HedgehogActorOptions } from "./hedgehog/config";
+import { HedgehogAccessoryAbilities } from "./hedgehog/accessory-abilities";
+import { getAccessoryInfo, HedgehogActorOptions } from "./hedgehog/config";
 import { HedgehogActorInterface } from "./hedgehog/interface";
 import { applyStaticColor } from "./hedgehog/colors";
 import type { HedgehogSkinAbility } from "./hedgehog/abilities";
@@ -51,6 +52,8 @@ export class HedgehogActor extends Actor {
   // The skin `ability` was built for, so we only rebuild on real skin changes.
   private abilitySkin?: HedgehogActorOptions["skin"];
   accessorySprites: { [key: string]: Sprite } = {};
+  // Resting y of each accessory sprite, before the falling nudge in update().
+  private accessoryOffsetY: { [key: string]: number } = {};
   overlayAnimation?: AnimatedSprite;
   isFlammable = true;
   isDead = false;
@@ -60,6 +63,7 @@ export class HedgehogActor extends Actor {
   controls: HedgehogActorControls;
   private filter = new ColorMatrixFilter();
   interface: HedgehogActorInterface;
+  accessoryAbilities: HedgehogAccessoryAbilities;
 
   hitBoxModifier = {
     left: 0.24,
@@ -80,6 +84,7 @@ export class HedgehogActor extends Actor {
     this.ai = new HedgehogActorAI(this);
     this.controls = new HedgehogActorControls(this);
     this.interface = new HedgehogActorInterface(game, this);
+    this.accessoryAbilities = new HedgehogAccessoryAbilities(this, game);
     this.setPosition({
       x: window.innerWidth * Math.random(),
       y: Math.random() * 200,
@@ -225,6 +230,7 @@ export class HedgehogActor extends Actor {
     this.syncAccessories();
     this.syncRigidBody();
     this.syncSkinAbility();
+    this.accessoryAbilities.sync();
   }
 
   public override setScale(scale: number): void {
@@ -452,19 +458,13 @@ export class HedgehogActor extends Actor {
     }
 
     // We want to make it look like the hedgehog's accessories are disconnected. If we are falling then we position them slightly above
-    if (this.rigidBody!.velocity.y > 0.1) {
-      const yOffsetDiff = Math.max(
-        -10,
-        Math.min(0, -this.rigidBody!.velocity.y)
-      );
-      Object.values(this.accessorySprites).forEach((sprite) => {
-        sprite.y = yOffsetDiff;
-      });
-    } else {
-      Object.values(this.accessorySprites).forEach((sprite) => {
-        sprite.y = 0;
-      });
-    }
+    const yOffsetDiff =
+      this.rigidBody!.velocity.y > 0.1
+        ? Math.max(-10, Math.min(0, -this.rigidBody!.velocity.y))
+        : 0;
+    Object.entries(this.accessorySprites).forEach(([accessory, sprite]) => {
+      sprite.y = (this.accessoryOffsetY[accessory] ?? 0) + yOffsetDiff;
+    });
 
     // Check if below screen and if so then move up (but not while tethered to a
     // web — teleporting across the screen would explode the constraint tension).
@@ -510,9 +510,11 @@ export class HedgehogActor extends Actor {
     FlameActor.fireBurst(this.game, contact);
   }
 
-  // Triggered by the `f` key; delegates to the skin's ability (hogzilla only).
+  // Triggered by the `f` key; delegates to the skin's ability and to any
+  // abilities granted by worn accessories.
   maybeSpawnFireball(): void {
     this.ability?.fire?.();
+    this.accessoryAbilities.fire();
   }
 
   onCollisionStart(element: GameElement, pair: Matter.Pair): void {
@@ -562,6 +564,7 @@ export class HedgehogActor extends Actor {
     });
 
     this.accessorySprites = {};
+    this.accessoryOffsetY = {};
 
     this.options.accessories?.forEach((accessory) => {
       const frame = this.game.spritesManager.getSpriteFrames(
@@ -576,13 +579,25 @@ export class HedgehogActor extends Actor {
       const sprite = new Sprite(frame);
       this.accessorySprites[accessory] = sprite;
       sprite.eventMode = "static";
-      sprite.anchor.set(0.5);
       this.sprite!.addChild(sprite);
 
-      const anchor = this.skinDefinition.accessoryAnchor;
-      if (anchor) {
+      const anchor = this.skinDefinition.accessoryAnchor ?? { x: 0.5, y: 0.5 };
+
+      // A spinning accessory pivots on its own centre, then shifts back by the
+      // difference so it still lands where the skin anchor would have put it.
+      const spinAnchor = getAccessoryInfo(accessory).spinAnchor;
+      if (!spinAnchor) {
         sprite.anchor.set(anchor.x, anchor.y);
+        return;
       }
+
+      sprite.anchor.set(spinAnchor.x, spinAnchor.y);
+      this.accessoryOffsetY[accessory] =
+        (spinAnchor.y - anchor.y) * frame.height;
+      sprite.position.set(
+        (spinAnchor.x - anchor.x) * frame.width,
+        this.accessoryOffsetY[accessory]
+      );
     });
   }
 
@@ -601,6 +616,9 @@ export class HedgehogActor extends Actor {
     const accessories = this.options.accessories;
     this.options.accessories = [];
     this.syncAccessories();
+    // The accessories were still on when updateOptions() synced above, so this
+    // is the call that actually tears the granted ability down.
+    this.accessoryAbilities.sync();
 
     accessories?.forEach((accessory) => {
       this.game.spawnAccessory(accessory, this.rigidBody!.position);
@@ -633,6 +651,7 @@ export class HedgehogActor extends Actor {
     clearTimeout(this.rampageTimer);
     this.ability?.destroy();
     this.controls.destroy();
+    this.accessoryAbilities.destroy();
     this.ai.enable(false);
     Object.values(this.accessorySprites).forEach((sprite) => {
       this.game.app.stage.removeChild(sprite);

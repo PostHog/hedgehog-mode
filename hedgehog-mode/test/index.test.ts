@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  getAccessoryInfo,
   getRandomAccessoryCombo,
   HedgehogActorAccessories,
   HedgehogActorAccessoryOptions,
@@ -22,6 +23,19 @@ describe("public hedgehog configuration", () => {
     expect(HedgehogActorAccessoryOptions).toEqual(
       Object.keys(HedgehogActorAccessories)
     );
+  });
+
+  it("grants an ability factory only to accessories that declare one", () => {
+    expect(getAccessoryInfo("catherine-wheel").createAbility).toBeTypeOf(
+      "function"
+    );
+    expect(getAccessoryInfo("tophat").createAbility).toBeUndefined();
+    // Accessories are read back from unvalidated storage, so a stale or
+    // hand-edited key must degrade to "no ability" rather than throw out of the
+    // actor constructor and take hedgehog mode down with it.
+    expect(
+      getAccessoryInfo("not-an-accessory" as never).createAbility
+    ).toBeUndefined();
   });
 
   it("generates valid accessory combinations", () => {

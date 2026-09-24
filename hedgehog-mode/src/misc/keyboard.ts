@@ -66,10 +66,9 @@ export function resolveControlKey(
 /**
  * The lowercased key an event reports, or null when it reports none.
  *
- * TRICKY: `KeyboardEvent.key` is not guaranteed to be there. Password managers,
- * autofill and framework code dispatch synthetic keydown events with no `key`
- * at all, and reading it directly then throws a TypeError out of a `window`
- * listener and into the host page.
+ * TRICKY: password managers, autofill and framework code dispatch synthetic
+ * keydown events with no `key` at all. Reading it directly throws a TypeError
+ * out of a `window` listener and into the host page.
  */
 export function normalizeEventKey(
   event: Pick<KeyboardEvent, "key">

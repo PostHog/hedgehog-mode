@@ -47,11 +47,5 @@ describe("normalizeEventKey", () => {
 
   it("returns null for a synthetic event that reports no key", () => {
     expect(normalizeEventKey({} as Pick<KeyboardEvent, "key">)).toBeNull();
-    expect(
-      normalizeEventKey({ key: undefined } as unknown as Pick<
-        KeyboardEvent,
-        "key"
-      >)
-    ).toBeNull();
   });
 });

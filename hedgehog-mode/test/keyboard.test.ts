@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { resolveControlKey } from "../src/misc/keyboard";
+import { normalizeEventKey, resolveControlKey } from "../src/misc/keyboard";
 
 const event = (code: string, key: string) =>
   ({ code, key }) as Pick<KeyboardEvent, "code" | "key">;
@@ -36,5 +36,16 @@ describe("resolveControlKey", () => {
   it("ignores keys that aren't controls", () => {
     expect(resolveControlKey(event("KeyQ", "q"))).toBeNull();
     expect(resolveControlKey(event("Enter", "Enter"))).toBeNull();
+  });
+});
+
+describe("normalizeEventKey", () => {
+  it("lowercases the reported key", () => {
+    expect(normalizeEventKey({ key: "A" })).toBe("a");
+    expect(normalizeEventKey({ key: "ArrowUp" })).toBe("arrowup");
+  });
+
+  it("returns null for a synthetic event that reports no key", () => {
+    expect(normalizeEventKey({} as Pick<KeyboardEvent, "key">)).toBeNull();
   });
 });

@@ -62,3 +62,16 @@ export function resolveControlKey(
   }
   return KEY_MAPPING[event.key?.toLowerCase()] ?? null;
 }
+
+/**
+ * The lowercased key an event reports, or null when it reports none.
+ *
+ * TRICKY: password managers, autofill and framework code dispatch synthetic
+ * keydown events with no `key` at all. Reading it directly throws a TypeError
+ * out of a `window` listener and into the host page.
+ */
+export function normalizeEventKey(
+  event: Pick<KeyboardEvent, "key">
+): string | null {
+  return typeof event.key === "string" ? event.key.toLowerCase() : null;
+}

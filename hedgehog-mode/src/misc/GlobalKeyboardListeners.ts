@@ -1,4 +1,5 @@
 import { range, sample, uniqueId } from "./utils";
+import { normalizeEventKey } from "./keyboard";
 import { HedgehogModeInterface } from "../types";
 import {
   getRandomAccessoryCombo,
@@ -226,7 +227,10 @@ export class GlobalKeyboardListeners {
     ];
 
     const keyDownListener = (e: KeyboardEvent): void => {
-      const key = e.key.toLowerCase();
+      const key = normalizeEventKey(e);
+      if (!key) {
+        return;
+      }
 
       lastKeys.push(key);
       if (lastKeys.length > 20) {

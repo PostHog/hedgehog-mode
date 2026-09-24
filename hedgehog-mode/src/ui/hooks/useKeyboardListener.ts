@@ -1,9 +1,12 @@
 import { useEffect } from "react";
 
+import { normalizeEventKey } from "../../misc/keyboard";
+
 export const useKeyboardListener = (keys: string[], action: () => void) => {
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (keys.includes(event.key.toLowerCase())) {
+      const key = normalizeEventKey(event);
+      if (key && keys.includes(key)) {
         action();
       }
     };

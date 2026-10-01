@@ -3,9 +3,30 @@ import { HedgehogModeInterface } from "../types";
 import {
   getRandomAccessoryCombo,
   HedgehogActorColorOptions,
-  HedgehogActorFlagOptions,
+  HedgehogActorFlagOption,
 } from "../actors/hedgehog/config";
 import { ShovedElement } from "../items/ShovedElement";
+
+/**
+ * Flags you can summon by typing their name. Deliberately not every country:
+ * these keys are matched anywhere on the page, so short names would fire
+ * mid-word ("oman" in "woman", "mali" in "malicious"), and one that fires
+ * swallows the keys — "mali" would make "somalia" untypeable. The globe is
+ * left out because "earth" would fire halfway through "earthquake".
+ */
+const TYPEABLE_FLAGS: HedgehogActorFlagOption[] = [
+  "brazil",
+  "china",
+  "france",
+  "germany",
+  "italy",
+  "japan",
+  "mexico",
+  "poland",
+  "south-korea",
+  "spain",
+  "turkiye",
+];
 
 export class GlobalKeyboardListeners {
   constructor(private game: HedgehogModeInterface) {
@@ -92,15 +113,12 @@ export class GlobalKeyboardListeners {
         },
       },
       // Type a flag's name to wave it ("france", "south-korea", ...).
-      // The globe is left out: "earth" would fire halfway through "earthquake".
-      ...HedgehogActorFlagOptions.filter((flag) => flag !== "earth").map(
-        (flag) => ({
-          keys: flag.split(""),
-          action: () => {
-            this.game.getPlayableHedgehog()?.updateOptions({ flag });
-          },
-        })
-      ),
+      ...TYPEABLE_FLAGS.map((flag) => ({
+        keys: flag.split(""),
+        action: () => {
+          this.game.getPlayableHedgehog()?.updateOptions({ flag });
+        },
+      })),
       {
         keys: ["r", "a", "m", "p", "a", "g", "e"],
         action: () => {

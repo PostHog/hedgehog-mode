@@ -11,6 +11,7 @@ export type {
   HedgehogActorAccessoryOption,
   HedgehogActorSkinOption,
   HedgehogActorFlagOption,
+  HedgehogActorFlagInfo,
   HedgehogActorAccessoryInfo,
 } from "./actors/hedgehog/config";
 export {
@@ -20,6 +21,7 @@ export {
   HedgehogActorSkinOptions,
   HedgehogActorFlagOptions,
   HedgehogActorFlags,
+  searchFlags,
   HedgehogActorAccessories,
 } from "./actors/hedgehog/config";
 export { StaticHedgehog } from "./static-renderer/StaticHedgehog";

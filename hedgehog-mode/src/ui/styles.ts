@@ -356,4 +356,62 @@ export const styles = `
     opacity: 1;
     visibility: visible;
   }
+
+  .FlagThumbnail {
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .FlagPickerCurrent {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+  }
+
+  .FlagPickerSearch {
+    font-family: var(--font-family);
+    font-size: var(--font-size-sm);
+    color: var(--color-text);
+    background-color: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+
+  .FlagPickerResults {
+    /* The offsetParent for its rows, so keyboard scrolling can measure them. */
+    position: relative;
+    list-style: none;
+    margin: 0;
+    padding: var(--spacing-xs);
+    max-height: 15rem;
+    overflow-y: auto;
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--border-radius-sm);
+  }
+
+  .FlagPickerResult {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-xs);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+  }
+
+  /* Hover is CSS, not state: re-rendering ~200 rows per row crossed is jank. */
+  .FlagPickerResult:hover,
+  .FlagPickerResult--highlighted {
+    background-color: var(--color-hover);
+  }
+
+  .FlagPickerResult--selected {
+    font-weight: bold;
+  }
+
+  .FlagPickerEmpty {
+    padding: var(--spacing-xs);
+    font-size: var(--font-size-sm);
+  }
 `;

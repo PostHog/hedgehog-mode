@@ -136,6 +136,34 @@ Everything on screen is a `GameElement` (see `src/types.ts`) held in
   single `rigidBody`/`sprite`).
 - `src/sprites/sprites.ts` — loads the packed spritesheet; animations are keyed
   like `skins/<skin>/<action>/tile`.
+- `src/actors/hedgehog/flags.ts` — the `HedgehogActorFlags` registry (name, ISO
+  code, search aliases): every UN member and observer, Taiwan, Kosovo, the UK
+  home nations, the EU and UN, territories with their own flag, and the globe.
+
+### Adding sprites (and flags)
+
+You don't need TexturePacker. Drop the PNG under `texturepacker/assets/` and run
+`node texturepacker/append-to-atlas.mjs`: it appends anything missing to
+`hedgehog-mode/assets/sprites.{png,json}` and redraws packed sprites whose
+source changed, without moving existing frames. It writes the JSON in
+TexturePacker's exact layout (and refuses to run if the current file doesn't
+round-trip), so the diff is only ever the new frames. `--check` lists what's
+stale without writing. Changing a sprite's _size_ needs a full repack.
+
+Flag cloths are 30x21 and mostly **generated**, not drawn: each country is a
+few lines of a small vector DSL (`texturepacker/flag-generator/draw.mjs` —
+stripes, stars, crescents, `unionJack()`, and `pixels()` for hand-placed detail)
+in `texturepacker/flag-generator/countries/*.mjs`. To add or fix one:
+
+```bash
+node texturepacker/flag-generator/generate.mjs --preview /tmp/f.png --only nepal  # eyeball it
+node texturepacker/flag-generator/generate.mjs   # write texturepacker/assets/flags/*.png
+node texturepacker/append-to-atlas.mjs           # pack new ones
+```
+
+Then add it to `flags.ts`; a test fails if a cloth and the registry disagree.
+The 11 original flags are hand-drawn PNGs with no spec, so the generator
+leaves them alone.
 
 Coordinates: Matter world space and Pixi stage space are both screen pixels, so
 pointer/`clientX` positions map 1:1 — no transforms needed.

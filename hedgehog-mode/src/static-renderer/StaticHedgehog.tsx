@@ -77,6 +77,11 @@ function getSpriteStyle(spriteName: string, assetsUrl: string): CSSProperties {
   };
 }
 
+/** A frame's size in the spritesheet, e.g. to give it a box of the right shape. */
+export function getSpriteSize(name: string): { w: number; h: number } | null {
+  return sprites.frames[name]?.sourceSize ?? null;
+}
+
 /** Renders a single frame from the spritesheet, scaled to fill its parent. */
 export function StaticSprite({
   name,

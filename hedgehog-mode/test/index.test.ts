@@ -4,8 +4,11 @@ import {
   getRandomAccessoryCombo,
   HedgehogActorAccessories,
   HedgehogActorAccessoryOptions,
+  HedgehogActorFlagOptions,
+  HedgehogActorFlags,
   HedgehogActorSkinOptions,
 } from "../src/actors/hedgehog/config";
+import sprites from "../assets/sprites.json";
 
 describe("public hedgehog configuration", () => {
   it("exports the supported skins", () => {
@@ -16,6 +19,17 @@ describe("public hedgehog configuration", () => {
       "hogzilla",
       "ghost",
     ]);
+  });
+
+  it("ships sprites for every flag", () => {
+    expect(HedgehogActorFlagOptions).toEqual(Object.keys(HedgehogActorFlags));
+    for (const flag of HedgehogActorFlagOptions) {
+      expect(sprites.frames).toHaveProperty([`icons/${flag}.png`]);
+      expect(sprites.animations).toHaveProperty([`props/${flag}/tile`]);
+      if (HedgehogActorFlags[flag].mirrored) {
+        expect(sprites.animations).toHaveProperty([`props/${flag}-left/tile`]);
+      }
+    }
   });
 
   it("exports every configured accessory", () => {

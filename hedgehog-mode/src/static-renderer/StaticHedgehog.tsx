@@ -13,6 +13,7 @@ type SpriteFrame = {
 
 type SpritesJSON = {
   frames: Record<string, SpriteFrame>;
+  meta: { size: { w: number; h: number } };
 };
 
 const sprites = spritesData as SpritesJSON;
@@ -50,8 +51,7 @@ function getSpriteStyle(spriteName: string, assetsUrl: string): CSSProperties {
   }
 
   // Sprite sheet dimensions from sprites.json meta
-  const sheetWidth = 2000;
-  const sheetHeight = 1440;
+  const { w: sheetWidth, h: sheetHeight } = sprites.meta.size;
 
   // Responsive mode: scale to parent using percentages
   const scaleX = 100 / frame.sourceSize.w;
@@ -67,6 +67,21 @@ function getSpriteStyle(spriteName: string, assetsUrl: string): CSSProperties {
     top: 0,
     left: 0,
   };
+}
+
+/** Renders a single frame from the spritesheet, scaled to fill its parent. */
+export function StaticSprite({
+  name,
+  assetsUrl,
+}: {
+  name: string;
+  assetsUrl: string;
+}) {
+  return (
+    <div style={{ position: "relative", width: "100%", height: "100%" }}>
+      <div style={getSpriteStyle(name, assetsUrl)} />
+    </div>
+  );
 }
 
 export function StaticHedgehog({
@@ -101,6 +116,13 @@ export function StaticHedgehog({
           filter: colorFilter,
         }}
       />
+
+      {/* Held flag, unfiltered so the colour option doesn't recolour it */}
+      {options.flag && (
+        <div
+          style={getSpriteStyle(`props/${options.flag}/tile000.png`, assetsUrl)}
+        />
+      )}
 
       {/* Accessories */}
       {options.accessories?.map((accessory) => {

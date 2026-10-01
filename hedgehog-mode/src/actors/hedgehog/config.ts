@@ -10,6 +10,50 @@ export const HedgehogActorSkinOptions = [
 
 export type HedgehogActorSkinOption = (typeof HedgehogActorSkinOptions)[number];
 
+export const HedgehogActorFlagOptions = [
+  "turkiye",
+  "mexico",
+  "italy",
+  "france",
+  "spain",
+  "germany",
+  "poland",
+  "japan",
+  "south-korea",
+  "china",
+  "brazil",
+  "earth",
+] as const;
+
+export type HedgehogActorFlagOption = (typeof HedgehogActorFlagOptions)[number];
+
+/**
+ * Something the hedgehog holds — a flag on a pole, or the globe — on top of
+ * whatever skin it's wearing. Animates from `props/<flag>/tile`; the
+ * customization menu shows `icons/<flag>.png`.
+ *
+ * Mirrored flags ship pre-flipped `props/<flag>-left` frames: the engine
+ * mirrors the hedgehog when it faces left, which would otherwise read a flag
+ * backwards.
+ */
+export const HedgehogActorFlags: Record<
+  HedgehogActorFlagOption,
+  { mirrored: boolean }
+> = {
+  turkiye: { mirrored: true },
+  mexico: { mirrored: true },
+  italy: { mirrored: true },
+  france: { mirrored: true },
+  spain: { mirrored: true },
+  germany: { mirrored: false },
+  poland: { mirrored: false },
+  japan: { mirrored: false },
+  "south-korea": { mirrored: true },
+  china: { mirrored: true },
+  brazil: { mirrored: true },
+  earth: { mirrored: true },
+};
+
 export const HedgehogActorColorOptions = [
   "green",
   "red",
@@ -123,6 +167,7 @@ export type HedgehogActorOptions = {
   id: string;
   player?: boolean;
   skin?: HedgehogActorSkinOption | null;
+  flag?: HedgehogActorFlagOption | null;
   color?: HedgehogActorColorOption | null;
   accessories?: HedgehogActorAccessoryOption[];
   ai_enabled?: boolean;
@@ -131,6 +176,6 @@ export type HedgehogActorOptions = {
   onClick?: () => void;
   friends?: Pick<
     HedgehogActorOptions,
-    "id" | "accessories" | "color" | "skin"
+    "id" | "accessories" | "color" | "skin" | "flag"
   >[];
 };

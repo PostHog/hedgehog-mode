@@ -573,27 +573,27 @@ export const flags = {
   },
   "united-kingdom": { layers: unionJack() },
   "united-states": {
+    // 13 stripes don't divide into 19 pixel rows: rounding made every red
+    // stripe 1px and every white one 2px, and the flag read mostly white.
+    // One stripe per row keeps red and white even (10 rows to 9) instead.
     layers: [
       hstripes(
-        Array.from({ length: 13 }, (_, i) => (i % 2 ? WHITE : "#b22234"))
+        Array.from({ length: 19 }, (_, i) => (i % 2 ? WHITE : "#b22234"))
       ),
-      rect(0, 0, 12, 10.8, "#3c3b6e"),
-      // 50 stars don't fit in 11x10 pixels; a checkerboard reads as stars.
+      // The canton covers the top nine rows, ending on a red stripe as the
+      // real one does, with the stars as a sparse staggered grid.
       pixels(
         0,
         0,
-        [
-          "",
-          ".w.w.w.w.w",
-          "..w.w.w.w",
-          ".w.w.w.w.w",
-          "..w.w.w.w",
-          ".w.w.w.w.w",
-          "..w.w.w.w",
-          ".w.w.w.w.w",
-          "..w.w.w.w",
-          ".w.w.w.w.w",
-        ],
+        Array.from({ length: 9 }, () => "b".repeat(11)),
+        {
+          b: "#3c3b6e",
+        }
+      ),
+      pixels(
+        0,
+        0,
+        ["", ".w.w.w.w.w", "", "..w.w.w.w", "", ".w.w.w.w.w", "", "..w.w.w.w"],
         { w: WHITE }
       ),
     ],

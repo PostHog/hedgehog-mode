@@ -109,10 +109,12 @@ export const flags = {
     ),
   },
   "british-indian-ocean-territory": {
-    // The wavy lines drawn straight; the crowned palm on the fly.
+    // The wavy lines drawn straight, one per pixel row (13 don't divide into
+    // 19 rows evenly, and rounding left it twice as blue as white); the
+    // crowned palm on the fly.
     layers: ensign(
       hstripes(
-        Array.from({ length: 13 }, (_, i) => (i % 2 ? "#000063" : WHITE))
+        Array.from({ length: 19 }, (_, i) => (i % 2 ? "#000063" : WHITE))
       ),
       pixels(
         19,

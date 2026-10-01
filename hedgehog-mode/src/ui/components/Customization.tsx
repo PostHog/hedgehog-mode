@@ -9,10 +9,13 @@ import {
   HedgehogActorAccessoryOptions,
   HedgehogActorColorOptions,
   HedgehogActorOptions,
+  HedgehogActorFlagOption,
+  HedgehogActorFlagOptions,
   HedgehogActorSkinOptions,
 } from "../../actors/hedgehog/config";
 import type { HedgeHogMode } from "../../hedgehog-mode";
 import { HedgehogProfileImage } from "../HedgehogStatic";
+import { StaticSprite } from "../../static-renderer/StaticHedgehog";
 import { Button, IconX } from "./Button";
 import { sample } from "../../misc/utils";
 import { v4 as uuid } from "uuid";
@@ -75,7 +78,10 @@ export function HedgehogCustomization({
   >(defaultFriend?.id ?? null);
 
   const updateCustomization = (
-    customization: Pick<HedgehogActorOptions, "accessories" | "color" | "skin">
+    customization: Pick<
+      HedgehogActorOptions,
+      "accessories" | "color" | "skin" | "flag"
+    >
   ) => {
     if (selectedFriendId) {
       setConfig({
@@ -175,6 +181,11 @@ export function HedgehogCustomization({
           assetsUrl={resolvedAssetsUrl}
           skin={selectedConfig?.skin}
           setSkin={(skin) => updateCustomization({ skin })}
+        />
+        <HedgehogFlags
+          assetsUrl={resolvedAssetsUrl}
+          flag={selectedConfig?.flag}
+          setFlag={(flag) => updateCustomization({ flag })}
         />
       </div>
     </div>
@@ -373,6 +384,40 @@ function HedgehogSkins({
               skin={option as HedgehogActorOptions["skin"]}
               assetsUrl={assetsUrl}
             />
+          </Button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function HedgehogFlags({
+  assetsUrl,
+  flag,
+  setFlag,
+}: {
+  assetsUrl: string;
+  flag: HedgehogActorOptions["flag"];
+  setFlag: (flag: HedgehogActorFlagOption | null) => void;
+}) {
+  return (
+    <div className="CustomizationSection">
+      <h4 className="CustomizationSectionTitle">flags</h4>
+      <div className="CustomizationGrid">
+        {HedgehogActorFlagOptions.map((option) => (
+          <Button
+            key={option}
+            active={flag === option}
+            // Click the selected flag again to put it down.
+            onClick={() => setFlag(flag === option ? null : option)}
+            title={option.split("-").join(" ")}
+          >
+            <div style={{ width: 64, height: 64 }}>
+              <StaticSprite
+                name={`icons/${option}.png`}
+                assetsUrl={assetsUrl}
+              />
+            </div>
           </Button>
         ))}
       </div>

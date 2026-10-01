@@ -7,6 +7,7 @@ import {
   HedgehogActorSkinOptions,
   HedgehogActorAccessories,
   HedgehogActorAccessoryOption,
+  HedgehogActorFlagOptions,
   StaticHedgehog,
 } from "@posthog/hedgehog-mode";
 import { uniqueId } from "lodash";
@@ -114,6 +115,22 @@ export default function StaticRendering() {
               />
             </span>
           ))}
+        </div>
+      </div>
+      <div>
+        <h2 className="text-2xl font-bold">Flags</h2>
+        <div className="flex flex-wrap gap-2">
+          {HedgehogActorSkinOptions.flatMap((skin) =>
+            HedgehogActorFlagOptions.map((flag) => (
+              <span key={`${skin}-${flag}`} title={`${skin} + ${flag}`}>
+                <StaticHedgehog
+                  options={{ id: `hedgehog-${skin}-${flag}`, skin, flag }}
+                  size={80}
+                  assetsUrl="/assets"
+                />
+              </span>
+            ))
+          )}
         </div>
       </div>
       <div>

@@ -7,18 +7,26 @@ import { HedgehogModeInterface, GameElement, UpdateTicker } from "../types";
 import Matter, { Pair } from "matter-js";
 import { SyncedPlatform } from "../items/SyncedPlatform";
 import { ShovedElement } from "../items/ShovedElement";
-import { AnimatedSprite, ColorMatrixFilter, Sprite } from "pixi.js";
+import { AnimatedSprite, ColorMatrixFilter, Container, Sprite } from "pixi.js";
 import { FlameActor } from "../items/Flame";
 import gsap from "gsap";
 import { COLLISIONS } from "../misc/collisions";
 import { HedgehogActorAI } from "./hedgehog/ai";
 import { HedgehogActorControls } from "./hedgehog/controls";
-import { HedgehogActorOptions } from "./hedgehog/config";
+import { HedgehogActorFlags, HedgehogActorOptions } from "./hedgehog/config";
 import { HedgehogActorInterface } from "./hedgehog/interface";
 import { applyStaticColor } from "./hedgehog/colors";
 import type { HedgehogSkinAbility } from "./hedgehog/abilities";
 import { getSkinDefinition, HedgehogSkinDefinition } from "./hedgehog/skins";
 import type { SpiderWebActor } from "../items/SpiderWebActor";
+import { BODY_Y_OFFSETS } from "../sprites/body-offsets";
+import { FLAG_CLOTH_ORIGIN, FLAG_GLOBE_CENTER } from "../sprites/flag-layout";
+import type { AvailableSpriteFrames } from "../sprites/sprites";
+
+// While holding a flag only these play: waving etc. would need a free paw.
+const FLAG_ANIMATIONS = ["idle", "walk", "jump", "fall"];
+// Radians per second: one full flutter of the cloth every two thirds of a second.
+const FLAG_WAVE_SPEED = Math.PI * 3;
 
 // Horizontal speed a swing must exceed before the hog commits to facing that
 // way. Below it he holds his current facing (hysteresis), so the jittery near-
@@ -52,6 +60,15 @@ export class HedgehogActor extends Actor {
   private abilitySkin?: HedgehogActorOptions["skin"];
   accessorySprites: { [key: string]: Sprite } = {};
   overlayAnimation?: AnimatedSprite;
+  // The held flag/globe (see HedgehogActorFlags). A sibling of `sprite` on the
+  // stage rather than a child, so colour filters don't recolour the flag.
+  flagContainer?: Container;
+  private flagName?: HedgehogActorOptions["flag"];
+  // The cloth as 1px columns, so it can wave and un-mirror (see syncFlagFacing).
+  private flagCloth: Sprite[] = [];
+  private flagGlobe?: AnimatedSprite;
+  private flagFacingLeft?: boolean;
+  private flagPhase = 0;
   isFlammable = true;
   isDead = false;
   hue = 0;
@@ -153,7 +170,22 @@ export class HedgehogActor extends Actor {
       loop?: boolean;
     } = {}
   ): void {
-    const skin = options.forceSkin ?? this.options.skin ?? "default";
+    if (
+      this.options.flag &&
+      !options.forceSkin &&
+      this.sprite &&
+      !FLAG_ANIMATIONS.includes(sprite)
+    ) {
+      return;
+    }
+    let skin = options.forceSkin ?? this.options.skin ?? "default";
+    // Play the default body for skins we don't know (e.g. a stale skin saved
+    // by an older version) rather than spawning without a sprite.
+    if (
+      !this.game.spritesManager.toAvailableAnimation(`skins/${skin}/idle/tile`)
+    ) {
+      skin = "default";
+    }
     const idleAnimation = `skins/${skin}/idle/tile`;
     const possibleAnimation = `skins/${skin}/${sprite}/tile`;
 
@@ -223,6 +255,7 @@ export class HedgehogActor extends Actor {
     this.options = { ...this.options, ...options };
     this.ai.enable(this.options.ai_enabled ?? true);
     this.syncAccessories();
+    this.syncFlag();
     this.syncRigidBody();
     this.syncSkinAbility();
   }
@@ -385,6 +418,7 @@ export class HedgehogActor extends Actor {
       this.sprite!.scale.x *= -1;
     } else if (direction !== "left" && this.sprite!.scale.x < 0)
       this.sprite!.scale.x *= -1;
+    this.syncFlag();
   }
 
   getDirection(): "left" | "right" {
@@ -407,6 +441,8 @@ export class HedgehogActor extends Actor {
     if (this.isDead) {
       return;
     }
+
+    this.updateFlag(ticker);
 
     const xForce = this.walkSpeed;
 
@@ -555,6 +591,114 @@ export class HedgehogActor extends Actor {
     this.rigidBody!.frictionAir = body.frictionAir!;
   }
 
+  /** Build (or tear down) the held flag to match the options. */
+  private syncFlag(): void {
+    const flag = this.isDead ? null : (this.options.flag ?? null);
+    if (flag === (this.flagName ?? null)) {
+      this.syncFlagFacing();
+      return;
+    }
+
+    this.flagContainer?.destroy({ children: true });
+    this.flagContainer = undefined;
+    this.flagCloth = [];
+    this.flagGlobe = undefined;
+    this.flagFacingLeft = undefined;
+    this.flagName = flag;
+
+    const kind = flag && HedgehogActorFlags[flag]?.kind;
+    if (!flag || !kind) {
+      return;
+    }
+
+    const sprites = this.game.spritesManager;
+    const container = new Container();
+    if (kind === "globe") {
+      const animation = sprites.toAvailableAnimation(`props/${flag}/tile`);
+      if (!animation) {
+        return;
+      }
+      const globe = new AnimatedSprite(
+        sprites.getAnimatedSpriteFrames(animation)
+      );
+      globe.anchor.set(0.5);
+      globe.position.copyFrom(FLAG_GLOBE_CENTER);
+      globe.animationSpeed = 0.2;
+      globe.play();
+      container.addChild(globe);
+      this.flagGlobe = globe;
+    } else {
+      const pole = new Sprite(sprites.getSpriteFrames("props/pole.png"));
+      pole.anchor.set(0.5);
+      container.addChild(pole);
+      const columns = sprites.getColumnTextures(
+        `flags/${flag}.png` as AvailableSpriteFrames
+      );
+      this.flagCloth = columns.map((texture, i) => {
+        const column = new Sprite(texture);
+        column.position.set(FLAG_CLOTH_ORIGIN.x + i, FLAG_CLOTH_ORIGIN.y);
+        container.addChild(column);
+        return column;
+      });
+    }
+
+    const stage = this.game.app.stage;
+    stage.addChildAt(container, stage.getChildIndex(this.sprite!) + 1);
+    this.flagContainer = container;
+    this.syncFlagFacing();
+    this.updateFlag({ deltaTime: 0, deltaMS: 0 });
+  }
+
+  /**
+   * The flag mirrors along with the hedgehog when it faces left, which would
+   * read a flag (or the continents) backwards. Undo that for the picture only:
+   * the cloth shows its columns in reverse, so it stays hoisted at the pole,
+   * and the globe flips back about its own centre.
+   */
+  private syncFlagFacing(): void {
+    const left = this.getDirection() === "left";
+    if (!this.flagContainer || left === (this.flagFacingLeft ?? false)) {
+      this.flagFacingLeft = left;
+      return;
+    }
+    this.flagFacingLeft = left;
+    const columns = this.flagCloth.map((column) => column.texture).reverse();
+    this.flagCloth.forEach((column, i) => {
+      column.texture = columns[i];
+    });
+    if (this.flagGlobe) {
+      this.flagGlobe.scale.x = left ? -1 : 1;
+    }
+  }
+
+  /** Pin the flag to the body (following it as it bobs) and wave the cloth. */
+  private updateFlag(ticker: UpdateTicker): void {
+    const container = this.flagContainer;
+    const sprite = this.sprite;
+    if (!container || !sprite || !this.currentAnimation) {
+      return;
+    }
+
+    const [, skin, animation] = this.currentAnimation.split("/");
+    const offset =
+      (BODY_Y_OFFSETS[skin]?.[animation]?.[sprite.currentFrame] ?? 0) *
+      sprite.scale.y;
+    container.x = sprite.x - Math.sin(sprite.rotation) * offset;
+    container.y = sprite.y + Math.cos(sprite.rotation) * offset;
+    container.rotation = sprite.rotation;
+    container.scale.copyFrom(sprite.scale);
+    container.alpha = sprite.alpha;
+    container.visible = sprite.visible;
+
+    // Ripple each column: still at the pole, widest at the free end. Whole
+    // pixels only, to match the rest of the pixel art.
+    this.flagPhase += ticker.deltaTime * FLAG_WAVE_SPEED;
+    this.flagCloth.forEach((column, i) => {
+      const ripple = Math.sin(this.flagPhase - i * 0.35) * 1.5;
+      column.y = FLAG_CLOTH_ORIGIN.y + Math.round(ripple * Math.min(1, i / 6));
+    });
+  }
+
   private syncAccessories(): void {
     // TODO: Remove old accessories
     Object.values(this.accessorySprites).forEach((sprite) => {
@@ -601,6 +745,7 @@ export class HedgehogActor extends Actor {
     const accessories = this.options.accessories;
     this.options.accessories = [];
     this.syncAccessories();
+    this.syncFlag();
 
     accessories?.forEach((accessory) => {
       this.game.spawnAccessory(accessory, this.rigidBody!.position);
@@ -637,5 +782,7 @@ export class HedgehogActor extends Actor {
     Object.values(this.accessorySprites).forEach((sprite) => {
       this.game.app.stage.removeChild(sprite);
     });
+    this.flagContainer?.destroy({ children: true });
+    this.flagContainer = undefined;
   }
 }

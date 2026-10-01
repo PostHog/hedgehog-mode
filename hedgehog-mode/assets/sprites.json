@@ -3583,9 +3583,266 @@
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
+},
+"icons/brazil.png":
+{
+	"frame": {"x":1840,"y":1360,"w":80,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
+	"sourceSize": {"w":80,"h":80}
+},
+"icons/china.png":
+{
+	"frame": {"x":1920,"y":1360,"w":80,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
+	"sourceSize": {"w":80,"h":80}
+},
+"icons/earth.png":
+{
+	"frame": {"x":0,"y":1440,"w":80,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
+	"sourceSize": {"w":80,"h":80}
+},
+"icons/france.png":
+{
+	"frame": {"x":80,"y":1440,"w":80,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
+	"sourceSize": {"w":80,"h":80}
+},
+"icons/germany.png":
+{
+	"frame": {"x":160,"y":1440,"w":80,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
+	"sourceSize": {"w":80,"h":80}
+},
+"icons/italy.png":
+{
+	"frame": {"x":240,"y":1440,"w":80,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
+	"sourceSize": {"w":80,"h":80}
+},
+"icons/japan.png":
+{
+	"frame": {"x":320,"y":1440,"w":80,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
+	"sourceSize": {"w":80,"h":80}
+},
+"icons/mexico.png":
+{
+	"frame": {"x":400,"y":1440,"w":80,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
+	"sourceSize": {"w":80,"h":80}
+},
+"icons/poland.png":
+{
+	"frame": {"x":480,"y":1440,"w":80,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
+	"sourceSize": {"w":80,"h":80}
+},
+"icons/south-korea.png":
+{
+	"frame": {"x":560,"y":1440,"w":80,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
+	"sourceSize": {"w":80,"h":80}
+},
+"icons/spain.png":
+{
+	"frame": {"x":640,"y":1440,"w":80,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
+	"sourceSize": {"w":80,"h":80}
+},
+"icons/turkiye.png":
+{
+	"frame": {"x":720,"y":1440,"w":80,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
+	"sourceSize": {"w":80,"h":80}
+},
+"props/pole.png":
+{
+	"frame": {"x":800,"y":1440,"w":80,"h":80},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
+	"sourceSize": {"w":80,"h":80}
+},
+"props/earth/tile000.png":
+{
+	"frame": {"x":0,"y":1520,"w":40,"h":40},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":40,"h":40},
+	"sourceSize": {"w":40,"h":40}
+},
+"props/earth/tile001.png":
+{
+	"frame": {"x":40,"y":1520,"w":40,"h":40},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":40,"h":40},
+	"sourceSize": {"w":40,"h":40}
+},
+"props/earth/tile002.png":
+{
+	"frame": {"x":80,"y":1520,"w":40,"h":40},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":40,"h":40},
+	"sourceSize": {"w":40,"h":40}
+},
+"props/earth/tile003.png":
+{
+	"frame": {"x":120,"y":1520,"w":40,"h":40},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":40,"h":40},
+	"sourceSize": {"w":40,"h":40}
+},
+"props/earth/tile004.png":
+{
+	"frame": {"x":160,"y":1520,"w":40,"h":40},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":40,"h":40},
+	"sourceSize": {"w":40,"h":40}
+},
+"props/earth/tile005.png":
+{
+	"frame": {"x":200,"y":1520,"w":40,"h":40},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":40,"h":40},
+	"sourceSize": {"w":40,"h":40}
+},
+"props/earth/tile006.png":
+{
+	"frame": {"x":240,"y":1520,"w":40,"h":40},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":40,"h":40},
+	"sourceSize": {"w":40,"h":40}
+},
+"props/earth/tile007.png":
+{
+	"frame": {"x":280,"y":1520,"w":40,"h":40},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":40,"h":40},
+	"sourceSize": {"w":40,"h":40}
+},
+"flags/brazil.png":
+{
+	"frame": {"x":320,"y":1520,"w":30,"h":21},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":30,"h":21},
+	"sourceSize": {"w":30,"h":21}
+},
+"flags/china.png":
+{
+	"frame": {"x":350,"y":1520,"w":30,"h":21},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":30,"h":21},
+	"sourceSize": {"w":30,"h":21}
+},
+"flags/france.png":
+{
+	"frame": {"x":380,"y":1520,"w":30,"h":21},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":30,"h":21},
+	"sourceSize": {"w":30,"h":21}
+},
+"flags/germany.png":
+{
+	"frame": {"x":410,"y":1520,"w":30,"h":21},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":30,"h":21},
+	"sourceSize": {"w":30,"h":21}
+},
+"flags/italy.png":
+{
+	"frame": {"x":440,"y":1520,"w":30,"h":21},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":30,"h":21},
+	"sourceSize": {"w":30,"h":21}
+},
+"flags/japan.png":
+{
+	"frame": {"x":470,"y":1520,"w":30,"h":21},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":30,"h":21},
+	"sourceSize": {"w":30,"h":21}
+},
+"flags/mexico.png":
+{
+	"frame": {"x":500,"y":1520,"w":30,"h":21},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":30,"h":21},
+	"sourceSize": {"w":30,"h":21}
+},
+"flags/poland.png":
+{
+	"frame": {"x":530,"y":1520,"w":30,"h":21},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":30,"h":21},
+	"sourceSize": {"w":30,"h":21}
+},
+"flags/south-korea.png":
+{
+	"frame": {"x":560,"y":1520,"w":30,"h":21},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":30,"h":21},
+	"sourceSize": {"w":30,"h":21}
+},
+"flags/spain.png":
+{
+	"frame": {"x":590,"y":1520,"w":30,"h":21},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":30,"h":21},
+	"sourceSize": {"w":30,"h":21}
+},
+"flags/turkiye.png":
+{
+	"frame": {"x":620,"y":1520,"w":30,"h":21},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":30,"h":21},
+	"sourceSize": {"w":30,"h":21}
 }},
 "animations": {
 	"overlays/fire/tile": ["overlays/fire/tile000.png","overlays/fire/tile001.png","overlays/fire/tile002.png","overlays/fire/tile003.png","overlays/fire/tile004.png","overlays/fire/tile005.png","overlays/fire/tile006.png","overlays/fire/tile007.png","overlays/fire/tile008.png","overlays/fire/tile009.png","overlays/fire/tile010.png","overlays/fire/tile011.png","overlays/fire/tile012.png","overlays/fire/tile013.png"],
+	"props/earth/tile": ["props/earth/tile000.png","props/earth/tile001.png","props/earth/tile002.png","props/earth/tile003.png","props/earth/tile004.png","props/earth/tile005.png","props/earth/tile006.png","props/earth/tile007.png"],
 	"skins/default/action/tile": ["skins/default/action/tile000.png","skins/default/action/tile001.png","skins/default/action/tile002.png","skins/default/action/tile003.png","skins/default/action/tile004.png","skins/default/action/tile005.png","skins/default/action/tile006.png","skins/default/action/tile007.png","skins/default/action/tile008.png","skins/default/action/tile009.png","skins/default/action/tile010.png","skins/default/action/tile011.png","skins/default/action/tile012.png","skins/default/action/tile013.png","skins/default/action/tile014.png","skins/default/action/tile015.png"],
 	"skins/default/death/tile": ["skins/default/death/tile000.png","skins/default/death/tile001.png","skins/default/death/tile002.png","skins/default/death/tile003.png","skins/default/death/tile004.png","skins/default/death/tile005.png","skins/default/death/tile006.png","skins/default/death/tile007.png","skins/default/death/tile008.png","skins/default/death/tile009.png","skins/default/death/tile010.png","skins/default/death/tile011.png","skins/default/death/tile012.png","skins/default/death/tile013.png","skins/default/death/tile014.png","skins/default/death/tile015.png","skins/default/death/tile016.png","skins/default/death/tile017.png","skins/default/death/tile018.png","skins/default/death/tile019.png","skins/default/death/tile020.png"],
 	"skins/default/fall/tile": ["skins/default/fall/tile000.png","skins/default/fall/tile001.png","skins/default/fall/tile002.png","skins/default/fall/tile003.png","skins/default/fall/tile004.png","skins/default/fall/tile005.png","skins/default/fall/tile006.png","skins/default/fall/tile007.png","skins/default/fall/tile008.png"],
@@ -3616,7 +3873,7 @@
 	"version": "1.1",
 	"image": "sprites.png",
 	"format": "RGBA8888",
-	"size": {"w":2000,"h":1440},
+	"size": {"w":2000,"h":1560},
 	"scale": "1",
 	"smartupdate": "$TexturePacker:SmartUpdate:eaf580dc95d1dee3bff0f7f346f23dd7:80ac418b0a7cda1be46867d2d5737449:1eabdf11f75e3a4fe3147baf7b5be24b$"
 }

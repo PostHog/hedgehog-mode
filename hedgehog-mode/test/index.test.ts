@@ -23,11 +23,13 @@ describe("public hedgehog configuration", () => {
 
   it("ships sprites for every flag", () => {
     expect(HedgehogActorFlagOptions).toEqual(Object.keys(HedgehogActorFlags));
+    expect(sprites.frames).toHaveProperty(["props/pole.png"]);
     for (const flag of HedgehogActorFlagOptions) {
       expect(sprites.frames).toHaveProperty([`icons/${flag}.png`]);
-      expect(sprites.animations).toHaveProperty([`props/${flag}/tile`]);
-      if (HedgehogActorFlags[flag].mirrored) {
-        expect(sprites.animations).toHaveProperty([`props/${flag}-left/tile`]);
+      if (HedgehogActorFlags[flag].kind === "globe") {
+        expect(sprites.animations).toHaveProperty([`props/${flag}/tile`]);
+      } else {
+        expect(sprites.frames).toHaveProperty([`flags/${flag}.png`]);
       }
     }
   });

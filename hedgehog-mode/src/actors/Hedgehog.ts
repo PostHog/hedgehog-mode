@@ -7,7 +7,7 @@ import { HedgehogModeInterface, GameElement, UpdateTicker } from "../types";
 import Matter, { Pair } from "matter-js";
 import { SyncedPlatform } from "../items/SyncedPlatform";
 import { ShovedElement } from "../items/ShovedElement";
-import { AnimatedSprite, ColorMatrixFilter, Sprite } from "pixi.js";
+import { AnimatedSprite, ColorMatrixFilter, Container, Sprite } from "pixi.js";
 import { FlameActor } from "../items/Flame";
 import gsap from "gsap";
 import { COLLISIONS } from "../misc/collisions";
@@ -20,9 +20,13 @@ import type { HedgehogSkinAbility } from "./hedgehog/abilities";
 import { getSkinDefinition, HedgehogSkinDefinition } from "./hedgehog/skins";
 import type { SpiderWebActor } from "../items/SpiderWebActor";
 import { BODY_Y_OFFSETS } from "../sprites/body-offsets";
+import { FLAG_CLOTH_ORIGIN, FLAG_GLOBE_CENTER } from "../sprites/flag-layout";
+import type { AvailableSpriteFrames } from "../sprites/sprites";
 
 // While holding a flag only these play: waving etc. would need a free paw.
 const FLAG_ANIMATIONS = ["idle", "walk", "jump", "fall"];
+// Radians per second: one full flutter of the cloth every two thirds of a second.
+const FLAG_WAVE_SPEED = Math.PI * 3;
 
 // Horizontal speed a swing must exceed before the hog commits to facing that
 // way. Below it he holds his current facing (hysteresis), so the jittery near-
@@ -58,8 +62,13 @@ export class HedgehogActor extends Actor {
   overlayAnimation?: AnimatedSprite;
   // The held flag/globe (see HedgehogActorFlags). A sibling of `sprite` on the
   // stage rather than a child, so colour filters don't recolour the flag.
-  flagSprite?: AnimatedSprite;
-  private flagAnimation?: string;
+  flagContainer?: Container;
+  private flagName?: HedgehogActorOptions["flag"];
+  // The cloth as 1px columns, so it can wave and un-mirror (see syncFlagFacing).
+  private flagCloth: Sprite[] = [];
+  private flagGlobe?: AnimatedSprite;
+  private flagFacingLeft?: boolean;
+  private flagPhase = 0;
   isFlammable = true;
   isDead = false;
   hue = 0;
@@ -433,7 +442,7 @@ export class HedgehogActor extends Actor {
       return;
     }
 
-    this.syncFlagTransform();
+    this.updateFlag(ticker);
 
     const xForce = this.walkSpeed;
 
@@ -582,68 +591,112 @@ export class HedgehogActor extends Actor {
     this.rigidBody!.frictionAir = body.frictionAir!;
   }
 
-  /**
-   * Keep the held flag in line with the options and facing direction. Mirrored
-   * flags swap to their `-left` frames mid-wave rather than restarting.
-   */
+  /** Build (or tear down) the held flag to match the options. */
   private syncFlag(): void {
-    const flag = this.isDead ? null : this.options.flag;
-    const mirrored =
-      flag &&
-      HedgehogActorFlags[flag]?.mirrored &&
-      this.getDirection() === "left";
-    const animation = flag
-      ? this.game.spritesManager.toAvailableAnimation(
-          `props/${flag}${mirrored ? "-left" : ""}/tile`
-        )
-      : null;
-
-    if ((animation ?? undefined) === this.flagAnimation) {
+    const flag = this.isDead ? null : (this.options.flag ?? null);
+    if (flag === (this.flagName ?? null)) {
+      this.syncFlagFacing();
       return;
     }
 
-    if (!animation) {
-      this.flagSprite?.destroy();
-      this.flagSprite = undefined;
-      this.flagAnimation = undefined;
+    this.flagContainer?.destroy({ children: true });
+    this.flagContainer = undefined;
+    this.flagCloth = [];
+    this.flagGlobe = undefined;
+    this.flagFacingLeft = undefined;
+    this.flagName = flag;
+
+    const kind = flag && HedgehogActorFlags[flag]?.kind;
+    if (!flag || !kind) {
       return;
     }
 
-    const textures =
-      this.game.spritesManager.getAnimatedSpriteFrames(animation);
-    if (this.flagSprite) {
-      const frame = this.flagSprite.currentFrame;
-      this.flagSprite.textures = textures;
-      this.flagSprite.gotoAndPlay(frame % this.flagSprite.totalFrames);
+    const sprites = this.game.spritesManager;
+    const container = new Container();
+    if (kind === "globe") {
+      const animation = sprites.toAvailableAnimation(`props/${flag}/tile`);
+      if (!animation) {
+        return;
+      }
+      const globe = new AnimatedSprite(
+        sprites.getAnimatedSpriteFrames(animation)
+      );
+      globe.anchor.set(0.5);
+      globe.position.copyFrom(FLAG_GLOBE_CENTER);
+      globe.animationSpeed = 0.2;
+      globe.play();
+      container.addChild(globe);
+      this.flagGlobe = globe;
     } else {
-      this.flagSprite = new AnimatedSprite(textures);
-      this.flagSprite.anchor.set(0.5);
-      this.flagSprite.animationSpeed = 0.2;
-      this.flagSprite.play();
-      const stage = this.game.app.stage;
-      stage.addChildAt(this.flagSprite, stage.getChildIndex(this.sprite!) + 1);
+      const pole = new Sprite(sprites.getSpriteFrames("props/pole.png"));
+      pole.anchor.set(0.5);
+      container.addChild(pole);
+      const columns = sprites.getColumnTextures(
+        `flags/${flag}.png` as AvailableSpriteFrames
+      );
+      this.flagCloth = columns.map((texture, i) => {
+        const column = new Sprite(texture);
+        column.position.set(FLAG_CLOTH_ORIGIN.x + i, FLAG_CLOTH_ORIGIN.y);
+        container.addChild(column);
+        return column;
+      });
     }
-    this.flagAnimation = animation;
-    this.syncFlagTransform();
+
+    const stage = this.game.app.stage;
+    stage.addChildAt(container, stage.getChildIndex(this.sprite!) + 1);
+    this.flagContainer = container;
+    this.syncFlagFacing();
+    this.updateFlag({ deltaTime: 0, deltaMS: 0 });
   }
 
-  /** Pin the flag to the body, following it as it bobs (e.g. into a jump). */
-  private syncFlagTransform(): void {
-    const flag = this.flagSprite;
-    const sprite = this.sprite;
-    if (!flag || !sprite || !this.currentAnimation) {
+  /**
+   * The flag mirrors along with the hedgehog when it faces left, which would
+   * read a flag (or the continents) backwards. Undo that for the picture only:
+   * the cloth shows its columns in reverse, so it stays hoisted at the pole,
+   * and the globe flips back about its own centre.
+   */
+  private syncFlagFacing(): void {
+    const left = this.getDirection() === "left";
+    if (!this.flagContainer || left === (this.flagFacingLeft ?? false)) {
+      this.flagFacingLeft = left;
       return;
     }
+    this.flagFacingLeft = left;
+    const columns = this.flagCloth.map((column) => column.texture).reverse();
+    this.flagCloth.forEach((column, i) => {
+      column.texture = columns[i];
+    });
+    if (this.flagGlobe) {
+      this.flagGlobe.scale.x = left ? -1 : 1;
+    }
+  }
+
+  /** Pin the flag to the body (following it as it bobs) and wave the cloth. */
+  private updateFlag(ticker: UpdateTicker): void {
+    const container = this.flagContainer;
+    const sprite = this.sprite;
+    if (!container || !sprite || !this.currentAnimation) {
+      return;
+    }
+
     const [, skin, animation] = this.currentAnimation.split("/");
     const offset =
       (BODY_Y_OFFSETS[skin]?.[animation]?.[sprite.currentFrame] ?? 0) *
       sprite.scale.y;
-    flag.x = sprite.x - Math.sin(sprite.rotation) * offset;
-    flag.y = sprite.y + Math.cos(sprite.rotation) * offset;
-    flag.rotation = sprite.rotation;
-    flag.scale.copyFrom(sprite.scale);
-    flag.alpha = sprite.alpha;
-    flag.visible = sprite.visible;
+    container.x = sprite.x - Math.sin(sprite.rotation) * offset;
+    container.y = sprite.y + Math.cos(sprite.rotation) * offset;
+    container.rotation = sprite.rotation;
+    container.scale.copyFrom(sprite.scale);
+    container.alpha = sprite.alpha;
+    container.visible = sprite.visible;
+
+    // Ripple each column: still at the pole, widest at the free end. Whole
+    // pixels only, to match the rest of the pixel art.
+    this.flagPhase += ticker.deltaTime * FLAG_WAVE_SPEED;
+    this.flagCloth.forEach((column, i) => {
+      const ripple = Math.sin(this.flagPhase - i * 0.35) * 1.5;
+      column.y = FLAG_CLOTH_ORIGIN.y + Math.round(ripple * Math.min(1, i / 6));
+    });
   }
 
   private syncAccessories(): void {
@@ -729,7 +782,7 @@ export class HedgehogActor extends Actor {
     Object.values(this.accessorySprites).forEach((sprite) => {
       this.game.app.stage.removeChild(sprite);
     });
-    this.flagSprite?.destroy();
-    this.flagSprite = undefined;
+    this.flagContainer?.destroy({ children: true });
+    this.flagContainer = undefined;
   }
 }

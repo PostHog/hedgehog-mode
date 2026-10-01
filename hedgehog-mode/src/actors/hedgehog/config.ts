@@ -29,29 +29,26 @@ export type HedgehogActorFlagOption = (typeof HedgehogActorFlagOptions)[number];
 
 /**
  * Something the hedgehog holds — a flag on a pole, or the globe — on top of
- * whatever skin it's wearing. Animates from `props/<flag>/tile`; the
- * customization menu shows `icons/<flag>.png`.
- *
- * Mirrored flags ship pre-flipped `props/<flag>-left` frames: the engine
- * mirrors the hedgehog when it faces left, which would otherwise read a flag
- * backwards.
+ * whatever skin it's wearing. A `flag` is a flat `flags/<flag>.png` cloth that
+ * the engine waves from a shared `props/pole.png`; a `globe` spins through
+ * `props/<flag>/tile`. The customization menu shows `icons/<flag>.png`.
  */
 export const HedgehogActorFlags: Record<
   HedgehogActorFlagOption,
-  { mirrored: boolean }
+  { kind: "flag" | "globe" }
 > = {
-  turkiye: { mirrored: true },
-  mexico: { mirrored: true },
-  italy: { mirrored: true },
-  france: { mirrored: true },
-  spain: { mirrored: true },
-  germany: { mirrored: false },
-  poland: { mirrored: false },
-  japan: { mirrored: false },
-  "south-korea": { mirrored: true },
-  china: { mirrored: true },
-  brazil: { mirrored: true },
-  earth: { mirrored: true },
+  turkiye: { kind: "flag" },
+  mexico: { kind: "flag" },
+  italy: { kind: "flag" },
+  france: { kind: "flag" },
+  spain: { kind: "flag" },
+  germany: { kind: "flag" },
+  poland: { kind: "flag" },
+  japan: { kind: "flag" },
+  "south-korea": { kind: "flag" },
+  china: { kind: "flag" },
+  brazil: { kind: "flag" },
+  earth: { kind: "globe" },
 };
 
 export const HedgehogActorColorOptions = [

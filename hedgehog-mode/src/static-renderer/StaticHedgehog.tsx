@@ -1,7 +1,11 @@
 import { CSSProperties } from "react";
 import spritesData from "../../assets/sprites.json";
 import { HedgehogActorOptions } from "../actors/hedgehog/config";
-import { HedgehogActorColorOption } from "../actors/hedgehog/config";
+import {
+  HedgehogActorColorOption,
+  HedgehogActorFlags,
+} from "../actors/hedgehog/config";
+import { FLAG_CLOTH_ORIGIN, FLAG_GLOBE_CENTER } from "../sprites/flag-layout";
 
 type SpriteFrame = {
   frame: { x: number; y: number; w: number; h: number };
@@ -60,7 +64,11 @@ function getSpriteStyle(spriteName: string, assetsUrl: string): CSSProperties {
     width: "100%",
     height: "100%",
     backgroundImage: `url(${assetsUrl}/sprites.png)`,
-    backgroundPosition: `-${frame.frame.x * scaleX}% -${frame.frame.y * scaleY}%`,
+    // A background-position percentage lines up that fraction of the image
+    // with the same fraction of the box, so `x / (sheet - frame)` puts the
+    // frame's left edge flush with the box's, for frames of any size.
+    backgroundPosition: `${(frame.frame.x / (sheetWidth - frame.sourceSize.w)) * 100}% ${(frame.frame.y / (sheetHeight - frame.sourceSize.h)) * 100}%`,
+    backgroundRepeat: "no-repeat",
     backgroundSize: `${sheetWidth * scaleX}% ${sheetHeight * scaleY}%`,
     imageRendering: "pixelated",
     position: "absolute",
@@ -81,6 +89,63 @@ export function StaticSprite({
     <div style={{ position: "relative", width: "100%", height: "100%" }}>
       <div style={getSpriteStyle(name, assetsUrl)} />
     </div>
+  );
+}
+
+/** Places a sprite frame at a spot on the 80x80 body frame. */
+function placedSprite(
+  name: string,
+  assetsUrl: string,
+  { x, y, w, h }: { x: number; y: number; w: number; h: number }
+) {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: `${(x / 80) * 100}%`,
+        top: `${(y / 80) * 100}%`,
+        width: `${(w / 80) * 100}%`,
+        height: `${(h / 80) * 100}%`,
+      }}
+    >
+      <div style={getSpriteStyle(name, assetsUrl)} />
+    </div>
+  );
+}
+
+function StaticFlag({
+  flag,
+  assetsUrl,
+}: {
+  flag: NonNullable<HedgehogActorOptions["flag"]>;
+  assetsUrl: string;
+}) {
+  if (HedgehogActorFlags[flag]?.kind === "globe") {
+    const name = `props/${flag}/tile000.png`;
+    const size = sprites.frames[name]?.sourceSize;
+    if (!size) {
+      return null;
+    }
+    return placedSprite(name, assetsUrl, {
+      x: 40 + FLAG_GLOBE_CENTER.x - size.w / 2,
+      y: 40 + FLAG_GLOBE_CENTER.y - size.h / 2,
+      ...size,
+    });
+  }
+  const name = `flags/${flag}.png`;
+  const size = sprites.frames[name]?.sourceSize;
+  if (!size) {
+    return null;
+  }
+  return (
+    <>
+      <div style={getSpriteStyle("props/pole.png", assetsUrl)} />
+      {placedSprite(name, assetsUrl, {
+        x: 40 + FLAG_CLOTH_ORIGIN.x,
+        y: 40 + FLAG_CLOTH_ORIGIN.y,
+        ...size,
+      })}
+    </>
   );
 }
 
@@ -118,11 +183,7 @@ export function StaticHedgehog({
       />
 
       {/* Held flag, unfiltered so the colour option doesn't recolour it */}
-      {options.flag && (
-        <div
-          style={getSpriteStyle(`props/${options.flag}/tile000.png`, assetsUrl)}
-        />
-      )}
+      {options.flag && <StaticFlag flag={options.flag} assetsUrl={assetsUrl} />}
 
       {/* Accessories */}
       {options.accessories?.map((accessory) => {

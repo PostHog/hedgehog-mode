@@ -148,22 +148,45 @@ You don't need TexturePacker. Drop the PNG under `texturepacker/assets/` and run
 source changed, without moving existing frames. It writes the JSON in
 TexturePacker's exact layout (and refuses to run if the current file doesn't
 round-trip), so the diff is only ever the new frames. `--check` lists what's
-stale without writing. Changing a sprite's _size_ needs a full repack.
+stale without writing. A sprite that changes size is moved to a fresh spot
+(its old slot stays empty until a full repack).
 
-Flag cloths are 30x21 and mostly **generated**, not drawn: each country is a
-few lines of a small vector DSL (`texturepacker/flag-generator/draw.mjs` —
-stripes, stars, crescents, `unionJack()`, and `pixels()` for hand-placed detail)
-in `texturepacker/flag-generator/countries/*.mjs`. To add or fix one:
+Flag cloths are 31x21 and every one is **generated**, not drawn: each country
+is a few lines of a small DSL (`texturepacker/flag-generator/draw.mjs`) in
+`texturepacker/flag-generator/countries/*.mjs`. Fields and big shapes (stripes,
+bands) are vectors on a 30x20 design canvas; anything that has to be
+symmetric or crisp uses the `pixel*` primitives, which work in whole interior
+pixels (29x19, so column 14 and row 9 — `MID_X`, `MID_Y` — are true centres)
+and are symmetric by construction:
+
+- `pixelStar` (any size; hand-drawn up to 7px), `pixelDisc`, `pixelRing`,
+  `pixelCrescent` (the standard moon), `pixelRect`;
+- `pixelCross` / `nordicCross` (equal arms, even fimbriation);
+- `pixelUnionJack` (what `ensign()` puts in its 15x11 canton);
+- `pixelStarRing` (a ring of stars with even gaps, like the EU's);
+- `pixelHoistTriangle` (the hoist triangles of Sudan, Comoros, ...);
+- `cellsWhere` + `pixelCells` for shapes easier to describe than draw (a
+  Y, a sail), and `mirrorHalves` for symmetric hand-drawn emblems.
+
+The country files hold only specs. Anything a spec needs beyond the DSL — a
+shared sun grid, a geometry helper, a one-off emblem like Korea's taegeuk —
+lives in `texturepacker/flag-generator/helpers.mjs`, documented with the
+flag(s) it's for. Put new helpers there, not in a country file.
+
+The design canvas maps onto the interior unevenly, so a vector star, circle or
+triangle comes out a pixel lopsided (or leaves a stray pixel where a stripe
+boundary falls mid-row); reach for the pixel version first. `pixels()` is for
+hand-placed detail. To add or fix one:
 
 ```bash
-node texturepacker/flag-generator/generate.mjs --preview /tmp/f.png --only nepal  # eyeball it
-node texturepacker/flag-generator/generate.mjs   # write texturepacker/assets/flags/*.png
-node texturepacker/append-to-atlas.mjs           # pack new ones
+pnpm flags:preview /tmp/f.png --only nepal   # eyeball it (writes nothing)
+pnpm flags                                   # regenerate every cloth + repack the atlas
+pnpm flags:check                             # CI: fails if a cloth or the atlas is stale
 ```
 
 Then add it to `flags.ts`; a test fails if a cloth and the registry disagree.
-The 11 original flags are hand-drawn PNGs with no spec, so the generator
-leaves them alone.
+Never hand-edit a cloth PNG: `pnpm flags` overwrites it, and `flags:check`
+(run in CI) fails on any cloth that doesn't match its spec.
 
 Coordinates: Matter world space and Pixi stage space are both screen pixels, so
 pointer/`clientX` positions map 1:1 — no transforms needed.

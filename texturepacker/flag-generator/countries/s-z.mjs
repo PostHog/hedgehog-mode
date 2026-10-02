@@ -1,22 +1,41 @@
-// Saint Vincent and the Grenadines → Zimbabwe. See ../draw.mjs for the DSL.
+// Saint Vincent and the Grenadines → Zimbabwe.
+// See ../draw.mjs for the DSL and ../helpers.mjs for shared emblems.
 import {
   BLACK,
+  INTERIOR_HEIGHT,
+  INTERIOR_WIDTH,
+  MID_X,
+  MID_Y,
   WHITE,
   band,
-  circle,
+  cellsWhere,
   crescent,
-  cross,
   ensign,
   fill,
   hstripes,
+  pixelCells,
+  pixelCrescent,
+  pixelCross,
+  pixelDisc,
+  pixelHoistTriangle,
+  pixelRect,
   pixelStar,
+  pixelUnionJack,
   pixels,
   poly,
   rect,
   star,
-  unionJack,
   vstripes,
 } from "../draw.mjs";
+import {
+  EIGHT_RAY_SUN,
+  SA_FIMBRIATION,
+  SA_GREEN,
+  saInFork,
+  saPall,
+  taegeuk,
+  trigram,
+} from "../helpers.mjs";
 
 export const flags = {
   "saint-vincent-and-the-grenadines": {
@@ -43,9 +62,10 @@ export const flags = {
     layers: [
       fill("#ce1126"),
       rect(0, 0, 15, 10, "#002b7f"),
-      // The Southern Cross: four plus-shaped stars and a little one.
+      // The Southern Cross: four plus-shaped stars and a little one,
+      // centred in the 15px canton.
       pixels(
-        2,
+        3,
         0,
         [
           "....w....",
@@ -85,8 +105,8 @@ export const flags = {
         ],
         "#d21034"
       ),
-      pixelStar(12, 7, BLACK),
-      pixelStar(19, 7, BLACK),
+      pixelStar(13, 7, BLACK),
+      pixelStar(20, 7, BLACK),
     ],
   },
   "saudi-arabia": {
@@ -97,9 +117,9 @@ export const flags = {
         6,
         4,
         [
-          "w.w..w.ww.w.ww.w",
-          "wwwww.wwwwwwwwww",
-          "...w..w....w..w.",
+          "w.w..w.ww.w.ww.ww",
+          "wwwww.wwwwwwwwwww",
+          "...w..w....w..w..",
           "",
           "",
           "...............w",
@@ -183,6 +203,9 @@ export const flags = {
         ],
         "#007a3d"
       ),
+      // Where the bands converge on the corner, keep each one visible at
+      // the edge: yellow on the hoist, white along the bottom.
+      pixels(0, 17, ["y", "..w"], { y: "#fcd856", w: WHITE }),
     ],
   },
   "sierra-leone": { layers: hstripes(["#1eb53a", WHITE, "#0072c6"]) },
@@ -262,44 +285,40 @@ export const flags = {
   "south-africa": {
     layers: [
       hstripes(["#e03c31", "#001489"]),
-      poly(
-        [
-          [0, 0],
-          [10.5, 7.2],
-          [30, 7.2],
-          [30, 12.8],
-          [10.5, 12.8],
-          [0, 20],
-        ],
-        WHITE
+      // The Y in whole pixels, drawn from its centre line: two arms from the
+      // hoist corners meeting at the fork, then straight to the fly. Green
+      // within 2.5px of it (a fifth of the height, the arms as wide as the
+      // band), then a 1px edge: white outside the fork, gold against the
+      // black triangle inside it. Symmetric top to bottom by construction.
+      ...[
+        [SA_FIMBRIATION, (inside) => (inside ? "#ffb612" : WHITE)],
+        [SA_GREEN, () => "#007749"],
+      ].flatMap(([reach, color]) =>
+        [false, true].map((inside) =>
+          pixelCells(
+            cellsWhere(
+              (x, y) => saPall(x, y) <= reach && saInFork(x, y) === inside
+            ),
+            color(inside)
+          )
+        )
       ),
-      poly(
-        [
-          [0, 1.6],
-          [9.6, 8.3],
-          [30, 8.3],
-          [30, 11.7],
-          [9.6, 11.7],
-          [0, 18.4],
-        ],
-        "#007749"
-      ),
-      poly(
-        [
-          [0, 3.3],
-          [9.4, 10],
-          [0, 16.7],
-        ],
-        "#ffb612"
-      ),
-      poly(
-        [
-          [0, 4.8],
-          [7.4, 10],
-          [0, 15.2],
-        ],
+      pixelCells(
+        cellsWhere((x, y) => saInFork(x, y) && saPall(x, y) > SA_FIMBRIATION),
         BLACK
       ),
+    ],
+  },
+  "south-korea": {
+    layers: [
+      fill(WHITE),
+      ...taegeuk(),
+      // Geon, gam, ri, gon, clockwise from the hoist top, mirrored about the
+      // middle column and row.
+      trigram(4, 4, 1, 1, [1, 1, 1]),
+      trigram(2 * MID_X - 4, 4, -1, 1, [0, 1, 0]),
+      trigram(2 * MID_X - 4, 2 * MID_Y - 4, -1, -1, [0, 0, 0]),
+      trigram(4, 2 * MID_Y - 4, 1, -1, [1, 0, 1]),
     ],
   },
   "south-sudan": {
@@ -316,48 +335,80 @@ export const flags = {
       pixelStar(2, 7, "#fcdd09"),
     ],
   },
+  spain: {
+    layers: [
+      hstripes(["#aa151b", "#f1bf00", "#aa151b"], [1, 2, 1]),
+      // The coat of arms, kept small: a crown over a squarish shield
+      // (Castile's red and León's white over Aragon's stripes and Navarre's
+      // red, the blue Bourbon dot in the middle, a rounded base) between the
+      // two Pillars of Hercules. Its axis is half the flag's height in from
+      // the hoist, on the middle row.
+      pixels(
+        5,
+        MID_Y - 3,
+        [
+          "...ccc...",
+          "c.ccccc.c",
+          "w.rrrww.w",
+          "w.rrbww.w",
+          "w.oroor.w",
+          "w.orrrr.w",
+          "c..rrr..c",
+        ],
+        {
+          c: "#a58600",
+          w: WHITE,
+          r: "#aa151b",
+          o: "#d39b00",
+          b: "#2a4a9e",
+        }
+      ),
+    ],
+  },
   "sri-lanka": {
     layers: [
       fill("#ffb700"),
       // Laid out in exact pixels so the yellow border stays 1px everywhere.
-      pixels(1, 1, Array(17).fill("gggooo"), { g: "#005f56", o: "#ff5b00" }),
-      pixels(8, 1, Array(17).fill("m".repeat(19)), { m: "#8d153a" }),
-      // The lion with its sword, and the four bo leaves.
+      pixelRect(1, 1, 3, 17, "#005f56"),
+      pixelRect(4, 1, 3, 17, "#ff5b00"),
+      pixelRect(8, 1, INTERIOR_WIDTH - 9, 17, "#8d153a"),
+      // The four bo leaves, one in each corner of the maroon panel.
+      pixels(9, 2, ["y" + ".".repeat(INTERIOR_WIDTH - 12) + "y"], {
+        y: "#ffb700",
+      }),
+      pixels(9, 16, ["y" + ".".repeat(INTERIOR_WIDTH - 12) + "y"], {
+        y: "#ffb700",
+      }),
+      // The lion passant, facing the hoist, holding the sword upright in its
+      // forepaw: the hilt sits low at its chest, the blade rising in front of
+      // its face. Mane up, tail curling over its back. 16 wide, centred on the
+      // 20px panel with 2px either side; the maroon eye gives it a face.
       pixels(
-        9,
-        2,
+        10,
+        4,
         [
-          "y.................y",
-          "",
-          "......yy...........",
-          ".....yyyy..........",
-          "..y..yyy...........",
-          "..yyyyyyyyy........",
-          "...yyyyyyyyy.......",
-          "...yyyyyyyy........",
-          "...y..y..y.........",
-          "...y..y..y.........",
-          "",
-          "",
-          "",
-          "",
-          "y.................y",
-        ].map((row) => row.padEnd(19, ".")),
-        { y: "#ffb700" }
+          ".y..............",
+          ".y...yyy......y.",
+          ".y..yyyyy......y",
+          ".y..yeyyyyy....y",
+          ".y..yyyyyyy...y.",
+          ".y...yyyyyyyyyy.",
+          "yyy.yyyyyyyyyyy.",
+          ".yyyyyyyyyyyyy..",
+          "....y.yy....y.y.",
+          "....y..y....y..y",
+          "...yy.yy...yy.yy",
+        ],
+        { y: "#ffb700", e: "#8d153a" }
       ),
     ],
   },
   sudan: {
     layers: [
       hstripes(["#d21034", WHITE, BLACK]),
-      poly(
-        [
-          [0, 0],
-          [10, 10],
-          [0, 20],
-        ],
-        "#007229"
-      ),
+      // The hoist triangle in whole pixels: straight 45° edges meeting in a
+      // one-pixel point on the middle row, a third of the way along.
+      pixelHoistTriangle(10, "#007229"),
     ],
   },
   suriname: {
@@ -369,12 +420,18 @@ export const flags = {
       pixelStar(12, 7, "#ecc81d"),
     ],
   },
-  sweden: { layers: [fill("#006aa7"), cross(11, 10, 4, "#fecc02")] },
+  // Whole pixels, so both arms are 3px: the horizontal one centred on the
+  // middle row, the vertical one 5/16 of the way along.
+  sweden: {
+    layers: [fill("#006aa7"), pixelCross(9, MID_Y - 1, 3, "#fecc02")],
+  },
   switzerland: {
     layers: [
       fill("#da291c"),
-      rect(13, 4, 4, 12, WHITE),
-      rect(9, 8, 12, 4, WHITE),
+      // Whole pixels, so the arms are exactly 3px and centred both ways: two
+      // overlapping vector rects fight over the pixels where they cross.
+      pixelRect(MID_X - 1, MID_Y - 5, 3, 11, WHITE),
+      pixelRect(MID_X - 5, MID_Y - 1, 11, 3, WHITE),
     ],
   },
   syria: {
@@ -391,7 +448,7 @@ export const flags = {
       // A crown under an arc of seven stars.
       pixels(
         10,
-        6,
+        7,
         ["..y.y.y..", ".y.....y.", "y...y...y", "..y.y.y..", "..yyyyy.."],
         { y: "#f8c300" }
       ),
@@ -428,29 +485,19 @@ export const flags = {
   "timor-leste": {
     layers: [
       fill("#dc241f"),
-      poly(
-        [
-          [0, 0],
-          [15, 10],
-          [0, 20],
-        ],
-        "#ffc726"
-      ),
-      poly(
-        [
-          [0, 0],
-          [10, 10],
-          [0, 20],
-        ],
-        BLACK
-      ),
+      // The yellow triangle to half the length and the black one to a third,
+      // in whole pixels: the yellow's edges are steeper, so its border shows
+      // all the way to the hoist corners.
+      pixelHoistTriangle(15, "#ffc726", 1.5),
+      pixelHoistTriangle(10, BLACK),
       pixelStar(1, 7, WHITE),
     ],
   },
   togo: {
     layers: [
       hstripes(["#006a4e", "#ffce00", "#006a4e", "#ffce00", "#006a4e"]),
-      rect(0, 0, 12, 12, "#d21034"),
+      // A square canton over the top three stripes, star dead centre.
+      pixelRect(0, 0, 11, 11, "#d21034"),
       pixelStar(3, 3, WHITE),
     ],
   },
@@ -472,7 +519,7 @@ export const flags = {
   tunisia: {
     layers: [
       fill("#e70013"),
-      circle(15, 10, 6, WHITE),
+      pixelDisc(MID_X - 5, MID_Y - 5, 11, WHITE),
       pixels(
         10,
         5,
@@ -489,6 +536,18 @@ export const flags = {
         ],
         { r: "#e70013" }
       ),
+    ],
+  },
+  turkiye: {
+    layers: [
+      fill("#e30a17"),
+      // The standard pixel moon, its circle centred half the flag's height in
+      // from the hoist and on the middle row.
+      pixelCrescent(5, MID_Y - 4, 9, WHITE),
+      // The star: the shared 7px one, upright and centred on the middle row,
+      // clear of the horns. Turned to point at the crescent as on the real
+      // flag, a star this small reads as a glyph rather than a star.
+      pixelStar(14, MID_Y - 3, WHITE, 7),
     ],
   },
   turkmenistan: {
@@ -522,30 +581,32 @@ export const flags = {
         ],
         { w: WHITE, o: "#f2a900" }
       ),
-      crescent(14, 4.4, 2.8, 15.4, 4.4, 2.4, WHITE),
-      pixels(15, 1, ["..w", ".w.w", "...", "w.w"], { w: WHITE }),
+      // The crescent opening towards the hoist, with its five stars in the
+      // mouth: two, one, two.
+      pixelCrescent(14, 1, 7, WHITE, { facing: "left" }),
+      pixels(11, 2, ["..w.w", "", "...w.", "", "w..w."], { w: WHITE }),
     ],
   },
   tuvalu: {
     layers: ensign(
       "#00a1de",
-      // Nine stars, one per island, roughly where they sit on the map.
+      // Nine stars, one per island, laid out like the flag's: a short row
+      // running down from the top fly corner, then a longer band of six
+      // below it, all clear of the canton.
       pixels(
-        14,
-        1,
+        18,
+        4,
         [
-          "...........y",
-          "............",
-          "......y.....",
-          "...........y",
+          "........y.",
+          "......y...",
+          "....y.....",
           "",
-          "...y....y...",
+          "........y.",
+          "..y...y...",
           "",
-          "",
-          "",
-          "y.....y.....",
-          "",
-          "...y.......y",
+          "....y.....",
+          "..y.......",
+          "y.........",
         ],
         { y: "#ffce00" }
       )
@@ -554,12 +615,13 @@ export const flags = {
   uganda: {
     layers: [
       hstripes([BLACK, "#fcdc04", "#d90000", BLACK, "#fcdc04", "#d90000"]),
-      circle(15, 10, 4, WHITE),
-      // The grey crowned crane.
+      pixelDisc(MID_X - 4, MID_Y - 4, 9, WHITE),
+      // The grey crowned crane, facing the fly: golden crest, red wattle,
+      // S-curved neck, and one leg raised.
       pixels(
         12,
         6,
-        ["...y.", "..rg.", "...g.", "..gg.", ".ggg.", "..gg.", "..g.."],
+        [".y.y.", "..gr.", "..g..", ".gg..", "gggg.", ".ggr.", ".g.g."],
         { y: "#fcdc04", r: "#d90000", g: "#9ca69c" }
       ),
     ],
@@ -571,7 +633,11 @@ export const flags = {
       rect(0, 0, 7.5, 20, "#ff0000"),
     ],
   },
-  "united-kingdom": { layers: unionJack() },
+  // In whole pixels, like the ensign cantons: St George's cross centred on
+  // the middle column and row, with the saltires' red showing.
+  "united-kingdom": {
+    layers: [pixelUnionJack(0, 0, INTERIOR_WIDTH, INTERIOR_HEIGHT)],
+  },
   "united-states": {
     // 13 stripes don't divide into 19 pixel rows: rounding made every red
     // stripe 1px and every white one 2px, and the flag read mostly white.
@@ -582,14 +648,7 @@ export const flags = {
       ),
       // The canton covers the top nine rows, ending on a red stripe as the
       // real one does, with the stars as a sparse staggered grid.
-      pixels(
-        0,
-        0,
-        Array.from({ length: 9 }, () => "b".repeat(11)),
-        {
-          b: "#3c3b6e",
-        }
-      ),
+      pixelRect(0, 0, 11, 9, "#3c3b6e"),
       pixels(
         0,
         0,
@@ -603,22 +662,10 @@ export const flags = {
       hstripes(
         Array.from({ length: 9 }, (_, i) => (i % 2 ? "#0038a8" : WHITE))
       ),
-      rect(0, 0, 11.1, 11.1, WHITE),
+      // A square canton over the top five stripes, the sun dead centre.
+      pixelRect(0, 0, 11, 11, WHITE),
       // The Sun of May.
-      pixels(
-        2,
-        2,
-        [
-          "...y...",
-          ".y.y.y.",
-          "..yyy..",
-          "yyyyyyy",
-          "..yyy..",
-          ".y.y.y.",
-          "...y...",
-        ],
-        { y: "#fcd116" }
-      ),
+      pixels(2, 2, EIGHT_RAY_SUN, { s: "#fcd116" }),
     ],
   },
   uzbekistan: {
@@ -716,7 +763,9 @@ export const flags = {
     ],
   },
   vietnam: {
-    layers: [fill("#da251d"), star(15, 10.4, 6.4, "#ffff00", { inner: 0.38 })],
+    // A 9px star centred on the middle column, its points' circle on the
+    // middle row.
+    layers: [fill("#da251d"), pixelStar(MID_X - 4, MID_Y - 5, "#ffff00", 9)],
   },
   yemen: { layers: hstripes(["#ce1126", WHITE, BLACK]) },
   zambia: {
@@ -725,8 +774,8 @@ export const flags = {
       rect(20.5, 8, 3.2, 12, "#de2010"),
       rect(23.7, 8, 3.2, 12, BLACK),
       rect(26.9, 8, 3.1, 12, "#ef7d00"),
-      // The eagle in flight.
-      pixels(21, 3, ["oo..oo", ".oooo.", "..oo.."], { o: "#ef7d00" }),
+      // The eagle in flight, centred over the three stripes (columns 20-28).
+      pixels(21, 3, ["ooo.ooo", ".ooooo.", "..ooo.."], { o: "#ef7d00" }),
     ],
   },
   zimbabwe: {

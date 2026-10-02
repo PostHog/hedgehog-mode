@@ -1,25 +1,46 @@
-// Renders every flag in ./countries into texturepacker/assets/flags/<slug>.png.
+// The flag generator's entry point. Every flag the hedgehog can hold is a
+// 31x21 "cloth" generated from a spec in ./countries (written in the DSL in
+// ./draw.mjs, with emblems from ./helpers.mjs), never drawn by hand. This
+// renders each spec and writes texturepacker/assets/flags/<slug>.png; then
+// texturepacker/append-to-atlas.mjs packs those into
+// hedgehog-mode/assets/sprites.{png,json}.
+//
+//   pnpm flags                    # generate + repack
+//   pnpm flags:check              # CI: fail if any cloth or the atlas is stale
+//   pnpm flags:preview <out.png> [--only a,b]
+//
+// or directly:
 //
 //   node texturepacker/flag-generator/generate.mjs              # write the PNGs
 //   node texturepacker/flag-generator/generate.mjs --preview /tmp/flags.png [--only a,b]
+//   node texturepacker/flag-generator/generate.mjs --check      # stale? exit 1
 //
 // --preview writes nothing into assets: it lays the flags out 10 to a row (in
-// the order it prints) at 4x, for eyeballing. Then run
-// texturepacker/append-to-atlas.mjs to get new PNGs into the spritesheet.
-import { readdirSync, writeFileSync } from "node:fs";
+// the order it prints) at 4x, for eyeballing. --check writes nothing either:
+// it fails if any cloth PNG doesn't match its spec, or has no spec, so a
+// hand-edited PNG or a forgotten regenerate can't slip through.
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import { CLOTH_HEIGHT, CLOTH_WIDTH, renderCloth } from "./draw.mjs";
 import { createImage, encodePng } from "./png.mjs";
 
+/** @typedef {import("./draw.mjs").Flag} Flag */
+/** @typedef {import("./png.mjs").Image} Image */
+
 const here = dirname(fileURLToPath(import.meta.url));
 const assets = join(here, "..", "assets", "flags");
 
 const { values } = parseArgs({
-  options: { preview: { type: "string" }, only: { type: "string" } },
+  options: {
+    preview: { type: "string" },
+    only: { type: "string" },
+    check: { type: "boolean" },
+  },
 });
 
+/** Every spec in ./countries, by slug. @type {Record<string, Flag>} */
 const flags = {};
 for (const file of readdirSync(join(here, "countries")).sort()) {
   const batch = await import(join(here, "countries", file));
@@ -37,7 +58,32 @@ const slugs = Object.keys(flags)
   .sort();
 const images = slugs.map((slug) => [slug, renderCloth(flags[slug])]);
 
-if (values.preview) {
+if (values.check) {
+  const stale = images
+    .filter(([slug, image]) => {
+      const file = join(assets, `${slug}.png`);
+      return !existsSync(file) || !encodePng(image).equals(readFileSync(file));
+    })
+    .map(([slug]) => slug);
+  const orphans = readdirSync(assets)
+    .map((file) => file.replace(/\.png$/, ""))
+    .filter((slug) => !flags[slug] && (!only || only.includes(slug)));
+  if (stale.length || orphans.length) {
+    if (stale.length) {
+      console.log(
+        `${stale.length} cloths don't match their spec: ${stale.join(" ")}`
+      );
+    }
+    if (orphans.length) {
+      console.log(
+        `${orphans.length} cloths have no spec: ${orphans.join(" ")}`
+      );
+    }
+    console.log("run `pnpm flags` to regenerate");
+    process.exit(1);
+  }
+  console.log(`all ${images.length} cloths match their specs`);
+} else if (values.preview) {
   writeFileSync(
     values.preview,
     encodePng(contactSheet(images.map(([, i]) => i)))
@@ -50,6 +96,14 @@ if (values.preview) {
   console.log(`wrote ${images.length} flags to ${assets}`);
 }
 
+/**
+ * Lays cloths out in a grid on a grey sheet, scaled up for eyeballing.
+ * @param {Image[]} cloths
+ * @param {number} [perRow]
+ * @param {number} [scale]
+ * @param {number} [gap] Grey pixels between cloths, after scaling.
+ * @returns {Image}
+ */
 function contactSheet(cloths, perRow = 10, scale = 4, gap = 4) {
   const cellW = CLOTH_WIDTH * scale + gap;
   const cellH = CLOTH_HEIGHT * scale + gap;

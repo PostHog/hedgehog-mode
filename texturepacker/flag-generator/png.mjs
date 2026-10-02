@@ -1,18 +1,37 @@
 // Just enough PNG to read and write the 8-bit RGBA images this repo ships, with
-// nothing but node:zlib — so regenerating sprites doesn't need TexturePacker,
-// ImageMagick or a native image library.
+// nothing but node:zlib — so generating flag cloths (generate.mjs) and packing
+// them into the sprite sheet (../append-to-atlas.mjs) doesn't need
+// TexturePacker, ImageMagick or a native image library.
 import { crc32, deflateSync, inflateSync } from "node:zlib";
 
+/** The eight bytes every PNG starts with. */
 const SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 
-/** @typedef {{ width: number, height: number, data: Uint8Array }} Image RGBA, row-major */
+/**
+ * @typedef {object} Image An 8-bit RGBA bitmap.
+ * @property {number} width
+ * @property {number} height
+ * @property {Uint8Array} data `width * height * 4` bytes, row-major RGBA.
+ */
 
-/** @returns {Image} */
+/**
+ * A blank (fully transparent) image.
+ * @param {number} width
+ * @param {number} height
+ * @returns {Image}
+ */
 export function createImage(width, height) {
   return { width, height, data: new Uint8Array(width * height * 4) };
 }
 
-/** Copies `image` into `sheet` with its top-left at (x, y). */
+/**
+ * Copies `image` into `sheet` with its top-left at (x, y), alpha and all.
+ * @param {Image} sheet
+ * @param {Image} image
+ * @param {number} x
+ * @param {number} y
+ * @returns {void}
+ */
 export function blit(sheet, image, x, y) {
   for (let row = 0; row < image.height; row++) {
     sheet.data.set(
@@ -22,7 +41,12 @@ export function blit(sheet, image, x, y) {
   }
 }
 
-/** The RGBA pixels of a `{ x, y, w, h }` region of `sheet`. */
+/**
+ * The RGBA pixels of a region of `sheet`.
+ * @param {Image} sheet
+ * @param {{ x: number, y: number, w: number, h: number }} region
+ * @returns {Uint8Array} `w * h * 4` bytes, row-major.
+ */
 export function crop(sheet, { x, y, w, h }) {
   const out = new Uint8Array(w * h * 4);
   for (let row = 0; row < h; row++) {
@@ -32,7 +56,12 @@ export function crop(sheet, { x, y, w, h }) {
   return out;
 }
 
-/** @param {Image} image */
+/**
+ * Encodes an image as an 8-bit RGBA PNG, deterministically: the same pixels
+ * always give the same bytes, which is what `--check` compares.
+ * @param {Image} image
+ * @returns {Buffer}
+ */
 export function encodePng({ width, height, data }) {
   const header = Buffer.alloc(13);
   header.writeUInt32BE(width, 0);
@@ -59,6 +88,8 @@ export function encodePng({ width, height, data }) {
  * up to 8 bits per channel) to RGBA. Fully transparent pixels come out as
  * 0,0,0,0 whatever colour they were stored with, so images that look the same
  * compare equal.
+ * @param {Buffer} buffer
+ * @returns {Image}
  */
 export function decodePng(buffer) {
   if (!buffer.subarray(0, 8).equals(SIGNATURE)) {
@@ -153,6 +184,14 @@ export function decodePng(buffer) {
   return { width, height, data };
 }
 
+/**
+ * The predictor a PNG row filter adds back to each byte.
+ * @param {number} filter 0 none, 1 sub, 2 up, 3 average, 4 Paeth.
+ * @param {number} left The reconstructed byte one pixel to the left.
+ * @param {number} up The reconstructed byte above.
+ * @param {number} upLeft The reconstructed byte above and to the left.
+ * @returns {number}
+ */
 function unfilter(filter, left, up, upLeft) {
   switch (filter) {
     case 0:
@@ -175,6 +214,12 @@ function unfilter(filter, left, up, upLeft) {
   }
 }
 
+/**
+ * One PNG chunk: length, type, body and CRC.
+ * @param {string} type Four ASCII characters, e.g. "IDAT".
+ * @param {Buffer} body
+ * @returns {Buffer}
+ */
 function chunk(type, body) {
   const length = Buffer.alloc(4);
   length.writeUInt32BE(body.length);

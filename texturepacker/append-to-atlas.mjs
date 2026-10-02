@@ -1,11 +1,16 @@
 // Brings hedgehog-mode/assets/sprites.{png,json} up to date with
-// texturepacker/assets without moving existing frames: PNGs that aren't in the
+// texturepacker/assets — the last step of the flag pipeline (spec →
+// flag-generator/generate.mjs → assets/flags/<slug>.png → here), and how any
+// other new sprite gets into the sheet too. It doesn't move existing frames: PNGs that aren't in the
 // sheet yet are appended, packed ones whose source changed (at the same size)
-// are redrawn in place, and ones whose source was deleted are dropped (their
-// space stays empty until the next full repack).
+// are redrawn in place, ones that changed size are moved to a new spot, and
+// ones whose source was deleted are dropped (the space a moved or dropped
+// sprite leaves stays empty until the next full repack).
 //
 //   node texturepacker/append-to-atlas.mjs           # update the sheet
 //   node texturepacker/append-to-atlas.mjs --check   # list what's stale; write nothing
+//
+// `pnpm flags` / `pnpm flags:check` run this after the flag generator.
 //
 // hedgehog-mode.tps is still the source of truth for a full repack, but
 // TexturePacker is a licensed GUI and a repack reshuffles every frame. This
@@ -24,6 +29,8 @@ import {
   decodePng,
   encodePng,
 } from "./flag-generator/png.mjs";
+
+/** @typedef {{ x: number, y: number, w: number, h: number }} Rect */
 
 const here = dirname(fileURLToPath(import.meta.url));
 const sourceDir = join(here, "assets");
@@ -46,8 +53,19 @@ const sources = listPngs(sourceDir).map((file) => {
   return { name, image: decodePng(readFileSync(file)) };
 });
 
+// A sprite that changed size can't be redrawn in place, so it's packed again
+// like a new one; its JSON entry keeps its position, so the diff stays small.
+const resized = new Set(
+  sources
+    .filter(({ name, image }) => {
+      const frame = atlas.frames[name]?.frame;
+      return frame && (frame.w !== image.width || frame.h !== image.height);
+    })
+    .map(({ name }) => name)
+);
+
 const missing = sources
-  .filter(({ name }) => !atlas.frames[name])
+  .filter(({ name }) => !atlas.frames[name] || resized.has(name))
   // Tallest first, so each shelf wastes as little height as possible.
   .sort(
     (a, b) => b.image.height - a.image.height || a.name.localeCompare(b.name)
@@ -55,33 +73,27 @@ const missing = sources
 
 const changed = sources.filter(({ name, image }) => {
   const frame = atlas.frames[name]?.frame;
-  if (!frame) {
+  if (!frame || resized.has(name)) {
     return false;
-  }
-  if (frame.w !== image.width || frame.h !== image.height) {
-    // Resizing would mean moving it; that's a job for a full repack.
-    throw new Error(
-      `${name} changed size (${frame.w}x${frame.h} -> ${image.width}x${image.height})`
-    );
   }
   const packed = crop(oldSheet, frame);
   return !Buffer.from(packed).equals(Buffer.from(image.data));
 });
 
 const sourceNames = new Set(sources.map(({ name }) => name));
-const removed = Object.keys(atlas.frames).filter(
-  (name) => !sourceNames.has(name)
+const removed = new Set(
+  Object.keys(atlas.frames).filter((name) => !sourceNames.has(name))
 );
 
 const stale = [
-  ...missing.map((m) => `  + ${m.name}`),
+  ...missing.map((m) => `  ${resized.has(m.name) ? "↔" : "+"} ${m.name}`),
   ...changed.map((c) => `  ~ ${c.name}`),
-  ...removed.map((name) => `  - ${name}`),
+  ...[...removed].map((name) => `  - ${name}`),
 ];
 if (values.check || stale.length === 0) {
   console.log(
     stale.length
-      ? `${stale.length} sprites out of date (+ missing, ~ changed, - deleted):\n${stale.join("\n")}`
+      ? `${stale.length} sprites out of date (+ missing, ~ changed, ↔ resized, - deleted):\n${stale.join("\n")}`
       : "sprite sheet is up to date"
   );
   process.exit(values.check && stale.length ? 1 : 0);
@@ -90,9 +102,15 @@ if (values.check || stale.length === 0) {
 const width = atlas.meta.size.w;
 // Everything that stays put, plus each new sprite once it's placed.
 const occupied = Object.entries(atlas.frames)
-  .filter(([name]) => !removed.includes(name))
+  .filter(([name]) => !removed.has(name) && !resized.has(name))
   .map(([, f]) => f.frame);
 const bottom = Math.max(...occupied.map((f) => f.y + f.h));
+/**
+ * Whether two `{ x, y, w, h }` rectangles overlap.
+ * @param {Rect} a
+ * @param {Rect} b
+ * @returns {boolean}
+ */
 const overlaps = (a, b) =>
   a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
 
@@ -132,6 +150,11 @@ const height = Math.max(
 );
 const sheet = createImage(width, height);
 sheet.data.set(oldSheet.data);
+// Clear the slots being vacated first: a moved sprite may land on one.
+for (const name of [...removed, ...resized]) {
+  const { w, h, x, y } = atlas.frames[name].frame;
+  blit(sheet, createImage(w, h), x, y);
+}
 for (const { image, x, y } of missing) {
   blit(sheet, image, x, y);
 }
@@ -140,8 +163,6 @@ for (const { name, image } of changed) {
   blit(sheet, image, x, y);
 }
 for (const name of removed) {
-  const { w, h, x, y } = atlas.frames[name].frame;
-  blit(sheet, createImage(w, h), x, y);
   delete atlas.frames[name];
 }
 
@@ -159,8 +180,7 @@ for (const { name, image, x, y } of missing) {
   const animation = name.match(/^(.*?)\d+\.png$/)?.[1];
   if (animation) {
     atlas.animations[animation] = [
-      ...(atlas.animations[animation] ?? []),
-      name,
+      ...new Set([...(atlas.animations[animation] ?? []), name]),
     ].sort();
   }
 }
@@ -175,9 +195,14 @@ atlas.meta.size = { w: width, h: height };
 writeFileSync(sheetPng, encodePng(sheet));
 writeFileSync(sheetJson, serialize(atlas));
 console.log(
-  `appended ${missing.length}, redrew ${changed.length} and dropped ${removed.length} sprites; sheet is now ${width}x${height} (was ${oldSheet.width}x${oldSheet.height})`
+  `appended ${missing.length - resized.size}, moved ${resized.size}, redrew ${changed.length} and dropped ${removed.size} sprites; sheet is now ${width}x${height} (was ${oldSheet.width}x${oldSheet.height})`
 );
 
+/**
+ * Every .png under `dir`, recursively.
+ * @param {string} dir
+ * @returns {string[]} Paths.
+ */
 function listPngs(dir) {
   return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
     const path = join(dir, entry.name);
@@ -188,8 +213,14 @@ function listPngs(dir) {
   });
 }
 
-/** TexturePacker's pixijs4 layout, exactly — see the round-trip check above. */
+/**
+ * The atlas as TexturePacker's pixijs4 layout, exactly — see the round-trip
+ * check above.
+ * @param {{ frames: object, animations: Record<string, string[]>, meta: object }} atlas
+ * @returns {string}
+ */
 function serialize({ frames, animations, meta }) {
+  // A flat object on one line, unquoted values: `{"x":1,"y":2}`.
   const box = (o) =>
     `{${Object.entries(o)
       .map(([k, v]) => `"${k}":${v}`)

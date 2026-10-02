@@ -29,6 +29,7 @@ jobs:
           pnpm format:check
           pnpm build
           pnpm test
+          pnpm flags:check
 
       # Chromium only, and only the browser this suite launches.
       - name: Install Playwright chromium

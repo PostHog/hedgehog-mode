@@ -2,7 +2,7 @@
  * Something the hedgehog holds, on top of whatever skin it's wearing: a
  * country's flag on a pole, or the whole planet.
  *
- * A `flag` is a flat `flags/<flag>.png` cloth (30x21) that the engine waves
+ * A `flag` is a flat `flags/<flag>.png` cloth (31x21) that the engine waves
  * from a shared `props/pole.png`; the customization menu shows the same cloth,
  * scaled up. A `globe` spins through `props/<flag>/tile` and is shown in the
  * menu as `icons/<flag>.png`.
@@ -10,8 +10,8 @@
  * Every UN member and observer state, plus Taiwan, Kosovo and Western Sahara,
  * the UK's home nations, the EU and the UN, and every territory with a flag of
  * its own — the ISO 3166-1 set, minus places that just fly their sovereign's
- * flag (Réunion, Svalbard...). Most cloths are drawn by
- * texturepacker/flag-generator — add a flag there, not by hand.
+ * flag (Réunion, Svalbard...). Every cloth is drawn by
+ * texturepacker/flag-generator — add or fix a flag there, not by hand.
  */
 export type HedgehogActorFlagInfo = {
   kind: "flag" | "globe";

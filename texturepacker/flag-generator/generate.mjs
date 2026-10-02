@@ -24,7 +24,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import { CLOTH_HEIGHT, CLOTH_WIDTH, renderCloth } from "./draw.mjs";
-import { createImage, encodePng } from "./png.mjs";
+import { createImage, decodePng, encodePng } from "./png.mjs";
 
 /** @typedef {import("./draw.mjs").Flag} Flag */
 /** @typedef {import("./png.mjs").Image} Image */
@@ -58,12 +58,30 @@ const slugs = Object.keys(flags)
   .sort();
 const images = slugs.map((slug) => [slug, renderCloth(flags[slug])]);
 
+/**
+ * Whether the cloth PNG on disk already has exactly these pixels. Compares
+ * decoded pixels, not file bytes: zlib's output differs between Node builds,
+ * so the same cloth can compress to different bytes on another machine.
+ * @param {string} slug
+ * @param {Image} image
+ * @returns {boolean}
+ */
+function matchesDisk(slug, image) {
+  const file = join(assets, `${slug}.png`);
+  if (!existsSync(file)) {
+    return false;
+  }
+  const onDisk = decodePng(readFileSync(file));
+  return (
+    onDisk.width === image.width &&
+    onDisk.height === image.height &&
+    Buffer.from(onDisk.data).equals(Buffer.from(image.data))
+  );
+}
+
 if (values.check) {
   const stale = images
-    .filter(([slug, image]) => {
-      const file = join(assets, `${slug}.png`);
-      return !existsSync(file) || !encodePng(image).equals(readFileSync(file));
-    })
+    .filter(([slug, image]) => !matchesDisk(slug, image))
     .map(([slug]) => slug);
   const orphans = readdirSync(assets)
     .map((file) => file.replace(/\.png$/, ""))
@@ -90,10 +108,15 @@ if (values.check) {
   );
   slugs.forEach((slug, i) => console.log(`${i}\t${slug}`));
 } else {
-  for (const [slug, image] of images) {
+  // Only rewrite cloths whose pixels changed, so regenerating on another
+  // machine doesn't churn every PNG through a different zlib.
+  const changed = images.filter(([slug, image]) => !matchesDisk(slug, image));
+  for (const [slug, image] of changed) {
     writeFileSync(join(assets, `${slug}.png`), encodePng(image));
   }
-  console.log(`wrote ${images.length} flags to ${assets}`);
+  console.log(
+    `wrote ${changed.length} of ${images.length} flags to ${assets} (the rest were unchanged)`
+  );
 }
 
 /**

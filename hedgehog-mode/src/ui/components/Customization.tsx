@@ -177,6 +177,11 @@ export function HedgehogCustomization({
           color={selectedConfig?.color}
           setColor={(color) => updateCustomization({ color })}
         />
+        <HedgehogFlags
+          assetsUrl={resolvedAssetsUrl}
+          flag={selectedConfig?.flag}
+          setFlag={(flag) => updateCustomization({ flag })}
+        />
         <HedgehogAccessories
           assetsUrl={resolvedAssetsUrl}
           accessories={selectedConfig?.accessories ?? []}
@@ -186,11 +191,6 @@ export function HedgehogCustomization({
           assetsUrl={resolvedAssetsUrl}
           skin={selectedConfig?.skin}
           setSkin={(skin) => updateCustomization({ skin })}
-        />
-        <HedgehogFlags
-          assetsUrl={resolvedAssetsUrl}
-          flag={selectedConfig?.flag}
-          setFlag={(flag) => updateCustomization({ flag })}
         />
       </div>
     </div>

@@ -22,6 +22,7 @@ import type { SpiderWebActor } from "../items/SpiderWebActor";
 import { BODY_Y_OFFSETS } from "../sprites/body-offsets";
 import { FLAG_CLOTH_ORIGIN, FLAG_GLOBE_CENTER } from "../sprites/flag-layout";
 import type { AvailableSpriteFrames } from "../sprites/sprites";
+import { FlagCloth } from "./hedgehog/flag-cloth";
 
 // While holding a flag only these play: waving etc. would need a free paw.
 const FLAG_ANIMATIONS = ["idle", "walk", "jump", "fall"];
@@ -64,8 +65,7 @@ export class HedgehogActor extends Actor {
   // stage rather than a child, so colour filters don't recolour the flag.
   flagContainer?: Container;
   private flagName?: HedgehogActorOptions["flag"];
-  // The cloth as 1px columns, so it can wave and un-mirror (see syncFlagFacing).
-  private flagCloth: Sprite[] = [];
+  private flagCloth?: FlagCloth;
   private flagGlobe?: AnimatedSprite;
   private flagFacingLeft?: boolean;
   private flagPhase = 0;
@@ -605,7 +605,7 @@ export class HedgehogActor extends Actor {
 
     this.flagContainer?.destroy({ children: true });
     this.flagContainer = undefined;
-    this.flagCloth = [];
+    this.flagCloth = undefined;
     this.flagGlobe = undefined;
     this.flagFacingLeft = undefined;
     this.flagName = flag;
@@ -635,15 +635,12 @@ export class HedgehogActor extends Actor {
       const pole = new Sprite(sprites.getSpriteFrames("props/pole.png"));
       pole.anchor.set(0.5);
       container.addChild(pole);
-      const columns = sprites.getColumnTextures(
-        `flags/${flag}.png` as AvailableSpriteFrames
+      const cloth = new FlagCloth(
+        sprites.getSpriteFrames(`flags/${flag}.png` as AvailableSpriteFrames)
       );
-      this.flagCloth = columns.map((texture, i) => {
-        const column = new Sprite(texture);
-        column.position.set(FLAG_CLOTH_ORIGIN.x + i, FLAG_CLOTH_ORIGIN.y);
-        container.addChild(column);
-        return column;
-      });
+      cloth.position.copyFrom(FLAG_CLOTH_ORIGIN);
+      container.addChild(cloth);
+      this.flagCloth = cloth;
     }
 
     const stage = this.game.app.stage;
@@ -656,7 +653,7 @@ export class HedgehogActor extends Actor {
   /**
    * The flag mirrors along with the hedgehog when it faces left, which would
    * read a flag (or the continents) backwards. Undo that for the picture only:
-   * the cloth shows its columns in reverse, so it stays hoisted at the pole,
+   * the cloth shows its picture in reverse, so it stays hoisted at the pole,
    * and the globe flips back about its own centre.
    */
   private syncFlagFacing(): void {
@@ -666,10 +663,7 @@ export class HedgehogActor extends Actor {
       return;
     }
     this.flagFacingLeft = left;
-    const columns = this.flagCloth.map((column) => column.texture).reverse();
-    this.flagCloth.forEach((column, i) => {
-      column.texture = columns[i];
-    });
+    this.flagCloth?.setMirrored(left);
     if (this.flagGlobe) {
       this.flagGlobe.scale.x = left ? -1 : 1;
     }
@@ -694,13 +688,8 @@ export class HedgehogActor extends Actor {
     container.alpha = sprite.alpha;
     container.visible = sprite.visible;
 
-    // Ripple each column: still at the pole, widest at the free end. Whole
-    // pixels only, to match the rest of the pixel art.
     this.flagPhase += ticker.deltaTime * FLAG_WAVE_SPEED;
-    this.flagCloth.forEach((column, i) => {
-      const ripple = Math.sin(this.flagPhase - i * 0.35) * 1.5;
-      column.y = FLAG_CLOTH_ORIGIN.y + Math.round(ripple * Math.min(1, i / 6));
-    });
+    this.flagCloth?.wave(this.flagPhase);
   }
 
   private syncAccessories(): void {

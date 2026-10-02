@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useId, useMemo, useRef, useState } from "react";
 // Import config values/types directly (not via the package index) so consumers that only
 // want this customization UI — e.g. the browser extension's popup — don't drag the whole
 // pixi/matter engine into their bundle just to render some sprite grids.
@@ -11,11 +11,16 @@ import {
   HedgehogActorOptions,
   HedgehogActorFlagOption,
   HedgehogActorFlagOptions,
+  HedgehogActorFlags,
   HedgehogActorSkinOptions,
+  searchFlags,
 } from "../../actors/hedgehog/config";
 import type { HedgeHogMode } from "../../hedgehog-mode";
 import { HedgehogProfileImage } from "../HedgehogStatic";
-import { StaticSprite } from "../../static-renderer/StaticHedgehog";
+import {
+  getSpriteSize,
+  StaticSprite,
+} from "../../static-renderer/StaticHedgehog";
 import { Button, IconX } from "./Button";
 import { sample } from "../../misc/utils";
 import { v4 as uuid } from "uuid";
@@ -172,6 +177,11 @@ export function HedgehogCustomization({
           color={selectedConfig?.color}
           setColor={(color) => updateCustomization({ color })}
         />
+        <HedgehogFlags
+          assetsUrl={resolvedAssetsUrl}
+          flag={selectedConfig?.flag}
+          setFlag={(flag) => updateCustomization({ flag })}
+        />
         <HedgehogAccessories
           assetsUrl={resolvedAssetsUrl}
           accessories={selectedConfig?.accessories ?? []}
@@ -181,11 +191,6 @@ export function HedgehogCustomization({
           assetsUrl={resolvedAssetsUrl}
           skin={selectedConfig?.skin}
           setSkin={(skin) => updateCustomization({ skin })}
-        />
-        <HedgehogFlags
-          assetsUrl={resolvedAssetsUrl}
-          flag={selectedConfig?.flag}
-          setFlag={(flag) => updateCustomization({ flag })}
         />
       </div>
     </div>
@@ -391,6 +396,67 @@ function HedgehogSkins({
   );
 }
 
+/** A flag's cloth (or the globe), scaled up crisply to `width` pixels. */
+function FlagThumbnail({
+  flag,
+  assetsUrl,
+  width,
+}: {
+  flag: HedgehogActorFlagOption;
+  assetsUrl: string;
+  width: number;
+}) {
+  const name =
+    HedgehogActorFlags[flag].kind === "globe"
+      ? `icons/${flag}.png`
+      : `flags/${flag}.png`;
+  const size = getSpriteSize(name) ?? { w: 1, h: 1 };
+  return (
+    <div
+      className="FlagThumbnail"
+      style={{ width, height: (width * size.h) / size.w }}
+    >
+      <StaticSprite name={name} assetsUrl={assetsUrl} />
+    </div>
+  );
+}
+
+// Memoised with only primitive props, so moving the keyboard highlight
+// re-renders the two rows it moved between rather than all ~240.
+const FlagPickerRow = React.memo(function FlagPickerRow({
+  flag,
+  id,
+  highlighted,
+  selected,
+  assetsUrl,
+}: {
+  flag: HedgehogActorFlagOption;
+  id: string;
+  highlighted: boolean;
+  selected: boolean;
+  assetsUrl: string;
+}) {
+  return (
+    <li
+      id={id}
+      role="option"
+      aria-selected={selected}
+      data-flag={flag}
+      className={`FlagPickerResult ${
+        highlighted ? "FlagPickerResult--highlighted" : ""
+      } ${selected ? "FlagPickerResult--selected" : ""}`}
+    >
+      <FlagThumbnail flag={flag} assetsUrl={assetsUrl} width={30} />
+      <span>{HedgehogActorFlags[flag].name}</span>
+    </li>
+  );
+});
+
+/**
+ * There are ~240 flags, so rather than a grid of all of them this is a
+ * search box (names, aliases and ISO codes — "us", "holland", "ivory coast")
+ * over a short scrolling list.
+ */
 function HedgehogFlags({
   assetsUrl,
   flag,
@@ -400,27 +466,139 @@ function HedgehogFlags({
   flag: HedgehogActorOptions["flag"];
   setFlag: (flag: HedgehogActorFlagOption | null) => void;
 }) {
+  const [query, setQuery] = useState("");
+  const [open, setOpen] = useState(false);
+  const [highlighted, setHighlighted] = useState(0);
+  const listRef = useRef<HTMLUListElement>(null);
+  const id = useId();
+  const results = useMemo(() => searchFlags(query), [query]);
+  const selected = flag && HedgehogActorFlags[flag] ? flag : null;
+
+  // Keep the keyboard-highlighted row in view. Scroll the list itself:
+  // scrollIntoView would also scroll the panel and page around it.
+  useEffect(() => {
+    const list = listRef.current;
+    const item = list?.children[highlighted] as HTMLElement | undefined;
+    if (!list || !item) {
+      return;
+    }
+    if (item.offsetTop < list.scrollTop) {
+      list.scrollTop = item.offsetTop;
+    } else if (
+      item.offsetTop + item.offsetHeight >
+      list.scrollTop + list.clientHeight
+    ) {
+      list.scrollTop = item.offsetTop + item.offsetHeight - list.clientHeight;
+    }
+  }, [highlighted]);
+
+  const openList = () => {
+    setHighlighted(0);
+    setOpen(true);
+  };
+
+  const choose = (option: HedgehogActorFlagOption) => {
+    setFlag(option);
+    setQuery("");
+    setOpen(false);
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Escape" && !open) {
+      // Nothing to dismiss here, so let Escape close the customization panel.
+      return;
+    }
+    // Typing a search is not typing a cheat code: without this, searching for
+    // "spain" would also wave the Spanish flag.
+    e.stopPropagation();
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault();
+      if (!open) {
+        openList();
+        return;
+      }
+      const step = e.key === "ArrowDown" ? 1 : -1;
+      setHighlighted((i) =>
+        Math.min(Math.max(i + step, 0), Math.max(results.length - 1, 0))
+      );
+    } else if (e.key === "Enter" && open && results[highlighted]) {
+      e.preventDefault();
+      choose(results[highlighted]);
+    } else if (e.key === "Escape") {
+      setOpen(false);
+    }
+  };
+
   return (
     <div className="CustomizationSection">
       <h4 className="CustomizationSectionTitle">flags</h4>
-      <div className="CustomizationGrid">
-        {HedgehogActorFlagOptions.map((option) => (
-          <Button
-            key={option}
-            active={flag === option}
-            // Click the selected flag again to put it down.
-            onClick={() => setFlag(flag === option ? null : option)}
-            title={option.split("-").join(" ")}
-          >
-            <div style={{ width: 64, height: 64 }}>
-              <StaticSprite
-                name={`icons/${option}.png`}
+      {selected && (
+        <div className="FlagPickerCurrent">
+          <FlagThumbnail flag={selected} assetsUrl={assetsUrl} width={45} />
+          <span>{HedgehogActorFlags[selected].name}</span>
+          <Button onClick={() => setFlag(null)}>put it down</Button>
+        </div>
+      )}
+      <input
+        className="FlagPickerSearch"
+        type="search"
+        role="combobox"
+        aria-label="search flags"
+        aria-expanded={open}
+        aria-controls={`${id}-results`}
+        aria-autocomplete="list"
+        aria-activedescendant={
+          open && results[highlighted]
+            ? `${id}-${results[highlighted]}`
+            : undefined
+        }
+        placeholder={`search ${HedgehogActorFlagOptions.length} flags (try "us" or "holland")`}
+        value={query}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          openList();
+        }}
+        onFocus={openList}
+        onBlur={() => setOpen(false)}
+        onKeyDown={onKeyDown}
+      />
+      {open && (
+        <ul
+          className="FlagPickerResults"
+          id={`${id}-results`}
+          role="listbox"
+          ref={listRef}
+          // Keep focus in the search box for any press on the list — a row,
+          // the padding, or the scrollbar — so its blur doesn't close it.
+          onMouseDown={(e) => e.preventDefault()}
+          // One handler for every row (see FlagPickerRow).
+          onClick={(e) => {
+            const row = (e.target as HTMLElement).closest<HTMLElement>(
+              "[data-flag]"
+            );
+            if (row) {
+              choose(row.dataset.flag as HedgehogActorFlagOption);
+            }
+          }}
+        >
+          {results.length === 0 ? (
+            <li className="FlagPickerEmpty">
+              no flag for that one. the hedgehog is lobbying the UN.
+            </li>
+          ) : (
+            results.map((option, i) => (
+              <FlagPickerRow
+                key={option}
+                flag={option}
+                id={`${id}-${option}`}
+                highlighted={i === highlighted}
+                selected={option === selected}
                 assetsUrl={assetsUrl}
               />
-            </div>
-          </Button>
-        ))}
-      </div>
+            ))
+          )}
+        </ul>
+      )}
     </div>
   );
 }

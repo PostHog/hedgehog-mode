@@ -164,6 +164,16 @@ Repo layout:
 - [`playground/`](./playground) — Next.js demo app (the easiest way to try changes)
 - [`texturepacker/`](./texturepacker) — sprite-sheet generation tooling
 
+Every flag the hedgehog can hold is generated from a few lines of code in
+[`texturepacker/flag-generator/countries/`](./texturepacker/flag-generator/countries),
+not drawn by hand. Edit the spec, then:
+
+```sh
+pnpm flags:preview /tmp/f.png --only nepal   # preview without writing anything
+pnpm flags                                   # regenerate the flags and repack the sprite sheet
+pnpm flags:check                             # what CI runs: is anything stale?
+```
+
 PRs welcome. Bonus points for new accessories.
 
 ## License

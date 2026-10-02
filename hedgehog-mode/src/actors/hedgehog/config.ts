@@ -1,4 +1,5 @@
 import { sample } from "../../misc/utils";
+import type { HedgehogActorFlagOption } from "./flags";
 
 export const HedgehogActorSkinOptions = [
   "default",
@@ -10,46 +11,12 @@ export const HedgehogActorSkinOptions = [
 
 export type HedgehogActorSkinOption = (typeof HedgehogActorSkinOptions)[number];
 
-export const HedgehogActorFlagOptions = [
-  "turkiye",
-  "mexico",
-  "italy",
-  "france",
-  "spain",
-  "germany",
-  "poland",
-  "japan",
-  "south-korea",
-  "china",
-  "brazil",
-  "earth",
-] as const;
-
-export type HedgehogActorFlagOption = (typeof HedgehogActorFlagOptions)[number];
-
-/**
- * Something the hedgehog holds — a flag on a pole, or the globe — on top of
- * whatever skin it's wearing. A `flag` is a flat `flags/<flag>.png` cloth that
- * the engine waves from a shared `props/pole.png`; a `globe` spins through
- * `props/<flag>/tile`. The customization menu shows `icons/<flag>.png`.
- */
-export const HedgehogActorFlags: Record<
-  HedgehogActorFlagOption,
-  { kind: "flag" | "globe" }
-> = {
-  turkiye: { kind: "flag" },
-  mexico: { kind: "flag" },
-  italy: { kind: "flag" },
-  france: { kind: "flag" },
-  spain: { kind: "flag" },
-  germany: { kind: "flag" },
-  poland: { kind: "flag" },
-  japan: { kind: "flag" },
-  "south-korea": { kind: "flag" },
-  china: { kind: "flag" },
-  brazil: { kind: "flag" },
-  earth: { kind: "globe" },
-};
+export {
+  HedgehogActorFlagOptions,
+  HedgehogActorFlags,
+  searchFlags,
+} from "./flags";
+export type { HedgehogActorFlagInfo, HedgehogActorFlagOption } from "./flags";
 
 export const HedgehogActorColorOptions = [
   "green",

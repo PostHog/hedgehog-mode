@@ -3,7 +3,6 @@ import { HedgehogModeInterface } from "../types";
 import {
   getRandomAccessoryCombo,
   HedgehogActorColorOptions,
-  HedgehogActorFlagOptions,
 } from "../actors/hedgehog/config";
 import { ShovedElement } from "../items/ShovedElement";
 
@@ -91,16 +90,6 @@ export class GlobalKeyboardListeners {
           });
         },
       },
-      // Type a flag's name to wave it ("france", "south-korea", ...).
-      // The globe is left out: "earth" would fire halfway through "earthquake".
-      ...HedgehogActorFlagOptions.filter((flag) => flag !== "earth").map(
-        (flag) => ({
-          keys: flag.split(""),
-          action: () => {
-            this.game.getPlayableHedgehog()?.updateOptions({ flag });
-          },
-        })
-      ),
       {
         keys: ["r", "a", "m", "p", "a", "g", "e"],
         action: () => {

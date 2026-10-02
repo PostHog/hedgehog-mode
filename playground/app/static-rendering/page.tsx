@@ -120,8 +120,25 @@ export default function StaticRendering() {
       <div>
         <h2 className="text-2xl font-bold">Flags</h2>
         <div className="flex flex-wrap gap-2">
+          {HedgehogActorFlagOptions.map((flag) => (
+            <span key={flag} title={flag}>
+              <StaticHedgehog
+                options={{ id: `hedgehog-${flag}`, flag }}
+                size={80}
+                assetsUrl="/assets"
+              />
+            </span>
+          ))}
+        </div>
+      </div>
+      <div>
+        {/* Every flag on every skin is ~1000 hedgehogs; these cover the cases
+            that differ per skin: a plain cloth, a non-rectangular one, and
+            the globe. */}
+        <h2 className="text-2xl font-bold">Flags on every skin</h2>
+        <div className="flex flex-wrap gap-2">
           {HedgehogActorSkinOptions.flatMap((skin) =>
-            HedgehogActorFlagOptions.map((flag) => (
+            (["united-states", "nepal", "earth"] as const).map((flag) => (
               <span key={`${skin}-${flag}`} title={`${skin} + ${flag}`}>
                 <StaticHedgehog
                   options={{ id: `hedgehog-${skin}-${flag}`, skin, flag }}

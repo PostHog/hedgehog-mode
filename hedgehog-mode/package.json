@@ -1,6 +1,6 @@
 {
   "name": "@posthog/hedgehog-mode",
-  "version": "0.0.60",
+  "version": "0.0.61",
   "description": "hedgehog mode",
   "license": "MIT",
   "author": "Ben White",

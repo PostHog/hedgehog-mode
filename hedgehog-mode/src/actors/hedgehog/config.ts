@@ -11,7 +11,6 @@ export const HedgehogActorSkinOptions = [
 
 export type HedgehogActorSkinOption = (typeof HedgehogActorSkinOptions)[number];
 
-// ~200 entries, so they live in their own file.
 export {
   HedgehogActorFlagOptions,
   HedgehogActorFlags,

@@ -6,6 +6,7 @@ import {
   HedgehogActorFlags,
 } from "../actors/hedgehog/config";
 import { FLAG_CLOTH_ORIGIN, FLAG_GLOBE_CENTER } from "../sprites/flag-layout";
+import { FLAG_CLOTH_BANDS } from "../sprites/flag-shear";
 
 type SpriteFrame = {
   frame: { x: number; y: number; w: number; h: number };
@@ -145,11 +146,32 @@ function StaticFlag({
   return (
     <>
       <div style={getSpriteStyle("props/pole.png", assetsUrl)} />
-      {placedSprite(name, assetsUrl, {
-        x: 40 + FLAG_CLOTH_ORIGIN.x,
-        y: 40 + FLAG_CLOTH_ORIGIN.y,
-        ...size,
-      })}
+      {/* Band by band, sheared to follow the leaning pole (see flag-shear). */}
+      {FLAG_CLOTH_BANDS.map(({ row, height, shift }) => (
+        <div
+          key={row}
+          style={{
+            position: "absolute",
+            left: `${((40 + FLAG_CLOTH_ORIGIN.x + shift) / 80) * 100}%`,
+            top: `${((40 + FLAG_CLOTH_ORIGIN.y + row) / 80) * 100}%`,
+            width: `${(size.w / 80) * 100}%`,
+            height: `${(height / 80) * 100}%`,
+            overflow: "hidden",
+          }}
+        >
+          <div
+            style={{
+              position: "absolute",
+              left: 0,
+              top: `${(-row / height) * 100}%`,
+              width: "100%",
+              height: `${(size.h / height) * 100}%`,
+            }}
+          >
+            <div style={getSpriteStyle(name, assetsUrl)} />
+          </div>
+        </div>
+      ))}
     </>
   );
 }

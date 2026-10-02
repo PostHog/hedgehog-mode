@@ -51,6 +51,8 @@ vi.mock("pixi.js", () => {
     AnimatedSprite: class {},
     Sprite: class {},
     Graphics: class {},
+    Mesh: class {},
+    MeshGeometry: class {},
     ColorMatrixFilter: class {},
     Texture: class {},
     Spritesheet: class {},

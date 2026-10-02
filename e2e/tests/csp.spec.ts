@@ -128,13 +128,13 @@ for (const route of ROUTES) {
       expect(canvas!.contextLost).toBe(false);
 
       // Spawning exercises sprites, filters and accessories — the shader-heavy paths where
-      // pixi generates code.
+      // pixi generates code. The flag's cloth is a mesh, a render path of its own.
       const before = await page.evaluate(
         () => window.__game!.getAllHedgehogs().length
       );
       await page.evaluate(() => {
         for (let i = 0; i < 5; i++) {
-          window.__game!.spawnHedgehog({ id: `csp-spec-${i}` });
+          window.__game!.spawnHedgehog({ id: `csp-spec-${i}`, flag: "spain" });
         }
       });
       await expect

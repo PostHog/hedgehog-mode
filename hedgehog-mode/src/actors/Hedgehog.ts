@@ -324,7 +324,11 @@ export class HedgehogActor extends Actor {
 
   /** Whether he's currently treating your layout as a bouncy castle. */
   get isRampaging(): boolean {
-    return this.isGiant || !!this.rampageTimer;
+    return (
+      this.isGiant ||
+      !!this.rampageTimer ||
+      !!this.skinDefinition.alwaysRampaging
+    );
   }
 
   /**

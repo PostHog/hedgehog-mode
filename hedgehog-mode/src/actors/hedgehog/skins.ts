@@ -34,6 +34,8 @@ export interface HedgehogSkinDefinition {
   collisionMask: number;
   /** Accessory anchor override (defaults to centre when omitted). */
   accessoryAnchor?: { x: number; y: number };
+  /** Permanently rampaging: anything he lands on gets knocked off the page. */
+  alwaysRampaging?: boolean;
   /** Build the skin's active ability, if it has one. */
   createAbility?: (
     actor: HedgehogActor,
@@ -71,6 +73,8 @@ export const HEDGEHOG_SKINS: Record<
   hogzilla: {
     ...DEFAULT_SKIN,
     accessoryAnchor: { x: 0.45, y: 0.5 },
+    // A kaiju who politely steps around your navbar is just a lizard.
+    alwaysRampaging: true,
     createAbility: (actor, game) => new HogzillaAbility(actor, game),
   },
   ghost: {

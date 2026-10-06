@@ -139,6 +139,15 @@ export function HedgehogCustomization({
                 web-slinging target. hold the web and press W / S to climb up
                 and down it.
               </>
+            ) : config.skin === "pig" ? (
+              <>
+                oink. so you thought posthog was about hogs? fair. the hedgehog
+                took the day off and i'm covering. same job, fewer spikes, much
+                better snout [citation needed].
+                <br />
+                you can move me around by clicking and dragging or control me
+                with WASD / arrow keys. press F and i'll oink at you.
+              </>
             ) : config.skin === "robohog" ? (
               <>
                 RoboHog reporting for duty. dead or alive, you're coding with

@@ -25,6 +25,7 @@ describe("public hedgehog configuration", () => {
       "robohog",
       "hogzilla",
       "ghost",
+      "pig",
     ]);
   });
 

@@ -106,6 +106,17 @@ export class SpiderHogAbility implements HedgehogSkinAbility {
 }
 
 /** Hogzilla breathes fire — a fireball in the direction it's facing. */
+/** The pig's `f` key: it oinks, and gently clears up the naming confusion. */
+export class PigAbility implements HedgehogSkinAbility {
+  constructor(private actor: HedgehogActor) {}
+
+  fire(): void {
+    this.actor.interface.oink();
+  }
+
+  destroy(): void {}
+}
+
 export class HogzillaAbility implements HedgehogSkinAbility {
   constructor(
     private actor: HedgehogActor,

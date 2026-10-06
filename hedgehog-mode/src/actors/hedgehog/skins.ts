@@ -5,6 +5,7 @@ import { COLLISIONS } from "../../misc/collisions";
 import {
   HedgehogSkinAbility,
   HogzillaAbility,
+  PigAbility,
   SpiderHogAbility,
 } from "./abilities";
 import { HedgehogActorSkinOption } from "./config";
@@ -92,6 +93,13 @@ export const HEDGEHOG_SKINS: Record<
     // The ghost drifts through everything except the ground.
     collisionMask: COLLISIONS.GROUND,
     accessoryAnchor: { x: 0.4, y: 0.55 },
+  },
+  pig: {
+    ...DEFAULT_SKIN,
+    // A little more pork, a little less spring. Pigs don't fly.
+    body: { ...DEFAULT_SKIN.body, density: 0.0015 },
+    jumpVelocity: -13,
+    createAbility: (actor) => new PigAbility(actor),
   },
 };
 

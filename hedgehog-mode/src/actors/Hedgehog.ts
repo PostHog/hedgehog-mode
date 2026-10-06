@@ -22,6 +22,7 @@ import type { SpiderWebActor } from "../items/SpiderWebActor";
 import { BODY_Y_OFFSETS } from "../sprites/body-offsets";
 import { FLAG_CLOTH_ORIGIN, FLAG_GLOBE_CENTER } from "../sprites/flag-layout";
 import type { AvailableSpriteFrames } from "../sprites/sprites";
+import { accessoryFrameName } from "../sprites/accessory-frame";
 import { FlagCloth } from "./hedgehog/flag-cloth";
 
 // While holding a flag only these play: waving etc. would need a free paw.
@@ -701,12 +702,13 @@ export class HedgehogActor extends Actor {
     this.accessorySprites = {};
 
     this.options.accessories?.forEach((accessory) => {
+      const frameName = accessoryFrameName(this.options.skin, accessory);
       const frame = this.game.spritesManager.getSpriteFrames(
-        `accessories/${accessory}.png`
+        frameName as AvailableSpriteFrames
       );
 
       if (!frame) {
-        this.game.log("Frame not found!", `accessories/${accessory}.png`);
+        this.game.log("Frame not found!", frameName);
         return;
       }
 

@@ -11,6 +11,7 @@ import {
   searchFlags,
 } from "../src/actors/hedgehog/config";
 import sprites from "../assets/sprites.json";
+import { accessoryFrameName } from "../src/sprites/accessory-frame";
 
 const ofKind = (kind: HedgehogActorFlagInfo["kind"]) =>
   HedgehogActorFlagOptions.filter(
@@ -103,6 +104,16 @@ describe("public hedgehog configuration", () => {
     expect(HedgehogActorAccessoryOptions).toEqual(
       Object.keys(HedgehogActorAccessories)
     );
+  });
+
+  it.each([
+    ["pig", "xmas-antlers", "skins/pig/accessories/xmas-antlers.png"],
+    ["pig", "tophat", "accessories/tophat.png"],
+    ["default", "xmas-antlers", "accessories/xmas-antlers.png"],
+    [null, "xmas-antlers", "accessories/xmas-antlers.png"],
+  ])("dresses a %s skin in %s from %s", (skin, accessory, frame) => {
+    expect(accessoryFrameName(skin, accessory)).toBe(frame);
+    expect(sprites.frames).toHaveProperty([frame]);
   });
 
   it("generates valid accessory combinations", () => {

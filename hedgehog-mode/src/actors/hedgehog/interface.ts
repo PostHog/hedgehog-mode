@@ -56,6 +56,12 @@ const cheatSheetMessages: GameUIProps["messages"] = [
   },
   {
     words: [
+      "came here for hogs? type",
+      { text: "oink", style: { color: "hotpink", fontWeight: "bold" } },
+    ],
+  },
+  {
+    words: [
       "feel",
       { text: "giant", style: { fontWeight: "bold", fontSize: "1.2em" } },
       "or get",

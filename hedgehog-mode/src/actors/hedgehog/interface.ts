@@ -56,6 +56,12 @@ const cheatSheetMessages: GameUIProps["messages"] = [
   },
   {
     words: [
+      "came here for hogs? type",
+      { text: "oink", style: { color: "hotpink", fontWeight: "bold" } },
+    ],
+  },
+  {
+    words: [
       "feel",
       { text: "giant", style: { fontWeight: "bold", fontSize: "1.2em" } },
       "or get",
@@ -326,6 +332,27 @@ export class HedgehogActorInterface {
     cheatSheetMessages,
   ];
 
+  // What the pig says when you press `f`. Mostly oink.
+  private oinkMessages: GameUIProps["messages"][] = [
+    [{ words: [{ text: "oink.", style: { fontWeight: "bold" } }] }],
+    [{ words: ["oink oink. that's", '"ship it"', "in pig"] }],
+    [
+      { words: ["you said posthog. i heard", '"hog".', "here i am"] },
+      { words: ["the hedgehog is fine. he's just on a break"] },
+    ],
+    [{ words: ["i'm not a hedgehog, i'm a full-stack hog"] }],
+    [{ words: ["rolling around in the data lake. it's mostly mud"] }],
+    [
+      {
+        words: [
+          "my KPIs?",
+          { text: "snacks", style: { fontWeight: "bold" } },
+          "and naps. both up and to the right",
+        ],
+      },
+    ],
+  ];
+
   // Said once, at the top of a rampage, by way of justification.
   private rampageMessages: GameUIProps["messages"][] = [
     [
@@ -401,6 +428,10 @@ export class HedgehogActorInterface {
       actor: this.actor,
       messages: cheatSheetMessages,
     });
+  }
+
+  oink(): void {
+    this.triggerMessages(sample(this.oinkMessages)!);
   }
 
   triggerMessages(messages: GameUIProps["messages"]): void {

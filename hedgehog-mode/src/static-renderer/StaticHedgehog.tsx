@@ -5,6 +5,7 @@ import {
   HedgehogActorColorOption,
   HedgehogActorFlags,
 } from "../actors/hedgehog/config";
+import { accessoryFrameName } from "../sprites/accessory-frame";
 import { FLAG_CLOTH_ORIGIN, FLAG_GLOBE_CENTER } from "../sprites/flag-layout";
 import { FLAG_CLOTH_BANDS } from "../sprites/flag-shear";
 
@@ -214,7 +215,7 @@ export function StaticHedgehog({
 
       {/* Accessories */}
       {options.accessories?.map((accessory) => {
-        const accessoryName = `accessories/${accessory}.png`;
+        const accessoryName = accessoryFrameName(options.skin, accessory);
         const accessoryStyle = getSpriteStyle(accessoryName, assetsUrl);
 
         return (

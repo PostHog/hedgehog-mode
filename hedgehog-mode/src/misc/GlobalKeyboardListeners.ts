@@ -91,6 +91,14 @@ export class GlobalKeyboardListeners {
         },
       },
       {
+        keys: ["o", "i", "n", "k"],
+        action: () => {
+          const hedgehog = this.game.getPlayableHedgehog();
+          hedgehog?.updateOptions({ skin: "pig" });
+          hedgehog?.interface.oink();
+        },
+      },
+      {
         keys: ["r", "a", "m", "p", "a", "g", "e"],
         action: () => {
           this.game.getPlayableHedgehog()?.startRampage();

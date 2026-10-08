@@ -12,6 +12,7 @@ import {
 } from "../src/actors/hedgehog/config";
 import sprites from "../assets/sprites.json";
 import { accessoryFrameName } from "../src/sprites/accessory-frame";
+import { AvailableSkins } from "../src/sprites/sprites";
 
 const ofKind = (kind: HedgehogActorFlagInfo["kind"]) =>
   HedgehogActorFlagOptions.filter(
@@ -28,6 +29,14 @@ describe("public hedgehog configuration", () => {
       "ghost",
       "pig",
     ]);
+  });
+
+  // A skin missing from AvailableSkins is drawn as the default hedgehog. Some
+  // skins idle on a single frame (no `idle/tile` animation), so this is the
+  // check that matters, not whether an idle animation exists.
+  it.each(HedgehogActorSkinOptions)("ships sprites for the %s skin", (skin) => {
+    expect(AvailableSkins.has(skin)).toBe(true);
+    expect(sprites.frames).toHaveProperty([`skins/${skin}/idle/tile000.png`]);
   });
 
   it("ships sprites for every flag", () => {

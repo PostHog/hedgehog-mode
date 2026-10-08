@@ -13,7 +13,11 @@ import gsap from "gsap";
 import { COLLISIONS } from "../misc/collisions";
 import { HedgehogActorAI } from "./hedgehog/ai";
 import { HedgehogActorControls } from "./hedgehog/controls";
-import { HedgehogActorFlags, HedgehogActorOptions } from "./hedgehog/config";
+import {
+  HedgehogActorFlagInfo,
+  HedgehogActorFlags,
+  HedgehogActorOptions,
+} from "./hedgehog/config";
 import { HedgehogActorInterface } from "./hedgehog/interface";
 import { applyStaticColor } from "./hedgehog/colors";
 import type { HedgehogSkinAbility } from "./hedgehog/abilities";
@@ -21,7 +25,7 @@ import { getSkinDefinition, HedgehogSkinDefinition } from "./hedgehog/skins";
 import type { SpiderWebActor } from "../items/SpiderWebActor";
 import { BODY_Y_OFFSETS } from "../sprites/body-offsets";
 import { FLAG_CLOTH_ORIGIN, FLAG_GLOBE_CENTER } from "../sprites/flag-layout";
-import type { AvailableSpriteFrames } from "../sprites/sprites";
+import { AvailableSkins, type AvailableSpriteFrames } from "../sprites/sprites";
 import { accessoryFrameName } from "../sprites/accessory-frame";
 import { FlagCloth } from "./hedgehog/flag-cloth";
 
@@ -179,14 +183,7 @@ export class HedgehogActor extends Actor {
     ) {
       return;
     }
-    let skin = options.forceSkin ?? this.options.skin ?? "default";
-    // Play the default body for skins we don't know (e.g. a stale skin saved
-    // by an older version) rather than spawning without a sprite.
-    if (
-      !this.game.spritesManager.toAvailableAnimation(`skins/${skin}/idle/tile`)
-    ) {
-      skin = "default";
-    }
+    const skin = this.resolveSpriteSkin(options.forceSkin ?? this.options.skin);
     const idleAnimation = `skins/${skin}/idle/tile`;
     const possibleAnimation = `skins/${skin}/${sprite}/tile`;
 
@@ -216,6 +213,33 @@ export class HedgehogActor extends Actor {
     });
     this.sprite!.filters = [this.filter];
     this.sprite!.alpha = this.skinDefinition.spriteAlpha;
+  }
+
+  // The skin whose sprites he's drawn with. Skins we don't know (e.g. a stale
+  // skin saved by an older version) get the default body rather than no
+  // sprite. Ask about the skin, not its idle: spiderhog, robohog and hogzilla
+  // idle on a single frame, so the atlas has no `idle/tile` animation for them.
+  private resolveSpriteSkin(skin: string | null | undefined): string {
+    return skin && AvailableSkins.has(skin) ? skin : "default";
+  }
+
+  // A skin change otherwise only shows on his next walk/jump/fall, so a hog
+  // standing still would keep wearing the old one. Replay what he's doing in
+  // the new skin; if it can't do that, idle, or walk for the skins that idle on
+  // a single frame (which is what they already do when they stop walking).
+  private syncSkinSprite(): void {
+    // A pose or the death animation finishes on its own and repaints in the
+    // right skin then; replaying it here would drop its onComplete.
+    if (!this.currentAnimation || this.posing || this.isDead) {
+      return;
+    }
+    const prefix = `skins/${this.resolveSpriteSkin(this.options.skin)}/`;
+    for (const sprite of [this.currentSprite, "idle", "walk"]) {
+      this.updateSprite(sprite);
+      if (this.currentAnimation.startsWith(prefix)) {
+        return;
+      }
+    }
   }
 
   get currentSprite(): string {
@@ -253,12 +277,16 @@ export class HedgehogActor extends Actor {
   }
 
   updateOptions(options: Partial<HedgehogActorOptions>): void {
+    const previousSkin = this.options.skin;
     this.options = { ...this.options, ...options };
     this.ai.enable(this.options.ai_enabled ?? true);
     this.syncAccessories();
     this.syncFlag();
     this.syncRigidBody();
     this.syncSkinAbility();
+    if (this.options.skin !== previousSkin) {
+      this.syncSkinSprite();
+    }
   }
 
   public override setScale(scale: number): void {
@@ -364,6 +392,9 @@ export class HedgehogActor extends Actor {
           this.updateSprite("idle");
         },
       });
+      // Skins without a headband (and hogs holding a flag) skip the flourish,
+      // and then nothing would ever call onComplete to let him move again.
+      this.posing = this.currentSprite === "action";
       this.interface.announceRampage();
     }
   }
@@ -655,7 +686,10 @@ export class HedgehogActor extends Actor {
    * The flag mirrors along with the hedgehog when it faces left, which would
    * read a flag (or the continents) backwards. Undo that for the picture only:
    * the cloth shows its picture in reverse, so it stays hoisted at the pole,
-   * and the globe flips back about its own centre.
+   * and the globe flips back about its own centre. Except a shaped cloth
+   * (Nepal): its outline is part of the picture, so reversing it would put
+   * the straight hoist edge at the free end and hang it off the pole by its
+   * tips. That one just mirrors, like a real flag seen from behind.
    */
   private syncFlagFacing(): void {
     const left = this.getDirection() === "left";
@@ -664,7 +698,12 @@ export class HedgehogActor extends Actor {
       return;
     }
     this.flagFacingLeft = left;
-    this.flagCloth?.setMirrored(left);
+    const info: HedgehogActorFlagInfo | undefined = this.flagName
+      ? HedgehogActorFlags[this.flagName]
+      : undefined;
+    if (!info?.shaped) {
+      this.flagCloth?.setMirrored(left);
+    }
     if (this.flagGlobe) {
       this.flagGlobe.scale.x = left ? -1 : 1;
     }

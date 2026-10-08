@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -12,6 +13,9 @@ import {
 } from "../src/actors/hedgehog/config";
 import sprites from "../assets/sprites.json";
 import { accessoryFrameName } from "../src/sprites/accessory-frame";
+import { AvailableSkins } from "../src/sprites/sprites";
+// @ts-expect-error untyped .mjs helper shared with the flag generator
+import { decodePng } from "../../texturepacker/flag-generator/png.mjs";
 
 const ofKind = (kind: HedgehogActorFlagInfo["kind"]) =>
   HedgehogActorFlagOptions.filter(
@@ -28,6 +32,14 @@ describe("public hedgehog configuration", () => {
       "ghost",
       "pig",
     ]);
+  });
+
+  // A skin missing from AvailableSkins is drawn as the default hedgehog. Some
+  // skins idle on a single frame (no `idle/tile` animation), so this is the
+  // check that matters, not whether an idle animation exists.
+  it.each(HedgehogActorSkinOptions)("ships sprites for the %s skin", (skin) => {
+    expect(AvailableSkins.has(skin)).toBe(true);
+    expect(sprites.frames).toHaveProperty([`skins/${skin}/idle/tile000.png`]);
   });
 
   it("ships sprites for every flag", () => {
@@ -49,6 +61,26 @@ describe("public hedgehog configuration", () => {
       .filter((name) => name.startsWith("flags/"))
       .map((name) => name.slice("flags/".length, -".png".length));
     expect(cloths.sort()).toEqual(ofKind("flag").sort());
+  });
+
+  it("marks exactly the shaped cloths as shaped", () => {
+    // A cloth with see-through pixels has its outline in the picture, so it
+    // can't be read the right way round facing left without leaving the pole.
+    // Miss the flag and the next pennant hangs off by its tips.
+    const withHoles = ofKind("flag").filter((flag) => {
+      const { data } = decodePng(
+        readFileSync(`../texturepacker/assets/flags/${flag}.png`)
+      );
+      return data.some(
+        (value: number, i: number) => i % 4 === 3 && value < 255
+      );
+    });
+    const shaped = ofKind("flag").filter((flag) => {
+      const info: HedgehogActorFlagInfo = HedgehogActorFlags[flag];
+      return info.shaped;
+    });
+    expect(shaped).toEqual(withHoles);
+    expect(shaped).toEqual(["nepal"]);
   });
 
   it("has every flag once", () => {

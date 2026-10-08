@@ -24,6 +24,13 @@ export type HedgehogActorFlagInfo = {
   code?: string;
   /** Other names people search for ("holland", "burma", "ivory coast"). */
   aliases?: readonly string[];
+  /**
+   * The cloth isn't a full rectangle: its outline is part of the picture
+   * (Nepal). Facing left it mirrors with the hedgehog instead of reading the
+   * right way round, or its hoist would end up at the free end, off the pole.
+   * Set exactly when the cloth has transparent pixels; a test checks.
+   */
+  shaped?: boolean;
 };
 
 export const HedgehogActorFlags = {
@@ -261,7 +268,7 @@ export const HedgehogActorFlags = {
   myanmar: { kind: "flag", name: "Myanmar", code: "MM", aliases: ["burma"] },
   namibia: { kind: "flag", name: "Namibia", code: "NA" },
   nauru: { kind: "flag", name: "Nauru", code: "NR" },
-  nepal: { kind: "flag", name: "Nepal", code: "NP" },
+  nepal: { kind: "flag", name: "Nepal", code: "NP", shaped: true },
   netherlands: {
     kind: "flag",
     name: "Netherlands",

@@ -13,7 +13,11 @@ import gsap from "gsap";
 import { COLLISIONS } from "../misc/collisions";
 import { HedgehogActorAI } from "./hedgehog/ai";
 import { HedgehogActorControls } from "./hedgehog/controls";
-import { HedgehogActorFlags, HedgehogActorOptions } from "./hedgehog/config";
+import {
+  HedgehogActorFlagInfo,
+  HedgehogActorFlags,
+  HedgehogActorOptions,
+} from "./hedgehog/config";
 import { HedgehogActorInterface } from "./hedgehog/interface";
 import { applyStaticColor } from "./hedgehog/colors";
 import type { HedgehogSkinAbility } from "./hedgehog/abilities";
@@ -682,7 +686,10 @@ export class HedgehogActor extends Actor {
    * The flag mirrors along with the hedgehog when it faces left, which would
    * read a flag (or the continents) backwards. Undo that for the picture only:
    * the cloth shows its picture in reverse, so it stays hoisted at the pole,
-   * and the globe flips back about its own centre.
+   * and the globe flips back about its own centre. Except a shaped cloth
+   * (Nepal): its outline is part of the picture, so reversing it would put
+   * the straight hoist edge at the free end and hang it off the pole by its
+   * tips. That one just mirrors, like a real flag seen from behind.
    */
   private syncFlagFacing(): void {
     const left = this.getDirection() === "left";
@@ -691,7 +698,12 @@ export class HedgehogActor extends Actor {
       return;
     }
     this.flagFacingLeft = left;
-    this.flagCloth?.setMirrored(left);
+    const info: HedgehogActorFlagInfo | undefined = this.flagName
+      ? HedgehogActorFlags[this.flagName]
+      : undefined;
+    if (!info?.shaped) {
+      this.flagCloth?.setMirrored(left);
+    }
     if (this.flagGlobe) {
       this.flagGlobe.scale.x = left ? -1 : 1;
     }

@@ -11,7 +11,7 @@ import "pixi.js/unsafe-eval";
 import gsap from "gsap";
 
 import Matter, { Render, Runner } from "matter-js";
-import { Application } from "pixi.js";
+import { Application, GlUniformGroupSystem } from "pixi.js";
 import {
   HedgehogModeInterface,
   GameElement,
@@ -32,6 +32,14 @@ import { GameStateManager } from "./state";
 import { uniqueId } from "./misc/utils";
 import { HedgehogGhostActor } from "./actors/Ghost";
 import { Accessory } from "./items/Accessory";
+import { guardMissingUniforms } from "./misc/uniformSync";
+
+const uniformGroupSystem = GlUniformGroupSystem.prototype as unknown as {
+  _generateUniformsSync: Parameters<typeof guardMissingUniforms>[0];
+};
+uniformGroupSystem._generateUniformsSync = guardMissingUniforms(
+  uniformGroupSystem._generateUniformsSync
+);
 
 export type {
   HedgehogActorOptions,

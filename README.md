@@ -150,7 +150,7 @@ Next 16 ships its own vendored React canary. With Turbopack, that vendored `reac
 
 Want to add a skin, fix a bug, or just poke around?
 
-Use Node.js 24.18.0 and pnpm 10.29.3. The repository includes an `.nvmrc` for the Node.js version.
+Use Node.js 24.22.3 and pnpm 10.29.3. The repository includes an `.nvmrc` for the Node.js version.
 
 ```sh
 pnpm install

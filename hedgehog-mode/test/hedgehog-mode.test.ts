@@ -48,6 +48,7 @@ vi.mock("pixi.js", () => {
 
   return {
     Application: MockApplication,
+    GlUniformGroupSystem: class {},
     AnimatedSprite: class {},
     Sprite: class {},
     Graphics: class {},

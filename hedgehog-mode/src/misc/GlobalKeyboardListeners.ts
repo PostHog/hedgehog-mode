@@ -1,6 +1,7 @@
 import { range, sample, uniqueId } from "./utils";
 import { HedgehogModeInterface } from "../types";
 import {
+  HedgehogActorAccessories,
   getRandomAccessoryCombo,
   HedgehogActorColorOptions,
 } from "../actors/hedgehog/config";
@@ -96,6 +97,28 @@ export class GlobalKeyboardListeners {
           const hedgehog = this.game.getPlayableHedgehog();
           hedgehog?.updateOptions({ skin: "pig" });
           hedgehog?.interface.oink();
+        },
+      },
+      {
+        keys: ["l", "i", "f", "t", "o", "f", "f"],
+        action: () => {
+          const hedgehog = this.game.getPlayableHedgehog();
+          if (!hedgehog) {
+            return;
+          }
+          // Swap whatever hat it had for the helmet; keep eyewear and the rest.
+          hedgehog.updateOptions({
+            accessories: [
+              ...(hedgehog.options.accessories ?? []).filter(
+                (accessory) =>
+                  HedgehogActorAccessories[accessory].group !== "headwear"
+              ),
+              "space-helmet",
+            ],
+          });
+          hedgehog.interface.triggerMessages([
+            { words: ["houston, we have a hog"] },
+          ]);
         },
       },
       {

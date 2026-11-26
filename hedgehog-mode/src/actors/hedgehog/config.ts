@@ -74,6 +74,9 @@ export const HedgehogActorAccessories = {
   pineapple: {
     group: "headwear",
   },
+  "space-helmet": {
+    group: "headwear",
+  },
   sunglasses: {
     group: "eyewear",
   },

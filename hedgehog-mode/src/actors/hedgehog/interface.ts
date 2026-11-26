@@ -62,6 +62,12 @@ const cheatSheetMessages: GameUIProps["messages"] = [
   },
   {
     words: [
+      "need some space? type",
+      { text: "liftoff", style: { color: "#1d4aff", fontWeight: "bold" } },
+    ],
+  },
+  {
+    words: [
       "feel",
       { text: "giant", style: { fontWeight: "bold", fontSize: "1.2em" } },
       "or get",

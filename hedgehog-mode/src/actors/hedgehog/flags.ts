@@ -10,7 +10,8 @@
  * Every UN member and observer state, plus Taiwan, Kosovo and Western Sahara,
  * the UK's home nations, the EU and the UN, and every territory with a flag of
  * its own — the ISO 3166-1 set, minus places that just fly their sovereign's
- * flag (Réunion, Svalbard...). Every cloth is drawn by
+ * flag (Réunion, Svalbard...). Plus one that isn't anywhere: a comet, for
+ * hogs back from orbit. Every cloth is drawn by
  * texturepacker/flag-generator — add or fix a flag there, not by hand.
  */
 export type HedgehogActorFlagInfo = {
@@ -38,6 +39,11 @@ export const HedgehogActorFlags = {
     kind: "globe",
     name: "Earth",
     aliases: ["globe", "world", "planet"],
+  },
+  comet: {
+    kind: "flag",
+    name: "Comet",
+    aliases: ["space", "shooting star", "orbit"],
   },
   afghanistan: { kind: "flag", name: "Afghanistan", code: "AF" },
   "aland-islands": { kind: "flag", name: "Åland Islands", code: "AX" },

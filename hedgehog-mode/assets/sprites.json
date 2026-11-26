@@ -6375,6 +6375,14 @@
 	"trimmed": false,
 	"spriteSourceSize": {"x":0,"y":0,"w":80,"h":80},
 	"sourceSize": {"w":80,"h":80}
+},
+"flags/comet.png":
+{
+	"frame": {"x":1840,"y":1863,"w":31,"h":21},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":31,"h":21},
+	"sourceSize": {"w":31,"h":21}
 }},
 "animations": {
 	"overlays/fire/tile": ["overlays/fire/tile000.png","overlays/fire/tile001.png","overlays/fire/tile002.png","overlays/fire/tile003.png","overlays/fire/tile004.png","overlays/fire/tile005.png","overlays/fire/tile006.png","overlays/fire/tile007.png","overlays/fire/tile008.png","overlays/fire/tile009.png","overlays/fire/tile010.png","overlays/fire/tile011.png","overlays/fire/tile012.png","overlays/fire/tile013.png"],

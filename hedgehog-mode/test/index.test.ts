@@ -85,14 +85,15 @@ describe("public hedgehog configuration", () => {
 
   it("has every flag once", () => {
     // 193 UN members + 2 observers + Taiwan, Kosovo, Western Sahara + 4 home
-    // nations + the EU and UN + 37 territories with flags of their own.
+    // nations + the EU and UN + 37 territories with flags of their own + the
+    // comet.
     const flags = ofKind("flag");
-    expect(flags).toHaveLength(241);
+    expect(flags).toHaveLength(242);
     const codes = flags.flatMap((flag) => {
       const info: HedgehogActorFlagInfo = HedgehogActorFlags[flag];
       return info.code ?? [];
     });
-    // Everything but the UN has a code, and no two share one.
+    // Everything but the UN and the comet has a code, and no two share one.
     expect(new Set(codes).size).toBe(240);
   });
 
@@ -109,6 +110,7 @@ describe("public hedgehog configuration", () => {
       ["sao tome", "sao-tome-and-principe"],
       ["  Côte  ", "cote-divoire"],
       ["planet", "earth"],
+      ["space", "comet"],
       ["tw", "taiwan"],
       ["scotland", "scotland"],
       ["eu", "european-union"],

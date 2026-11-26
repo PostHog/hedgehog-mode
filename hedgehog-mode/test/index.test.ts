@@ -141,6 +141,7 @@ describe("public hedgehog configuration", () => {
   it.each([
     ["pig", "xmas-antlers", "skins/pig/accessories/xmas-antlers.png"],
     ["pig", "tophat", "accessories/tophat.png"],
+    ["default", "space-helmet", "accessories/space-helmet.png"],
     ["default", "xmas-antlers", "accessories/xmas-antlers.png"],
     [null, "xmas-antlers", "accessories/xmas-antlers.png"],
   ])("dresses a %s skin in %s from %s", (skin, accessory, frame) => {

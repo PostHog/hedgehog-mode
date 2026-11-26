@@ -548,3 +548,26 @@ export const [SAIL_TOP, SAIL_BASE] = [1, 15];
  * bottom.
  */
 export const ARM = MID_Y - 1;
+
+/**
+ * A comet's tail streak (the comet): a 1px line from (x0, y0) at the head to
+ * (x1, y1) at the tip, split into equal runs that cool through `colors`,
+ * head first. Interior pixels.
+ * @param {number} x0
+ * @param {number} y0
+ * @param {number} x1
+ * @param {number} y1
+ * @param {string[]} colors
+ */
+export function streak(x0, y0, x1, y1, colors) {
+  const n = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0));
+  const runs = colors.map(() => []);
+  for (let i = 0; i <= n; i++) {
+    const x = Math.round(x0 + ((x1 - x0) * i) / n);
+    const y = Math.round(y0 + ((y1 - y0) * i) / n);
+    runs[
+      Math.min(colors.length - 1, Math.floor((i / (n + 1)) * colors.length))
+    ].push([x, y]);
+  }
+  return runs.map((cells, i) => pixelCells(cells, colors[i]));
+}
